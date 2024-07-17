@@ -1,6 +1,6 @@
 import React from 'react'
 
-const inventery = () => {
+const inventory = () => {
   return (
     <div>
       inventery
@@ -8,4 +8,4 @@ const inventery = () => {
   )
 }
 
-export default inventery
+export default inventory
