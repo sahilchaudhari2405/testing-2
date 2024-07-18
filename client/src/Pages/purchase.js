@@ -1,7 +1,68 @@
-import React from 'react';
+import React, { useRef,useEffect,useState} from 'react';
 import { FaBarcode } from 'react-icons/fa'; // Import the barcode icon from react-icons
-
+import ReactToPrint from "react-to-print";
+import logo from '../logo.png'
 const Purchase = () => {
+  const sharedClasses = {
+    flex: 'flex',
+    justifyBetween: 'justify-between',
+    itemsCenter: 'items-center',
+    mb4: 'mb-4',
+    border: 'border text-center',
+    p2: 'p-2',
+    fontBold: 'font-bold',
+  }
+  const [list, setList] = useState([]);
+  const [total, setTotal] = useState();
+  const [GST, setGST] = useState();
+  const [discount, setDiscount] = useState();
+
+  const details=[{
+    id:99048945534,
+    description:"product name 1",
+    quantity:2,
+    discount:2,
+    gst:2,
+    price:100
+  },
+  {
+    id:99048945049,
+    description:"product name 2",
+    quantity:1,
+    discount:5,
+    gst:4,
+    price:34,
+
+  },
+  {
+    id:99048945545,
+    description:"product name 3",
+    quantity:3,
+    discount:3,
+    gst:1,
+    price:18,
+
+  },
+  {
+    id:990489454954,
+    description:"product name 4",
+    quantity:4,
+    discount:12,
+    gst:2,
+    price:20,
+
+  }
+  ]
+  useEffect(() => {
+    setList(details);
+    const totalAmount = details.reduce((total, item) => total + (item.price*item.quantity), 0);
+    const disc = details.reduce((total, item) => total + (item.discount*item.quantity), 0);
+    const GST = details.reduce((total, item) => total + ((item.price*item.gst/100)*item.quantity), 0);
+    setTotal(totalAmount);
+    setGST(GST);
+    setDiscount(disc);
+  }, []);
+  const componentRef = useRef();
   return (
     <div className="bg-gray-100 mt-20 p-6 rounded-lg shadow-lg">
       <div className="bg-green-700 text-white p-4 rounded-t-lg flex justify-between items-center">
@@ -177,12 +238,18 @@ const Purchase = () => {
     </div>
     <div class="flex space-x-2">
       <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">Save</button>
-      <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">Save & Print</button>
+     
+           <ReactToPrint
+            trigger={() => (
+              <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">Save & Print</button>
+            )}
+            content={() => componentRef.current}
+          />
       <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">PDF</button>
     </div>
   </div>
 
-        <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
+        {/* <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
             <h2 className="text-lg font-semibold mb-4">Expense</h2>
             <table className="w-full border-collapse">
               <tbody>
@@ -204,8 +271,103 @@ const Purchase = () => {
                 </tr>
               </tbody>
             </table>
-          </div>
+          </div> */}
+
+
+
       </div>
+
+      
+          {/* ---------------------invoice ganrator------------------------- */}
+
+
+          <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200">
+
+            <div ref={componentRef}  className="max-w-4xl mx-auto p-4 bg-white text-black">
+      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
+        <div>
+          <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
+          <p>AAPLA BAJAR</p>
+          <p>SHRIGONDA, AHMADNAGAR</p>
+          <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
+          <p>PHONE: 9849589588</p>
+          <p>EMAIL: aaplabajar1777@gmail.com</p>
+        </div>
+        <div className="w-24 h-24 border flex items-center justify-center">
+          <img src={logo} alt="Insert Logo Above" />
+        </div>
+      </div>
+      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
+        <div>
+          <span className={sharedClasses.fontBold}>INVOICE #: </span>
+          <span>985934857944</span>
+        </div>
+        <div>
+          <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
+          <span>18/07/2024</span>
+        </div>
+      </div>
+      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
+        <div className="w-1/2 pr-2">
+          <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
+          <p>Shivam Bole</p>
+          <p>Pune,Maharashtra</p>
+          <p>Pune,Maharashtra,444003</p>
+          <p>9637837434</p>
+          <p>shivam@gmail.com</p>
+        </div>
+      </div>
+      <table className="w-full border-collapse border mb-4">
+        <thead>
+          <tr className="bg-black text-white">
+            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>QUANTITY</th>
+            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>DESCRIPTION</th>
+            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>GST</th>
+            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>DISCOUNT</th>
+            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>UNIT PRICE</th>
+      
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((e, index) => (
+            <tr key={index}>
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2 + ' h-12'}>{e.quantity}</td>
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.description}</td>
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.gst}</td>
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.discount}</td>
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.price}</td>
+           
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className={`${sharedClasses.flex} justify-end ${sharedClasses.mb4}`}>
+        <div className="w-1/4">
+          <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
+            <span>SUBTOTAL</span>
+            <span>${total}</span>
+          </div>
+          <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
+            <span>DISCOUNT</span>
+            <span>${discount}</span>
+          </div>
+          <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
+            <span>GST</span>
+            <span>${GST}</span>
+          </div>
+          <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
+            <span>TOTAL</span>
+            <span>${total-discount+GST}</span>
+          </div>
+        </div>
+      </div>
+      <div className="mb-4">
+        <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2>
+        <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div>
+      </div>
+      <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
+    </div>
+        </div>
     </div>
   );
 };
