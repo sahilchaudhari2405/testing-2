@@ -56,7 +56,7 @@ const Purchase = () => {
         </div>
         
         {/* New Input Fields */}
-        <div className="flex flex-nowrap space-x-2 mb-6">
+        <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
           <div className=" mb-4">
             <label htmlFor="list" className="block text-gray-700 text-sm font-medium">List</label>
             <input type="checkbox" id="list" className="border border-gray-300 rounded p-2" />
@@ -116,7 +116,7 @@ const Purchase = () => {
             <label htmlFor="amount-paid" className="block text-gray-700 text-sm font-medium">Amount Paid</label>
             <input type="text" id="amount-paid" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter amount paid" />
           </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 m-6">
+          <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 my-6">
             <button className='bg-blue-600 text-white p-2 rounded-md'>Enter</button>
           </div>
         </div>
