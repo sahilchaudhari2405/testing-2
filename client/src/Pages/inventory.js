@@ -17,6 +17,7 @@ const Inventory = () => {
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Print Report</button>
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Excel Report</button>
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate Barcode</button>
+          <button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded">Add Item</button>
         </div>
         
         <div className="flex items-center space-x-2 mb-4 flex-col bg-gray-100 p-3 rounded-md">
@@ -40,7 +41,6 @@ const Inventory = () => {
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Manage HSN</button>
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Manage Units</button>
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Categories</button>
-          <button className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded">Add Item</button>
         </div>
         </div>
        
