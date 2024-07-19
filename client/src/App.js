@@ -13,7 +13,7 @@ import Inventory from './Pages/inventory';
 // import Import from './pages/Import';
 // import More from './pages/More';
 // import Company from './pages/Company';
-// import Users from './pages/Users';
+import Users from './Pages/Users.js';
 // import Settings from './pages/Settings';
 
 const App = () => {
@@ -24,6 +24,8 @@ const App = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/purchase" element={<Purchase />} />
         <Route path="/inventory" element={<Inventory />} />
+        <Route path="/users" element={<Users />} />
+
         {/* <Route path="/sales" element={<Sales />} />
         <Route path="/view" element={<View />} />
         <Route path="/accounts" element={<Accounts />} />
@@ -32,7 +34,6 @@ const App = () => {
         <Route path="/import" element={<Import />} />
         <Route path="/more" element={<More />} />
         <Route path="/company" element={<Company />} />
-        <Route path="/users" element={<Users />} />
         <Route path="/settings" element={<Settings />} /> */}
       </Routes>
     </Router>
