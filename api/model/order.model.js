@@ -11,10 +11,20 @@ const offlineOrderSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "OfflineOrderItem",
     }],
+    Name:{
+        type:String,
+        required:true,
+    },
+    mobileNumber:{
+        type:Number,
+    },
+    email:{
+        type:String,
+        default:'No',
+    },
     orderDate: {
         type: Date,
         required: true,
-        default: Date.now,
     },
     paymentType: {
         cash: {
@@ -73,7 +83,7 @@ const offlineOrderSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now,
+        required:true,
     },
     updatedAt: {
         type: Date,

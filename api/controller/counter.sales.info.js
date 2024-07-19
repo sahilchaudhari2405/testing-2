@@ -1,6 +1,9 @@
 import OfflineCounterSales from "../model/counter.sales.js";
+
 const isSameDay = (date1, date2) => {
-  return date1===date2;
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
 };
 
 const isSameWeek = (date1, date2) => {
@@ -19,10 +22,10 @@ const isSameMonth = (date1, date2) => {
 };
 
 const handleOfflineCounterSales = async (userId, order) => {
-  
-    const orderDate =  new Date();
+    // const dummyDate = new Date('2024-08-11T00:00:00Z');
+    let orderDate = new Date();
     const currentMonth = orderDate.toISOString().slice(0, 7); // YYYY-MM
-    const currentWeek = `${orderDate.getFullYear()}-W${Math.ceil((orderDate.getDate() ) / 7)}`; // YYYY-WW
+    const currentWeek = `${orderDate.getFullYear()}-W${Math.ceil((orderDate.getDate()) / 7)}`; // YYYY-WW
 
     const dailySale = {
         totalPrice: order.totalPrice,
@@ -38,7 +41,7 @@ const handleOfflineCounterSales = async (userId, order) => {
         orderDate: orderDate,
     };
 
-    const week = {
+    const weekSale = {
         totalPrice: order.totalPrice,
         totalDiscountedPrice: order.totalDiscountedPrice,
         GST: order.GST,
@@ -58,7 +61,7 @@ const handleOfflineCounterSales = async (userId, order) => {
         offlineCounterSales = new OfflineCounterSales({
             user: userId,
             dailySales: [dailySale],
-            weekSales: [week],
+            weekSales: [weekSale],
             monthTotalPrice: dailySale.totalPrice,
             monthTotalDiscountedPrice: dailySale.totalDiscountedPrice,
             monthGST: dailySale.GST,
@@ -75,9 +78,9 @@ const handleOfflineCounterSales = async (userId, order) => {
             ? offlineCounterSales.dailySales[offlineCounterSales.dailySales.length - 1]
             : null;
 
-        
-          
-        if (lastSale && lastSale.date===orderDate.getDate()) {
+         const existingDailySale = lastSale; 
+
+        if (existingDailySale && existingDailySale.date===orderDate.getDate()) {
             existingDailySale.totalPrice += dailySale.totalPrice;
             existingDailySale.totalDiscountedPrice += dailySale.totalDiscountedPrice;
             existingDailySale.GST += dailySale.GST;
@@ -96,17 +99,17 @@ const handleOfflineCounterSales = async (userId, order) => {
         );
 
         if (existingWeekSale) {
-            existingWeekSale.totalPrice += dailySale.totalPrice;
-            existingWeekSale.totalDiscountedPrice += dailySale.totalDiscountedPrice;
-            existingWeekSale.GST += dailySale.GST;
-            existingWeekSale.discount += dailySale.discount;
-            existingWeekSale.totalItem += dailySale.totalItem;
-            existingWeekSale.WeekBill += dailySale.DayBill;
-            existingWeekSale.totalRetailPrice += dailySale.totalRetailPrice;
-            existingWeekSale.totalProfit += dailySale.totalProfit;
-            existingWeekSale.finalPriceWithGST += dailySale.finalPriceWithGST;
+            existingWeekSale.totalPrice += weekSale.totalPrice;
+            existingWeekSale.totalDiscountedPrice += weekSale.totalDiscountedPrice;
+            existingWeekSale.GST += weekSale.GST;
+            existingWeekSale.discount += weekSale.discount;
+            existingWeekSale.totalItem += weekSale.totalItem;
+            existingWeekSale.WeekBill += weekSale.WeekBill;
+            existingWeekSale.totalRetailPrice += weekSale.totalRetailPrice;
+            existingWeekSale.totalProfit += weekSale.totalProfit;
+            existingWeekSale.finalPriceWithGST += weekSale.finalPriceWithGST;
         } else {
-            offlineCounterSales.weekSales.push(week);
+            offlineCounterSales.weekSales.push(weekSale);
         }
 
         offlineCounterSales.monthTotalPrice += dailySale.totalPrice;
@@ -123,4 +126,82 @@ const handleOfflineCounterSales = async (userId, order) => {
     offlineCounterSales.updatedAt = Date.now();
     await offlineCounterSales.save();
 };
-export {handleOfflineCounterSales};
+
+const updateSalesData = async (userId,oldOrder,newOrder) => {
+    const orderDate = new Date(oldOrder.createdAt);
+    const currentMonth = orderDate.toISOString().slice(0, 7);
+    const currentWeek = `${orderDate.getFullYear()}-W${Math.ceil((orderDate.getDate()) / 7)}`; 
+    // Find the existing sales record for the user
+    console.log(currentWeek);
+    let salesRecord = await OfflineCounterSales.findOne({ month: currentMonth ,user:id});
+ 
+    const dailyIndex = salesRecord.dailySales.findIndex(d => d.date === orderDate.getDate());
+    console.log(salesRecord.dailySales[dailyIndex]);
+    if (dailyIndex !== -1) {
+        salesRecord.dailySales[dailyIndex].totalPrice -= oldOrder.total;
+        salesRecord.dailySales[dailyIndex].totalDiscountedPrice += totalDiscountedPrice;
+        salesRecord.dailySales[dailyIndex].GST += GST;
+        salesRecord.dailySales[dailyIndex].discount += discount;
+        salesRecord.dailySales[dailyIndex].totalItem += totalItem;
+        salesRecord.dailySales[dailyIndex].totalRetailPrice += totalRetailPrice;
+        salesRecord.dailySales[dailyIndex].totalProfit += totalProfit;
+        salesRecord.dailySales[dailyIndex].finalPriceWithGST += finalPriceWithGST;
+        // update
+        salesRecord.dailySales[dailyIndex].totalPrice += totalPrice;
+        salesRecord.dailySales[dailyIndex].totalDiscountedPrice += totalDiscountedPrice;
+        salesRecord.dailySales[dailyIndex].GST += GST;
+        salesRecord.dailySales[dailyIndex].discount += discount;
+        salesRecord.dailySales[dailyIndex].totalItem += totalItem;
+        salesRecord.dailySales[dailyIndex].totalRetailPrice += totalRetailPrice;
+        salesRecord.dailySales[dailyIndex].totalProfit += totalProfit;
+        salesRecord.dailySales[dailyIndex].finalPriceWithGST += finalPriceWithGST;
+    }
+
+    // Update weekly sales
+    const weeklyIndex = salesRecord.weekSales.findIndex(w => w.week === currentWeek);
+    console.log(salesRecord.weekSales[weeklyIndex]);
+    if (weeklyIndex !== -1) {
+        salesRecord.weekSales[weeklyIndex].totalPrice -= totalPrice;
+        salesRecord.weekSales[weeklyIndex].totalDiscountedPrice += totalDiscountedPrice;
+        salesRecord.weekSales[weeklyIndex].GST += GST;
+        salesRecord.weekSales[weeklyIndex].discount += discount;
+        salesRecord.weekSales[weeklyIndex].totalItem += totalItem;
+        salesRecord.weekSales[weeklyIndex].totalRetailPrice += totalRetailPrice;
+        salesRecord.weekSales[weeklyIndex].totalProfit += totalProfit;
+        salesRecord.weekSales[weeklyIndex].finalPriceWithGST += finalPriceWithGST;
+        //update
+        salesRecord.weekSales[weeklyIndex].totalPrice += totalPrice;
+        salesRecord.weekSales[weeklyIndex].totalDiscountedPrice += totalDiscountedPrice;
+        salesRecord.weekSales[weeklyIndex].GST += GST;
+        salesRecord.weekSales[weeklyIndex].discount += discount;
+        salesRecord.weekSales[weeklyIndex].totalItem += totalItem;
+        salesRecord.weekSales[weeklyIndex].totalRetailPrice += totalRetailPrice;
+        salesRecord.weekSales[weeklyIndex].totalProfit += totalProfit;
+        salesRecord.weekSales[weeklyIndex].finalPriceWithGST += finalPriceWithGST;
+    } 
+
+    if (salesRecord.month === monthIdentifier) {
+        salesRecord.monthTotalPrice += totalPrice;
+        salesRecord.monthTotalDiscountedPrice += totalDiscountedPrice;
+        salesRecord.monthGST += GST;
+        salesRecord.monthDiscount += discount;
+        salesRecord.monthTotalItem += totalItem;
+        salesRecord.monthTotalRetailPrice += totalRetailPrice;
+        salesRecord.monthTotalProfit += totalProfit;
+        salesRecord.monthFinalPriceWithGST += finalPriceWithGST;
+        //update
+        salesRecord.monthTotalPrice += totalPrice;
+        salesRecord.monthTotalDiscountedPrice += totalDiscountedPrice;
+        salesRecord.monthGST += GST;
+        salesRecord.monthDiscount += discount;
+        salesRecord.monthTotalItem += totalItem;
+        salesRecord.monthTotalRetailPrice += totalRetailPrice;
+        salesRecord.monthTotalProfit += totalProfit;
+        salesRecord.monthFinalPriceWithGST += finalPriceWithGST;
+    } 
+    salesRecord.updatedAt = new Date();
+    await salesRecord.save();
+};
+
+export { handleOfflineCounterSales ,updateSalesData};
+
