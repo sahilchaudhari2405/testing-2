@@ -15,6 +15,8 @@ import Inventory from './Pages/inventory';
 // import Company from './pages/Company';
 // import Users from './pages/Users';
 // import Settings from './pages/Settings';
+import adminDashboard from './Pages/admin';
+import Admin from './Pages/admin';
 
 const App = () => {
   return (
@@ -24,6 +26,7 @@ const App = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/purchase" element={<Purchase />} />
         <Route path="/inventory" element={<Inventory />} />
+        <Route path="/admin" element={<Admin/>}/>
         {/* <Route path="/sales" element={<Sales />} />
         <Route path="/view" element={<View />} />
         <Route path="/accounts" element={<Accounts />} />
