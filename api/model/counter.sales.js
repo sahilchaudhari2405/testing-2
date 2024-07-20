@@ -150,7 +150,7 @@ const offlineCounterSalesSchema = new Schema({
     updatedAt: {
         type: Date,
     },
-});
+},);
 
 // Middleware to update the `updatedAt` field on save
 offlineCounterSalesSchema.pre('save', function (next) {

@@ -6,6 +6,8 @@ import Product from "../model/product.model.js";
 import OfflineOrder from "../model/order.model.js";
 import Offline_CartItem from "../model/cartItem.model.js";
 import { handleOfflineCounterSales, updateSalesData } from "./counter.sales.info.js";
+import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./offline.sales.info.js";
+import { handleAllTotalOfflineSales, TotalAllupdateSalesData } from "./total.sales.info.js";
 
 // Function to place an order
 const placeOrder = asyncHandler(async (req, res) => {
@@ -60,6 +62,8 @@ const placeOrder = asyncHandler(async (req, res) => {
 
         await order.save();
         await handleOfflineCounterSales(id, order);
+        await handleTotalOfflineSales(order);
+        await handleAllTotalOfflineSales(order);
         const results = await OfflineOrder.findById(order._id).populate({
             path: 'orderItems',
             populate: {
@@ -77,10 +81,9 @@ const placeOrder = asyncHandler(async (req, res) => {
         return res.status(500).json(new ApiResponse(500, 'Error placing order', error.message));
     }
 });
-
 // Function to remove item quantity from cart
 const removeItemQuantityCart = asyncHandler(async (req, res) => {
-    const { id,fullName,email,mobile } = req.user;
+    const {id} = req.user;
     const { itemId, orderId,paymentType } = req.body;
 
     try {
@@ -101,17 +104,16 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
             cartItem.finalPriceWithGST -= (product.discountedPrice + product.GST);
             cartItem.discountedPrice -= product.discountedPrice;
             cartItem.updatedAt = new Date();
+            product.quantity+=1;
+            await product.save();
             await cartItem.save();
-
+             
             const cart = await OfflineOrder.findById(orderId);
             const oldOrder=cart;
             if (cart) {
                 const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
                 if (cartItemExists) {
                     cart.user=id,
-                    cart.Name=fullName,
-                    cart.mobileNumber=mobile,
-                    cart.email=email,
                     cart.paymentType=paymentType,
                     cart.orderStatus='Update',
                     cart.totalPrice -= product.price;
@@ -123,6 +125,8 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
                     cart.finalPriceWithGST -= (product.discountedPrice + product.GST);
                     await cart.save();
                    await updateSalesData(oldOrder.user,oldOrder,cart);
+                   await TotalAllupdateSalesData(oldOrder,cart);
+                   await TotalOfflineupdateSalesData(oldOrder,cart);
                 }
             }
             
@@ -138,7 +142,7 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
 
 // Function to remove one cart item
 const removeOneCart = asyncHandler(async (req, res) => {
-    const { id,fullName,email,mobile } = req.user;
+    const { id } = req.user;
     const { itemId, orderId,paymentType } = req.body;
 
     try {
@@ -151,29 +155,32 @@ const removeOneCart = asyncHandler(async (req, res) => {
         if (cartItem.userId.toString() !== id) {
             return res.status(403).json(new ApiResponse(403, 'Unauthorized to delete this cart item', null));
         }
-
+        const product = await Product.findById(cartItem.product);
         const cart = await OfflineOrder.findById(orderId);
         const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
         if (cartItem.quantity > 0 && cartItemExists) {
+            cart.user = id,
             cart.orderItems.pull(cartItem._id);
-            cart.user=id,
-            cart.Name=fullName,
-            cart.mobileNumber=mobile,
-            cart.email=email,
             cart.paymentType=paymentType,
             cart.orderStatus='Update',
             cart.totalPrice -= cartItem.price;
             cart.totalDiscountedPrice -=cartItem.discountedPrice;
             cart.totalRetailPrice -= cartItem.retailPrice;
             cart.GST -= cartItem.GST;
+            cart.totalItem-=1,
             cart.discount -= (cartItem.price-cartItem.discountedPrice);
             cart.totalProfit -= cartItem.totalProfit;
             cart.finalPriceWithGST -= cartItem.finalPriceWithGST;
             await cart.save();
+            product.quantity+=cartItem.quantity,
+            product.save();
             await OfflineOrderItem.findByIdAndRemove(itemId);
+            await updateSalesData(oldOrder.user,oldOrder,cart);
+            await TotalAllupdateSalesData(oldOrder,cart);
+            await TotalOfflineupdateSalesData(oldOrder,cart);
         }
 
-        return res.status(200).json(new ApiResponse(200, 'Cart item deleted successfully', cartItem));
+        return res.status(200).json(new ApiResponse(200, 'Cart item deleted successfully', cartItem,cart));
     } catch (error) {
         console.error(error);
         return res.status(500).json({

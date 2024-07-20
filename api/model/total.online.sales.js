@@ -1,6 +1,11 @@
 import mongoose, { Schema } from "mongoose";
 
 const totalOnlineSalesSchema = new Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CounterUser",
+        required: true,
+    },
     dailySales: [{
         totalPrice: {
             type: Number,
@@ -35,6 +40,10 @@ const totalOnlineSalesSchema = new Schema({
             type: Number,
             required: true,
         },
+        DayBill:{
+            type:Number,
+            default:0,
+        },
         date: {
             type: Number,
             required: true,
@@ -67,6 +76,10 @@ const totalOnlineSalesSchema = new Schema({
             type: Number,
             required: true,
         },
+        WeekBill:{
+            type:Number,
+            default:0,
+        },
         totalRetailPrice: {
             type: Number,
             required: true,
@@ -79,7 +92,7 @@ const totalOnlineSalesSchema = new Schema({
             type: Number,
             required: true,
         },
-        day: {
+        week: {
             type: String,
             required: true,
         },
@@ -110,6 +123,10 @@ const totalOnlineSalesSchema = new Schema({
         type: Number,
         required: true,
     },
+    MonthsBill:{
+        type:Number,
+        default:0,
+    },
     monthTotalRetailPrice: {
         type: Number,
         required: true,
@@ -126,11 +143,6 @@ const totalOnlineSalesSchema = new Schema({
         type: String,
         required: true,
     },
-    orderDate: {
-        type: Date,
-        required: true,
-        default: Date.now,
-    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -138,7 +150,7 @@ const totalOnlineSalesSchema = new Schema({
     updatedAt: {
         type: Date,
     },
-});
+},);
 
 
 totalOnlineSalesSchema.pre('save', function (next) {

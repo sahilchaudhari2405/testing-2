@@ -35,6 +35,10 @@ const totalOfflineSalesSchema = new Schema({
             type: Number,
             required: true,
         },
+        DayBill:{
+            type:Number,
+            default:0,
+        },
         date: {
             type: Number,
             required: true,
@@ -67,6 +71,10 @@ const totalOfflineSalesSchema = new Schema({
             type: Number,
             required: true,
         },
+        WeekBill:{
+            type:Number,
+            default:0,
+        },
         totalRetailPrice: {
             type: Number,
             required: true,
@@ -79,7 +87,7 @@ const totalOfflineSalesSchema = new Schema({
             type: Number,
             required: true,
         },
-        day: {
+        week: {
             type: String,
             required: true,
         },
@@ -110,6 +118,10 @@ const totalOfflineSalesSchema = new Schema({
         type: Number,
         required: true,
     },
+    MonthsBill:{
+        type:Number,
+        default:0,
+    },
     monthTotalRetailPrice: {
         type: Number,
         required: true,
@@ -126,11 +138,6 @@ const totalOfflineSalesSchema = new Schema({
         type: String,
         required: true,
     },
-    orderDate: {
-        type: Date,
-        required: true,
-        default: Date.now,
-    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -138,7 +145,7 @@ const totalOfflineSalesSchema = new Schema({
     updatedAt: {
         type: Date,
     },
-});
+},);
 
 totalOfflineSalesSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
