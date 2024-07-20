@@ -51,7 +51,7 @@ const offlineOrderSchema = new Schema({
         type: Number,
         required: true,
     },
-    totalRetailPrice: {
+    totalPurchaseRate: {
         type: Number,
         required: true,
     },
@@ -83,7 +83,7 @@ const offlineOrderSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        required:true,
+        default: Date.now,
     },
     updatedAt: {
         type: Date,

@@ -23,7 +23,7 @@ const totalOfflineSalesSchema = new Schema({
             type: Number,
             required: true,
         },
-        totalRetailPrice: {
+        totalPurchaseRate: {
             type: Number,
             required: true,
         },
@@ -75,7 +75,7 @@ const totalOfflineSalesSchema = new Schema({
             type:Number,
             default:0,
         },
-        totalRetailPrice: {
+        totalPurchaseRate: {
             type: Number,
             required: true,
         },
@@ -122,7 +122,7 @@ const totalOfflineSalesSchema = new Schema({
         type:Number,
         default:0,
     },
-    monthTotalRetailPrice: {
+    monthTotalPurchaseRate: {
         type: Number,
         required: true,
     },

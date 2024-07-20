@@ -12,5 +12,6 @@ allRouter.use('/auth', auth);
 // allRouter.use('/OR', QR_Routes);
 allRouter.use('/order', OrderRouter);
 allRouter.use('/cart', cart);
+allRouter.use('/admin',cart);
 allRouter.use('/test',test)
 export default allRouter;

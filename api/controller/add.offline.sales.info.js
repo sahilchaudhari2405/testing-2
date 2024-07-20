@@ -35,7 +35,7 @@ const handleTotalOfflineSales = async (order) => {
         discount: order.discount,
         totalItem: order.totalItem,
         DayBill: 1,
-        totalRetailPrice: order.totalRetailPrice,
+        totalPurchaseRate: order.totalPurchaseRate,
         totalProfit: order.totalProfit,
         finalPriceWithGST: order.finalPriceWithGST,
         date: orderDate.getDate(),
@@ -49,7 +49,7 @@ const handleTotalOfflineSales = async (order) => {
         discount: order.discount,
         totalItem: order.totalItem,
         WeekBill: 1,
-        totalRetailPrice: order.totalRetailPrice,
+        totalPurchaseRate: order.totalPurchaseRate,
         totalProfit: order.totalProfit,
         finalPriceWithGST: order.finalPriceWithGST,
         week: currentWeek,
@@ -68,7 +68,7 @@ const handleTotalOfflineSales = async (order) => {
             MonthsBill: dailySale.DayBill,
             monthDiscount: dailySale.discount,
             monthTotalItem: dailySale.totalItem,
-            monthTotalRetailPrice: dailySale.totalRetailPrice,
+            monthTotalPurchaseRate: dailySale.totalPurchaseRate,
             monthTotalProfit: dailySale.totalProfit,
             monthFinalPriceWithGST: dailySale.finalPriceWithGST,
             month: currentMonth,
@@ -87,7 +87,7 @@ const handleTotalOfflineSales = async (order) => {
             existingDailySale.discount += dailySale.discount;
             existingDailySale.totalItem += dailySale.totalItem;
             existingDailySale.DayBill += dailySale.DayBill;
-            existingDailySale.totalRetailPrice += dailySale.totalRetailPrice;
+            existingDailySale.totalPurchaseRate += dailySale.totalPurchaseRate;
             existingDailySale.totalProfit += dailySale.totalProfit;
             existingDailySale.finalPriceWithGST += dailySale.finalPriceWithGST;
         } else {
@@ -105,7 +105,7 @@ const handleTotalOfflineSales = async (order) => {
             existingWeekSale.discount += weekSale.discount;
             existingWeekSale.totalItem += weekSale.totalItem;
             existingWeekSale.WeekBill += weekSale.WeekBill;
-            existingWeekSale.totalRetailPrice += weekSale.totalRetailPrice;
+            existingWeekSale.totalPurchaseRate += weekSale.totalPurchaseRate;
             existingWeekSale.totalProfit += weekSale.totalProfit;
             existingWeekSale.finalPriceWithGST += weekSale.finalPriceWithGST;
         } else {
@@ -118,7 +118,7 @@ const handleTotalOfflineSales = async (order) => {
         offlineCounterSales.monthDiscount += dailySale.discount;
         offlineCounterSales.monthTotalItem += dailySale.totalItem;
         offlineCounterSales.MonthsBill += dailySale.DayBill;
-        offlineCounterSales.monthTotalRetailPrice += dailySale.totalRetailPrice;
+        offlineCounterSales.monthTotalPurchaseRate += dailySale.totalPurchaseRate;
         offlineCounterSales.monthTotalProfit += dailySale.totalProfit;
         offlineCounterSales.monthFinalPriceWithGST += dailySale.finalPriceWithGST;
     }
@@ -147,7 +147,7 @@ const TotalOfflineupdateSalesData = async (oldOrder, newOrder) => {
         salesRecord.dailySales[dailyIndex].GST -= oldOrder.GST;
         salesRecord.dailySales[dailyIndex].discount -= oldOrder.discount;
         salesRecord.dailySales[dailyIndex].totalItem -= oldOrder.totalItem;
-        salesRecord.dailySales[dailyIndex].totalRetailPrice -= oldOrder.totalRetailPrice;
+        salesRecord.dailySales[dailyIndex].totalPurchaseRate -= oldOrder.totalPurchaseRate;
         salesRecord.dailySales[dailyIndex].totalProfit -= oldOrder.totalProfit;
         salesRecord.dailySales[dailyIndex].finalPriceWithGST -= oldOrder.finalPriceWithGST;
         
@@ -157,7 +157,7 @@ const TotalOfflineupdateSalesData = async (oldOrder, newOrder) => {
         salesRecord.dailySales[dailyIndex].GST += newOrder.GST;
         salesRecord.dailySales[dailyIndex].discount += newOrder.discount;
         salesRecord.dailySales[dailyIndex].totalItem += newOrder.totalItem;
-        salesRecord.dailySales[dailyIndex].totalRetailPrice += newOrder.totalRetailPrice;
+        salesRecord.dailySales[dailyIndex].totalPurchaseRate += newOrder.totalPurchaseRate;
         salesRecord.dailySales[dailyIndex].totalProfit += newOrder.totalProfit;
         salesRecord.dailySales[dailyIndex].finalPriceWithGST += newOrder.finalPriceWithGST;
     } else {
@@ -172,7 +172,7 @@ const TotalOfflineupdateSalesData = async (oldOrder, newOrder) => {
         salesRecord.weekSales[weeklyIndex].GST -= oldOrder.GST;
         salesRecord.weekSales[weeklyIndex].discount -= oldOrder.discount;
         salesRecord.weekSales[weeklyIndex].totalItem -= oldOrder.totalItem;
-        salesRecord.weekSales[weeklyIndex].totalRetailPrice -= oldOrder.totalRetailPrice;
+        salesRecord.weekSales[weeklyIndex].totalPurchaseRate -= oldOrder.totalPurchaseRate;
         salesRecord.weekSales[weeklyIndex].totalProfit -= oldOrder.totalProfit;
         salesRecord.weekSales[weeklyIndex].finalPriceWithGST -= oldOrder.finalPriceWithGST;
         
@@ -182,7 +182,7 @@ const TotalOfflineupdateSalesData = async (oldOrder, newOrder) => {
         salesRecord.weekSales[weeklyIndex].GST += newOrder.GST;
         salesRecord.weekSales[weeklyIndex].discount += newOrder.discount;
         salesRecord.weekSales[weeklyIndex].totalItem += newOrder.totalItem;
-        salesRecord.weekSales[weeklyIndex].totalRetailPrice += newOrder.totalRetailPrice;
+        salesRecord.weekSales[weeklyIndex].totalPurchaseRate += newOrder.totalPurchaseRate;
         salesRecord.weekSales[weeklyIndex].totalProfit += newOrder.totalProfit;
         salesRecord.weekSales[weeklyIndex].finalPriceWithGST += newOrder.finalPriceWithGST;
     } else {
@@ -196,7 +196,7 @@ const TotalOfflineupdateSalesData = async (oldOrder, newOrder) => {
         salesRecord.monthGST -= oldOrder.GST;
         salesRecord.monthDiscount -= oldOrder.discount;
         salesRecord.monthTotalItem -= oldOrder.totalItem;
-        salesRecord.monthTotalRetailPrice -= oldOrder.totalRetailPrice;
+        salesRecord.monthTotalPurchaseRate -= oldOrder.totalPurchaseRate;
         salesRecord.monthTotalProfit -= oldOrder.totalProfit;
         salesRecord.monthFinalPriceWithGST -= oldOrder.finalPriceWithGST;
         
@@ -206,7 +206,7 @@ const TotalOfflineupdateSalesData = async (oldOrder, newOrder) => {
         salesRecord.monthGST += newOrder.GST;
         salesRecord.monthDiscount += newOrder.discount;
         salesRecord.monthTotalItem += newOrder.totalItem;
-        salesRecord.monthTotalRetailPrice += newOrder.totalRetailPrice;
+        salesRecord.monthTotalPurchaseRate += newOrder.totalPurchaseRate;
         salesRecord.monthTotalProfit += newOrder.totalProfit;
         salesRecord.monthFinalPriceWithGST += newOrder.finalPriceWithGST;
     } else {

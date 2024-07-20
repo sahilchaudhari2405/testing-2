@@ -5,9 +5,10 @@ import OfflineOrderItem from "../model/orderItems.js";
 import Product from "../model/product.model.js";
 import OfflineOrder from "../model/order.model.js";
 import Offline_CartItem from "../model/cartItem.model.js";
-import { handleOfflineCounterSales, updateSalesData } from "./counter.sales.info.js";
-import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./offline.sales.info.js";
-import { handleAllTotalOfflineSales, TotalAllupdateSalesData } from "./total.sales.info.js";
+import { handleOfflineCounterSales, updateSalesData } from "./add.counter.sales.info.js";
+import { handleAllTotalOfflineSales, TotalAllupdateSalesData } from "./add.total.sales.info.js";
+import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./add.offline.sales.info.js";
+
 
 // Function to place an order
 const placeOrder = asyncHandler(async (req, res) => {
@@ -20,7 +21,7 @@ const placeOrder = asyncHandler(async (req, res) => {
     }
 
     try {
-        let retailPrice = 0;
+        let purchaseRate = 0;
         let totalProfit = 0;
         const orderItems = [];
         for (const cartItem of cart.cartItems) {
@@ -29,16 +30,16 @@ const placeOrder = asyncHandler(async (req, res) => {
                 product: cartItem.product,
                 quantity: cartItem.quantity,
                 price: cartItem.price,
-                retailPrice: product.retailPrice * cartItem.quantity,
+                purchaseRate: product.purchaseRate * cartItem.quantity,
                 GST: cartItem.GST,
-                totalProfit: (cartItem.price - (product.retailPrice * cartItem.quantity)) * cartItem.quantity,
+                totalProfit: (cartItem.price - (product.purchaseRate * cartItem.quantity)) * cartItem.quantity,
                 finalPriceWithGST: cartItem.finalPrice_with_GST,
                 discountedPrice: cartItem.discountedPrice,
                 userId: id,
             });
             await orderItem.save();
             orderItems.push(orderItem._id);
-            retailPrice += orderItem.retailPrice;
+            purchaseRate += orderItem.purchaseRate;
             totalProfit += orderItem.totalProfit;
         }
 
@@ -54,10 +55,10 @@ const placeOrder = asyncHandler(async (req, res) => {
             discount: cart.discount,
             GST: cart.GST,
             paymentType: paymentType,
-            totalRetailPrice: retailPrice,
+            totalPurchaseRate: purchaseRate,
             totalProfit: totalProfit,
             finalPriceWithGST: cart.final_price_With_GST,
-            createdAt:new Date(),
+            orderDate:new Date(),
         });
 
         await order.save();
@@ -68,7 +69,7 @@ const placeOrder = asyncHandler(async (req, res) => {
             path: 'orderItems',
             populate: {
                 path: 'product',
-                model: 'Product'
+                model: 'products'
             }
         });
 
@@ -82,7 +83,7 @@ const placeOrder = asyncHandler(async (req, res) => {
     }
 });
 // Function to remove item quantity from cart
-const removeItemQuantityCart = asyncHandler(async (req, res) => {
+const removeItemQuantityOrder = asyncHandler(async (req, res) => {
     const {id} = req.user;
     const { itemId, orderId,paymentType } = req.body;
 
@@ -99,7 +100,7 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
             cartItem.quantity -= 1;
             cartItem.price -= product.price;
             cartItem.GST -= product.GST;
-            cartItem.retailPrice -= product.retailPrice;
+            cartItem.purchaseRate -= product.purchaseRate;
             cartItem.totalProfit -= (product.price - product.retailPrice);
             cartItem.finalPriceWithGST -= (product.discountedPrice + product.GST);
             cartItem.discountedPrice -= product.discountedPrice;
@@ -118,7 +119,7 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
                     cart.orderStatus='Update',
                     cart.totalPrice -= product.price;
                     cart.totalDiscountedPrice -= product.discountedPrice;
-                    cart.totalRetailPrice -= product.retailPrice;
+                    cart.totalPurchaseRate -= product.purchaseRate;
                     cart.GST -= product.GST;
                     cart.discount -= (product.price - product.discountedPrice);
                     cart.totalProfit -= (product.price - product.retailPrice);
@@ -141,7 +142,7 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
 });
 
 // Function to remove one cart item
-const removeOneCart = asyncHandler(async (req, res) => {
+const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
     const { itemId, orderId,paymentType } = req.body;
 
@@ -165,7 +166,7 @@ const removeOneCart = asyncHandler(async (req, res) => {
             cart.orderStatus='Update',
             cart.totalPrice -= cartItem.price;
             cart.totalDiscountedPrice -=cartItem.discountedPrice;
-            cart.totalRetailPrice -= cartItem.retailPrice;
+            cart.totalPurchaseRate -= cartItem.purchaseRate;
             cart.GST -= cartItem.GST;
             cart.totalItem-=1,
             cart.discount -= (cartItem.price-cartItem.discountedPrice);
@@ -191,4 +192,4 @@ const removeOneCart = asyncHandler(async (req, res) => {
 });
 
 // Export functions
-export {placeOrder, removeItemQuantityCart, removeOneCart };
+export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder };

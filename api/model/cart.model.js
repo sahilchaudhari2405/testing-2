@@ -4,7 +4,7 @@ const Offline_cartSchema = new mongoose.Schema({
     
     userId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"CounterUserSchema",
+        ref:"CounterUser",
         required: true,
     },
 
