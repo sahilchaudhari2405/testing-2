@@ -56,13 +56,14 @@ const addToCart = asyncHandler(async (req, res) => {
                 totalDiscountedPrice: cartItem.discountedPrice,
                 discount: cartItem.price - cartItem.discountedPrice,
             });
+            await cart.save();
         } else {
             if (!cart.cartItems.includes(cartItem._id)) {
                 cart.cartItems.push(cartItem._id);
                 cart.totalItem += 1;
             }
-            cart.GST += cartItem.GST;
-            cart.final_price_With_GST += cartItem.finalPrice_with_GST;
+            cart.GST += product.GST;
+            cart.final_price_With_GST +=  product.discountedPrice + product.GST;
             cart.totalPrice += product.price;
             cart.totalDiscountedPrice += product.discountedPrice;
             cart.discount += (product.price - product.discountedPrice);

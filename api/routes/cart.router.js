@@ -7,7 +7,7 @@ const cart = express.Router();
 cart.post('/addCart', authenticateToken, addToCart);
 cart.get('/getCart', authenticateToken, getCartDetails);
 cart.get('/getCartById', authenticateToken, getCartItemsById);
-cart.get('/removeOneCart', authenticateToken, removeOneCart);
-cart.get('/removeItemQuantity', authenticateToken, removeItemQuantityCart);
+cart.delete('/removeOneCart', authenticateToken, removeOneCart);
+cart.delete('/removeItemQuantity', authenticateToken, removeItemQuantityCart);
 
 export default cart;

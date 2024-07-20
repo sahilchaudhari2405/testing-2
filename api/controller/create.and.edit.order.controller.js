@@ -32,7 +32,7 @@ const placeOrder = asyncHandler(async (req, res) => {
                 price: cartItem.price,
                 purchaseRate: product.purchaseRate * cartItem.quantity,
                 GST: cartItem.GST,
-                totalProfit: (cartItem.price - (product.purchaseRate * cartItem.quantity)) * cartItem.quantity,
+                totalProfit: (product.discountedPrice-product.purchaseRate)*cartItem.quantity,
                 finalPriceWithGST: cartItem.finalPrice_with_GST,
                 discountedPrice: cartItem.discountedPrice,
                 userId: id,
@@ -66,7 +66,7 @@ const placeOrder = asyncHandler(async (req, res) => {
         await handleTotalOfflineSales(order);
         await handleAllTotalOfflineSales(order);
         const results = await OfflineOrder.findById(order._id).populate({
-            path: 'orderItems',
+            path:'orderItems',
             populate: {
                 path: 'product',
                 model: 'products'
@@ -101,7 +101,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
             cartItem.price -= product.price;
             cartItem.GST -= product.GST;
             cartItem.purchaseRate -= product.purchaseRate;
-            cartItem.totalProfit -= (product.price - product.retailPrice);
+            cartItem.totalProfit -= (product.discountedPrice - product.purchaseRate);
             cartItem.finalPriceWithGST -= (product.discountedPrice + product.GST);
             cartItem.discountedPrice -= product.discountedPrice;
             cartItem.updatedAt = new Date();
@@ -122,7 +122,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
                     cart.totalPurchaseRate -= product.purchaseRate;
                     cart.GST -= product.GST;
                     cart.discount -= (product.price - product.discountedPrice);
-                    cart.totalProfit -= (product.price - product.retailPrice);
+                    cart.totalProfit -= (product.discountedPrice - product.purchaseRate);
                     cart.finalPriceWithGST -= (product.discountedPrice + product.GST);
                     await cart.save();
                    await updateSalesData(oldOrder.user,oldOrder,cart);
