@@ -9,6 +9,8 @@ import Purchase from './Pages/purchase';
 import Inventory from './Pages/inventory';
 import Login from './Pages/login';
 import Sales from './Pages/sale';
+import Forbidden from './component/Forbidden';
+import Admin from './Pages/admin';
 // import View from './pages/View';
 // import Accounts from './pages/Accounts';
 // import Reports from './pages/Reports';
@@ -19,6 +21,7 @@ import Sales from './Pages/sale';
 // import Users from './pages/Users';
 // import Settings from './pages/Settings';
 import { ToastContainer } from 'react-toastify';
+import ProtectedRoute from './component/ProtectedRoute';
 
 const App = () => {
   return (
@@ -30,6 +33,40 @@ const App = () => {
           <Route path="/purchase" element={<PageWithNavbar><Purchase /></PageWithNavbar>} />
           <Route path="/inventory" element={<PageWithNavbar><Inventory /></PageWithNavbar>} />
           <Route path="/sales" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
+          <Route path="/forbidden" element={<Forbidden />} />
+          {/* Admin protected routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PageWithNavbar><Admin /></PageWithNavbar>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/purchase"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PageWithNavbar><Purchase /></PageWithNavbar>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/inventory"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PageWithNavbar><Inventory /></PageWithNavbar>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/sales"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PageWithNavbar><Sales /></PageWithNavbar>
+              </ProtectedRoute>
+            }
+          />
           {/* <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
           <Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
           <Route path="/reports" element={<PageWithNavbar><Reports /></PageWithNavbar>} />
@@ -55,7 +92,6 @@ const PageWithNavbar = ({ children }) => {
       {location.pathname !== '/' && <Navbar />}
       {children}
     </>
-
   );
 };
 
