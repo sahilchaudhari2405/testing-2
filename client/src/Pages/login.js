@@ -16,6 +16,27 @@ const Login = () => {
   const [password, setPassword] = useState('');
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        // Decode the token
+        const decodedToken = jwtDecode(token);
+
+        // Extract role or any other user information
+        const role = decodedToken.role;
+
+        if (role === 'admin') {
+          navigate('/admin');
+        } else if (role === 'user') {
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        toast.error('Error decoding token');
+      }
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     if (status === 'succeeded') {
       // Assuming token is stored in localStorage after login
       const token = localStorage.getItem('token');
@@ -24,7 +45,7 @@ const Login = () => {
         try {
           // Decode the token
           const decodedToken = jwtDecode(token);
-          
+
           // Extract role or any other user information
           const role = decodedToken.role;
 
