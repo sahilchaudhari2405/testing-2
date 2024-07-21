@@ -55,6 +55,7 @@ const PageWithNavbar = ({ children }) => {
       {location.pathname !== '/' && <Navbar />}
       {children}
     </>
+
   );
 };
 

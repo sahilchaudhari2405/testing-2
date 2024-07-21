@@ -35,6 +35,7 @@ const Navbar = () => {
           <NavItem icon={<FaExchangeAlt className="text-indigo-400" />} label="Import" to="/import" />
           <NavItem icon={<FaCog className="text-gray-400" />} label="More" to="/more" />
           <NavItem icon={<FaBuilding className="text-yellow-400" />} label="Company" to="/company" />
+          <NavItem icon={<FaPersonBooth className="text-blue-400" />} label="admin" to="/admin" />
         </div>
       </div>
       <div className="flex items-center space-x-4">
