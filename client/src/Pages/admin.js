@@ -5,13 +5,25 @@ import ChartofProducts from '../component/lineGraphProduct';
 import ChartofVisitors from '../component/lineGraphVisitors';
 import Chartofdonut from '../component/donutChart';
 
-const Dashboard = ({ selectedCounter, onCounterChange }) => {
+const Admin = ({ selectedCounter, onCounterChange }) => {
   return (
     <div className='flex flex-col justify-center items-center '>
 
       <div className="p-8 w-[95vw] mt-20">
         <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
         <p className="mb-8">Welcome to Apala Bazaar </p>
+
+        <select className='my-5' value={selectedCounter} onChange={onCounterChange}>
+          <option value="1">Counter 1</option>
+          <option value="2">Counter 2</option>
+          <option value="3">Counter 3</option>
+          <option value="4">Counter 4</option>
+          <option value="4">Online Total</option>
+          <option value="4">Offline Total</option>
+          <option value="4">Grand Total</option>
+        </select>
+
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-purple-500 text-white p-6 rounded-lg">
             <h2 className="text-xl">Current Users</h2>
@@ -66,5 +78,5 @@ const Dashboard = ({ selectedCounter, onCounterChange }) => {
   );
 }
 
-export default Dashboard;
+export default Admin;
 
