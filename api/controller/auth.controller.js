@@ -2,6 +2,9 @@ import { setTokens,  } from '../middleware/generateToken.js';
 import User from '../model/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+
+
+
 export async function signup(req, res) {
     try {
         const { fullName, username, email, password, mobile } = req.body;
@@ -58,13 +61,9 @@ export async function login(req, res) {
             return res.status(400).json({ error: "Invalid username or password" });
         }
 
-        const { accessToken, refreshToken } = setTokens(user._id, res);
+        const { accessToken, refreshToken } = setTokens(user, res);
 
         res.status(200).json({
-            _id: user._id,
-            fullName: user.fullName,
-            email: user.email,
-            mobile: user.mobile,
             accessToken,
             refreshToken,
         });
