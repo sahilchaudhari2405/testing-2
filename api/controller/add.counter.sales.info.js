@@ -38,7 +38,6 @@ const handleOfflineCounterSales = async (userId, order) => {
         totalProfit: order.totalProfit,
         finalPriceWithGST: order.finalPriceWithGST,
         date: orderDate.getDate(),
-        orderDate: orderDate,
     };
 
     const weekSale = {
@@ -52,7 +51,6 @@ const handleOfflineCounterSales = async (userId, order) => {
         totalProfit: order.totalProfit,
         finalPriceWithGST: order.finalPriceWithGST,
         week: currentWeek,
-        orderDate: orderDate,
     };
 
     let offlineCounterSales = await OfflineCounterSales.findOne({ user: userId, month: currentMonth });
@@ -138,7 +136,7 @@ const updateSalesData = async (userId, oldOrder, newOrder) => {
         console.error("Sales record not found for the given user and month.");
         return;
     }
-
+   
     const dailyIndex = salesRecord.dailySales.findIndex(d => d.date === orderDate.getDate());
     if (dailyIndex !== -1) {
         // Subtract old order values

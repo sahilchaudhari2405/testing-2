@@ -39,7 +39,6 @@ const handleTotalOfflineSales = async (order) => {
         totalProfit: order.totalProfit,
         finalPriceWithGST: order.finalPriceWithGST,
         date: orderDate.getDate(),
-        orderDate: orderDate,
     };
 
     const weekSale = {
@@ -53,7 +52,6 @@ const handleTotalOfflineSales = async (order) => {
         totalProfit: order.totalProfit,
         finalPriceWithGST: order.finalPriceWithGST,
         week: currentWeek,
-        orderDate: orderDate,
     };
 
     let offlineCounterSales = await TotalOfflineSales.findOne({ month: currentMonth });

@@ -85,11 +85,11 @@ const placeOrder = asyncHandler(async (req, res) => {
 // Function to remove item quantity from cart
 const removeItemQuantityOrder = asyncHandler(async (req, res) => {
     const {id} = req.user;
-    const { itemId, orderId,paymentType } = req.body;
-
+    const { iteamId,orderId,paymentType } = req.body;
+   console.log(req.body)
     try {
-        const cartItem = await OfflineOrderItem.findById(itemId);
-
+        const cartItem = await OfflineOrderItem.findById(iteamId);
+        
         if (!cartItem) {
             return res.status(404).json(new ApiResponse(404, 'Cart item not found', null));
         }
@@ -110,7 +110,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
             await cartItem.save();
              
             const cart = await OfflineOrder.findById(orderId);
-            const oldOrder=cart;
+            const oldOrder = JSON.parse(JSON.stringify(cart)); 
             if (cart) {
                 const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
                 if (cartItemExists) {
@@ -158,6 +158,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
         }
         const product = await Product.findById(cartItem.product);
         const cart = await OfflineOrder.findById(orderId);
+        const oldOrder = JSON.parse(JSON.stringify(cart));  
         const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
         if (cartItem.quantity > 0 && cartItemExists) {
             cart.user = id,
