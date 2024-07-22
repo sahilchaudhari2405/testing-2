@@ -21,6 +21,9 @@ const CounterUserSchema = new mongoose.Schema(
             required: true,
             maxLength: 10,
         },
+        counterNumber: {
+            type: String,
+        }
     },
     { timestamps: true }
 );

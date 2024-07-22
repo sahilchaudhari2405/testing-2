@@ -4,15 +4,15 @@ import { UserIcon, MailIcon, LockClosedIcon, PhoneIcon, DeviceMobileIcon,Briefca
 
 const Users = () => {
   const [users, setUsers] = useState([
-    { id: 1, name: 'boy1', role: 'Counter Boy', counter:'1' },
-    { id: 2, name: 'Boy2', role: 'Counter Boy', counter:'2' },
+    { id: 1, fullname: 'Boy1', counterNumber:'1' },
+    { id: 2, fullname: 'Boy2', counterNumber:'2' },
   ]);
 
   const [form, setForm] = useState({
-    name: '',
+    fullname: '',
     email: '',
     password: '',
-    phone: '',
+    mobile: '',
     counterNumber: '',
   });
 
@@ -23,7 +23,7 @@ const Users = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setUsers([...users, { ...form, id: users.length + 1, role: 'Counter Boy' }]);
-    setForm({ name: '', email: '', password: '', phone: '', counterNumber: '' });
+    setForm({ fullname: '', email: '', password: '', mobile: '', counterNumber: '' });
   };
 
   return (

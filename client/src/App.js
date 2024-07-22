@@ -6,7 +6,7 @@ import Dashboard from './Pages/dashboard';
 import Purchase from './Pages/purchase';
 import Inventory from './Pages/inventory';
 // import Sales from './pages/Sales';
-// import View from './pages/View';
+import View from './Pages/View';
 // import Accounts from './pages/Accounts';
 // import Reports from './pages/Reports';
 // import Msg from './pages/Msg';
@@ -25,9 +25,10 @@ const App = () => {
         <Route path="/purchase" element={<Purchase />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/users" element={<Users />} />
+        <Route path="/view" element={<View />} />
+
 
         {/* <Route path="/sales" element={<Sales />} />
-        <Route path="/view" element={<View />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/msg" element={<Msg />} />
