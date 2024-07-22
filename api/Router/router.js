@@ -3,6 +3,8 @@ import express from 'express';
 import auth from '../routes/auth.route.js'; // Ensure .js extension
 import OrderRouter from '../routes/Order.route.js'; // Ensure .js extension
 import cart from '../routes/cart.router.js'; // Ensure .js extension
+import test from '../controller/test.js';
+
 import userRoutes from '../routes/users.route.js'
 
 
@@ -14,4 +16,6 @@ allRouter.use('/order', OrderRouter);
 allRouter.use('/cart', cart);
 allRouter.use('/users', userRoutes);
 
+allRouter.use('/admin',cart);
+allRouter.use('/test',test);
 export default allRouter;
