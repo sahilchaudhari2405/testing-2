@@ -7,14 +7,8 @@ const isSameDay = (date1, date2) => {
 };
 
 const isSameWeek = (date1, date2) => {
-    const startOfWeek = (date) => {
-        const day = date.getDay();
-        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-        return new Date(date.setDate(diff));
+    return date1===date2;
     };
-
-    return startOfWeek(date1).toISOString().slice(0, 10) === startOfWeek(date2).toISOString().slice(0, 10);
-};
 
 const isSameMonth = (date1, date2) => {
     return date1.getFullYear() === date2.getFullYear() &&
@@ -93,7 +87,7 @@ const handleOfflineCounterSales = async (userId, order) => {
         }
 
         const existingWeekSale = offlineCounterSales.weekSales.find((sale) =>
-            isSameWeek(new Date(sale.orderDate), orderDate)
+            isSameWeek(sale.week,currentWeek)
         );
 
         if (existingWeekSale) {
