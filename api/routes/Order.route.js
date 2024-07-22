@@ -11,6 +11,7 @@ OrderRouter.put('/RemoveOneItem', authenticateToken, RemoveOneItemOnOrder);
 OrderRouter.put('/RemoveOneQuantity', authenticateToken, removeItemQuantityOrder);
 OrderRouter.get('/getAllOrderByCounter', authenticateToken,getCounterBill );
 OrderRouter.get('/getCounterSales', authenticateToken,getCounterSale);
-
+OrderRouter.get('/getCounterSales', authenticateToken,getCounterSale);
+OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
 export default OrderRouter;
     
