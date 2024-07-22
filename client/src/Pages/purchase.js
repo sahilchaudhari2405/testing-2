@@ -1,8 +1,35 @@
 import React, { useRef,useEffect,useState} from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { FaBarcode } from 'react-icons/fa'; // Import the barcode icon from react-icons
 import ReactToPrint from "react-to-print";
-import logo from '../logo.png'
+import logo from '../logo.png';
+import {jwtDecode} from 'jwt-decode';
+import { logoutUser } from '../Redux/User/userSlices';
+import { toast } from 'react-toastify';
+
+
 const Purchase = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [fullName, setFullName] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setFullName(decodedToken.fullName);
+    } else { // Redirect to login if no token found
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    localStorage.removeItem('token');
+    toast.error("Logout Successfully!")
+    navigate('/');
+  };
+
   const sharedClasses = {
     flex: 'flex',
     justifyBetween: 'justify-between',
@@ -64,12 +91,13 @@ const Purchase = () => {
   }, []);
   const componentRef = useRef();
   return (
-    <div className="bg-gray-100 mt-20 p-6 rounded-lg shadow-lg">
+    <div className="bg-gray-100 mt-28 mx-6 rounded-lg shadow-lg">
       <div className="bg-green-700 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h1 className="text-lg font-bold">Purchase</h1>
+        <h1 className="text-3xl font-bold">Purchase</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>salescounter1</span></span>
-          <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
+          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
+          <button
+            onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
         </div>
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">

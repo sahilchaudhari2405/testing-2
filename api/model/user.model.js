@@ -21,6 +21,11 @@ const CounterUserSchema = new mongoose.Schema(
             required: true,
             maxLength: 10,
         },
+        role: {
+            type: String,
+            enum: ['user', 'admin'],
+            default: 'user',
+        },
         counterNumber: {
             type: String,
         }

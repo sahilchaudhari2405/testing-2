@@ -1,10 +1,10 @@
 import express from 'express';
-import { authenticateToken, authorizeRoles } from '../middleware/verify.js';
+import { authenticateToken, authorizeRoles, checkAdmin } from '../middleware/verify.js';
 import { signup, login, logout, refresh, getUsers,updateUser,deleteUser } from '../controller/auth.controller.js';
 
 const auth = express.Router();
 
-auth.post('/signup', signup);
+auth.post('/signup',checkAdmin, authenticateToken, signup);
 auth.post('/login', login);
 auth.post('/logout', logout);
 auth.post('/refresh', refresh);
