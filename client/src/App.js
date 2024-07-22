@@ -13,7 +13,6 @@ import Login from './Pages/login';
 import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
 import Admin from './Pages/admin';
-// import View from './pages/View';
 // import Accounts from './pages/Accounts';
 // import Reports from './pages/Reports';
 // import Msg from './pages/Msg';
@@ -37,6 +36,7 @@ const App = () => {
           <Route path="/sales" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
           <Route path="/forbidden" element={<Forbidden />} />
           <Route path="/users" element={<PageWithNavbar><Users /></PageWithNavbar>} />
+          <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
 
           {/* Admin protected routes */}
           <Route

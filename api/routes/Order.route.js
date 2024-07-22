@@ -9,7 +9,7 @@ const OrderRouter = express.Router();
 OrderRouter.post('/placeOrder', authenticateToken, placeOrder);
 OrderRouter.put('/RemoveOneItem', authenticateToken, RemoveOneItemOnOrder);
 OrderRouter.put('/RemoveOneQuantity', authenticateToken, removeItemQuantityOrder);
-OrderRouter.get('/getAllOrderByCounter', authenticateToken,getCounterBill );
+OrderRouter.get('/getAllOrderByCounter',getAllBill );
 OrderRouter.get('/getCounterSales', authenticateToken,getCounterSale);
 
 export default OrderRouter;

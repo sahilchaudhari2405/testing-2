@@ -47,6 +47,6 @@ connectDB();
 console.log(orderDate)
 app.use('/api', allRouter);
 
-app.listen(3000, () => {
+app.listen(4000, () => {
     console.log('listening on *:4000');
 });
