@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Define initial state
 const initialState = {
     user: null,
     token: null,
@@ -9,7 +8,7 @@ const initialState = {
     error: null,
 };
 
-// Define async thunks for login, signup, logout, and fetching users
+// Async thunks for login, signup, logout, and fetching users
 export const loginUser = createAsyncThunk('user/login', async (credentials, { rejectWithValue }) => {
     try {
         const response = await axios.post(`http://localhost:4000/api/auth/login`, credentials);
@@ -39,9 +38,7 @@ export const logoutUser = createAsyncThunk('user/logout', async (_, { rejectWith
 
 export const fetchUsers = createAsyncThunk('user/fetchUsers', async (_, { rejectWithValue }) => {
     try {
-        const response = await axios.get('http://localhost:3000/api/users', {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        const response = await axios.get(`http://localhost:4000/api/auth/users`);
         return response.data;
     } catch (error) {
         return rejectWithValue(error.response.data);
@@ -71,7 +68,7 @@ const userSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.user = action.payload;
+                state.user = action.payload.user;
                 state.token = action.payload.accessToken;
                 localStorage.setItem('token', action.payload.accessToken);
             })
@@ -84,7 +81,7 @@ const userSlice = createSlice({
             })
             .addCase(signupUser.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.user = action.payload;
+                state.user = action.payload.user;
                 state.token = action.payload.accessToken;
                 localStorage.setItem('token', action.payload.accessToken);
             })

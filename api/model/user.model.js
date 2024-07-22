@@ -16,6 +16,10 @@ const CounterUserSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
+        counterNumber: {
+            type: String,
+            unique: true,
+        },
         mobile: {
             type: Number,
             required: true,

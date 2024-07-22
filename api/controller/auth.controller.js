@@ -7,7 +7,8 @@ import jwt from 'jsonwebtoken';
 
 export async function signup(req, res) {
     try {
-        const { fullName, username, email, password, mobile } = req.body;
+        const { fullName, username, email, password,
+            counterNumber, mobile } = req.body;
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -34,6 +35,7 @@ export async function signup(req, res) {
         const newUser = new User({
             fullName,
             email,
+            counterNumber,
             password: hashedPassword,
             mobile,
         });

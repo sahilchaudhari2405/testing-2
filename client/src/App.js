@@ -11,14 +11,14 @@ import Login from './Pages/login';
 import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
 import Admin from './Pages/admin';
-// import View from './pages/View';
+import View from './Pages/view';
 // import Accounts from './pages/Accounts';
 // import Reports from './pages/Reports';
 // import Msg from './pages/Msg';
 // import Import from './pages/Import';
 // import More from './pages/More';
 // import Company from './pages/Company';
-// import Users from './pages/Users';
+import Users from './Pages/users';
 // import Settings from './pages/Settings';
 import { ToastContainer } from 'react-toastify';
 import ProtectedRoute from './component/ProtectedRoute';
@@ -40,6 +40,14 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="admin">
                 <PageWithNavbar><Admin /></PageWithNavbar>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PageWithNavbar><Users /></PageWithNavbar>
               </ProtectedRoute>
             }
           />
@@ -67,8 +75,8 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          {/* <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
-          <Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
+           <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
+          {/*<Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
           <Route path="/reports" element={<PageWithNavbar><Reports /></PageWithNavbar>} />
           <Route path="/msg" element={<PageWithNavbar><Msg /></PageWithNavbar>} />
           <Route path="/import" element={<PageWithNavbar><Import /></PageWithNavbar>} />
