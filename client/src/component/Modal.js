@@ -1,85 +1,117 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createProduct, fetchProducts } from '../Redux/Product/productSlice';
+import { createProduct, updateProduct } from '../Redux/Product/productSlice'; // Add updateProduct action
 import { fetchCategories } from '../Redux/Category/categoriesSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // import styles
 
-
- 
-const Modal = ({ show, onClose, children }) => {
+const Modal = ({ show, onClose, product }) => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
-    const [form, setForm] = useState({
-        title: '',
-        description: '',
-        price: '',
-        discountedPrice: '',
-        discountPercent: '',
-        quantity: '',
-        category: '',
-        brand: '',
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    price: '',
+    discountedPrice: '',
+    discountPercent: '',
+    quantity: '',
+    weight:'',
+    category: 'General',
+    brand: '',
+    image: null,
+    slug: '',
+    BarCode: '',
+    stockType:'',
+    unit:'',
+    purchaseRate: '',
+    profitPercentage: '',
+    HSN:'',
+    GST:'',
+    retailPrice:'',
+    totalAmount:'',
+    amountPaid:'',
+  });
+  const [imagePreview, setImagePreview] = useState(null);
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+    if (product) {
+      // console.log(product)
+      setForm({
+        title: product.items.title,
+        description: product.items.description,
+        price: product.items.price,
+        discountedPrice:product.items.discountedPrice,
+        discountPercent:product.items.discountPercent,
+        quantity:product.items. quantity,
+        weight:product.items.weight,
+        category:product.items.category,
+        brand:product.items.brand,
         image: null,
-        slug: '',
-        BarCode: '',
-        stockType:'',
-        unit:'',
-        purchaseRate: '',
-        profitPercentage: '',
-        HSN:'',
-        GST:'',
-        retailPrice:'',
-        totalAmount:'',
-        amountPaid:'',
-    
+        slug:product.items.slug,
+        BarCode:product.items.BarCode,
+        stockType: product.items.stockType,
+        unit:product.items.unit,
+        purchaseRate: product.items.purchaseRate,
+        profitPercentage:product.items.profitPercentage,
+        HSN:product.items.HSN,
+        GST:product.items.GST,
+        retailPrice:product.items.retailPrice,
+        totalAmount:product.items.totalAmount,
+        amountPaid:product.items.amountPaid,
       });
-      const [imagePreview, setImagePreview] = useState(null);
-    
-      useEffect(() => {
-        dispatch(fetchCategories());
-      }, [dispatch]);
-    
-      const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm((prevForm) => ({ ...prevForm, [name]: value }));
-      };
-    
-      const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setForm((prevForm) => ({ ...prevForm, image: file }));
-        setImagePreview(URL.createObjectURL(file));
-      };
-    
-      const handleDescriptionChange = (value) => {
-        setForm((prevForm) => ({ ...prevForm, description: value }));
-      };
-    
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        for (const key in form) {
-          formData.append(key, form[key]);
+      setImagePreview(product.imgSrc);
+    }
+  }, [dispatch, product]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prevForm) => ({ ...prevForm, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setForm((prevForm) => ({ ...prevForm, image: file }));
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleDescriptionChange = (value) => {
+    setForm((prevForm) => ({ ...prevForm, description: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (product) {
+      console.log(form)
+      dispatch(updateProduct({ id: product.items._id, productData:form })).then((response) => {
+     
+        if (response.error) {
+          toast.error('Failed to update product');
+        } else {
+          toast.success('Product updated successfully');
+          onClose();
         }
-        dispatch(createProduct(formData)).then((response) => {
-          if (response.error) {
-            toast.error('Failed to create product');
-          } else {
-            toast.success('Product created successfully');
-            dispatch(fetchProducts());
-            // Navigate to products page after a short delay to show toast
-            setTimeout(() => {
-              window.location.href = '/admin/products';
-            }, 2000);
-          }
-        });
-      };  
-  
-    return (
-        <>
-        {
-            !show? null :  <div className="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center overflow-scroll">
+      });
+    } else {
+      dispatch(createProduct(form)).then((response) => {
+        console.log(response)
+        if (response.error) {
+          toast.error('Failed to create product');
+        } else {
+          toast.success('Product created successfully');
+          onClose();
+        }
+      });
+    }
+  };
+
+  return (
+    <>
+      {
+            !show? null :  <div className="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center overflow-scroll z-50">
             <div className="bg-white relative p-6 bg-card text-card-foreground rounded-lg max-w-9xl mx-auto w-full h-full mt-32">
                <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 text-4xl hover:text-gray-800">
                  &times;
@@ -101,6 +133,9 @@ const Modal = ({ show, onClose, children }) => {
                    <label htmlFor="category" className="block text-sm font-medium text-zinc-700 mb-3">Category <span className="text-destructive">*</span></label>
                    <select id="category" name="category" value={form.category} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" required>
                      <option value="">Choose category</option>
+                     {/* <option key='general' value='general'>General</option>
+                     <option key='sport' value='sport'>60d72b2f9b1d8b001f8e4f2c</option> */}
+                     
                      {categories.map((category) => (
                        <option key={category._id} value={category._id}>{category.name}</option>
                      ))}
@@ -129,6 +164,10 @@ const Modal = ({ show, onClose, children }) => {
                <div className="mb-4">
                  <label htmlFor="quantity" className="block text-sm font-medium text-zinc-700 mb-3">Quantity</label>
                  <input type="number" id="quantity" name="quantity" value={form.quantity} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter quantity" />
+               </div>
+               <div className="mb-4">
+                 <label htmlFor="weight" className="block text-sm font-medium text-zinc-700 mb-3">Weight</label>
+                 <input type="number" id="weight" name="weight" value={form.weight} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter quantity" />
                </div>
                <div className="mb-4">
                  <label htmlFor="BarCode" className="block text-sm font-medium text-zinc-700 mb-3">Bar Code</label>
@@ -194,9 +233,14 @@ const Modal = ({ show, onClose, children }) => {
                    <img src={imagePreview} alt="Preview" className="h-32 w-32 object-cover rounded-md shadow-md" />
                  </div>
                )}
-               <div className="flex justify-end space-x-4 mt-12">
-                 <button type="submit" className="px-4 py-2 rounded-md bg-green-500 text-primary-foreground hover:bg-green-600">Add Product</button>
-               </div>
+                  <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  {product ? 'Update Product' : 'Create Product'}
+                </button>
+              </div>
              </div>
 
              </div>
@@ -208,8 +252,8 @@ const Modal = ({ show, onClose, children }) => {
            </div>
         }
     
-      </>
-    );
-  };
-  
-  export default Modal;
+    </>
+  );
+};
+
+export default Modal;

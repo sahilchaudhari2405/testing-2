@@ -7,6 +7,7 @@ import { fetchProducts } from "../Redux/Product/productSlice";
 const Inventory = () => {
   const dispatch = useDispatch();
   const { products, status } = useSelector((state) => state.products);
+  const [prod,setProd]=useState([])
 
   // Ensure all hooks are called at the top level
   const [formValues, setFormValues] = useState({
@@ -24,6 +25,9 @@ const Inventory = () => {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+  useEffect(() => {
+    setProd(products);
+  }, [products]);
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -55,7 +59,7 @@ const Inventory = () => {
         product.category.name.toLowerCase().includes(formValues.category.toLowerCase()) ||
         product.brand.toLowerCase().includes(formValues.category.toLowerCase())
     );
-    console.log(filteredProducts)
+setProd(filteredProducts)
   };
 
   const handleOpenModal = () => {
@@ -163,31 +167,21 @@ const Inventory = () => {
           </div>
         </div>
 
-        <div className="bg-gray-100 rounded-lg text-foreground p-4 space-y-4 mt-5 overflow-scroll h-[60vh]">
+        <div className="bg-gray-100 rounded-lg text-foreground p-4 space-y-4 mt-5 overflow-scroll h-[100vh] z-0">
+         {prod&&prod.map((items)=>(
+          // console.log(items)
           <ProductCard
-            imgSrc="https://placehold.co/50"
-            imgAlt="Adidas NEO Light Green 36"
-            productName="Adidas NEO Light Green 36"
+      items={items}
+          />
+         ))} 
+          {/* <ProductCard
+            imgSrc={items.imageUrl}
+            imgAlt={items.title}
+            productName={items.title}
             productDetails="Man Shoes • Stocked Product: 12 in stock • low"
             retailPrice="$280.00"
             wholesalePrice="$300.00"
-          />
-          <ProductCard
-            imgSrc="https://placehold.co/50"
-            imgAlt="Adidas NEO Light Green 36"
-            productName="Adidas NEO Light Green 36"
-            productDetails="Man Shoes • Stocked Product: 12 in stock • low"
-            retailPrice="$280.00"
-            wholesalePrice="$300.00"
-          />
-          <ProductCard
-            imgSrc="https://placehold.co/50"
-            imgAlt="Adidas NEO Light Green 36"
-            productName="Adidas NEO Light Green 36"
-            productDetails="Man Shoes • Stocked Product: 12 in stock • low"
-            retailPrice="$280.00"
-            wholesalePrice="$300.00"
-          />
+          /> */}
        
         </div>
       </div>

@@ -1,0 +1,45 @@
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import connectDB from './database/mongo.db.js';
+import allRouter from './Router/router.js';
+import cors from 'cors';
+dotenv.config({
+  path: './env',
+});
+
+const app = express();
+
+dotenv.config();
+let orderDate = new Date().setDate()+1;
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: false }));
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://apalabajar.com',
+  'http://www.apalabajar.com'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Allow requests with no origin (like mobile apps or curl requests)
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, // Enable credentials
+}));
+// Connect to the database
+connectDB();
+
+// console.log(orderDate)
+app.use('/', allRouter);
+app.listen(4000, () => {
+    console.log('listening on *:4000');
+});

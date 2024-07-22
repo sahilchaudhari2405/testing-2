@@ -3,23 +3,23 @@ import axiosInstance from '../../axiosConfig';
 
 // Thunks for API requests
 export const fetchCategories = createAsyncThunk('categories/fetchCategories', async () => {
-  const response = await axiosInstance.get(`/admin/category/view`);
+  const response = await axiosInstance.get(`/category/view`);
   return response.data.data;
 });
 
 export const createCategory = createAsyncThunk('categories/createCategory', async (category) => {
-  const response = await axiosInstance.post(`/admin/category/create`, category);
+  const response = await axiosInstance.post(`/category/create`, category);
   return response.data.data;
 });
 
 export const updateCategory = createAsyncThunk('categories/updateCategory', async (category) => {
   const { id, ...data } = category;
-  const response = await axiosInstance.put(`/admin/category/update/${id}`, data);
+  const response = await axiosInstance.put(`/category/update/${id}`, data);
   return response.data.data;
 });
 
 export const deleteCategory = createAsyncThunk('categories/deleteCategory', async (id) => {
-  await axiosInstance.delete(`/admin/category/delete/${id}`);
+  await axiosInstance.delete(`/category/delete/${id}`);
   return id;
 });
 
