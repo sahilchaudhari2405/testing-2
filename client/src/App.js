@@ -36,6 +36,8 @@ const App = () => {
           <Route path="/inventory" element={<PageWithNavbar><Inventory /></PageWithNavbar>} />
           <Route path="/sales" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
           <Route path="/forbidden" element={<Forbidden />} />
+          <Route path="/users" element={<PageWithNavbar><Users /></PageWithNavbar>} />
+
           {/* Admin protected routes */}
           <Route
             path="/admin"
