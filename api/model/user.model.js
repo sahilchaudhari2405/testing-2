@@ -30,6 +30,9 @@ const CounterUserSchema = new mongoose.Schema(
             enum: ['user', 'admin'],
             default: 'user',
         },
+        counterNumber: {
+            type: String,
+        }
     },
     { timestamps: true }
 );

@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './database/mongo.db.js';
 import allRouter from './Router/router.js';
+import bodyParser from 'body-parser';
 
 dotenv.config({
   path: './env',
@@ -11,8 +12,10 @@ dotenv.config({
 
 const app = express();
 
+
 const allowedOrigins = [
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://localhost:3001',
 ];
 
 app.use(cors({
@@ -29,15 +32,15 @@ app.use(cors({
   credentials: true, // Enable credentials
 }));
 
-
-
 dotenv.config();
 let orderDate = new Date().setDate()+1;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }))
 
+// parse application/json
+app.use(bodyParser.json())
 // Connect to the database
 connectDB();
 

@@ -1,5 +1,5 @@
-import { setTokens,  } from '../middleware/generateToken.js';
-import User from '../model/user.model.js';
+import { generateAccessToken, setTokens,  } from '../middleware/generateToken.js';
+import CounterUser from '../model/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -7,20 +7,24 @@ import jwt from 'jsonwebtoken';
 
 export async function signup(req, res) {
     try {
+<<<<<<< HEAD
         const { fullName, username, email, password,
             counterNumber, mobile } = req.body;
+=======
+        const { fullName, email, password, mobile } = req.body;
+>>>>>>> 54dc7299224f7bd8fe31982c21de8fcb4c9f91d9
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ error: "Invalid email format" });
         }
 
-        const existingUser = await User.findOne({ username });
+        const existingUser = await CounterUser.findOne({ fullName });
         if (existingUser) {
             return res.status(400).json({ error: "Username is already taken" });
         }
 
-        const existingEmail = await User.findOne({ email });
+        const existingEmail = await CounterUser.findOne({ email });
         if (existingEmail) {
             return res.status(400).json({ error: "Email is already taken" });
         }
@@ -32,7 +36,7 @@ export async function signup(req, res) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({
+        const newUser = new CounterUser({
             fullName,
             email,
             counterNumber,
@@ -56,7 +60,7 @@ export async function signup(req, res) {
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        const user = await CounterUser.findOne({ email });
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
 
         if (!user || !isPasswordCorrect) {
@@ -113,7 +117,7 @@ export async function refresh(req, res) {
 
 export async function getUsers(req, res) {
     try {
-        const users = await User.find().select('-password'); // Exclude password field from query results
+        const users = await CounterUser.find().select('-password'); // Exclude password field from query results
 
         res.status(200).json(users);
     } catch (error) {
@@ -121,3 +125,62 @@ export async function getUsers(req, res) {
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
+
+
+// this will Update Counter User
+export async function updateUser(req, res){
+    const { id } = req.params;
+    const {
+        fullName,
+        password,
+        email,
+        mobile,
+        counterNumber
+    } = req.body;
+  
+    try {
+      // the existing user
+      const existingUser = await User.findById(id);
+      if (!existingUser) {
+        return res.status(404).send({ message: "User not found", status: false });
+      }
+  
+      let updateData = {};
+  
+      // We Update only the provided fields
+      if (fullName !== undefined) updateData.fullName = fullName;
+      if (email !== undefined) updateData.email = email;
+      if (mobile !== undefined) updateData.mobile = mobile;
+      if (counterNumber !== undefined) updateData.counterNumber = counterNumber;
+  
+      if (password) {
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+      const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+      if (!updatedUser) {
+        return res.status(404).send({ message: "User not found", status: false });
+      }
+  
+      return res.status(200).send({ message: "User updated successfully", status: true, data: updatedUser });
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+};
+
+
+
+// this fucntion deletes Counter User
+export async function deleteUser(req, res){
+    const { id } = req.params;
+  
+    try {
+      const deletedUser = await User.findByIdAndDelete(id);
+      if (!deletedUser) {
+        return res.status(404).send({ message: "User not found", status: false });
+      }
+  
+      return res.status(200).send({ message: "User deleted successfully", status: true, data: deletedUser });
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+};
