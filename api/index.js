@@ -12,8 +12,10 @@ dotenv.config({
 
 const app = express();
 
+
 const allowedOrigins = [
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://localhost:3001',
 ];
 
 app.use(cors({
@@ -29,8 +31,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, // Enable credentials
 }));
-
-
 
 dotenv.config();
 let orderDate = new Date().setDate()+1;
