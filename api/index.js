@@ -1,25 +1,21 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './database/mongo.db.js';
 import allRouter from './Router/router.js';
-import cors from 'cors';
+import bodyParser from 'body-parser';
+
 dotenv.config({
   path: './env',
 });
 
 const app = express();
 
-dotenv.config();
-let orderDate = new Date().setDate()+1;
 
-app.use(express.json());
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }));
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://apalabajar.com',
-  'http://www.apalabajar.com'
+  'http://localhost:3001',
 ];
 
 app.use(cors({
@@ -35,11 +31,22 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, // Enable credentials
 }));
+
+dotenv.config();
+let orderDate = new Date().setDate()+1;
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
 // Connect to the database
 connectDB();
 
-// console.log(orderDate)
-app.use('/', allRouter);
+console.log(orderDate)
+app.use('/api', allRouter);
+
 app.listen(4000, () => {
     console.log('listening on *:4000');
 });

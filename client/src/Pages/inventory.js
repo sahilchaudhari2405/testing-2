@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';  // Add useEffect here
+import React, { useState, useEffect } from 'react';
 import ProductCard from '../component/Card';
 import Modal from '../component/Modal';
 import { useDispatch, useSelector } from "react-redux";
@@ -7,7 +7,7 @@ import { fetchProducts } from "../Redux/Product/productSlice";
 const Inventory = () => {
   const dispatch = useDispatch();
   const { products, status } = useSelector((state) => state.products);
-  const [prod,setProd]=useState([])
+  const [prod, setProd] = useState([]);
 
   // Ensure all hooks are called at the top level
   const [formValues, setFormValues] = useState({
@@ -25,6 +25,7 @@ const Inventory = () => {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+
   useEffect(() => {
     setProd(products);
   }, [products]);
@@ -46,20 +47,40 @@ const Inventory = () => {
     }));
   };
 
-
-
   // Handle form submission
   const handleFilter = (e) => {
     e.preventDefault();
     console.log('Form Values:', formValues);
-    const filteredProducts = products.filter(
-      (product) =>
-        // console.log(product)
-        product.title.toLowerCase().includes(formValues.category.toLowerCase()) ||
-        product.category.name.toLowerCase().includes(formValues.category.toLowerCase()) ||
-        product.brand.toLowerCase().includes(formValues.category.toLowerCase())
-    );
-setProd(filteredProducts)
+    let filteredProducts = products.filter((product) => {
+      return (
+        (formValues.barcode === '' || product.BarCode.toString() === formValues.barcode) &&
+        (formValues.description === '' || (product.description && product.description.toLowerCase().includes(formValues.description.toLowerCase()))) &&
+        (formValues.category === '' || (product.category && product.category.name && product.category.name.toLowerCase().includes(formValues.category.toLowerCase()))) &&
+        (formValues.brand === '' || (product.brand && product.brand.toLowerCase().includes(formValues.brand.toLowerCase()))) &&
+        (formValues.size === '' || (product.size && product.size === formValues.size)) &&
+        (formValues.expiringDays === '' || (product.expiringDays && product.expiringDays <= parseInt(formValues.expiringDays)))
+       );
+    });
+
+    if (formValues.lowStock) {
+      filteredProducts = filteredProducts.sort((a, b) => a.quantity - b.quantity);
+    }
+
+    setProd(filteredProducts);
+  };
+
+  // Handle clearing all filters
+  const handleClearFilters = () => {
+    setFormValues({
+      barcode: '',
+      description: '',
+      category: '',
+      brand: '',
+      size: '',
+      expiringDays: '',
+      lowStock: false,
+    });
+    setProd(products);
   };
 
   const handleOpenModal = () => {
@@ -71,9 +92,9 @@ setProd(filteredProducts)
   };
 
   return (
-    <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg ">
+    <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
       <div className="bg-slate-700 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h1 className="text-lg font-bold">Inventory</h1>
+        <h1 className="text-3xl font-bold">Inventory</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm">Online Orders | Hi, <span className='font-bold'>salescounter1</span></span>
           <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
@@ -85,6 +106,7 @@ setProd(filteredProducts)
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Print Report</button>
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Excel Report</button>
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate Barcode</button>
+          <button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded">Add Item</button>
         </div>
         
         <div className="flex items-center space-x-2 mb-4 flex-col bg-gray-100 p-3 rounded-md">
@@ -150,6 +172,7 @@ setProd(filteredProducts)
                 <span>Low Stock</span>
               </label>
               <button type="submit" className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded">Apply</button>
+              <button type="button" onClick={handleClearFilters} className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded">Clear</button>
             </div>
           </form>  
           <div className="flex space-x-2 mb-4">
@@ -168,21 +191,12 @@ setProd(filteredProducts)
         </div>
 
         <div className="bg-gray-100 rounded-lg text-foreground p-4 space-y-4 mt-5 overflow-scroll h-[100vh] z-0">
-         {prod&&prod.map((items)=>(
-          // console.log(items)
+         {prod && prod.map((items) => (
           <ProductCard
-      items={items}
+            key={items._id}
+            items={items}
           />
          ))} 
-          {/* <ProductCard
-            imgSrc={items.imageUrl}
-            imgAlt={items.title}
-            productName={items.title}
-            productDetails="Man Shoes • Stocked Product: 12 in stock • low"
-            retailPrice="$280.00"
-            wholesalePrice="$300.00"
-          /> */}
-       
         </div>
       </div>
       <Modal show={isModalOpen} onClose={handleCloseModal}>

@@ -4,7 +4,7 @@ import mongoose, { Schema } from "mongoose";
 const offlineOrderItemSchema = new Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: "products",
         required: true,
     },
     quantity: {
@@ -12,7 +12,7 @@ const offlineOrderItemSchema = new Schema({
         required: true,
         default: 1,
     },
-    retailPrice: {
+    purchaseRate: {
         type: Number,
         required: true,
     },
@@ -22,7 +22,7 @@ const offlineOrderItemSchema = new Schema({
     },
     GST: {
         type: Number,
-        required: true,
+        required: true, 
     },
     totalProfit: {
         type: Number,

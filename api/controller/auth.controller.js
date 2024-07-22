@@ -1,22 +1,25 @@
-import { setTokens,  } from '../middleware/generateToken.js';
-import User from '../model/user.model.js';
+import { generateAccessToken, setTokens,  } from '../middleware/generateToken.js';
+import CounterUser from '../model/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+
+
+
 export async function signup(req, res) {
     try {
-        const { fullName, username, email, password, mobile } = req.body;
+        const { fullName, email, password, mobile } = req.body;
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ error: "Invalid email format" });
         }
 
-        const existingUser = await User.findOne({ username });
+        const existingUser = await CounterUser.findOne({ fullName });
         if (existingUser) {
             return res.status(400).json({ error: "Username is already taken" });
         }
 
-        const existingEmail = await User.findOne({ email });
+        const existingEmail = await CounterUser.findOne({ email });
         if (existingEmail) {
             return res.status(400).json({ error: "Email is already taken" });
         }
@@ -28,7 +31,7 @@ export async function signup(req, res) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({
+        const newUser = new CounterUser({
             fullName,
             email,
             password: hashedPassword,
@@ -51,20 +54,16 @@ export async function signup(req, res) {
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        const user = await CounterUser.findOne({ email });
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
 
         if (!user || !isPasswordCorrect) {
             return res.status(400).json({ error: "Invalid username or password" });
         }
 
-        const { accessToken, refreshToken } = setTokens(user._id, res);
+        const { accessToken, refreshToken } = setTokens(user, res);
 
         res.status(200).json({
-            _id: user._id,
-            fullName: user.fullName,
-            email: user.email,
-            mobile: user.mobile,
             accessToken,
             refreshToken,
         });
@@ -112,7 +111,7 @@ export async function refresh(req, res) {
 
 export async function getUsers(req, res) {
     try {
-        const users = await User.find().select('-password'); // Exclude password field from query results
+        const users = await CounterUser.find().select('-password'); // Exclude password field from query results
 
         res.status(200).json(users);
     } catch (error) {
