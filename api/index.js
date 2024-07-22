@@ -12,8 +12,10 @@ dotenv.config({
 
 const app = express();
 
+
 const allowedOrigins = [
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://localhost:3001',
 ];
 
 app.use(cors({
@@ -30,8 +32,6 @@ app.use(cors({
   credentials: true, // Enable credentials
 }));
 
-
-
 dotenv.config();
 let orderDate = new Date().setDate()+1;
 
@@ -47,6 +47,6 @@ connectDB();
 console.log(orderDate)
 app.use('/api', allRouter);
 
-app.listen(3000, () => {
+app.listen(4000, () => {
     console.log('listening on *:4000');
 });

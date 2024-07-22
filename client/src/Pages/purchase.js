@@ -348,8 +348,9 @@ const Purchase = () => {
       <table className="w-full border-collapse border mb-4">
         <thead>
           <tr className="bg-black text-white">
-            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>QUANTITY</th>
+       
             <th className={sharedClasses.border + ' ' + sharedClasses.p2}>DESCRIPTION</th>
+            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>QUANTITY</th>
             <th className={sharedClasses.border + ' ' + sharedClasses.p2}>GST</th>
             <th className={sharedClasses.border + ' ' + sharedClasses.p2}>DISCOUNT</th>
             <th className={sharedClasses.border + ' ' + sharedClasses.p2}>UNIT PRICE</th>
@@ -359,11 +360,13 @@ const Purchase = () => {
         <tbody>
           {list.map((e, index) => (
             <tr key={index}>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2 + ' h-12'}>{e.quantity}</td>
+         
               <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.description}</td>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.gst}</td>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.discount}</td>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.price}</td>
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2 + ' h-12'}>{e.quantity}</td>
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.gst}%</td>
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.discount}rs</td>
+
+              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.price}rs</td>
            
             </tr>
           ))}
@@ -373,19 +376,19 @@ const Purchase = () => {
         <div className="w-1/4">
           <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
             <span>SUBTOTAL</span>
-            <span>${total}</span>
+            <span>{total}rs</span>
           </div>
           <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
             <span>DISCOUNT</span>
-            <span>${discount}</span>
+            <span>{discount}rs</span>
           </div>
           <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
             <span>GST</span>
-            <span>${GST}</span>
+            <span>{GST}rs</span>
           </div>
           <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
             <span>TOTAL</span>
-            <span>${total-discount+GST}</span>
+            <span>{total-discount+GST}rs</span>
           </div>
         </div>
       </div>
