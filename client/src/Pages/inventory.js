@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from '../component/Card';
+import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
+import { logoutUser } from '../Redux/User/userSlices';
+import { toast } from 'react-toastify';
 import Modal from '../component/Modal';
 import { fetchProducts } from "../Redux/Product/productSlice";
 import { fetchCategories } from "../Redux/Category/categoriesSlice";
@@ -8,6 +12,8 @@ import CategorySuggestions from '../component/CategorySuggestions';
 
 const Inventory = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [fullName, setFullName] = useState('');
   const { products, status } = useSelector((state) => state.products);
   const { categories } = useSelector((state) => state.categories);
   const [prod, setProd] = useState([]);
@@ -27,6 +33,23 @@ const Inventory = () => {
   // Ref for category input field
   const categoryInputRef = useRef(null);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setFullName(decodedToken.fullName);
+    } else { // Redirect to login if no token found
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    localStorage.removeItem('token');
+    toast.error("Logout Successfully!")
+    navigate('/');
+  };
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -128,8 +151,8 @@ const Inventory = () => {
       <div className="bg-slate-700 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Inventory</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>salescounter1</span></span>
-          <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
+          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
+          <button  onClick={handleLogout}  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
         </div>
       </div>
 

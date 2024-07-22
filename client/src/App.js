@@ -13,21 +13,13 @@ import Login from './Pages/login';
 import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
 import Admin from './Pages/admin';
-<<<<<<< HEAD
-import View from './Pages/view';
-=======
->>>>>>> 54dc7299224f7bd8fe31982c21de8fcb4c9f91d9
 // import Accounts from './pages/Accounts';
 // import Reports from './pages/Reports';
 // import Msg from './pages/Msg';
 // import Import from './pages/Import';
 // import More from './pages/More';
 // import Company from './pages/Company';
-<<<<<<< HEAD
-import Users from './Pages/users';
-=======
 import Users from './Pages/Users.js';
->>>>>>> 54dc7299224f7bd8fe31982c21de8fcb4c9f91d9
 // import Settings from './pages/Settings';
 import { ToastContainer } from 'react-toastify';
 import ProtectedRoute from './component/ProtectedRoute';
