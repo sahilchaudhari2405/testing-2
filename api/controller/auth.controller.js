@@ -119,3 +119,62 @@ export async function getUsers(req, res) {
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
+
+
+// this will Update Counter User
+export async function updateUser(req, res){
+    const { id } = req.params;
+    const {
+        fullName,
+        password,
+        email,
+        mobile,
+        counterNumber
+    } = req.body;
+  
+    try {
+      // the existing user
+      const existingUser = await User.findById(id);
+      if (!existingUser) {
+        return res.status(404).send({ message: "User not found", status: false });
+      }
+  
+      let updateData = {};
+  
+      // We Update only the provided fields
+      if (fullName !== undefined) updateData.fullName = fullName;
+      if (email !== undefined) updateData.email = email;
+      if (mobile !== undefined) updateData.mobile = mobile;
+      if (counterNumber !== undefined) updateData.counterNumber = counterNumber;
+  
+      if (password) {
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+      const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+      if (!updatedUser) {
+        return res.status(404).send({ message: "User not found", status: false });
+      }
+  
+      return res.status(200).send({ message: "User updated successfully", status: true, data: updatedUser });
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+};
+
+
+
+// this fucntion deletes Counter User
+export async function deleteUser(req, res){
+    const { id } = req.params;
+  
+    try {
+      const deletedUser = await User.findByIdAndDelete(id);
+      if (!deletedUser) {
+        return res.status(404).send({ message: "User not found", status: false });
+      }
+  
+      return res.status(200).send({ message: "User deleted successfully", status: true, data: deletedUser });
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+};

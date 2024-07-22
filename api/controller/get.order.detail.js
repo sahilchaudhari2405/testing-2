@@ -4,7 +4,7 @@ import OfflineOrder from "../model/order.model.js";
 // Function to place an order
 const getCounterBill = asyncHandler(async (req, res) => {
     const { id } = req.user;
-    const cart = await OfflineOrder.findOne({ user: id }).populate(
+    const cart = await OfflineOrder.find({ user: id }).populate(
         {
             path:'orderItems',
             populate: {
