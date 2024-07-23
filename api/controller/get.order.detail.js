@@ -22,6 +22,26 @@ const getCounterBill = asyncHandler(async (req, res) => {
 
     }
 );
+const getOneBill = asyncHandler(async (req, res) => {
+    const { id } = req.query;
+    const cart = await OfflineOrder.findById(id).populate(
+        {
+            path:'orderItems',
+            populate: {
+                path: 'product',
+                model: 'products'
+            }
+        }
+    );
+
+    if (!cart) {
+        return res.status(404).json(new ApiResponse(404, 'Cart not found', null));
+    }
+
+        return res.status(200).json(new ApiResponse(200, 'Order placed successfully', cart));
+
+    }
+);
 const getAllBill = asyncHandler(async (req, res) => {
     const cart = await OfflineOrder.find().populate(
         {
@@ -41,4 +61,4 @@ const getAllBill = asyncHandler(async (req, res) => {
 
     }
 );
-export {getAllBill,getCounterBill}
+export {getAllBill,getCounterBill,getOneBill};
