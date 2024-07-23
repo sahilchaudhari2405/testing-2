@@ -11,7 +11,6 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector(state => state.user);
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 

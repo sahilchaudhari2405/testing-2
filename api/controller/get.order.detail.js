@@ -5,6 +5,7 @@ import OfflineOrder from "../model/order.model.js";
 const getCounterBill = asyncHandler(async (req, res) => {
     const { id } = req.user;
     const cart = await OfflineOrder.find({ user: id }).populate(
+
         {
             path:'orderItems',
             populate: {
@@ -25,6 +26,8 @@ const getCounterBill = asyncHandler(async (req, res) => {
 const getOneBill = asyncHandler(async (req, res) => {
     const { id } = req.query;
     const cart = await OfflineOrder.findById(id).populate(
+
+
         {
             path:'orderItems',
             populate: {

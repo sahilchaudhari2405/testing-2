@@ -9,6 +9,31 @@ import ChartofProducts from '../component/lineGraphProduct';
 import ChartofVisitors from '../component/lineGraphVisitors';
 import Chartofdonut from '../component/donutChart';
 import { toast } from 'react-toastify';
+import axios from 'axios';
+
+// const getAllOrderByCounter = () => {
+//     const fetchOrders = async () => {
+//         try {
+//             const response = await axios.get('http://localhost:4000/api/order/getAllOrderByCounter');
+//             console.log(response.data);
+//         } catch (error) {
+//             console.error('Error fetching orders:', error); 
+//         }
+//     };
+
+//     useEffect(() => {
+//         fetchOrders();
+//     }, []); 
+
+//     return (
+//         <div>
+//             <h1>getAllOrderByCounter</h1>
+//         </div>
+//     );
+// };
+
+
+
 
 
 const Dashboard = () => {
@@ -16,10 +41,28 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
 
+  const fetchOrders = async (token) => {
+    try {
+      if (!token) {
+          throw new Error('No token found in localStorage');
+      }
+
+      const response = await axios.get('http://localhost:4000/api/order/getAllOrderByCounter', {
+          headers: { Authorization: `Bearer ${token}` }
+      });
+        console.log("getAllOrderByCounter : ",response.data.data);
+    } catch (error) {
+        console.error('Error fetching orders:', error); 
+    }
+  };
+  
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode(token);
+      fetchOrders(token);
+
       setFullName(decodedToken.fullName);
     } else { // Redirect to login if no token found
     }
