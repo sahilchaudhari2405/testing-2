@@ -44,7 +44,7 @@ app.use(bodyParser.json())
 // Connect to the database
 connectDB();
 
-console.log(orderDate)
+// y
 app.use('/api', allRouter);
 
 app.listen(4000, () => {

@@ -5,7 +5,7 @@ import { getAllBill, getCounterBill } from '../controller/get.order.detail.js';
 import { getCounterSale } from '../controller/get.counter.sales.js';
 const OrderRouter = express.Router();
 
-OrderRouter.post('/placeOrder', authenticateToken, placeOrder);
+OrderRouter.post('/placeOrder', placeOrder);
 OrderRouter.put('/RemoveOneItem', authenticateToken, RemoveOneItemOnOrder);
 OrderRouter.put('/RemoveOneQuantity', authenticateToken, removeItemQuantityOrder);
 OrderRouter.get('/getAllOrderByCounter',getAllBill );

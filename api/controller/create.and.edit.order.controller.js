@@ -12,7 +12,8 @@ import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./add.offl
 
 // Function to place an order
 const placeOrder = asyncHandler(async (req, res) => {
-    const { id } = req.user;
+    // const { id } = req.user;
+    const id=`669b9afa72e1e9138e2a64a3`;
     const { paymentType, BillUser } = req.body;
     const cart = await Offline_Cart.findOne({ userId: id }).populate('cartItems');
 

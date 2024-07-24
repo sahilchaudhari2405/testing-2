@@ -4,10 +4,11 @@ import { addToCart, getCartDetails, getCartItemsById, removeOneCart, removeItemQ
 
 const cart = express.Router();
 
-cart.post('/addCart', authenticateToken, addToCart);
-cart.get('/getCart', authenticateToken, getCartDetails);
-cart.get('/getCartById', authenticateToken, getCartItemsById);
-cart.delete('/removeOneCart', authenticateToken, removeOneCart);
-cart.delete('/removeItemQuantity', authenticateToken, removeItemQuantityCart);
+cart.post('/addCart', addToCart);
+cart.get('/getCart',  getCartDetails);
+cart.get('/getCartById', getCartItemsById);
+cart.delete('/removeOneCart', removeOneCart);
+cart.delete('/removeItemQuantity',  removeItemQuantityCart);
+// authenticateToken,
 
 export default cart;

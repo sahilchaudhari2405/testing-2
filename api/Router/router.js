@@ -17,7 +17,6 @@ allRouter.use('/auth', auth);
 allRouter.use('/order', OrderRouter);
 allRouter.use('/cart', cart);
 allRouter.use('/users', userRoutes);
-
 allRouter.use('/product', productRouter);
 allRouter.use('/category' ,categoryRouter );
 allRouter.use('/admin',cart);

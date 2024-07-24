@@ -312,8 +312,8 @@ const Purchase = () => {
           <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200">
 
             <div ref={componentRef}  className="max-w-4xl mx-auto p-4 bg-white text-black">
-      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-        <div>
+           <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
+           <div>
           <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
           <p>AAPLA BAJAR</p>
           <p>SHRIGONDA, AHMADNAGAR</p>
@@ -344,6 +344,15 @@ const Purchase = () => {
           <p>9637837434</p>
           <p>shivam@gmail.com</p>
         </div>
+        <div className="w-1/2 pr-2">
+          <h2 className={sharedClasses.fontBold}>SHIP TO:</h2>
+          <p>AAPLA BAJAR</p>
+          <p>AHMADNAGAR,Maharashtra</p>
+          <p>Pune,Maharashtra,444003</p>
+          <p>9637837434</p>
+          <p>shivam@gmail.com</p>
+        </div>
+   
       </div>
       <table className="w-full border-collapse border mb-4">
         <thead>

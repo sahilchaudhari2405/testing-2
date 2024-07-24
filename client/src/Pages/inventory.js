@@ -24,8 +24,9 @@ const Inventory = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Ref for category input field
+  // Refs for category input field and suggestions container
   const categoryInputRef = useRef(null);
+  const suggestionsRef = useRef(null);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
@@ -44,19 +45,31 @@ const Inventory = () => {
       );
       setFilteredCategories(filtered);
       setShowSuggestions(true);
-      // Calculate position of the category input
-      if (categoryInputRef.current) {
-        const rect = categoryInputRef.current.getBoundingClientRect();
-        setSuggestionPosition({
-          top: rect.bottom + window.scrollY,
-          left: rect.left + window.scrollX,
-        });
-      }
+   
     } else {
       setFilteredCategories([]);
       setShowSuggestions(false);
     }
   }, [formValues.category, categories]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        categoryInputRef.current &&
+        !categoryInputRef.current.contains(event.target) &&
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -83,7 +96,7 @@ const Inventory = () => {
         (formValues.category === '' || (product.category && product.category.name && product.category.name.toLowerCase().includes(formValues.category.toLowerCase()))) &&
         (formValues.brand === '' || (product.brand && product.brand.toLowerCase().includes(formValues.brand.toLowerCase()))) &&
         (formValues.size === '' || (product.size && product.size === formValues.size)) &&
-        (formValues.expiringDays === '' || (product.expiringDays && product.expiringDays <= parseInt(formValues.expiringDays)))
+        (formValues.expiringDays === '' || (product.expiringDays && product.ageing<= parseInt(formValues.expiringDays)))
        );
     });
 
@@ -138,7 +151,7 @@ const Inventory = () => {
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Print Report</button>
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Excel Report</button>
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate Barcode</button>
-                  <button 
+          <button 
               className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded" 
               onClick={handleOpenModal}
             >
@@ -181,6 +194,7 @@ const Inventory = () => {
                   categories={filteredCategories}
                   onSelect={handleCategorySelect}
                   position={suggestionPosition}
+                  ref={suggestionsRef}
                 />
               )}
               <input
