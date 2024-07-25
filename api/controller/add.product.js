@@ -5,7 +5,7 @@ import OfflinePurchaseOrder from "../model/purchaseOrder";
 export const generateOrderWithProductCheck = async (req, res) => {
     try {
         const { products, orderDetails } = req.body;
-
+        const { id } = req.user;
         // Array to store product details for the order
         const orderItems = [];
 
@@ -54,11 +54,12 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalPrice += item.retailPrice * item.quantity;
             totalPurchaseRate += item.purchaseRate * item.quantity;
             totalGST += (item.retailPrice * item.GST / 100) * item.quantity; // GST calculation
-            totalItem += item.quantity;
+            totalItem += 1;
         }
 
         // Create a new order
         const newOrder = new OfflinePurchaseOrder({
+            user:id,
             ...orderDetails,
             orderItems, // Store only product IDs in orderItems
             totalPrice,
