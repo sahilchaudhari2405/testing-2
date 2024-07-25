@@ -16,14 +16,7 @@ export const authenticateToken = (req, res, next) => {
     }
 };
 
-export const authorizeRoles = (...roles) => {
-    return (req, res, next) => {
-        if (!roles.includes(req.user.role)) {
-            return res.status(403).json({ error: "You do not have permission to perform this action" });
-        }
-        next();
-    };
-};
+
 
 export async function checkAdmin(req, res, next) {
     const token = req.cookies.accessToken;
@@ -34,7 +27,7 @@ export async function checkAdmin(req, res, next) {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
+        const user = decoded;
 
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized', status: false });
