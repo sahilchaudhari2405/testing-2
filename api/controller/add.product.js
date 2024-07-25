@@ -1,20 +1,17 @@
-// controllers/orderController.js
-import Product from "../model/product.model";
-import OfflinePurchaseOrder from "../model/purchaseOrder";
+import Product from "../model/product.model.js";
+import OfflinePurchaseOrder from "../model/purchaseOrder.js";
 
 export const generateOrderWithProductCheck = async (req, res) => {
     try {
         const { products, orderDetails } = req.body;
         const { id } = req.user;
-        // Array to store product details for the order
+
         const orderItems = [];
 
         for (const productData of products) {
-            // Check if the product exists based on BarCode
             let existingProduct = await Product.findOne({ BarCode: productData.BarCode });
 
             if (existingProduct) {
-                // Update the existing product
                 existingProduct.quantity += productData.quantity;
                 existingProduct.purchaseRate = productData.purchaseRate;
                 existingProduct.retailPrice = productData.retailPrice;
@@ -29,9 +26,33 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     retailPrice: productData.retailPrice,
                 });
             } else {
-                // Create a new product
                 const newProduct = new Product({
-                    ...productData,
+                    title: productData.title,
+                    description: productData.description,
+                    price: productData.price,
+                    discountedPrice: productData.discountedPrice,
+                    discountPercent: productData.discountPercent,
+                    weight: productData.weight,
+                    quantity: productData.quantity,
+                    brand: productData.brand,
+                    imageUrl: productData.imageUrl,
+                    slug: productData.slug,
+                    ratings: productData.ratings,
+                    reviews: productData.reviews,
+                    numRatings: productData.numRatings,
+                    category: productData.category,
+                    createdAt: productData.createdAt,
+                    updatedAt: productData.updatedAt,
+                    BarCode: productData.BarCode,
+                    stockType: productData.stockType,
+                    unit: productData.unit,
+                    purchaseRate: productData.purchaseRate,
+                    profitPercentage: productData.profitPercentage,
+                    HSN: productData.HSN,
+                    GST: productData.GST,
+                    retailPrice: productData.retailPrice,
+                    totalAmount: productData.totalAmount,
+                    amountPaid: productData.amountPaid
                 });
                 await newProduct.save();
                 orderItems.push({
@@ -44,7 +65,6 @@ export const generateOrderWithProductCheck = async (req, res) => {
             }
         }
 
-        // Calculate order totals
         let totalPrice = 0;
         let totalPurchaseRate = 0;
         let totalGST = 0;
@@ -53,15 +73,30 @@ export const generateOrderWithProductCheck = async (req, res) => {
         for (const item of orderItems) {
             totalPrice += item.retailPrice * item.quantity;
             totalPurchaseRate += item.purchaseRate * item.quantity;
-            totalGST += (item.retailPrice * item.GST / 100) * item.quantity; // GST calculation
+            totalGST += (item.retailPrice * item.GST / 100) * item.quantity;
             totalItem += 1;
         }
 
-        // Create a new order
         const newOrder = new OfflinePurchaseOrder({
-            user:id,
-            ...orderDetails,
-            orderItems, // Store only product IDs in orderItems
+            user: id,
+            Name: orderDetails.Name,
+            mobileNumber: orderDetails.mobileNumber,
+            email: orderDetails.email,
+            Address: {
+                streetAddress: orderDetails.Address.streetAddress,
+                area: orderDetails.Address.area,
+                houseNumber: orderDetails.Address.houseNumber,
+                landMark: orderDetails.Address.landMark,
+                city: orderDetails.Address.city,
+                district: orderDetails.Address.district,
+                state: orderDetails.Address.state,
+                zipCode: orderDetails.Address.zipCode
+            },
+            paymentType: orderDetails.paymentType,
+            billImageURL: orderDetails.billImageURL,
+            discount: orderDetails.discount,
+            orderStatus: orderDetails.orderStatus,
+            orderItems,
             totalPrice,
             totalPurchaseRate,
             GST: totalGST,
