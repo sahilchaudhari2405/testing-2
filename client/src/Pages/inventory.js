@@ -173,8 +173,7 @@ const Inventory = () => {
         <div className="flex space-x-2 mb-4">
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Print Report</button>
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Excel Report</button>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate Barcode</button>
-          <button 
+               <button 
               className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded" 
               onClick={handleOpenModal}
             >

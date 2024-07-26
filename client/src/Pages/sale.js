@@ -518,6 +518,8 @@ dispatch(fetchCart())
                 type="submit"
                 className="w-full bg-green-700 text-white py-3 rounded font-medium hover:bg-green-800 transition-colors"
               >
+                    <BarcodeReader onError={handleError} onScan={handleScan} />
+
                 Enter
               </button>
             </div>
@@ -656,10 +658,11 @@ dispatch(fetchCart())
                   <td className="border p-3"><input
                 type="text"
                 id="card"
-                 value={cardPay}
+                required
+                value={cardPay}
                 onChange={(e)=>setCardPay(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter payed cash"
+                placeholder="Enter payed cash or enter 0"
               /></td>
                 </tr>
                 <tr>
@@ -668,9 +671,10 @@ dispatch(fetchCart())
                 type="text"
                 id="upi"
                 value={upiPay}
+                required
                 onChange={(e)=>setUPIPay(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter payed cash"
+                placeholder="Enter payed cash or enter 0"
               /></td>
                 </tr>
               </tbody>

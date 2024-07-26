@@ -8,8 +8,8 @@ import Offline_Cart from "../model/cart.model.js";
 import counter from "../model/user.model.js";
 
 const addToCart = asyncHandler(async (req, res) => {
-    // const { id } = req.user; 
-    const id=`669b9afa72e1e9138e2a64a3`;
+    const { id } = req.user; 
+    // const id=`669b9afa72e1e9138e2a64a3`;
     const { productCode } = req.body; 
     const user = await counter.findById(id); 
     if (!user) {
@@ -78,8 +78,8 @@ const addToCart = asyncHandler(async (req, res) => {
 });
 
 const getCartDetails = asyncHandler(async (req, res) => {
-    // const { id } = req.user;
-    const id=`669b9afa72e1e9138e2a64a3`;
+    const { id } = req.user;
+    // const id=`669b9afa72e1e9138e2a64a3`;
       console.log(id);
     if (!id) {
         return res.status(401).json(new ApiResponse(401, 'User ID not provided in cookies', null));
@@ -139,8 +139,8 @@ const getCartItemsById = asyncHandler(async (req, res) => {
 });
 
 const removeOneCart = asyncHandler(async (req, res) => {
-    // const { id } = req.user; 
-    const id=`669b9afa72e1e9138e2a64a3`;
+    const { id } = req.user; 
+    // const id=`669b9afa72e1e9138e2a64a3`;
     const { itemId } = req.query;
 
     const user = await counter.findById(id);
@@ -171,7 +171,7 @@ const removeOneCart = asyncHandler(async (req, res) => {
             cart.final_price_With_GST -= cartItem.finalPrice_with_GST;
             cart.discount -= (cartItem.price - cartItem.discountedPrice);
             await cart.save();
-            await Offline_CartItem.findByIdAndRemove({ _id: itemId });
+            await Offline_CartItem.findByIdAndDelete({ _id: itemId });
         }
 
         return res.status(200).json(new ApiResponse(200, 'Cart item deleted successfully', cartItem));
@@ -185,8 +185,8 @@ const removeOneCart = asyncHandler(async (req, res) => {
 });
 
 const removeAllCart = asyncHandler(async (req, res) => {
-    // const { id } = req.user; 
-    const id=`669b9afa72e1e9138e2a64a3`;
+    const { id } = req.user; 
+    // const id=`669b9afa72e1e9138e2a64a3`;
     const user = await counter.findById(id);
     if (!user) {
         return res.status(401).json(new ApiError(401, 'User not found'));
@@ -212,8 +212,8 @@ const removeAllCart = asyncHandler(async (req, res) => {
 });
 
 const removeItemQuantityCart = asyncHandler(async (req, res) => {
-    //const { id } = req.user; 
-    const id=`669b9afa72e1e9138e2a64a3`
+    const { id } = req.user; 
+    // const id=`669b9afa72e1e9138e2a64a3`
     const { itemId } = req.query;
     console.log(itemId)
 
