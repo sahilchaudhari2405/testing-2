@@ -171,7 +171,7 @@ const removeOneCart = asyncHandler(async (req, res) => {
             cart.final_price_With_GST -= cartItem.finalPrice_with_GST;
             cart.discount -= (cartItem.price - cartItem.discountedPrice);
             await cart.save();
-            await Offline_CartItem.findByIdAndDelete({ _id: itemId });
+            await Offline_CartItem.findOneAndDelete({ _id: itemId });
         }
 
         return res.status(200).json(new ApiResponse(200, 'Cart item deleted successfully', cartItem));

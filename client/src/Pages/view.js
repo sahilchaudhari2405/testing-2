@@ -73,7 +73,7 @@ const View = () => {
         </tr>
       </thead>
       <tbody>
-        {orders.map((item,i) => (
+        {data?.map((item,i) => (
           <tr key={item._id} className={(i+1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
             <td className="border border-zinc-800 px-4 py-2">{i+1}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.Name}</td>
@@ -135,8 +135,8 @@ const View = () => {
           </label>
         </div>
 
-        {selectedView === 'Sales' && renderTable(salesData)}
-        {selectedView === 'Purchase' && renderTable(purchaseData)}
+        {selectedView === 'Sales' && renderTable(orders)}
+        {selectedView === 'Purchase' && renderTable(orders)}
       </div>
     </div>
   );

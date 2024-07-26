@@ -43,6 +43,17 @@ export const deleteOrder = createAsyncThunk('orders/deleteOrder', async (orderId
   }
 });
 
+export const createPurchaseOrder = createAsyncThunk('purchaseOrders/createPurchaseOrder', async ({  products, orderDetails }) => {
+  console.log(products)
+  console.log(orderDetails)
+  try {
+    const response = await axiosInstance.post('/product/purchaseOrder', {products, orderDetails });
+    return response.data;  // Return the data directly from axios response
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to create purchase order');
+  }
+});
+
 // Initial state
 const initialState = {
   orders: [],
@@ -101,6 +112,17 @@ const ordersSlice = createSlice({
         state.orders = state.orders.filter(order => order.id !== action.payload);
       })
       .addCase(deleteOrder.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(createPurchaseOrder.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(createPurchaseOrder.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.purchaseOrders.push(action.payload);
+      })
+      .addCase(createPurchaseOrder.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       });

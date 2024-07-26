@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaBarcode } from "react-icons/fa"; // Import the barcode icon from react-icons
 import ReactToPrint from "react-to-print";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import logo from "../logo.png";
 import { logoutUser } from "../Redux/User/userSlices";
 import { toast } from "react-toastify";
@@ -16,31 +16,22 @@ import {
   updateCartQuantity,
   addToCart,
 } from "../Redux/Cart/cartSlice";
-import { createOrder } from "../Redux/Orders/orderSlice";
+import { createPurchaseOrder } from "../Redux/Orders/orderSlice";
 import Invoice from "../component/invoice.js";
 import BarcodeReader from "react-barcode-reader";
-
-
-
 
 const Purchase = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
-  const productDetails = useSelector((state) => state.products.productDetails);
-  const [list, setList] = useState([]);
-  const [total, setTotal] = useState();
-  const [GST, setGST] = useState();
-  const [discount, setDiscount] = useState();
-  const { items, status, fetchCartError } = useSelector((state) => state.cart);
+  let productDetails = useSelector((state) => state.products.productDetails);
+  const purchaseOrders = useSelector((state) => state.orders.purchaseOrders);
   const [currentDate, setCurrentDate] = useState("");
   const [cart, setCart] = useState([]);
-  const [invoice, setInvoicePrice]=useState();
-  const [totalGst,setTotalGst]=useState();
-  const [paid,setPaid]=useState();
-   const [cardPay,setCardPay]=useState('');
-  const [cashPay,setCashPay]=useState('');
-  const [upiPay,setUPIPay]=useState('');
+  const [invoice, setInvoicePrice] = useState();
+  const [totalGst, setTotalGst] = useState();
+  const [paid, setPaid] = useState();
+  const [invoiceData,setInvoice] = useState();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -52,7 +43,6 @@ const Purchase = () => {
     }
   }, [navigate]);
 
-  
   useEffect(() => {
     // Get the current date in the required format (YYYY-MM-DD)
     const today = new Date();
@@ -66,24 +56,23 @@ const Purchase = () => {
   }, []);
 
   useEffect(() => {
-// setDetails(items[0]);
-if(cart.length>0){
-  const totalAmount = cart.reduce((acc,e)=>acc+(e.purchaseRate*e.qty),0)
-    console.log(totalAmount)
-    
-    const totalGST = cart.reduce((acc,e)=> acc+(e.gst*e.qty),0
-    )
-    console.log(totalGST)
-    const paid = cart.reduce((acc,e)=>acc+parseInt(e.amountpaid),0)
-    console.log(paid)
-    setInvoicePrice(totalAmount)
-    setTotalGst(totalGST)
-    setPaid(paid)
-    
-    // console.log(details);
-    // console.log(cart);
-}
+    if (cart.length > 0) {
+      const totalAmount = cart.reduce((acc, e) => acc + (e.purchaseRate * e.qty), 0);
+      const totalGST = cart.reduce((acc, e) => acc + (e.gst * e.qty), 0);
+      const paid = cart.reduce((acc, e) => acc + parseInt(e.amountpaid, 10), 0);
 
+      setInvoicePrice(totalAmount);
+      setTotalGst(totalGST);
+      setPaid(paid);
+
+      setFinal((prevState) => ({
+        ...prevState,
+        TotalAmount: totalAmount,
+        AmountPaid: paid,
+        totalGst: totalGST,
+        date:currentDate
+      }));
+    }
   }, [cart]);
 
   const handleLogout = () => {
@@ -103,9 +92,6 @@ if(cart.length>0){
     fontBold: "font-bold",
   };
 
-
-
-
   // ============================functions for scanning product===============================
   const handleScan = (data) => {
     if (data) {
@@ -116,6 +102,7 @@ if(cart.length>0){
   const handleError = (err) => {
     dispatch(fetchProduct("2345632900700"));
   };
+
   const [formData, setFormData] = useState({
     barcode: "",
     brand: "",
@@ -132,6 +119,7 @@ if(cart.length>0){
     total: "",
     amountpaid: "",
   });
+
   useEffect(() => {
     if (productDetails) {
       setFormData({
@@ -143,10 +131,10 @@ if(cart.length>0){
         unit: productDetails.unit || "",
         qty: 1,
         saleRate: productDetails.discountedPrice || "",
-        purchaseRate:productDetails.purchaseRate || "",
-        profit:(productDetails.discountedPrice-productDetails.purchaseRate)|| "",
-        hsn: productDetails.HSN || "0",
-        gst: productDetails.GST || "0",
+        purchaseRate: productDetails.purchaseRate || "",
+        profit: (productDetails.discountedPrice - productDetails.purchaseRate) || "",
+        hsn: productDetails.HSN || "",
+        gst: productDetails.GST || "",
         amountpaid: "",
       });
     }
@@ -157,7 +145,6 @@ if(cart.length>0){
       ...formData,
       [e.target.id]: e.target.value,
     });
-    // decreaseQuantity(e)
   };
 
   // ============================functions for adding product in cart===============================
@@ -166,38 +153,59 @@ if(cart.length>0){
     e.preventDefault();
 
     if (formData) {
-        setCart([...cart, formData]);
-       
-  
+      setCart([...cart, formData]);
     }
+    productDetails = { qty: "" };
+
+    setFormData({
+      barcode: productDetails.BarCode || "",
+      brand: productDetails.brand || "",
+      description: productDetails.title || "",
+      category: productDetails.category?.name || "",
+      stockType: productDetails.stockType || "",
+      unit: productDetails.unit || "",
+      qty: productDetails.BarCode ? 1 : "",
+      saleRate: productDetails.discountedPrice || "",
+      purchaseRate: productDetails.purchaseRate || "",
+      profit: (productDetails.discountedPrice - productDetails.purchaseRate) || "",
+      hsn: productDetails.HSN || "",
+      gst: productDetails.GST || "",
+      amountpaid: "",
+    });
   };
+
   const handleKeyPress = (e) => {
-    // console.log(e);
     if (e.key === "Enter") {
       handleSubmit(e);
     }
   };
 
-
   const handleDelete = (id) => {
-    console.log(id)
-    const updatedProducts = cart.filter(product => product.barcode != id);
-    console.log(updatedProducts)
+    const updatedProducts = cart.filter((product) => product.barcode !== id);
     setCart(updatedProducts);
   };
-  // =====================creating order===========================
-  const [finalform,setFinal] = useState({
-    type:"Purchase",
-    name:"",
-    date:currentDate,
-    mobileNumber:"",
-    ShipTo:"",
-    address:"",
-    ref:"",
-    state:"Maharastra",
-    GSTNo:""
-  });
 
+  // =====================creating order===========================
+  const [finalform, setFinal] = useState({
+    type: "Purchase",
+    name: "",
+    date: '',
+    mobileNumber: "",
+    ShipTo: "",
+    address: "",
+    ref: "",
+    state: "Maharastra",
+    GSTNo: "",
+    totalGst: "",
+    TotalAmount: "",
+    AmountPaid: "",
+    orderStatus: "first time",
+    paymentType: {
+      cash: "",
+      card: "",
+      upi: ""
+    },
+  });
 
   const handleFinal = (e) => {
     setFinal({
@@ -205,82 +213,96 @@ if(cart.length>0){
       [e.target.id]: e.target.value,
     });
   };
-  const bill =()=>{
-    //  console.log(Type);
-    const BillData={
-      "products":cart,
-      "orderDetails": finalform,
-      "billImageURL": "",
-      "GST":totalGst,
-      "TotalAmount":invoice,
-      "AmountPaid":paid,
-      "orderStatus": "first time",
-      "date":currentDate
-      }
-    
-    console.log(BillData)
-    // try {
-    //   const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay}, BillUser:finalform })).unwrap()
-    //   console.log(createdOrder);
-    
-    //   setInvoice(createdOrder.data)
-    //   setFinal({
-    //     type:"Sale",
-    //     name:"",
-    //     Date:currentDate,
-    //     mobileNumber:"",
-    //     ShipTo:"",
-    //     address:"",
-    //     state:"Maharastra",
-    //     GSTNo:"",
-    //   })
-    //   setFormData({
-    //     barcode: "",
-    //     brand: "",
-    //     description: "",
-    //     category: "",
-    //     stockType: "",
-    //     unit: "",
-    //     qty: "",
-    //     saleRate: "",
-    //     profit: "",
-    //     hsn: "",
-    //     gst: "",
-    //     total: "",
-    //   })
-    // dispatch(fetchCart())
-    //   setCardPay('');
-    //   setCashPay('');
-    //   setUPIPay('')
-    //   setFinalTotal('');
-    //   setTotalPrice('');
-    //   setDiscount('');
-    //   setGst('');
-    //   alert('Order created successfully!');
-    // } catch (err) {
-    //   alert(`Failed to create order: ${err.message}`);
-    // }
-      }
 
-      //======================barcode genration====================================
+  const handlePaymentTypeChange = (e) => {
+    const { id, value } = e.target;
+    setFinal((prevState) => ({
+      ...prevState,
+      paymentType: {
+        ...prevState.paymentType,
+        [id]: value,
+      },
+    }));
+  };
 
-const genrateBarcode = async() =>{
-  try {
-    const response = await axiosInstance.get('/order/getAllOrderByCounter');
-    console.log(response.data)
-    setFormData({
-      ...formData,
-      ['barcode']: response.data.data,
-    });
-   // Return the data directly from axios response
-  } catch (error) {
-    throw new Error(error.response?.data?.message || 'Failed to genrate barcode');
+  const bill = async() => {
+    // const BillData = {
+    //   products: cart,
+    //   orderDetails: finalform,
+    //   billImageURL: "",
+    //   date: currentDate
+    // };
+
+    // console.log(BillData);
+
+
+    if(cart.length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
+
+  
+    try {
+      const createdOrder=  await dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform})).unwrap()
+      console.log(createdOrder);
+    
+      setInvoice(createdOrder.data)
+      setFinal({
+        type: "Purchase",
+        name: "",
+        date: '',
+        mobileNumber: "",
+        ShipTo: "",
+        address: "",
+        ref: "",
+        state: "Maharastra",
+        GSTNo: "",
+        totalGst: "",
+        TotalAmount: "",
+        AmountPaid: "",
+        orderStatus: "first time",
+        paymentType: {
+          cash: "",
+          card: "",
+          upi: ""
+        },
+      })
+      setFormData({
+        barcode:"",
+        brand:"",
+        description:"",
+        category:"",
+        stockType:"",
+        unit:"",
+        qty: "",
+        saleRate: "",
+        purchaseRate:"",
+        profit:"",
+        hsn:"",
+        gst:"",
+        amountpaid: "",
+      })
+      alert('Order created successfully!');
+    } catch (err) {
+      alert("Failed to create order: ",err.message);
+    }
+  }else{
+    alert("enter all details")
   }
-}
 
+    
+  };
 
+  //======================barcode genration====================================
 
-
+  const genrateBarcode = async () => {
+    try {
+      const response = await axiosInstance.get('/order/getAllOrderByCounter');
+      setFormData({
+        ...formData,
+        ['barcode']: response.data.data||'09230239203',
+      });
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to genrate barcode');
+    }
+  };
 
   const componentRef = useRef();
   return (
@@ -855,8 +877,8 @@ const genrateBarcode = async() =>{
                 type="text"
                 id="cash"
                 required
-                value={cashPay}
-                onChange={(e)=>setCashPay(e.target.value)}
+                value={finalform.paymentType.cash}
+                onChange={handlePaymentTypeChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter payed cash"
               /></td>
@@ -866,8 +888,8 @@ const genrateBarcode = async() =>{
                   <td className="border p-3"><input
                 type="text"
                 id="card"
-                 value={cardPay}
-                onChange={(e)=>setCardPay(e.target.value)}
+                value={finalform.paymentType.card}
+                onChange={handlePaymentTypeChange}
                 required
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter payed cash or enter 0"
@@ -878,9 +900,9 @@ const genrateBarcode = async() =>{
                   <td className="border p-3"><input
                 type="text"
                 id="upi"
-                value={upiPay}
+                value={finalform.paymentType.upi}
                 required
-                onChange={(e)=>setUPIPay(e.target.value)}
+                onChange={handlePaymentTypeChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter payed cash or enter 0"
               /></td>
@@ -891,149 +913,7 @@ const genrateBarcode = async() =>{
       </div>
 
       {/* ---------------------invoice ganrator------------------------- */}
-
-      {/* <div style={{ display: "none" }}>
-          <Invoice ref={componentRef} cart={cart} total={total} GST={GST} discount={discount} />
-        </div> */}
-    
-      {/* <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200">
-        <div
-          ref={componentRef}
-          className="max-w-4xl mx-auto p-4 bg-white text-black"
-        >
-          <div
-            className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}
-          >
-            <div>
-              <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
-              <p>AAPLA BAJAR</p>
-              <p>SHRIGONDA, AHMADNAGAR</p>
-              <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
-              <p>PHONE: 9849589588</p>
-              <p>EMAIL: aaplabajar1777@gmail.com</p>
-            </div>
-            <div className="w-24 h-24 border flex items-center justify-center">
-              <img src={logo} alt="Insert Logo Above" />
-            </div>
-          </div>
-          <div
-            className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}
-          >
-            <div>
-              <span className={sharedClasses.fontBold}>INVOICE #: </span>
-              <span>985934857944</span>
-            </div>
-            <div>
-              <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-              <span>18/07/2024</span>
-            </div>
-          </div>
-          <div
-            className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}
-          >
-            <div className="w-1/2 pr-2">
-              <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
-              <p>Shivam Bole</p>
-              <p>Pune,Maharashtra</p>
-              <p>Pune,Maharashtra,444003</p>
-              <p>9637837434</p>
-              <p>shivam@gmail.com</p>
-            </div>
-            <div className="w-1/2 pr-2">
-              <h2 className={sharedClasses.fontBold}>SHIP TO:</h2>
-              <p>AAPLA BAJAR</p>
-              <p>AHMADNAGAR,Maharashtra</p>
-              <p>Pune,Maharashtra,444003</p>
-              <p>9637837434</p>
-              <p>shivam@gmail.com</p>
-            </div>
-          </div>
-          <table className="w-full border-collapse border mb-4">
-            <thead>
-              <tr className="bg-black text-white">
-                <th className={sharedClasses.border + " " + sharedClasses.p2}>
-                  DESCRIPTION
-                </th>
-                <th className={sharedClasses.border + " " + sharedClasses.p2}>
-                  QUANTITY
-                </th>
-                <th className={sharedClasses.border + " " + sharedClasses.p2}>
-                  GST
-                </th>
-                <th className={sharedClasses.border + " " + sharedClasses.p2}>
-                  DISCOUNT
-                </th>
-                <th className={sharedClasses.border + " " + sharedClasses.p2}>
-                  UNIT PRICE
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.map((e, index) => (
-                <tr key={index}>
-                  <td className={sharedClasses.border + " " + sharedClasses.p2}>
-                    {e.description}
-                  </td>
-                  <td
-                    className={
-                      sharedClasses.border + " " + sharedClasses.p2 + " h-12"
-                    }
-                  >
-                    {e.quantity}
-                  </td>
-                  <td className={sharedClasses.border + " " + sharedClasses.p2}>
-                    {e.gst}%
-                  </td>
-                  <td className={sharedClasses.border + " " + sharedClasses.p2}>
-                    {e.discount}rs
-                  </td>
-
-                  <td className={sharedClasses.border + " " + sharedClasses.p2}>
-                    {e.price}rs
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div
-            className={`${sharedClasses.flex} justify-end ${sharedClasses.mb4}`}
-          >
-            <div className="w-1/4">
-              <div
-                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
-              >
-                <span>SUBTOTAL</span>
-                <span>{total}rs</span>
-              </div>
-              <div
-                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
-              >
-                <span>DISCOUNT</span>
-                <span>{discount}rs</span>
-              </div>
-              <div
-                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
-              >
-                <span>GST</span>
-                <span>{GST}rs</span>
-              </div>
-              <div
-                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}
-              >
-                <span>TOTAL</span>
-                <span>{total - discount + GST}rs</span>
-              </div>
-            </div>
-          </div>
-          <div className="mb-4">
-            <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2>
-            <div
-              className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}
-            ></div>
-          </div>
-          <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
-        </div>
-      </div> */}
+<Invoice/>
     </div>
   );
 };
