@@ -7,7 +7,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
         const { products, orderDetails } = req.body;
         const { id } = req.user;
         // const id=`669b9afa72e1e9138e2a64a3`;
-        console.log(orderDetails)
+        // console.log(orderDetails)
         // Array to store product details for the order
         const orderItems = [];
 
@@ -17,6 +17,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
 
             if (existingProduct) {
                 // Update the existing product
+                //console.log(existingProduct)
                 existingProduct.quantity += productData.qty;
                 existingProduct.purchaseRate = productData.purchaseRate;
                 existingProduct.retailPrice = productData.saleRate;
@@ -35,6 +36,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                 const newProduct = new Product({
                     ...productData,
                 });
+               // console.log(newProduct)
                 await newProduct.save();
                 orderItems.push({
                     productId: newProduct._id,
@@ -58,7 +60,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalGST += (item.retailPrice * item.GST / 100) * item.quantity; // GST calculation
             totalItem += 1;
         }
-
+        console.log(orderItems)
         // Create a new order
         const newOrder = new OfflinePurchaseOrder({
             user:id,
