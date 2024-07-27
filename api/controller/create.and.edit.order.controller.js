@@ -192,5 +192,31 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
     }
 });
 
+
+// to get order by id
+const getOrderById = asyncHandler(async (req, res) => {
+    const { id } = req.params; 
+
+    try {
+        const order = await OfflineOrder.findById(id).populate({
+            path: 'orderItems',
+            populate: {
+                path: 'product',
+                model: 'Product', 
+            },
+        });
+
+        if (!order) {
+            return res.status(404).json(new ApiResponse(404, 'Order not found', null));
+        }
+
+        return res.status(200).json(new ApiResponse(200, 'Order retrieved successfully', order));
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json(new ApiResponse(500, 'Error retrieving order', error.message));
+    }
+});
+
+
 // Export functions
-export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder };
+export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById };

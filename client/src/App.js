@@ -8,6 +8,7 @@ import Dashboard from './Pages/dashboard';
 import Purchase from './Pages/purchase';
 import Inventory from './Pages/inventory';
 // import Sales from './pages/Sales';
+import EditOrder from './Pages/editOrder.js';
 import View from './Pages/View';
 import Login from './Pages/login';
 import Sales from './Pages/sale';
@@ -34,6 +35,7 @@ const App = () => {
           <Route path="/purchase" element={<PageWithNavbar><Purchase /></PageWithNavbar>} />
           <Route path="/inventory" element={<PageWithNavbar><Inventory /></PageWithNavbar>} />
           <Route path="/sales" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
+          <Route path="/editOrder" element={<PageWithNavbar><EditOrder /></PageWithNavbar>} />
           <Route path="/forbidden" element={<Forbidden />} />
           <Route path="/users" element={<PageWithNavbar><Users /></PageWithNavbar>} />
           <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />

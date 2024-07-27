@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart, LineChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useEffect } from 'react';
 
 const dataDay = [
     { name: 'Day 1', sales: 4000, revenue: 2400 },
@@ -33,20 +34,25 @@ const dataYear = [
     { name: 'Dec', sales: 90000, revenue: 75000 },
 ];
 
-const ChartWithDropdown = () => {
+const ChartWithDropdown = ({daywiseData,weekwiseData,monthwiseData}) => {
     const [timeFrame, setTimeFrame] = useState('day');
     const [chartData, setChartData] = useState(dataDay);
     const [chartType, setChartType] = useState('bar');
+
+    useEffect(() => {
+        setChartData(daywiseData);
+        console.log("this is daywiseData: ",daywiseData );
+    },[daywiseData]);
 
     const handleTimeFrameChange = (event) => {
         const value = event.target.value;
         setTimeFrame(value);
         if (value === 'day') {
-            setChartData(dataDay);
+            setChartData(daywiseData);
         } else if (value === 'week') {
-            setChartData(dataWeek);
-        } else if (value === 'year') {
-            setChartData(dataYear);
+            setChartData(weekwiseData);
+        } else if (value === 'month') {
+            setChartData(monthwiseData);
         }
     };
 
@@ -66,7 +72,7 @@ const ChartWithDropdown = () => {
                 <select value={timeFrame} onChange={handleTimeFrameChange}>
                         <option value="day">Day</option>
                         <option value="week">Week</option>
-                        <option value="year">Year</option>
+                        <option value="month">Month</option>
                     </select>
                 </button>
 

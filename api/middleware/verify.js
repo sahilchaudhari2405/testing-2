@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../model/user.model.js';
 
 export const authenticateToken = (req, res, next) => {
-    const token = req.cookies.accessToken;
+    const token = req.cookies.access_token;
     console.log(token);
 
     if (!token) {

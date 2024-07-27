@@ -270,6 +270,10 @@ const Sale = () => {
     navigate('/');
   };
 
+  const handleOrderEdit = () => {
+    navigate('/editOrder');
+  }
+
   const sharedClasses = {
     flex: 'flex',
     justifyBetween: 'justify-between',
@@ -336,8 +340,13 @@ const Sale = () => {
         <h1 className="text-3xl font-bold">Sale</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
-          <button
-            onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
+          <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">
+              LogOut
+          </button>
+          <button onClick={handleOrderEdit} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors">
+              Edit an Order
+          </button>
+
         </div>
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">

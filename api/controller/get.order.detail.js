@@ -22,6 +22,7 @@ const getCounterBill = asyncHandler(async (req, res) => {
 
     }
 );
+
 const getAllBill = asyncHandler(async (req, res) => {
     const cart = await OfflineOrder.find().populate(
         {
