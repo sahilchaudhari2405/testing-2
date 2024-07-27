@@ -19,15 +19,14 @@ export const authenticateToken = (req, res, next) => {
 
 
 export async function checkAdmin(req, res, next) {
-    const token = req.cookies.accessToken;
+    const token = req.user;
 
     if (!token) {
         return res.status(401).json({ message: 'Access token is missing', status: false });
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = decoded;
+        const user = token;
 
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized', status: false });
