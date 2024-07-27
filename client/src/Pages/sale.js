@@ -1,343 +1,251 @@
-// import React from 'react';
-
-// const Sale = () => {
-//   return (
-//     <div className="bg-zinc-100 mt-28 mx-6">
-//       <div className="bg-zinc-300 p-4 flex justify-between items-center">
-//         <div className="text-lg font-bold">SALES</div>
-//         <div className="text-sm">
-//           <span>Online Orders | Hi, salescounter1 - </span>
-//           <a href="#" className="text-blue-500">LogOut</a>
-//         </div>
-//       </div>
-//       <div className="bg-white p-4 shadow-md">
-//         <div className="grid grid-cols-4 gap-4 mb-4">
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">Type</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" value="Sales" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">Name</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">Ref.</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">Mobile</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">Address</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">Invoice</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" value="63525" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">Ship To</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">Date</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" value="18-07-2024" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">GST NO.</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-zinc-700">State</label>
-//             <input type="text" className="mt-1 block w-full border-zinc-300 rounded-md shadow-sm" value="Maharashtra (27)" />
-//           </div>
-//         </div>
-//         <div className="grid grid-cols-4 gap-4 mb-4">
-//           <div className="flex items-center">
-//             <label className="block text-sm font-medium text-zinc-700 mr-2">Sold</label>
-//             <button className="bg-zinc-200 text-zinc-700 px-2 py-1 rounded-md">Recent</button>
-//           </div>
-//           <div className="flex items-center">
-//             <label className="block text-sm font-medium text-zinc-700 mr-2">Loyalty</label>
-//             <button className="bg-zinc-200 text-zinc-700 px-2 py-1 rounded-md">Balance</button>
-//           </div>
-//           <div className="flex items-center">
-//             <label className="block text-sm font-medium text-zinc-700 mr-2">Wholesale</label>
-//             <button className="bg-zinc-200 text-zinc-700 px-2 py-1 rounded-md">Balance</button>
-//           </div>
-//         </div>
-//         <div className="overflow-x-auto">
-//           <table className="min-w-full bg-white">
-//             <thead>
-//               <tr className="w-full bg-zinc-200 text-zinc-600 uppercase text-sm leading-normal">
-//                 <th className="py-3 px-6 text-left">#</th>
-//                 <th className="py-3 px-6 text-left">Description</th>
-//                 <th className="py-3 px-6 text-left">Offers</th>
-//                 <th className="py-3 px-6 text-left">Agent</th>
-//                 <th className="py-3 px-6 text-left">MRP</th>
-//                 <th className="py-3 px-6 text-left">Net Qty</th>
-//                 <th className="py-3 px-6 text-left">Price</th>
-//                 <th className="py-3 px-6 text-left">Rate</th>
-//                 <th className="py-3 px-6 text-left">Value</th>
-//                 <th className="py-3 px-6 text-left">Disc.</th>
-//                 <th className="py-3 px-6 text-left">GST%</th>
-//                 <th className="py-3 px-6 text-left">Total Value</th>
-//                 <th className="py-3 px-6 text-left">Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody className="text-zinc-600 text-sm font-light">
-//               <tr className="border-b border-zinc-200 hover:bg-zinc-100">
-//                 <td className="py-3 px-6 text-left whitespace-nowrap">1</td>
-//                 <td className="py-3 px-6 text-left">KISAN PEANUT BUTTER</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <select className="border-zinc-300 rounded-md shadow-sm">
-//                     <option>Select</option>
-//                   </select>
-//                 </td>
-//                 <td className="py-3 px-6 text-left">
-//                   <select className="border-zinc-300 rounded-md shadow-sm">
-//                     <option>Select</option>
-//                   </select>
-//                 </td>
-//                 <td className="py-3 px-6 text-left">50</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <input type="number" className="border-zinc-300 rounded-md shadow-sm w-full" value="1" />
-//                 </td>
-//                 <td className="py-3 px-6 text-left">PCS-PF</td>
-//                 <td className="py-3 px-6 text-left">50</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">50</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <button className="text-red-500">
-//                     <img aria-hidden="true" alt="delete" src="https://openui.fly.dev/openui/24x24.svg?text=🗑️" />
-//                   </button>
-//                 </td>
-//               </tr>
-//               <tr className="border-b border-zinc-200 hover:bg-zinc-100">
-//                 <td className="py-3 px-6 text-left whitespace-nowrap">2</td>
-//                 <td className="py-3 px-6 text-left">KIDS COLGATE 85RS</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <select className="border-zinc-300 rounded-md shadow-sm">
-//                     <option>Select</option>
-//                   </select>
-//                 </td>
-//                 <td className="py-3 px-6 text-left">
-//                   <select className="border-zinc-300 rounded-md shadow-sm">
-//                     <option>Select</option>
-//                   </select>
-//                 </td>
-//                 <td className="py-3 px-6 text-left">85</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <input type="number" className="border-zinc-300 rounded-md shadow-sm w-full" value="1" />
-//                 </td>
-//                 <td className="py-3 px-6 text-left">PCS-PF</td>
-//                 <td className="py-3 px-6 text-left">80</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">80</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <button className="text-red-500">
-//                     <img aria-hidden="true" alt="delete" src="https://openui.fly.dev/openui/24x24.svg?text=🗑️" />
-//                   </button>
-//                 </td>
-//               </tr>
-//               <tr className="border-b border-zinc-200 hover:bg-zinc-100">
-//                 <td className="py-3 px-6 text-left whitespace-nowrap">3</td>
-//                 <td className="py-3 px-6 text-left">FAIR AND LOVELY 52RS</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <select className="border-zinc-300 rounded-md shadow-sm">
-//                     <option>Select</option>
-//                   </select>
-//                 </td>
-//                 <td className="py-3 px-6 text-left">
-//                   <select className="border-zinc-300 rounded-md shadow-sm">
-//                     <option>Select</option>
-//                   </select>
-//                 </td>
-//                 <td className="py-3 px-6 text-left">52</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <input type="number" className="border-zinc-300 rounded-md shadow-sm w-full" value="1" />
-//                 </td>
-//                 <td className="py-3 px-6 text-left">PCS-PF</td>
-//                 <td className="py-3 px-6 text-left">50</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">50</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <button className="text-red-500">
-//                     <img aria-hidden="true" alt="delete" src="https://openui.fly.dev/openui/24x24.svg?text=🗑️" />
-//                   </button>
-//                 </td>
-//               </tr>
-//               <tr className="border-b border-zinc-200 hover:bg-zinc-100">
-//                 <td className="py-3 px-6 text-left whitespace-nowrap">4</td>
-//                 <td className="py-3 px-6 text-left">SUGAR 1 KG</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <select className="border-zinc-300 rounded-md shadow-sm">
-//                     <option>Select</option>
-//                   </select>
-//                 </td>
-//                 <td className="py-3 px-6 text-left">
-//                   <select className="border-zinc-300 rounded-md shadow-sm">
-//                     <option>Select</option>
-//                   </select>
-//                 </td>
-//                 <td className="py-3 px-6 text-left">50</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <input type="number" className="border-zinc-300 rounded-md shadow-sm w-full" value="1" />
-//                 </td>
-//                 <td className="py-3 px-6 text-left">PCS-PF</td>
-//                 <td className="py-3 px-6 text-left">40</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">0</td>
-//                 <td className="py-3 px-6 text-left">40</td>
-//                 <td className="py-3 px-6 text-left">
-//                   <button className="text-red-500">
-//                     <img aria-hidden="true" alt="delete" src="https://openui.fly.dev/openui/24x24.svg?text=🗑️" />
-//                   </button>
-//                 </td>
-//               </tr>
-//             </tbody>
-//           </table>
-//         </div>
-//         <div className="grid grid-cols-3 gap-4 my-4">
-//           <div className="col-span-2">
-//             <textarea className="w-full border-zinc-300 rounded-md shadow-sm" rows="4" placeholder="Other Expenses Details"></textarea>
-//           </div>
-//           <div className="flex flex-col space-y-2">
-//             <div className="flex justify-between">
-//               <span>Discounts</span>
-//               <input type="number" className="border-zinc-300 rounded-md shadow-sm w-24" value="0" />
-//             </div>
-//             <div className="flex justify-between">
-//               <span>Other Expenses</span>
-//               <input type="number" className="border-zinc-300 rounded-md shadow-sm w-24" value="0" />
-//             </div>
-//             <div className="flex justify-between">
-//               <span>Payment</span>
-//               <input type="number" className="border-zinc-300 rounded-md shadow-sm w-24" value="0" />
-//             </div>
-//             <div className="flex justify-between">
-//               <span>Balance</span>
-//               <input type="number" className="border-zinc-300 rounded-md shadow-sm w-24" value="0" />
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Sale;
-
-
-
-import React, { useRef,useEffect,useState} from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { FaBarcode } from 'react-icons/fa'; // Import the barcode icon from react-icons
+import React, { useRef, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProduct } from "../Redux/Product/productSlice";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaBarcode } from "react-icons/fa"; // Import the barcode icon from react-icons
+import BarcodeReader from "react-barcode-reader";
 import ReactToPrint from "react-to-print";
-import logo from '../logo.png';
-import {jwtDecode} from 'jwt-decode';
-import { logoutUser } from '../Redux/User/userSlices';
-import { toast } from 'react-toastify';
-
+import logo from "../logo.png";
+import {jwtDecode }from "jwt-decode";
+import {logoutUser } from "../Redux/User/userSlices";
+import { toast } from "react-toastify";
+import { fetchCart, removeFromCart, clearCart, updateCartQuantity, addToCart } from '../Redux/Cart/cartSlice';
+import {createOrder} from '../Redux/Orders/orderSlice';
+import Invoice from "../component/invoice.js";
 
 const Sale = () => {
+  const [details, setDetails] = useState([]);
   const dispatch = useDispatch();
+  const productDetails = useSelector((state) => state.products.productDetails);
+const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState('');
+  const [fullName, setFullName] = useState("");
+  const { orderId } = useParams();
+  const { items, status, fetchCartError } = useSelector((state) => state.cart);
+  const [currentDate, setCurrentDate] = useState('');
+  const [cardPay,setCardPay]=useState('');
+  const [cashPay,setCashPay]=useState('');
+  const [upiPay,setUPIPay]=useState('');
+  const [totalPrice,setTotalPrice]=useState('');
+  const [discount,setDiscount]= useState('');
+  const [gst,setGst]= useState('');
+  const [total,setFinalTotal]= useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    dispatch(fetchCart());
+  }, [dispatch]);
+
+  useEffect(() => {
+    setDetails(items[0]);
+setDiscount(items[1]&&items[1].discount)
+setTotalPrice(items[1]&&items[1].totalPrice)
+setGst(items[1]&&items[1].GST)
+setFinalTotal(items[1]&&items[1].final_price_With_GST)
+
+    // console.log(details);
+    console.log(items);
+  }, [items]);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
     if (token) {
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
-    } else { // Redirect to login if no token found
+    } else {
+      // Redirect to login if no token found
     }
   }, [navigate]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    localStorage.removeItem('token');
-    toast.error("Logout Successfully!")
-    navigate('/');
+    localStorage.removeItem("token");
+    toast.error("Logout Successfully!");
+    navigate("/");
   };
 
-  const sharedClasses = {
-    flex: 'flex',
-    justifyBetween: 'justify-between',
-    itemsCenter: 'items-center',
-    mb4: 'mb-4',
-    border: 'border text-center',
-    p2: 'p-2',
-    fontBold: 'font-bold',
-  }
-  const [list, setList] = useState([]);
-  const [total, setTotal] = useState();
-  const [GST, setGST] = useState();
-  const [discount, setDiscount] = useState();
-
-  const details=[{
-    id:99048945534,
-    description:"product name 1",
-    quantity:2,
-    discount:2,
-    gst:2,
-    price:100
-  },
-  {
-    id:99048945049,
-    description:"product name 2",
-    quantity:1,
-    discount:5,
-    gst:4,
-    price:34,
-
-  },
-  {
-    id:99048945545,
-    description:"product name 3",
-    quantity:3,
-    discount:3,
-    gst:1,
-    price:18,
-
-  },
-  {
-    id:990489454954,
-    description:"product name 4",
-    quantity:4,
-    discount:12,
-    gst:2,
-    price:20,
-
-  }
-  ]
   useEffect(() => {
-    setList(details);
-    const totalAmount = details.reduce((total, item) => total + (item.price*item.quantity), 0);
-    const disc = details.reduce((total, item) => total + (item.discount*item.quantity), 0);
-    const GST = details.reduce((total, item) => total + ((item.price*item.gst/100)*item.quantity), 0);
-    setTotal(totalAmount);
-    setGST(GST);
-    setDiscount(disc);
+    // Get the current date in the required format (YYYY-MM-DD)
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    // Set the current date as the default value
+    setCurrentDate(formattedDate);
   }, []);
+  //  console.log(details);
+  
+  const handleScan = (data) => {
+    if (data) {
+      dispatch(fetchProduct(data));
+    }
+  };
+
+  const handleError = (err) => {
+    dispatch(fetchProduct("2345632900700"));
+  };
+
+  // State variables for form fields
+  const [formData, setFormData] = useState({
+    barcode: "",
+    brand: "",
+    description: "",
+    category: "",
+    stockType: "",
+    unit: "",
+    qty: "",
+    saleRate: "",
+    profit: "",
+    hsn: "",
+    gst: "",
+    total: "",
+  });
+
+  const [finalform,setFinal] = useState({
+    type:"Sale",
+    name:"",
+    Date:currentDate,
+    mobileNumber:"",
+    ShipTo:"",
+    address:"",
+    state:"Maharastra",
+    GSTNo:"",
+  });
+
+
+  const bill =async ()=>{
+//  console.log(Type);
+try {
+  const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay}, BillUser:finalform })).unwrap()
+  console.log(createdOrder);
+
+  setInvoice(createdOrder.data)
+  setFinal({
+    type:"Sale",
+    name:"",
+    Date:currentDate,
+    mobileNumber:"",
+    ShipTo:"",
+    address:"",
+    state:"Maharastra",
+    GSTNo:"",
+  })
+  setFormData({
+    barcode: "",
+    brand: "",
+    description: "",
+    category: "",
+    stockType: "",
+    unit: "",
+    qty: "",
+    saleRate: "",
+    profit: "",
+    hsn: "",
+    gst: "",
+    total: "",
+  })
+dispatch(fetchCart())
+  setCardPay('');
+  setCashPay('');
+  setUPIPay('')
+  setFinalTotal('');
+  setTotalPrice('');
+  setDiscount('');
+  setGst('');
+  alert('Order created successfully!');
+} catch (err) {
+  alert(`Failed to create order: ${err.message}`);
+}
+  }
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+  const handleFinal = (e) => {
+    setFinal({
+      ...finalform,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const decreaseQuantity = (id) => {
+    const item = items[0].find(item => item._id === id);
+    if (item.quantity > 1) {
+      dispatch(updateCartQuantity({ productId: id, quantity: item.quantity - 1 })).then(() => {
+        dispatch(fetchCart());
+      });
+    }
+  };
+
+  const removeItem = (id) => {
+    dispatch(removeFromCart(id)).then(() => {
+      dispatch(fetchCart());
+    });
+  };
+
+  const clearCartItems = () => {
+    dispatch(clearCart()).then(() => {
+      dispatch(fetchCart());
+    });
+  };
+
+  useEffect(() => {
+    if (productDetails) {
+      setFormData({
+        barcode: productDetails.BarCode || "",
+        brand: productDetails.brand || "",
+        description: productDetails.title || "",
+        category: productDetails.category.name || "",
+        stockType: productDetails.stockType || "",
+        unit: productDetails.unit || "",
+        qty: 1,
+        saleRate: productDetails.discountedPrice || "",
+        // profit: productDetails.profit || "",
+        hsn: productDetails.HSN || "0",
+        gst: productDetails.GST || "",
+      });
+    }
+  }, [productDetails]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(productDetails){
+      const id = productDetails.BarCode;
+      console.log(id);
+      dispatch(addToCart(id)).then(() => {
+        dispatch(fetchCart());
+      });
+    }
+
+  };
+
+  const handleKeyPress = (e) => {
+    console.log(e);
+    if (e.key === "Enter") {
+      handleSubmit(e);
+    }
+  };
   const componentRef = useRef();
   return (
     <div className="bg-gray-100 mt-28 mx-6 rounded-lg shadow-lg">
+      <BarcodeReader onError={handleError} onScan={handleScan} />
       <div className="bg-green-700 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Sale</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
+          <span className="text-sm">
+            Online Orders | Hi, <span className="font-bold">{fullName}</span>
+          </span>
           <button
-            onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+          >
+            LogOut
+          </button>
         </div>
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
@@ -350,339 +258,445 @@ const Sale = () => {
           </div>
           <div>
             <label className="block text-gray-700 font-medium">Name</label>
-            <input type="text" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              type="text"
+              id="name"
+              required
+              value={finalform.name}
+              onChange={handleFinal}
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-gray-700 font-medium">Invoice</label>
-            <input type="date" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              type="date"
+              id="Date"
+              value={currentDate}
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Ref.</label>
-            <input type="text" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
+     
           <div>
             <label className="block text-gray-700 font-medium">Mobile</label>
-            <input type="text" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              type="text"
+              id="mobileNumber"
+              required
+              maxLength={10}
+              minLength={10}
+              value={finalform.mobileNumber}
+              onChange={handleFinal}
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-gray-700 font-medium">GST No.</label>
-            <input type="text" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              type="text"
+              id="GSTNo"
+              value={finalform.GSTNo}
+              onChange={handleFinal}
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-gray-700 font-medium">Ship To</label>
-            <input type="text" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              type="text"
+              id="ShipTo"
+              value={finalform.ShipTo}
+              onChange={handleFinal}
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-gray-700 font-medium">Address</label>
-            <input type="text" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              type="text"
+              id="address"
+              value={finalform.address}
+              onChange={handleFinal}
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-gray-700 font-medium">State</label>
-            <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>Maharashtra (27)</option>
-            </select>
+            <input id="state"
+              value={finalform.state}
+             onChange={handleFinal} className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </input>
           </div>
         </div>
 
 
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-zinc-700 mr-2">Sold</label>
-            <button className="bg-zinc-200 text-zinc-700 px-2 py-1 rounded-md">Recent</button>
-          </div>
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-zinc-700 mr-2">Loyalty</label>
-            <button className="bg-zinc-200 text-zinc-700 px-2 py-1 rounded-md">Balance</button>
-          </div>
-          <div className="flex items-center">
-            <label className="block text-sm font-medium text-zinc-700 mr-2">Wholesale</label>
-            <button className="bg-zinc-200 text-zinc-700 px-2 py-1 rounded-md">Balance</button>
-          </div>
-        </div>
-        
         {/* New Input Fields */}
-        <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
-          <div className=" mb-4">
-            <label htmlFor="list" className="block text-gray-700 text-sm font-medium">List</label>
-            <input type="checkbox" id="list" className="border border-gray-300 rounded p-2" />
-          </div>
-          <div className=" m-4">
-            <FaBarcode className='h-12'/>
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="barcode" className="block text-gray-700 text-sm font-medium">Barcode</label>
-            <input type="text" id="barcode" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter barcode" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="brand" className="block text-gray-700 text-sm font-medium">Brand</label>
-            <input type="text" id="brand" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter brand" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="description" className="block text-gray-700 text-sm font-medium">Description</label>
-            <input type="text" id="description" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter description" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="category" className="block text-gray-700 text-sm font-medium">Category</label>
-            <input type="text" id="category" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter category" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="stock-type" className="block text-gray-700 text-sm font-medium">Stock Type</label>
-            <input type="text" id="stock-type" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter stock type" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="unit" className="block text-gray-700 text-sm font-medium">Unit</label>
-            <input type="text" id="unit" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter unit" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="qty" className="block text-gray-700 text-sm font-medium">Qty</label>
-            <input type="text" id="qty" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter quantity" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="sale-rate" className="block text-gray-700 text-sm font-medium">Sale Rate</label>
-            <input type="text" id="sale-rate" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Sale rate" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="profit" className="block text-gray-700 text-sm font-medium">Profit%</label>
-            <input type="text" id="profit" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter profit percentage" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="hsn" className="block text-gray-700 text-sm font-medium">HSN</label>
-            <input type="text" id="hsn" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter HSN" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="gst" className="block text-gray-700 text-sm font-medium">GST%</label>
-            <input type="text" id="gst" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter GST percentage" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="total" className="block text-gray-700 text-sm font-medium">Total</label>
-            <input type="text" id="total" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter total amount" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-            <label htmlFor="amount-paid" className="block text-gray-700 text-sm font-medium">Amount Paid</label>
-            <input type="text" id="amount-paid" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter amount paid" />
-          </div>
-          <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 my-6">
-            <button className='bg-blue-600 text-white p-2 rounded-md'>Enter</button>
-          </div>
-        </div>
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
+          <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
+            <div className=" mb-4">
+              <label
+                htmlFor="list"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                List
+              </label>
+              <input
+                type="checkbox"
+                id="list"
+                className="border border-gray-300 rounded p-2"
+              />
+            </div>
+            <div className=" m-4">
+              <button id="scan">
+                {" "}
+                <FaBarcode className="h-12" />
+              </button>
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="barcode"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Barcode
+              </label>
+              <input
+                type="text"
+                id="barcode"
+                value={formData.barcode}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter barcode"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="brand"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Brand
+              </label>
+              <input
+                type="text"
+                value={formData.brand}
+                onChange={handleChange}
+                id="brand"
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter brand"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="description"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Description
+              </label>
+              <input
+                type="text"
+                id="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter description"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="category"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Category
+              </label>
+              <input
+                type="text"
+                id="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter category"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="stock-type"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Stock Type
+              </label>
+              <input
+                type="text"
+                id="stockType"
+                value={formData.stockType}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter stock type"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="unit"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Unit
+              </label>
+              <input
+                type="text"
+                id="unit"
+                value={formData.unit}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter unit"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="qty"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Qty
+              </label>
+              <input
+                type="number"
+                id="qty"
+                value={formData.qty}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter quantity"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="sale-rate"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Sale Rate
+              </label>
+              <input
+                type="text"
+                id="sale-rate"
+                value={formData.saleRate}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter Sale rate"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="hsn"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                HSN
+              </label>
+              <input
+                type="text"
+                id="hsn"
+                value={formData.hsn}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter HSN"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="gst"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                GST%
+              </label>
+              <input
+                type="text"
+                id="gst"
+                value={formData.gst}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter GST percentage"
+              />
+            </div>
+     
 
+            <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 my-6">
+              <button
+                type="submit"
+                className="w-full bg-green-700 text-white py-3 rounded font-medium hover:bg-green-800 transition-colors"
+              >
+                    <BarcodeReader onError={handleError} onScan={handleScan} />
+
+                Enter
+              </button>
+            </div>
+          </div>
+        </form>
         {/* Table */}
         <div className="overflow-x-auto">
+        <div>
+            <span class="text-muted-foreground">ITEMS</span>
+            <span class="text-primary px-3">{items[1]&&items[1].totalItem}</span>
+          </div>
           <table className="w-full mb-6 border-collapse bg-white rounded-lg shadow-md overflow-hidden">
             <thead>
               <tr className="bg-gray-300 text-gray-600">
                 <th className="p-3 border border-gray-600 text-left">#</th>
-                <th className="p-3 border border-gray-600 text-left">Description</th>
-                <th className="p-3 border border-gray-600 text-left">Offers</th>
-                <th className="p-3 border border-gray-600 text-left">Agent</th>
+                <th className="p-3 border border-gray-600 text-left">
+                  Description
+                </th>
                 <th className="p-3 border border-gray-600 text-left">MRP</th>
-                <th className="p-3 border border-gray-600 text-left">Net Qty</th>
-                <th className="p-3 border border-gray-600 text-left">Price</th>
+                <th className="p-3 border border-gray-600 text-left w-[60px]">
+                  Net Qty
+                </th>
                 <th className="p-3 border border-gray-600 text-left">Rate</th>
-                <th className="p-3 border border-gray-600 text-left">Value</th>
                 <th className="p-3 border border-gray-600 text-left">Disc.</th>
                 <th className="p-3 border border-gray-600 text-left">GST%</th>
-                <th className="p-3 border border-gray-600 text-left">Total Value</th>
-                <th className="p-3 border border-gray-600 text-left">Actions</th>
-              </tr> 
+                <th className="p-3 border border-gray-600 text-left">
+                  Total Value
+                </th>
+                <th className="p-3 border border-gray-600 text-left">
+                  Actions
+                </th>
+              </tr>
             </thead>
             <tbody>
               {/* Add rows dynamically here */}
-              <tr>
-                <td className="py-3 px-6 border border-gray-600 text-left whitespace-nowrap">1</td>
-                 <td className="py-3 px-6 border border-gray-600 text-left">KISAN PEANUT BUTTER</td>
-                 <td className="p-3 border border-gray-600">
-                   <select className="border-zinc-300 rounded-md shadow-sm">
-                     <option>Select</option>
-                   </select>
-                 </td>
-                 <td className="p-3 border border-gray-600">
-                   <select className="border-zinc-300 rounded-md shadow-sm">
-                     <option>Select</option>
-                   </select>
-                 </td>
-                 <td className="p-3 border border-gray-600">50</td>
-                 <td className="p-3 border border-gray-600">
-                   <input type="number" className="border-zinc-300 rounded-md shadow-sm w-full" value="1" />
-                 </td>
-                 <td className="p-3 border border-gray-600">PCS-PF</td>
-                 <td className="p-3 border border-gray-600">50</td>
-                 <td className="p-3 border border-gray-600">0</td>
-                 <td className="p-3 border border-gray-600">0</td>
-                 <td className="p-3 border border-gray-600">0</td>
-                 <td className="p-3 border border-gray-600">50</td>
-                 <td className="p-3 border border-gray-600 text-center">
-                  <button className="bg-yellow-500 text-white px-1 py-1 rounded hover:bg-yellow-600">Edit</button>
-                  <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 ">Delete</button>
-                </td>
-              </tr>
+            { 
+             details&&details.map((item,i)=>(
+         <tr key={item._id}>
+         <td className="py-3 px-6 border border-gray-600 text-left whitespace-nowrap">
+           {i+1}
+         </td>
+         <td className="py-3 px-6 border border-gray-600 text-left">
+         {item.product.title}
+         </td>
+         <td className="p-3 border border-gray-600"> {item.product.price}</td>
+         <td className="p-3 border border-gray-600">
+         <div className="flex flex-row items-center">
+                 <input type="number" value={item.quantity} readOnly min="1" className="w-12 sm:w-12 text-center border m-1 sm:mb-0" />
+                 <button className=" bg-blue-500 mt-1 px-2 py-0 rounded-sm text-lg" onClick={() => decreaseQuantity(item._id)}>-</button>
+       
+            </div>
+         </td>
+         <td className="p-3 border border-gray-600"> {item.discountedPrice}</td>
+         <td className="p-3 border border-gray-600"> {item.price-item.discountedPrice}</td>
+         <td className="p-3 border border-gray-600"> {item.GST}</td>
+         <td className="p-3 border border-gray-600"> {item.finalPrice_with_GST}</td>
+         <td className="p-3 border border-gray-600 text-center">
+           <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 " onClick={() => removeItem(item._id)}>
+             Delete
+           </button>
+         </td>
+       </tr>
+
+
+      // console.log(item)
+             ))
+              }
+
               {/* Repeat rows as needed */}
             </tbody>
           </table>
         </div>
 
         <div class="mt-4 flex justify-between items-center">
-    <div>
-      <span class="text-muted-foreground">TOTAL</span>
-      <span class="text-primary px-3">2</span>
-    </div>
-    <div class="flex space-x-2">
-      <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">Save</button>
-     
-           <ReactToPrint
-            trigger={() => (
-              <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">Save & Print</button>
-            )}
-            content={() => componentRef.current}
-          />
-      <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">PDF</button>
-      <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold</button>
-      <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">View</button>
-      <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold(1)</button>
-    </div>
 
-    <div className="flex flex-col bg-gray-400 p-3 space-y-2 space-x-3 rounded-md">
-             <div className="flex justify-between">
-               <span>Discounts</span>
-               <input type="number" className="border-zinc-300 rounded-md shadow-sm w-24" value="0" />
-             </div>
-             <div className="flex justify-between">
-               <span>Other Expenses</span>
-               <input type="number" className="border-zinc-300 rounded-md shadow-sm w-24" value="0" />
-             </div>
-             <div className="flex justify-between">
-               <span>Payment</span>
-               <input type="number" className="border-zinc-300 rounded-md shadow-sm w-24" value="0" />
-             </div>
-             <div className="flex justify-between">
-               <span>Balance</span>
-               <input type="number" className="border-zinc-300 rounded-md shadow-sm w-24" value="0" />
-             </div>
-           </div>
+          <div class="flex space-x-2">
+            <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={bill}>
+              Save
+            </button>
 
-  </div>
+            <ReactToPrint
+              trigger={() => (
+                <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
+                  Print
+                </button>
+              )}
+              content={() => componentRef.current}
+            />
+            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold</button> */}
+            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">
+              View
+            </button> */}
+      
+            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold(1)</button> */}
+          </div>
 
-        {/* <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
+      
+          <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
             <h2 className="text-lg font-semibold mb-4">Expense</h2>
             <table className="w-full border-collapse">
               <tbody>
+     
+              <tr>
+                  <td className="border p-3">SUBTOTAL:</td>
+                  <td className="border p-3"> {totalPrice}
+            </td>
+                </tr>
+                <tr>
+                  <td className="border p-3">DISCOUNT:</td>
+                  <td className="border p-3">{discount}</td>
+                </tr>
+                <tr>
+                  <td className="border p-3">TAXES:</td>
+                  <td className="border p-3">{gst}</td>
+                </tr>
+        
                 <tr>
                   <td className="border p-3">INVOICE TOTAL :</td>
-                  <td className="border p-3">0</td>
+                  <td className="border p-3">{total}</td>
                 </tr>
                 <tr>
                   <td className="border p-3">PAYMENT IN CASH:</td>
-                  <td className="border p-3">0</td>
+                  <td className="border p-3">  
+                    <input
+                type="text"
+                id="cash"
+                required
+                value={cashPay}
+                onChange={(e)=>setCashPay(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter payed cash"
+              /></td>
                 </tr>
                 <tr>
                   <td className="border p-3">PAYMENT IN CARD:</td>
-                  <td className="border p-3">0</td>
+                  <td className="border p-3"><input
+                type="text"
+                id="card"
+                required
+                value={cardPay}
+                onChange={(e)=>setCardPay(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter payed cash or enter 0"
+              /></td>
                 </tr>
                 <tr>
                   <td className="border p-3">PAYMENT IN UPI:</td>
-                  <td className="border p-3">0</td>
+                  <td className="border p-3"><input
+                type="text"
+                id="upi"
+                value={upiPay}
+                required
+                onChange={(e)=>setUPIPay(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter payed cash or enter 0"
+              /></td>
                 </tr>
               </tbody>
             </table>
-          </div> */}
-
-
-
-      </div>
-
+          </div>
       
-          {/* ---------------------invoice ganrator------------------------- */}
 
+        </div>
 
-          <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200">
+      {/* ---------------------invoice ganrator------------------------- */}
+      <Invoice 
+        componentRef={componentRef} 
+        details={invoice} 
+      />
+ 
+     
+      </div>
 
-            <div ref={componentRef}  className="max-w-4xl mx-auto p-4 bg-white text-black">
-      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-        <div>
-          <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
-          <p>AAPLA BAJAR</p>
-          <p>SHRIGONDA, AHMADNAGAR</p>
-          <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
-          <p>PHONE: 9849589588</p>
-          <p>EMAIL: aaplabajar1777@gmail.com</p>
-        </div>
-        <div className="w-24 h-24 border flex items-center justify-center">
-          <img src={logo} alt="Insert Logo Above" />
-        </div>
       </div>
-      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
-        <div>
-          <span className={sharedClasses.fontBold}>INVOICE #: </span>
-          <span>985934857944</span>
-        </div>
-        <div>
-          <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-          <span>18/07/2024</span>
-        </div>
-      </div>
-      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
-        <div className="w-1/2 pr-2">
-          <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
-          <p>Shivam Bole</p>
-          <p>Pune,Maharashtra</p>
-          <p>Pune,Maharashtra,444003</p>
-          <p>9637837434</p>
-          <p>shivam@gmail.com</p>
-        </div>
-      </div>
-      <table className="w-full border-collapse border mb-4">
-        <thead>
-          <tr className="bg-black text-white">
-            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>QUANTITY</th>
-            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>DESCRIPTION</th>
-            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>GST</th>
-            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>DISCOUNT</th>
-            <th className={sharedClasses.border + ' ' + sharedClasses.p2}>UNIT PRICE</th>
-      
-          </tr>
-        </thead>
-        <tbody>
-          {list.map((e, index) => (
-            <tr key={index}>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2 + ' h-12'}>{e.quantity}</td>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.description}</td>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.gst}</td>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.discount}</td>
-              <td className={sharedClasses.border + ' ' + sharedClasses.p2}>{e.price}</td>
-           
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className={`${sharedClasses.flex} justify-end ${sharedClasses.mb4}`}>
-        <div className="w-1/4">
-          <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-            <span>SUBTOTAL</span>
-            <span>${total}</span>
-          </div>
-          <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-            <span>DISCOUNT</span>
-            <span>${discount}</span>
-          </div>
-          <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-            <span>GST</span>
-            <span>${GST}</span>
-          </div>
-          <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
-            <span>TOTAL</span>
-            <span>${total-discount+GST}</span>
-          </div>
-        </div>
-      </div>
-      <div className="mb-4">
-        <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2>
-        <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div>
-      </div>
-      <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
-    </div>
-        </div>
-    </div>
   );
 };
 
 export default Sale;
+
+    

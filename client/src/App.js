@@ -8,7 +8,7 @@ import Dashboard from './Pages/dashboard';
 import Purchase from './Pages/purchase';
 import Inventory from './Pages/inventory';
 // import Sales from './pages/Sales';
-import View from './Pages/View';
+import View from './Pages/view';
 import Login from './Pages/login';
 import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
@@ -19,7 +19,7 @@ import Admin from './Pages/admin';
 // import Import from './pages/Import';
 // import More from './pages/More';
 // import Company from './pages/Company';
-import Users from './Pages/Users.js';
+import Users from './Pages/users.js';
 // import Settings from './pages/Settings';
 import { ToastContainer } from 'react-toastify';
 import ProtectedRoute from './component/ProtectedRoute';
@@ -34,6 +34,7 @@ const App = () => {
           <Route path="/purchase" element={<PageWithNavbar><Purchase /></PageWithNavbar>} />
           <Route path="/inventory" element={<PageWithNavbar><Inventory /></PageWithNavbar>} />
           <Route path="/sales" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
+          <Route path="/sales/:orderId" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
           <Route path="/forbidden" element={<Forbidden />} />
           <Route path="/users" element={<PageWithNavbar><Users /></PageWithNavbar>} />
           <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />

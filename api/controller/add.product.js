@@ -1,3 +1,5 @@
+
+
 import Product from "../model/product.model.js";
 import OfflinePurchaseOrder from "../model/purchaseOrder.js";
 
@@ -6,24 +8,30 @@ export const generateOrderWithProductCheck = async (req, res) => {
         const { products, orderDetails } = req.body;
         const { id } = req.user;
 
+
         const orderItems = [];
 
         for (const productData of products) {
             let existingProduct = await Product.findOne({ BarCode: productData.BarCode });
 
             if (existingProduct) {
+
+                // Update the existing product
+//                 existingProduct.quantity += productData.qty;
+
                 existingProduct.quantity += productData.quantity;
+
                 existingProduct.purchaseRate = productData.purchaseRate;
-                existingProduct.retailPrice = productData.retailPrice;
-                existingProduct.GST = productData.GST;
+                existingProduct.retailPrice = productData.saleRate;
+                existingProduct.GST = productData.gst;
 
                 await existingProduct.save();
                 orderItems.push({
                     productId: existingProduct._id,
-                    quantity: productData.quantity,
+                    quantity: productData.qty,
                     purchaseRate: productData.purchaseRate,
-                    GST: productData.GST,
-                    retailPrice: productData.retailPrice,
+                    GST: productData.gst,
+                    retailPrice: productData.saleRate,
                 });
             } else {
                 const newProduct = new Product({
@@ -57,10 +65,10 @@ export const generateOrderWithProductCheck = async (req, res) => {
                 await newProduct.save();
                 orderItems.push({
                     productId: newProduct._id,
-                    quantity: productData.quantity,
+                    quantity: productData.qty,
                     purchaseRate: productData.purchaseRate,
-                    GST: productData.GST,
-                    retailPrice: productData.retailPrice,
+                    GST: productData.gst,
+                    retailPrice: productData.saleRate,
                 });
             }
         }

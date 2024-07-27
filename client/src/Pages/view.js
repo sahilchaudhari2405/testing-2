@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { FaArrowDown, FaEdit, FaTrash } from 'react-icons/fa';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchOrders, updateOrder, deleteOrder } from '../Redux/Orders/orderSlice';
+import { useNavigate } from 'react-router-dom';
 const salesData = [
     { SrNo: 1, Name: 'John Doe', Mobile: '1234567890', GSTNo: '12ABCDE1234F1Z5', Address: '123 Main St, City', Disc: '10%', Taxable: '$1000', IGST: '$18', SGST: '$9', CGST: '$9', CESS: '$0', Less: '$50', Total: '$936', Mode: 'Credit', Pending: '$200', User: 'salescounter1' },
     { SrNo: 2, Name: 'Jane Smith', Mobile: '2345678901', GSTNo: '22BCDEF2345G6H7', Address: '456 Elm St, Town', Disc: '5%', Taxable: '$500', IGST: '$9', SGST: '$4.5', CGST: '$4.5', CESS: '$0', Less: '$25', Total: '$484', Mode: 'Cash', Pending: '$0', User: 'salescounter2' },
@@ -29,12 +31,29 @@ const salesData = [
   ];
   
 const View = () => {
+  const navigate = useNavigate()
   const [selectedView, setSelectedView] = useState('Sales');
+  const dispatch = useDispatch();
+  const orders = useSelector((state) => state.orders.orders);
+  const status = useSelector((state) => state.orders.status);
+  const error = useSelector((state) => state.orders.error);
 
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch]);
   const handleSelect = (view) => {
     setSelectedView(view);
   };
-
+  const handleDelete = (item) => {
+    console.log(item)
+    dispatch(deleteOrder(item._id));
+  };
+  const handleEdit = (item) => {
+    console.log(item.Name)
+  navigate(`/sales/${item._id}`)
+  };
+  
+// console.log(orders)
   const renderTable = (data) => (
     <table className="w-full mb-6 border-collapse bg-white rounded-lg shadow-md overflow-hidden">
       <thead className="bg-gray-600 text-white">
@@ -42,44 +61,38 @@ const View = () => {
           <th className="border border-zinc-800 px-4 py-2">SrNo.</th>
           <th className="border border-zinc-800 px-4 py-2">Name</th>
           <th className="border border-zinc-800 px-4 py-2">Mobile</th>
-          <th className="border border-zinc-800 px-4 py-2">GSTNo.</th>
           <th className="border border-zinc-800 px-4 py-2">Address</th>
           <th className="border border-zinc-800 px-4 py-2">Disc</th>
           <th className="border border-zinc-800 px-4 py-2">Taxable</th>
-          <th className="border border-zinc-800 px-4 py-2">IGST | SGST | CGST</th>
-          <th className="border border-zinc-800 px-4 py-2">CESS</th>
-          <th className="border border-zinc-800 px-4 py-2">Less</th>
+          <th className="border border-zinc-800 px-4 py-2">GST</th>
           <th className="border border-zinc-800 px-4 py-2">Total</th>
-          <th className="border border-zinc-800 px-4 py-2">Mode</th>
+          <th className="border border-zinc-800 px-4 py-2">Payment Mode</th>
           <th className="border border-zinc-800 px-4 py-2">Pending</th>
-          <th className="border border-zinc-800 px-4 py-2">User</th>
+          <th className="border border-zinc-800 px-4 py-2">Counter</th>
           <th className="border border-zinc-800 px-4 py-2">Action</th>
         </tr>
       </thead>
       <tbody>
-        {data.map((item) => (
-          <tr key={item.SrNo} className={item.SrNo % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
-            <td className="border border-zinc-800 px-4 py-2">{item.SrNo}</td>
+        {data?.map((item,i) => (
+          <tr key={item._id} className={(i+1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
+            <td className="border border-zinc-800 px-4 py-2">{i+1}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.Name}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Mobile}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.GSTNo}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Address}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Disc}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Taxable}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.IGST} | {item.SGST} | {item.CGST}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.CESS}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Less}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Total}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Mode}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Pending}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.User}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.mobileNumber}</td>
+            <td className="border border-zinc-800 px-4 py-2">(Maharastra)</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.discount}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.GST}%</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
+            <td className="border border-zinc-800 px-4 py-2">CASH:{item.paymentType.cash}|CARD:{item.paymentType.Card}|UPI:{item.paymentType.UPI}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.user}</td>
             <td className="border border-zinc-800 px-4 py-2">
               <div className='flex justify-around'>
                 <button className="text-blue-500">
-                  <FaEdit aria-hidden="true" />
+                  <FaEdit aria-hidden="true" onClick={()=>handleEdit(item)}/>
                 </button>
                 <button className="text-red-500">
-                  <FaTrash aria-hidden="true" />
+                  <FaTrash aria-hidden="true" onClick={()=>handleDelete(item)}/>
                 </button>
               </div>
             </td>
@@ -122,8 +135,8 @@ const View = () => {
           </label>
         </div>
 
-        {selectedView === 'Sales' && renderTable(salesData)}
-        {selectedView === 'Purchase' && renderTable(purchaseData)}
+        {selectedView === 'Sales' && renderTable(orders)}
+        {selectedView === 'Purchase' && renderTable(orders)}
       </div>
     </div>
   );

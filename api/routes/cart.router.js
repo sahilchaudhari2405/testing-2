@@ -5,9 +5,10 @@ import { addToCart, getCartDetails, getCartItemsById, removeOneCart, removeItemQ
 const cart = express.Router();
 
 cart.post('/addCart', authenticateToken, addToCart);
-cart.get('/getCart', authenticateToken, getCartDetails);
+cart.get('/getCart',  authenticateToken, getCartDetails);
 cart.get('/getCartById', authenticateToken, getCartItemsById);
 cart.delete('/removeOneCart', authenticateToken, removeOneCart);
-cart.delete('/removeItemQuantity', authenticateToken, removeItemQuantityCart);
+cart.delete('/removeItemQuantity',  authenticateToken, removeItemQuantityCart);
+// authenticateToken,
 
 export default cart;

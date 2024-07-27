@@ -8,10 +8,10 @@ import { authenticateToken } from '../middleware/verify.js';
 const router = express.Router();
 // console.log("hallo")
 // upload.single('image')
-router.post('/create', createProduct);
+router.post('/create',authenticateToken, createProduct);
 router.get('/view/:id', viewProduct);
-router.put('/update/:id', updateProduct);
-router.delete('/delete/:id',deleteProduct);
+router.put('/update/:id', authenticateToken,updateProduct);
+router.delete('/delete/:id',authenticateToken,deleteProduct);
 router.get('/view', viewProducts);
 router.post('/purchaseOrder',authenticateToken, generateOrderWithProductCheck);
 export default router;

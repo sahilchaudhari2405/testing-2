@@ -5,10 +5,10 @@ import { getAllBill, getCounterBill, getOneBill } from '../controller/get.order.
 import { getCounterSale } from '../controller/get.counter.sales.js';
 const OrderRouter = express.Router();
 
-OrderRouter.post('/placeOrder', authenticateToken, placeOrder);
+OrderRouter.post('/placeOrder', authenticateToken,placeOrder);
 OrderRouter.put('/RemoveOneItem', authenticateToken, RemoveOneItemOnOrder);
 OrderRouter.put('/RemoveOneQuantity', authenticateToken, removeItemQuantityOrder);
-OrderRouter.get('/getAllOrderByCounter',getAllBill );
+OrderRouter.get('/getAllOrderByCounter',authenticateToken,getAllBill );
 OrderRouter.get('/getCounterSales', authenticateToken,getCounterSale);
 
 
