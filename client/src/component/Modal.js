@@ -5,7 +5,7 @@ import { fetchCategories } from '../Redux/Category/categoriesSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // import styles
+import 'react-quill/dist/quill.snow.css'; // 
 
 const Modal = ({ show, onClose, product }) => {
   const dispatch = useDispatch();

@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import ProductCard from '../component/Card';
-import Modal from '../component/Modal';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import ProductCard from '../component/Card';
+import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
+import { logoutUser } from '../Redux/User/userSlices';
+import { toast } from 'react-toastify';
+import Modal from '../component/Modal';
 import { fetchProducts } from "../Redux/Product/productSlice";
+import { fetchCategories } from "../Redux/Category/categoriesSlice";
+import CategorySuggestions from '../component/CategorySuggestions';
 
 const Inventory = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [fullName, setFullName] = useState('');
   const { products, status } = useSelector((state) => state.products);
+  const { categories } = useSelector((state) => state.categories);
   const [prod, setProd] = useState([]);
-
-  // Ensure all hooks are called at the top level
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [formValues, setFormValues] = useState({
     barcode: '',
     description: '',
@@ -19,16 +28,71 @@ const Inventory = () => {
     expiringDays: '',
     lowStock: false,
   });
-  
-  const [isModalOpen, setIsModalOpen] = useState(false);  // Set initial state to false
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Refs for category input field and suggestions container
+  const categoryInputRef = useRef(null);
+  const suggestionsRef = useRef(null);
+  const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setFullName(decodedToken.fullName);
+    } else { // Redirect to login if no token found
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    localStorage.removeItem('token');
+    toast.error("Logout Successfully!")
+    navigate('/');
+  };
 
   useEffect(() => {
     dispatch(fetchProducts());
+    dispatch(fetchCategories());
   }, [dispatch]);
 
   useEffect(() => {
     setProd(products);
   }, [products]);
+
+  useEffect(() => {
+    if (formValues.category) {
+      const filtered = categories.filter((cat) =>
+        cat.name.toLowerCase().startsWith(formValues.category.toLowerCase())
+      );
+      setFilteredCategories(filtered);
+      setShowSuggestions(true);
+   
+    } else {
+      setFilteredCategories([]);
+      setShowSuggestions(false);
+    }
+  }, [formValues.category, categories]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        categoryInputRef.current &&
+        !categoryInputRef.current.contains(event.target) &&
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -38,7 +102,6 @@ const Inventory = () => {
     return <div>Error fetching products</div>;
   }
 
-  // Handle input field changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormValues((prevValues) => ({
@@ -47,10 +110,8 @@ const Inventory = () => {
     }));
   };
 
-  // Handle form submission
   const handleFilter = (e) => {
     e.preventDefault();
-    console.log('Form Values:', formValues);
     let filteredProducts = products.filter((product) => {
       return (
         (formValues.barcode === '' || product.BarCode.toString() === formValues.barcode) &&
@@ -58,7 +119,7 @@ const Inventory = () => {
         (formValues.category === '' || (product.category && product.category.name && product.category.name.toLowerCase().includes(formValues.category.toLowerCase()))) &&
         (formValues.brand === '' || (product.brand && product.brand.toLowerCase().includes(formValues.brand.toLowerCase()))) &&
         (formValues.size === '' || (product.size && product.size === formValues.size)) &&
-        (formValues.expiringDays === '' || (product.expiringDays && product.expiringDays <= parseInt(formValues.expiringDays)))
+        (formValues.expiringDays === '' || (product.expiringDays && product.ageing<= parseInt(formValues.expiringDays)))
        );
     });
 
@@ -69,7 +130,6 @@ const Inventory = () => {
     setProd(filteredProducts);
   };
 
-  // Handle clearing all filters
   const handleClearFilters = () => {
     setFormValues({
       barcode: '',
@@ -91,13 +151,21 @@ const Inventory = () => {
     setIsModalOpen(false);
   };
 
+  const handleCategorySelect = (category) => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      category,
+    }));
+    setShowSuggestions(false);
+  };
+
   return (
     <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
       <div className="bg-slate-700 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Inventory</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>salescounter1</span></span>
-          <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
+          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
+          <button  onClick={handleLogout}  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
         </div>
       </div>
 
@@ -105,11 +173,15 @@ const Inventory = () => {
         <div className="flex space-x-2 mb-4">
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Print Report</button>
           <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Excel Report</button>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate Barcode</button>
-          <button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded">Add Item</button>
+               <button 
+              className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded" 
+              onClick={handleOpenModal}
+            >
+              Add Item
+            </button>
         </div>
         
-        <div className="flex items-center space-x-2 mb-4 flex-col bg-gray-100 p-3 rounded-md">
+        <div className="flex items-center space-x-2 mb-4 flex-col bg-gray-100 p-3 rounded-md relative">
           <form onSubmit={handleFilter}>
             <div className="flex items-center space-x-2 mb-4">
               <img aria-hidden="true" alt="barcode-icon" src="https://openui.fly.dev/openui/24x24.svg?text=🛒" />
@@ -136,7 +208,17 @@ const Inventory = () => {
                 onChange={handleChange}
                 placeholder="Category"
                 className="border border-zinc-300 px-2 py-1 rounded"
+                ref={categoryInputRef}
+                onFocus={() => setShowSuggestions(true)}
               />
+              {showSuggestions && filteredCategories.length > 0 && (
+                <CategorySuggestions
+                  categories={filteredCategories}
+                  onSelect={handleCategorySelect}
+                  position={suggestionPosition}
+                  ref={suggestionsRef}
+                />
+              )}
               <input
                 type="text"
                 name="brand"
@@ -175,19 +257,7 @@ const Inventory = () => {
               <button type="button" onClick={handleClearFilters} className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded">Clear</button>
             </div>
           </form>  
-          <div className="flex space-x-2 mb-4">
-            <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Brand</button>
-            <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Quantity</button>
-            <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Manage HSN</button>
-            <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Manage Units</button>
-            <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Categories</button>
-            <button 
-              className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded" 
-              onClick={handleOpenModal}
-            >
-              Add Item
-            </button>
-          </div>
+         
         </div>
 
         <div className="bg-gray-100 rounded-lg text-foreground p-4 space-y-4 mt-5 overflow-scroll h-[100vh] z-0">

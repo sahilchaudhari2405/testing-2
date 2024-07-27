@@ -45,7 +45,7 @@ const Navbar = () => {
         <div className="text-white text-sm">
           <Moment format="HH:mm:ss">{currentTime}</Moment>
         </div>
-        <NavItem icon={<FaUsersCog className="text-purple-400" />} label="Users" to="/users" />
+        <NavItem icon={<FaUsersCog className="text-purple-400" />} label="Users" to="/admin/users" />
         <NavItem icon={<FaCog className="text-gray-400" />} label="Settings" to="/settings" />
       </div>
     </div>

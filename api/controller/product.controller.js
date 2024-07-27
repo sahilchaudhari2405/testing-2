@@ -54,8 +54,8 @@ export const viewProduct = async (req, res) => {
   const { id } = req.params;
   // console.log(id,"hallo")
   try {
-    // Fetch product details including populated ratings and reviews
-    const product = await Product.findById(id).populate('category');
+    // Fetch product details using the barcode
+    const product = await Product.findOne({ BarCode: id }).populate('category');
     if (!product) {
       return res.status(404).send({ message: "Product not found", status: false });
     }

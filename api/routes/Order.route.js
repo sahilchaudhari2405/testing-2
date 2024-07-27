@@ -6,13 +6,17 @@ import { getCounterSale,getAllCounterSale } from '../controller/get.counter.sale
 
 const OrderRouter = express.Router();
 
-OrderRouter.post('/placeOrder', authenticateToken, placeOrder);
+OrderRouter.post('/placeOrder', authenticateToken,placeOrder);
 OrderRouter.put('/RemoveOneItem', authenticateToken, RemoveOneItemOnOrder);
 OrderRouter.put('/RemoveOneQuantity', authenticateToken, removeItemQuantityOrder);
 OrderRouter.get('/getAllOrderByCounter',getAllCounterSale );
 OrderRouter.get('/getCounterSales', authenticateToken,getCounterSale);
+
+
+OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
+OrderRouter.get('/getEditOrder', authenticateToken,getOneBill);
+
 OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
 OrderRouter.get('/getCounterOrderbyID', authenticateToken,getOrderById);
 
 export default OrderRouter;
-    

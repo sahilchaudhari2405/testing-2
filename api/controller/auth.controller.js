@@ -1,13 +1,11 @@
-import { generateAccessToken, setTokens,  } from '../middleware/generateToken.js';
+import { generateAccessToken, setTokens } from '../middleware/generateToken.js';
 import CounterUser from '../model/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-
-
 export async function signup(req, res) {
     try {
-        const { fullName, email, password, mobile } = req.body;
+        const { fullName, username, email, password, counterNumber, mobile } = req.body;
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -33,9 +31,12 @@ export async function signup(req, res) {
 
         const newUser = new CounterUser({
             fullName,
+            username,
             email,
             password: hashedPassword,
+            counterNumber,
             mobile,
+            role: 'user' // Default role
         });
 
         await newUser.save();
@@ -58,7 +59,7 @@ export async function login(req, res) {
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
 
         if (!user || !isPasswordCorrect) {
-            return res.status(400).json({ error: "Invalid username or password" });
+            return res.status(400).json({ error: "Invalid email or password" });
         }
 
         const { accessToken, refreshToken } = setTokens(user, res);
@@ -120,61 +121,54 @@ export async function getUsers(req, res) {
     }
 }
 
-
-// this will Update Counter User
-export async function updateUser(req, res){
+// Update Counter User
+export async function updateUser(req, res) {
     const { id } = req.params;
-    const {
-        fullName,
-        password,
-        email,
-        mobile,
-        counterNumber
-    } = req.body;
-  
+    const { fullName, password, email, mobile, counterNumber } = req.body;
+
     try {
-      // the existing user
-      const existingUser = await User.findById(id);
-      if (!existingUser) {
-        return res.status(404).send({ message: "User not found", status: false });
-      }
-  
-      let updateData = {};
-  
-      // We Update only the provided fields
-      if (fullName !== undefined) updateData.fullName = fullName;
-      if (email !== undefined) updateData.email = email;
-      if (mobile !== undefined) updateData.mobile = mobile;
-      if (counterNumber !== undefined) updateData.counterNumber = counterNumber;
-  
-      if (password) {
-        updateData.password = await bcrypt.hash(password, 10);
-      }
-      const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
-      if (!updatedUser) {
-        return res.status(404).send({ message: "User not found", status: false });
-      }
-  
-      return res.status(200).send({ message: "User updated successfully", status: true, data: updatedUser });
+        // the existing user
+        const existingUser = await CounterUser.findById(id);
+        if (!existingUser) {
+            return res.status(404).send({ message: "User not found", status: false });
+        }
+
+        let updateData = {};
+
+        // We Update only the provided fields
+        if (fullName !== undefined) updateData.fullName = fullName;
+        if (email !== undefined) updateData.email = email;
+        if (mobile !== undefined) updateData.mobile = mobile;
+        if (counterNumber !== undefined) updateData.counterNumber = counterNumber;
+
+        if (password) {
+            updateData.password = await bcrypt.hash(password, 10);
+        }
+        const updatedUser = await CounterUser.findByIdAndUpdate(id, updateData, { new: true });
+        if (!updatedUser) {
+            return res.status(404).send({ message: "User not found", status: false });
+        }
+
+        return res.status(200).send({ message: "User updated successfully", status: true, data: updatedUser });
     } catch (error) {
-      return handleErrorResponse(res, error);
+        console.log("Error in updateUser controller", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };
 
-
-
-// this fucntion deletes Counter User
-export async function deleteUser(req, res){
+// Delete Counter User
+export async function deleteUser(req, res) {
     const { id } = req.params;
-  
+
     try {
-      const deletedUser = await User.findByIdAndDelete(id);
-      if (!deletedUser) {
-        return res.status(404).send({ message: "User not found", status: false });
-      }
-  
-      return res.status(200).send({ message: "User deleted successfully", status: true, data: deletedUser });
+        const deletedUser = await CounterUser.findByIdAndDelete(id);
+        if (!deletedUser) {
+            return res.status(404).send({ message: "User not found", status: false });
+        }
+
+        return res.status(200).send({ message: "User deleted successfully", status: true, data: deletedUser });
     } catch (error) {
-      return handleErrorResponse(res, error);
+        console.log("Error in deleteUser controller", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };

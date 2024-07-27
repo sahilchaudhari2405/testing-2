@@ -2,9 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../model/user.model.js';
 
 export const authenticateToken = (req, res, next) => {
-    const token = req.cookies.access_token;
-    console.log(token);
-
+    const token = req.cookies.accessToken;
     if (!token) {
         return res.status(401).json({ error: "No access token provided" });
     }
@@ -18,26 +16,17 @@ export const authenticateToken = (req, res, next) => {
     }
 };
 
-export const authorizeRoles = (...roles) => {
-    return (req, res, next) => {
-        console.log(req.user);
-        if (!roles.includes(req.user.role)) {
-            return res.status(403).json({ error: "You do not have permission to perform this action" });
-        }
-        next();
-    };
-};
+
 
 export async function checkAdmin(req, res, next) {
-    const token = req.cookies.accessToken;
+    const token = req.user;
 
     if (!token) {
         return res.status(401).json({ message: 'Access token is missing', status: false });
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
+        const user = token;
 
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized', status: false });

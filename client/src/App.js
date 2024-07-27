@@ -20,7 +20,7 @@ import Admin from './Pages/admin';
 // import Import from './pages/Import';
 // import More from './pages/More';
 // import Company from './pages/Company';
-import Users from './Pages/Users.js';
+import Users from './Pages/users.js';
 // import Settings from './pages/Settings';
 import { ToastContainer } from 'react-toastify';
 import ProtectedRoute from './component/ProtectedRoute';
@@ -50,6 +50,14 @@ const App = () => {
             }
           />
           <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PageWithNavbar><Users /></PageWithNavbar>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/purchase"
             element={
               <ProtectedRoute requiredRole="admin">
@@ -73,8 +81,8 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          {/* <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
-          <Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
+           <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
+          {/*<Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
           <Route path="/reports" element={<PageWithNavbar><Reports /></PageWithNavbar>} />
           <Route path="/msg" element={<PageWithNavbar><Msg /></PageWithNavbar>} />
           <Route path="/import" element={<PageWithNavbar><Import /></PageWithNavbar>} />

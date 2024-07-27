@@ -16,6 +16,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://apalabajar.shop',
 ];
 
 app.use(cors({
@@ -44,7 +45,7 @@ app.use(bodyParser.json())
 // Connect to the database
 connectDB();
 
-console.log(orderDate)
+// y
 app.use('/api', allRouter);
 
 app.listen(4000, () => {
