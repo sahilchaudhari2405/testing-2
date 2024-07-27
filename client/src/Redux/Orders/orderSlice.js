@@ -48,6 +48,7 @@ export const createPurchaseOrder = createAsyncThunk('purchaseOrders/createPurcha
   console.log(orderDetails)
   try {
     const response = await axiosInstance.post('/product/purchaseOrder', {products, orderDetails });
+     console.log(response);
     return response.data;  // Return the data directly from axios response
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to create purchase order');
