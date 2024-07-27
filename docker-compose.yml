@@ -6,7 +6,7 @@ services:
       context: ./api
       dockerfile: dockerfile.prod
     ports:
-      - "5454:5454"
+      - "4000:4000"
     environment:
       - NODE_ENV=production
       - PORT=5454
