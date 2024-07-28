@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from '../component/Card';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { logoutUser } from '../Redux/User/userSlices';
 import { toast } from 'react-toastify';
 import Modal from '../component/Modal';
 import { fetchProducts } from "../Redux/Product/productSlice";
 import { fetchCategories } from "../Redux/Category/categoriesSlice";
 import CategorySuggestions from '../component/CategorySuggestions';
+import { importExcelData, exportExcelData } from '../component/Card'; // Import utility functions
 
 const Inventory = () => {
   const dispatch = useDispatch();
@@ -35,20 +36,20 @@ const Inventory = () => {
   const suggestionsRef = useRef(null);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
 
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
     } else { // Redirect to login if no token found
+      navigate('/login');
     }
   }, [navigate]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
     localStorage.removeItem('token');
-    toast.error("Logout Successfully!")
+    toast.error("Logout Successfully!");
     navigate('/');
   };
 
@@ -68,7 +69,6 @@ const Inventory = () => {
       );
       setFilteredCategories(filtered);
       setShowSuggestions(true);
-   
     } else {
       setFilteredCategories([]);
       setShowSuggestions(false);
@@ -159,6 +159,22 @@ const Inventory = () => {
     setShowSuggestions(false);
   };
 
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      importExcelData(file, (data) => {
+        // Update the state with the imported data
+        // This example assumes the imported data is an array of products
+        setProd(data);
+        dispatch({ type: 'products/import', payload: data });
+      });
+    }
+  };
+
+  const handleExport = () => {
+    exportExcelData(prod);
+  };
+
   return (
     <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
       <div className="bg-slate-700 text-white p-4 rounded-t-lg flex justify-between items-center">
@@ -171,14 +187,31 @@ const Inventory = () => {
 
       <div className="p-4">
         <div className="flex space-x-2 mb-4">
-          <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Print Report</button>
-          <button className="bg-white border border-zinc-300 text-black px-4 py-2 rounded">Excel Report</button>
-               <button 
-              className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded" 
-              onClick={handleOpenModal}
-            >
-              Add Item
-            </button>
+          <input
+            type="file"
+            accept=".xlsx, .xls"
+            onChange={handleImport}
+            className="hidden"
+            id="import-file"
+          />
+          <label
+            htmlFor="import-file"
+            className="bg-white border border-zinc-300 text-black px-4 py-2 rounded cursor-pointer"
+          >
+            Import Report
+          </label>
+          <button
+            onClick={handleExport}
+            className="bg-white border border-zinc-300 text-black px-4 py-2 rounded"
+          >
+            Export Report
+          </button>
+          <button 
+            className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded" 
+            onClick={handleOpenModal}
+          >
+            Add Item
+          </button>
         </div>
         
         <div className="flex items-center space-x-2 mb-4 flex-col bg-gray-100 p-3 rounded-md relative">
