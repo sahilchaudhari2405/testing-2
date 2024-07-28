@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../axiosConfig';
 
 const EditOrder = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +12,7 @@ const EditOrder = () => {
       Card: 0,
       UPI: 0,
     },
+    orderItems: [],
     billImageURL: '',
     totalPrice: '',
     totalDiscountedPrice: '',
@@ -30,6 +31,10 @@ const EditOrder = () => {
   const handleOrderIdChange = (e) => {
     setOrderId(e.target.value);
   };
+  const formatDateToDisplay = (date) => {
+    const [year, month, day] = date.split('-');
+    return `${day}/${month}/${year}`;
+  };
 
   const fetchOrderData = async () => {
     if (!orderId) {
@@ -38,8 +43,34 @@ const EditOrder = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5454/api/orders/${orderId}`);
+      const response = await axiosInstance.get(`/order/getCounterOrderbyID/${orderId}`);
+      console.log("editorderresponse: ",response.data);
       setFormData(response.data);
+      const orderData = response.data.data;
+      const formattedOrderDate = orderData.orderDate.split('T')[0];
+      const displayOrderDate = formatDateToDisplay(formattedOrderDate);
+
+      setFormData({
+        Name: orderData.Name,
+        mobileNumber: orderData.mobileNumber,
+        email: orderData.email,
+        orderDate: formattedOrderDate,
+        orderItems: orderData.orderItems,
+        paymentType: orderData.paymentType,
+        billImageURL: orderData.billImageURL || '', // Add this if available in the response
+        totalPrice: orderData.totalPrice,
+        totalDiscountedPrice: orderData.totalDiscountedPrice,
+        totalPurchaseRate: orderData.totalPurchaseRate,
+        GST: orderData.GST,
+        discount: orderData.discount,
+        orderStatus: orderData.orderStatus,
+        totalItem: orderData.totalItem,
+        totalProfit: orderData.totalProfit,
+        finalPriceWithGST: orderData.finalPriceWithGST,
+      });
+      console.log("setFormData: ",formData);
+
+
       setError('');
     } catch (err) {
       setError('Failed to fetch order data. Please check the Order ID.');
@@ -48,6 +79,7 @@ const EditOrder = () => {
         mobileNumber: '',
         email: 'No',
         orderDate: '',
+        orderItems: [],
         paymentType: {
           cash: 0,
           Card: 0,
@@ -74,6 +106,7 @@ const EditOrder = () => {
       ...prevData,
       [name]: value
     }));
+    console.log("changed formdata: ",formData);
   };
 
   const handlePaymentChange = (e) => {
@@ -85,11 +118,34 @@ const EditOrder = () => {
         [name]: Number(value)
       }
     }));
+    console.log("changed formdata: ",formData);
+
+  };
+  const handleOrderItemChange = (index, e) => {
+    const { name, value } = e.target;
+    const updatedOrderItems = [...formData.orderItems];
+    updatedOrderItems[index] = {
+      ...updatedOrderItems[index],
+      [name]: value,
+    };
+    setFormData((prevState) => ({
+      ...prevState,
+      orderItems: updatedOrderItems,
+    }));
+  };
+
+  const handleRemoveOrderItem = (index) => {
+    const updatedOrderItems = formData.orderItems.filter((_, i) => i !== index);
+    setFormData((prevState) => ({
+      ...prevState,
+      orderItems: updatedOrderItems,
+    }));
+    console.log("changed formdata: ",formData);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.put(`/api/orders/${orderId}`, formData)
+    axiosInstance.put(`/order/updateOrderbyID/${orderId}`, formData)
       .then(response => {
         alert('Order updated successfully!');
       })
@@ -173,7 +229,7 @@ const EditOrder = () => {
               <input
                 type="number"
                 name="cash"
-                value={formData.paymentType.cash}
+                value={formData.paymentType?.cash}
                 onChange={handlePaymentChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -183,7 +239,7 @@ const EditOrder = () => {
               <input
                 type="number"
                 name="Card"
-                value={formData.paymentType.Card}
+                value={formData.paymentType?.Card}
                 onChange={handlePaymentChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -193,7 +249,7 @@ const EditOrder = () => {
               <input
                 type="number"
                 name="UPI"
-                value={formData.paymentType.UPI}
+                value={formData.paymentType?.UPI}
                 onChange={handlePaymentChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -306,6 +362,34 @@ const EditOrder = () => {
                 required
               />
             </div>
+            {formData.orderItems.map((item, index) => (
+              <div key={item._id} className="flex items-center justify-between p-4 mb-2 border border-gray-300 rounded">
+              <div>
+                <p className="text-gray-700 font-medium">{item.product.title}</p>
+                <p className="text-gray-500">Quantity: {item.quantity}</p>
+                <p className="text-gray-500">Price: ${item.price}</p>
+              </div>
+              <button
+                onClick={() => handleRemoveOrderItem(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            ))}
           </div>
           <div className="flex justify-end space-x-4">
             <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">

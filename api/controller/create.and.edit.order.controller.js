@@ -203,7 +203,7 @@ const getOrderById = asyncHandler(async (req, res) => {
             path: 'orderItems',
             populate: {
                 path: 'product',
-                model: 'Product', 
+                model: 'products', 
             },
         });
 
@@ -218,6 +218,86 @@ const getOrderById = asyncHandler(async (req, res) => {
     }
 });
 
+// Function to update order
+const updateOrder = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { paymentType, BillUser, orderItems, ...rest } = req.body;
+  
+    try {
+      const order = await OfflineOrder.findById(id);
+  
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+  
+      // Update order items if provided
+      if (orderItems && orderItems.length > 0) {
+        let purchaseRate = 0;
+        let totalProfit = 0;
+        const updatedOrderItems = [];
+  
+        for (const item of orderItems) {
+          const product = await Product.findById(item.product);
+          const updatedOrderItem = {
+            product: item.product,
+            quantity: item.quantity,
+            price: item.price,
+            purchaseRate: product.purchaseRate * item.quantity,
+            GST: item.GST,
+            totalProfit: (product.discountedPrice - product.purchaseRate) * item.quantity,
+            finalPriceWithGST: item.finalPriceWithGST,
+            discountedPrice: item.discountedPrice,
+            userId: order.user,
+          };
+  
+          if (item._id) {
+            await OfflineOrderItem.findByIdAndUpdate(item._id, updatedOrderItem);
+            updatedOrderItems.push(item._id);
+          } else {
+            const newOrderItem = new OfflineOrderItem(updatedOrderItem);
+            await newOrderItem.save();
+            updatedOrderItems.push(newOrderItem._id);
+          }
+  
+          purchaseRate += updatedOrderItem.purchaseRate;
+          totalProfit += updatedOrderItem.totalProfit;
+        }
+  
+        order.orderItems = updatedOrderItems;
+        order.totalPurchaseRate = purchaseRate;
+        order.totalProfit = totalProfit;
+      }
+  
+      // Update the rest of the order fields
+      order.Name = BillUser?.name || order.Name;
+      order.mobileNumber = BillUser?.mobileNumber || order.mobileNumber;
+      order.email = BillUser?.email || order.email;
+      order.paymentType = paymentType || order.paymentType;
+      order.orderDate = rest.orderDate ? new Date(rest.orderDate) : order.orderDate;
+  
+      for (const key in rest) {
+        if (rest.hasOwnProperty(key)) {
+          order[key] = rest[key];
+        }
+      }
+  
+      await order.save();
+  
+      const results = await OfflineOrder.findById(order._id).populate({
+        path: 'orderItems',
+        populate: {
+          path: 'product',
+          model: 'products'
+        }
+      });
+  
+      return res.status(200).json({ statusCode: 200, success: true, message: 'Order updated successfully', data: results });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ statusCode: 500, success: false, message: 'Error updating order', data: error.message });
+    }
+  });
+
 
 // Export functions
-export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById };
+export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById,updateOrder };

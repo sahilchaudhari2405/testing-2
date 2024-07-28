@@ -64,60 +64,136 @@ setFinalTotal(items[1]&&items[1].final_price_With_GST)
     navigate("/");
   };
 
-  const handleOrderEdit = () => {
-    navigate('/editOrder');
+  useEffect(() => {
+    // Get the current date in the required format (YYYY-MM-DD)
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    // Set the current date as the default value
+    setCurrentDate(formattedDate);
+  }, []);
+  //  console.log(details);
+  
+  const handleScan = (data) => {
+    if (data) {
+      dispatch(fetchProduct(data));
+    }
+  };
+
+  const handleError = (err) => {
+    dispatch(fetchProduct("2345632900700"));
+  };
+
+  // State variables for form fields
+  const [formData, setFormData] = useState({
+    barcode: "",
+    brand: "",
+    description: "",
+    category: "",
+    stockType: "",
+    unit: "",
+    qty: "",
+    saleRate: "",
+    profit: "",
+    hsn: "",
+    gst: "",
+    total: "",
+  });
+
+  const [finalform,setFinal] = useState({
+    type:"Sale",
+    name:"",
+    Date:currentDate,
+    mobileNumber:"",
+    ShipTo:"",
+    address:"",
+    state:"Maharastra",
+    GSTNo:"",
+  });
+
+
+  const bill =async ()=>{
+//  console.log(Type);
+try {
+  const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay}, BillUser:finalform })).unwrap()
+  console.log(createdOrder);
+
+  setInvoice(createdOrder.data)
+  setFinal({
+    type:"Sale",
+    name:"",
+    Date:currentDate,
+    mobileNumber:"",
+    ShipTo:"",
+    address:"",
+    state:"Maharastra",
+    GSTNo:"",
+  })
+  setFormData({
+    barcode: "",
+    brand: "",
+    description: "",
+    category: "",
+    stockType: "",
+    unit: "",
+    qty: "",
+    saleRate: "",
+    profit: "",
+    hsn: "",
+    gst: "",
+    total: "",
+  })
+dispatch(fetchCart())
+  setCardPay('');
+  setCashPay('');
+  setUPIPay('')
+  setFinalTotal('');
+  setTotalPrice('');
+  setDiscount('');
+  setGst('');
+  alert('Order created successfully!');
+} catch (err) {
+  alert(`Failed to create order: ${err.message}`);
+}
   }
 
-  const sharedClasses = {
-    flex: 'flex',
-    justifyBetween: 'justify-between',
-    itemsCenter: 'items-center',
-    mb4: 'mb-4',
-    border: 'border text-center',
-    p2: 'p-2',
-    fontBold: 'font-bold',
-  }
-  const [list, setList] = useState([]);
-  const [total, setTotal] = useState();
-  const [GST, setGST] = useState();
-  const [discount, setDiscount] = useState();
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+  const handleFinal = (e) => {
+    setFinal({
+      ...finalform,
+      [e.target.id]: e.target.value,
+    });
+  };
 
-  const details=[{
-    id:99048945534,
-    description:"product name 1",
-    quantity:2,
-    discount:2,
-    gst:2,
-    price:100
-  },
-  {
-    id:99048945049,
-    description:"product name 2",
-    quantity:1,
-    discount:5,
-    gst:4,
-    price:34,
+  const decreaseQuantity = (id) => {
+    const item = items[0].find(item => item._id === id);
+    if (item.quantity > 1) {
+      dispatch(updateCartQuantity({ productId: id, quantity: item.quantity - 1 })).then(() => {
+        dispatch(fetchCart());
+      });
+    }
+  };
 
-  },
-  {
-    id:99048945545,
-    description:"product name 3",
-    quantity:3,
-    discount:3,
-    gst:1,
-    price:18,
+  const removeItem = (id) => {
+    dispatch(removeFromCart(id)).then(() => {
+      dispatch(fetchCart());
+    });
+  };
 
-  },
-  {
-    id:990489454954,
-    description:"product name 4",
-    quantity:4,
-    discount:12,
-    gst:2,
-    price:20,
+  const clearCartItems = () => {
+    dispatch(clearCart()).then(() => {
+      dispatch(fetchCart());
+    });
+  };
 
-  }
-  ]
   useEffect(() => {
     if (productDetails) {
       setFormData({
@@ -161,14 +237,21 @@ setFinalTotal(items[1]&&items[1].final_price_With_GST)
       <div className="bg-green-700 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Sale</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
-          <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">
-              LogOut
+          <span className="text-sm">
+            Online Orders | Hi, <span className="font-bold">{fullName}</span>
+          </span>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+          >
+            LogOut
           </button>
-          <button onClick={handleOrderEdit} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors">
-              Edit an Order
+          <button
+            onClick={() => navigate("/editOrder")}
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors"
+          >
+            Edit Order
           </button>
-
         </div>
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
