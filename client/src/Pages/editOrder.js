@@ -134,12 +134,21 @@ const EditOrder = () => {
     }));
   };
 
-  const handleRemoveOrderItem = (index) => {
-    const updatedOrderItems = formData.orderItems.filter((_, i) => i !== index);
-    setFormData((prevState) => ({
-      ...prevState,
-      orderItems: updatedOrderItems,
-    }));
+  const handleRemoveOrderItem = (orderId, itemId) => {
+    const remove_payload = {
+      itemId : itemId,
+      orderId : orderId
+    }
+
+    axiosInstance.put('/order/RemoveOneItem', remove_payload)
+      .then(response => {
+        alert('Order item removed successfully!');
+      })
+      .catch(err => {
+        alert('Failed to remove item.');
+      });
+
+    fetchOrderData();
     console.log("changed formdata: ",formData);
   };
 
@@ -370,7 +379,7 @@ const EditOrder = () => {
                 <p className="text-gray-500">Price: ${item.price}</p>
               </div>
               <button
-                onClick={() => handleRemoveOrderItem(index)}
+                onClick={() => handleRemoveOrderItem(orderId, item._id)}
                 className="text-red-500 hover:text-red-700"
               >
                 <svg
@@ -401,6 +410,7 @@ const EditOrder = () => {
                 mobileNumber: '',
                 email: 'No',
                 orderDate: '',
+                orderItems: [],
                 paymentType: {
                   cash: 0,
                   Card: 0,

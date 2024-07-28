@@ -177,7 +177,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
             await cart.save();
             product.quantity+=cartItem.quantity,
             product.save();
-            await OfflineOrderItem.findByIdAndRemove(itemId);
+            await OfflineOrderItem.findByIdAndDelete(itemId);
             await updateSalesData(oldOrder.user,oldOrder,cart);
             await TotalAllupdateSalesData(oldOrder,cart);
             await TotalOfflineupdateSalesData(oldOrder,cart);
