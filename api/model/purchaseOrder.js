@@ -26,41 +26,17 @@ const offlinePurchaseOrderSchema = new Schema({
             type: Number,
             default: 0
         },
+        AmountPaid: {
+            type: Number,
+            default: 0
+        },
         retailPrice: {
             type: Number,
             default: 0
         },
     }],
     Address: {
-        streetAddress: {
-            type: String,
-            required: true,
-        },
-        area: {
-            type: String,
-        },
-        houseNumber: {
-            type: String,
-        },
-        landMark: {
-            type: String,
-        },
-        city: {
-            type: String,
-            required: true,
-        },
-        district: {
-            type: String,
-            required: true,
-        },
-        state: {
-            type: String,
-            required: true,
-        },
-        zipCode: {
-            type: String,
-            required: true,
-        },
+     type:String,
     },
     Name: {
         type: String,
@@ -106,6 +82,10 @@ const offlinePurchaseOrderSchema = new Schema({
         type: Number,
         required: true,
     },
+    GSTNB: {
+        type:String,
+     
+    },
     orderStatus: {
         type: String,
         required: true,
@@ -114,6 +94,9 @@ const offlinePurchaseOrderSchema = new Schema({
     totalItem: {
         type: Number,
         required: true,
+    },
+    AmountPaid:{
+        type:Number,
     },
     createdAt: {
         type: Date,
