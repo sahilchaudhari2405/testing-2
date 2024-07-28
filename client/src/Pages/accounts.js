@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { FaArrowDown, FaEdit, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchOrders, updateOrder, deleteOrder } from '../Redux/Orders/orderSlice';
+import { fetchUsers, updateUser, deleteUser } from '../Redux/User/userSlices';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import {jwtDecode} from 'jwt-decode';
-import { saveAs } from 'file-saver';
 import { logoutUser } from '../Redux/User/userSlices';
+import { saveAs } from 'file-saver';
 import { toast } from 'react-toastify';
 
-const View = () => {
+const Accounts = () => {
   const navigate = useNavigate();
-  const [selectedView, setSelectedView] = useState('Sales');
-  const [importedData, setImportedData] = useState([]);
+  const [selectedView, setSelectedView] = useState('Users');
   const [fullName, setFullName] = useState('');
+  const [importedData, setImportedData] = useState([]);
   const [showImportModal, setShowImportModal] = useState(false);
   const dispatch = useDispatch();
-  const orders = useSelector((state) => state.orders.orders);
-  const status = useSelector((state) => state.orders.status);
-  const error = useSelector((state) => state.orders.error);
+  const users = useSelector((state) => state.user.users);
+  const status = useSelector((state) => state.user.status);
+  const error = useSelector((state) => state.user.error);
 
   useEffect(() => {
-    dispatch(fetchOrders());
+    dispatch(fetchUsers());
   }, [dispatch]);
+
+  const handleSelect = (view) => {
+    setSelectedView(view);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -39,22 +43,27 @@ const View = () => {
     toast.error("Logout Successfully!")
     navigate('/');
   };
-  const handleSelect = (view) => {
-    setSelectedView(view);
-  };
 
-  const handleDelete = (item) => {
-    dispatch(deleteOrder(item._id));
-  };
 
-  const handleEdit = (item) => {
-    navigate(`/sales/${item._id}`);
+  const handleDelete = async (user) => {
+    try {
+        await dispatch(deleteUser(user._id)).unwrap();
+        dispatch(fetchUsers());
+        toast.success('User deleted successfully!');
+    } catch (error) {
+        console.error('Failed to delete user:', error);
+        toast.error('Failed to delete user: ' + error.message);
+    }
+};
+
+  const handleEdit = (user) => {
+    navigate(`/admin/users`);
   };
 
   const exportToExcel = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Report');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Users_Report');
 
     const excelBuffer = XLSX.write(workbook, {
       bookType: 'xlsx',
@@ -62,7 +71,7 @@ const View = () => {
     });
 
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'Inventory_Report.xlsx');
+    saveAs(blob, 'Users_Report.xlsx');
   };
 
   const handleFileUpload = (e) => {
@@ -86,41 +95,33 @@ const View = () => {
         <tr>
           <th className="border border-zinc-800 px-4 py-2">SrNo.</th>
           <th className="border border-zinc-800 px-4 py-2">Name</th>
+          <th className="border border-zinc-800 px-4 py-2">Email</th>
           <th className="border border-zinc-800 px-4 py-2">Mobile</th>
-          <th className="border border-zinc-800 px-4 py-2">Address</th>
-          <th className="border border-zinc-800 px-4 py-2">Disc</th>
-          <th className="border border-zinc-800 px-4 py-2">Taxable</th>
-          <th className="border border-zinc-800 px-4 py-2">GST</th>
-          <th className="border border-zinc-800 px-4 py-2">Total</th>
-          <th className="border border-zinc-800 px-4 py-2">Payment Mode</th>
-          <th className="border border-zinc-800 px-4 py-2">Pending</th>
-          <th className="border border-zinc-800 px-4 py-2">Counter</th>
+          <th className="border border-zinc-800 px-4 py-2">Counter Number</th>
+          <th className="border border-zinc-800 px-4 py-2">Role</th>
+          <th className="border border-zinc-800 px-4 py-2">Created At</th>
+          <th className="border border-zinc-800 px-4 py-2">Updated At</th>
           <th className="border border-zinc-800 px-4 py-2">Action</th>
         </tr>
       </thead>
       <tbody>
-        {data?.map((item, i) => (
-          <tr key={item._id || i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
+        {data?.map((user, i) => (
+          <tr key={user._id || i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
             <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.Name}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.mobileNumber}</td>
-            <td className="border border-zinc-800 px-4 py-2">(Maharastra)</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.discount}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.GST}%</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
-            <td className="border border-zinc-800 px-4 py-2">
-            CASH: {item.paymentType?.cash || 0} | CARD: {item.paymentType?.Card || 0} | UPI: {item.paymentType?.UPI || 0}
-          </td>
-            <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.user}</td>
+            <td className="border border-zinc-800 px-4 py-2">{user.fullName}</td>
+            <td className="border border-zinc-800 px-4 py-2">{user.email}</td>
+            <td className="border border-zinc-800 px-4 py-2">{user.mobile}</td>
+            <td className="border border-zinc-800 px-4 py-2">{user.counterNumber}</td>
+            <td className="border border-zinc-800 px-4 py-2">{user.role}</td>
+            <td className="border border-zinc-800 px-4 py-2">{new Date(user.createdAt).toLocaleDateString()}</td>
+            <td className="border border-zinc-800 px-4 py-2">{new Date(user.updatedAt).toLocaleDateString()}</td>
             <td className="border border-zinc-800 px-4 py-2">
               <div className='flex justify-around'>
                 <button className="text-blue-500">
-                  <FaEdit aria-hidden="true" onClick={() => handleEdit(item)} />
+                  <FaEdit aria-hidden="true" onClick={() => handleEdit(user)} />
                 </button>
                 <button className="text-red-500">
-                  <FaTrash aria-hidden="true" onClick={() => handleDelete(item)} />
+                  <FaTrash aria-hidden="true" onClick={() => handleDelete(user)} />
                 </button>
               </div>
             </td>
@@ -132,10 +133,10 @@ const View = () => {
 
   return (
     <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
-      <div className="bg-slate-700 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h1 className="text-3xl font-bold">View Data</h1>
+      <div className="bg-emerald-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Accounts</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
+          <span className="text-sm">User Management | Hi, <span className='font-bold'>{fullName}</span></span>
           <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
         </div>
       </div>
@@ -150,7 +151,7 @@ const View = () => {
           </button>
           <button
             className="bg-white border border-zinc-300 text-black px-4 py-2 rounded"
-            onClick={() => exportToExcel(selectedView === 'Sales' ? orders : orders)}
+            onClick={() => exportToExcel(users)}
           >
             Excel Report
           </button>
@@ -181,18 +182,16 @@ const View = () => {
                 value={selectedView}
                 onChange={(e) => handleSelect(e.target.value)}
               >
-                <option value="Sales">Sales View</option>
-                <option value="Purchase">Purchase View</option>
+                <option value="Users">Users View</option>
               </select>
             </div>
           </label>
         </div>
 
-        {selectedView === 'Sales' && renderTable(orders)}
-        {selectedView === 'Purchase' && renderTable(importedData.length ? importedData : orders)}
+        {selectedView === 'Users' && renderTable(users)}
       </div>
     </div>
   );
 };
 
-export default View;
+export default Accounts;
