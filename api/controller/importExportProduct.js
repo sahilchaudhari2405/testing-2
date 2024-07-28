@@ -1,5 +1,4 @@
 import Product from '../model/product.model.js';
-import { v4 as uuidv4 } from 'uuid';
 
 export const importProducts = async (req, res) => {
   const products = req.body.products;
@@ -27,8 +26,8 @@ export const importProducts = async (req, res) => {
         let isUnique = false;
 
         while (!isUnique) {
-          newBarcode = uuidv4();
-          const checkBarcode = await Product.findOne({ BarCode: newBarcode });
+            newBarcode = Math.floor(Math.random() * 10 ** 22).toString().padStart(22, '0');
+            const checkBarcode = await Product.findOne({ BarCode: newBarcode });
 
           if (!checkBarcode) {
             isUnique = true;
@@ -54,3 +53,4 @@ export const importProducts = async (req, res) => {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };
+
