@@ -83,7 +83,7 @@ const View = () => {
             <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.GST}%</td>
             <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
-            <td className="border border-zinc-800 px-4 py-2">CASH:{item.paymentType?.cash}|CARD:{item.paymentType?.Card}|UPI:{item.paymentType?.UPI}</td>
+            <td className="border border-zinc-800 px-4 py-2">CASH:{item.paymentType.cash}|CARD:{item.paymentType.Card}|UPI:{item.paymentType.UPI}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.user}</td>
             <td className="border border-zinc-800 px-4 py-2">
