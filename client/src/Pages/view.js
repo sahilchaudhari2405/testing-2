@@ -54,10 +54,10 @@ const View = () => {
   const orders = useSelector((state) => state.orders.orders);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
-  // const handleView=(item)=>{
-  //   console.log(item,"dusra")
-  //   setInvoice(item)
-  // }
+  const handleView=(item)=>{
+    console.log(item,"dusra")
+    setDetails(item)
+  }
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -112,7 +112,7 @@ const View = () => {
           
                 <ReactToPrint
               trigger={() => (
-                <button className="text-blue-500 " onClick={setDetails(item)}>
+                <button className="text-blue-500 " onClick={()=>setDetails(item) }>
                 <span className='text-center'><TbEyeEdit className="text-2xl"/>Invoice</span>
                 </button>
               )}
@@ -192,14 +192,20 @@ const View = () => {
             <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.user}</td>
             <td className="border border-zinc-800 px-4 py-2">
-            <ReactToPrint
-              trigger={() => (
-                <button className="text-blue-500 " onClick={setDetails(item)}>
-                <TbEyeEdit className="text-2xl"/>Invoice
-                </button>
-                 )}
-                 content={() => componentRef.current}
-               />
+    
+          <button className="text-blue-500"  onClick={()=>setDetails(item)}>
+          <ReactToPrint
+        trigger={() => (
+            <span className="text-center">
+              <TbEyeEdit className="text-2xl" />
+              Invoice
+            </span>
+    
+        )}
+        content={() => componentRef.current}
+        onClick={()=>setDetails(item)}/>
+              </button>
+
             </td>
           </tr>
         ))}
@@ -212,8 +218,7 @@ const View = () => {
         {selectedView === 'Purchase' && renderTable(orders)} */}
       </div>
 <div>
-
-  {console.log(details)}
+{/* {console.log(details)} */}
 {details&&
 <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200 hidden">
       <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
