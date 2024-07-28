@@ -16,7 +16,7 @@ import Invoice from "../component/invoice.js";
 const Sale = () => {
   const [details, setDetails] = useState([]);
   const dispatch = useDispatch();
-  const productDetails = useSelector((state) => state.products.productDetails);
+  let productDetails = useSelector((state) => state.products.productDetails);
 const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
@@ -42,8 +42,8 @@ setTotalPrice(items[1]&&items[1].totalPrice)
 setGst(items[1]&&items[1].GST)
 setFinalTotal(items[1]&&items[1].final_price_With_GST)
 
-    // console.log(details);
-    console.log(items);
+    //console.log(details);
+    console.log(items[1]);
   }, [items]);
 
 
@@ -146,7 +146,7 @@ try {
     gst: "",
     total: "",
   })
-dispatch(fetchCart())
+// dispatch(fetchCart())
   setCardPay('');
   setCashPay('');
   setUPIPay('')
@@ -221,6 +221,7 @@ dispatch(fetchCart())
         dispatch(fetchCart());
       });
     }
+    productDetails = { qty: "" };
 
   };
 

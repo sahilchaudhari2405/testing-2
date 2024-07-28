@@ -9,13 +9,6 @@ import { logoutUser } from "../Redux/User/userSlices";
 import { toast } from "react-toastify";
 import { fetchProduct } from "../Redux/Product/productSlice";
 import axiosInstance from "../axiosConfig.js";
-import {
-  fetchCart,
-  removeFromCart,
-  clearCart,
-  updateCartQuantity,
-  addToCart,
-} from "../Redux/Cart/cartSlice";
 import { createPurchaseOrder } from "../Redux/Orders/orderSlice";
 import Invoice from "../component/invoice.js";
 import BarcodeReader from "react-barcode-reader";
@@ -118,6 +111,7 @@ const Purchase = () => {
     gst: "",
     total: "",
     amountpaid: "",
+    image:null
   });
 
   useEffect(() => {
@@ -136,6 +130,7 @@ const Purchase = () => {
         hsn: productDetails.HSN || "",
         gst: productDetails.GST || "",
         amountpaid: "",
+        image:null
       });
     }
   }, [productDetails]);
@@ -151,7 +146,7 @@ const Purchase = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    productDetails = { qty: "" };
     if (formData) {
       setCart([...cart, formData]);
     }
@@ -171,6 +166,7 @@ const Purchase = () => {
       hsn: productDetails.HSN || "",
       gst: productDetails.GST || "",
       amountpaid: "",
+      image:null
     });
   };
 
@@ -278,6 +274,7 @@ const Purchase = () => {
         hsn:"",
         gst:"",
         amountpaid: "",
+        image:null
       })
       alert('Order created successfully!');
     } catch (err) {
@@ -484,10 +481,7 @@ const Purchase = () => {
         <form onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
       
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
-       
-            <div className=" m-4">
-              <FaBarcode className="h-12" />
-            </div>
+    
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="barcode"
@@ -495,6 +489,7 @@ const Purchase = () => {
               >
                 Barcode
               </label>
+
               <input
                 type="text"
                 id="barcode"
@@ -503,6 +498,22 @@ const Purchase = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter barcode"
+              />
+            </div>
+            <div className="w-25 mb-4">
+              <label
+                htmlFor="image"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Upload Image
+              </label>
+
+              <input
+                type="file"
+                id="image"
+                onChange={handleChange}
+                className="w-full border border-white "
+            
               />
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
