@@ -250,7 +250,7 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
             if (cart && cartItemExists) {
                 cart.totalPrice -= product.price;
                 cart.GST -= product.GST;
-                cart.final_price_With_GST -= (product.discountedPrice - product.GST);
+                cart.final_price_With_GST -= (product.discountedPrice + product.GST);
                 cart.totalDiscountedPrice -= product.discountedPrice;
                 cart.discount -= (product.price - product.discountedPrice);
                 await cart.save();
