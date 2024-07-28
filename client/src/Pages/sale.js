@@ -246,6 +246,12 @@ dispatch(fetchCart())
           >
             LogOut
           </button>
+          <button
+            onClick={() => navigate("/editOrder")}
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors"
+          >
+            Edit Order
+          </button>
         </div>
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
