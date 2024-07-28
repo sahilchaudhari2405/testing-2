@@ -52,8 +52,7 @@ const Purchase = () => {
     if (cart.length > 0) {
       const totalAmount = cart.reduce((acc, e) => acc + (e.purchaseRate * e.qty), 0);
       const totalGST = cart.reduce((acc, e) => acc + (e.gst * e.qty), 0);
-      const paid = cart.reduce((acc, e) => acc + parseInt(e.amountpaid, 10), 0);
-
+   
       setInvoicePrice(totalAmount);
       setTotalGst(totalGST);
       setPaid(paid);
@@ -67,6 +66,20 @@ const Purchase = () => {
       }));
     }
   }, [cart]);
+
+
+  const handleKeys = (e) => {
+    console.log(e.key)
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission on Enter
+      const form = e.target.form;
+      const index = Array.prototype.indexOf.call(form, e.target);
+      form.elements[index + 1].focus();
+    }
+    // if (e.key === "Enter"&&e.target.value=="") {
+    //   handleSubmit(e);
+    // }
+  };
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -222,15 +235,6 @@ const Purchase = () => {
   };
 
   const bill = async() => {
-    // const BillData = {
-    //   products: cart,
-    //   orderDetails: finalform,
-    //   billImageURL: "",
-    //   date: currentDate
-    // };
-
-    // console.log(BillData);
-
 
     if(cart.length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
 
@@ -319,70 +323,9 @@ const Purchase = () => {
           </button>
         </div>
       </div>
+    
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div>
-            <label className="block text-gray-700 font-medium">Type</label>
-            <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>Purchase</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Name</label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Invoice</label>
-            <input
-              type="date"
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Ref.</label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Mobile</label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">GST No.</label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Ship To</label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Address</label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">State</label>
-            <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>Maharashtra (27)</option>
-            </select>
-          </div>
-        </div> */}
+      <form>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="block text-gray-700 font-medium">Type</label>
@@ -396,6 +339,7 @@ const Purchase = () => {
               type="text"
               id="name"
               required
+              onKeyDown={handleKeys}
               value={finalform.name}
               onChange={handleFinal}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -406,6 +350,7 @@ const Purchase = () => {
             <input
               type="date"
               id="Date"
+              onKeyDown={handleKeys}
               value={currentDate}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -417,6 +362,7 @@ const Purchase = () => {
               type="text"
               id="mobileNumber"
               required
+              onKeyDown={handleKeys}
               maxLength={10}
               minLength={10}
               value={finalform.mobileNumber}
@@ -430,6 +376,7 @@ const Purchase = () => {
             <input
               type="text"
               id="ref"
+              onKeyDown={handleKeys}
               value={finalform.ref}
               onChange={handleFinal}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -440,6 +387,7 @@ const Purchase = () => {
             <input
               type="text"
               id="GSTNo"
+              onKeyDown={handleKeys}
               value={finalform.GSTNo}
               onChange={handleFinal}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -449,6 +397,7 @@ const Purchase = () => {
             <label className="block text-gray-700 font-medium">Vendor</label>
             <input
               type="text"
+              onKeyDown={handleKeys}
               id="ShipTo"
               value={finalform.ShipTo}
               onChange={handleFinal}
@@ -460,6 +409,7 @@ const Purchase = () => {
             <input
               type="text"
               id="address"
+              onKeyDown={handleKeys}
               value={finalform.address}
               onChange={handleFinal}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -473,12 +423,12 @@ const Purchase = () => {
             </input>
           </div>
         </div>
-
+        </form>
 
         {/* New Input Fields */}
         <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded" onClick={genrateBarcode}>Generate Barcode</button>
     
-        <form onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
+        <form onSubmit={handleSubmit}>
       
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
     
@@ -496,6 +446,7 @@ const Purchase = () => {
                 required
                 value={formData.barcode}
                 onChange={handleChange}
+                onKeyDown={handleKeys}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter barcode"
               />
@@ -511,6 +462,7 @@ const Purchase = () => {
               <input
                 type="file"
                 id="image"
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full border border-white "
             
@@ -525,6 +477,7 @@ const Purchase = () => {
               </label>
               <input
                 type="text"
+                onKeyDown={handleKeys}
                 value={formData.brand}
                 onChange={handleChange}
                 id="brand"
@@ -542,6 +495,7 @@ const Purchase = () => {
               <input
                 type="text"
                 id="description"
+                onKeyDown={handleKeys}
                 required
                 value={formData.description}
                 onChange={handleChange}
@@ -562,6 +516,7 @@ const Purchase = () => {
               required
                 value={formData.category.toUpperCase()}
                 onChange={handleChange}
+                onKeyDown={handleKeys}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter category"
               />
@@ -577,6 +532,7 @@ const Purchase = () => {
                 type="text"
                 id="stockType"
                 value={formData.stockType}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter stock type"
@@ -593,6 +549,7 @@ const Purchase = () => {
                 type="text"
                 id="unit"
                 value={formData.unit}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter unit"
@@ -610,6 +567,7 @@ const Purchase = () => {
                 id="qty"
                 min={1}
                 required
+                onKeyDown={handleKeys}
                 value={formData.qty}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -627,6 +585,7 @@ const Purchase = () => {
                 type="text"
                 id="purchaseRate"
                 value={formData.purchaseRate}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter purchase rate"
@@ -643,6 +602,7 @@ const Purchase = () => {
                 type="text"
                 id="saleRate"
                 value={formData.saleRate}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter purchase rate"
@@ -660,6 +620,7 @@ const Purchase = () => {
                 id="hsn"
                 value={formData.hsn}
                 onChange={handleChange}
+                onKeyDown={handleKeys}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter HSN"
               />
@@ -676,6 +637,7 @@ const Purchase = () => {
                 id="gst"
                 value={formData.gst}
                 onChange={handleChange}
+                onKeyDown={handleKeys}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter GST percentage"
               />
@@ -697,7 +659,7 @@ const Purchase = () => {
                 placeholder="Enter total amount"
               />
             </div> */}
-            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+            {/* <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="amount-paid"
                 className="block text-gray-700 text-sm font-medium"
@@ -709,11 +671,12 @@ const Purchase = () => {
                 id="amountpaid"
                 required
                 value={formData.amountpaid}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter amount paid"
               />
-            </div>
+            </div> */}
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="profit"
@@ -725,6 +688,7 @@ const Purchase = () => {
                 type="text"
                 id="profit"
                 value={formData.profit}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter profit percentage"
@@ -734,7 +698,8 @@ const Purchase = () => {
               <button
                 type="submit"
                 className="w-full bg-green-700 text-white py-3 rounded font-medium hover:bg-green-800 transition-colors"
-              >
+             
+             >
                 Enter
               </button>
             </div>
@@ -772,10 +737,8 @@ const Purchase = () => {
                   Profit%
                 </th>
                 <th className="p-3 border border-gray-600 text-left">HSN</th>
-                <th className="p-3 border border-gray-600 text-left">GST%</th>
-                <th className="p-3 border border-gray-600 text-left">
-                  Amount Paid
-                </th>
+                <th className="p-3 border border-gray-600 text-left">GST</th>
+
                 <th className="p-3 border border-gray-600 text-left">
                   Actions
                 </th>
@@ -813,10 +776,8 @@ const Purchase = () => {
                       {item.profit}
                     </td>
                     <td className="p-3 border border-gray-600">{item.hsn}</td>
-                    <td className="p-3 border border-gray-600">{item.gst}%</td>
-                    <td className="p-3 border border-gray-600">
-                      {item.amountpaid}
-                    </td>
+                    <td className="p-3 border border-gray-600">{item.gst}</td>
+                 
                     <td className="p-3 border border-gray-600 text-center">
                       <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 " onClick={() => handleDelete(item.barcode)}>
                         Delete
@@ -868,10 +829,7 @@ const Purchase = () => {
                   <td className="border p-3"> {invoice}
             </td>
                 </tr>
-                <tr>
-                  <td className="border p-3">AMOUNTPAID:</td>
-                  <td className="border p-3">{paid}</td>
-                </tr>
+             
                 <tr>
                   <td className="border p-3">TAXES:</td>
                   <td className="border p-3">{totalGst}</td>
@@ -924,7 +882,10 @@ const Purchase = () => {
       </div>
 
       {/* ---------------------invoice ganrator------------------------- */}
-<Invoice/>
+      {/* <Invoice 
+        componentRef={componentRef} 
+        details={invoice} 
+      /> */}
     </div>
   );
 };
