@@ -9,11 +9,13 @@ import Modal from '../component/Modal';
 import { fetchProducts } from "../Redux/Product/productSlice";
 import { fetchCategories } from "../Redux/Category/categoriesSlice";
 import CategorySuggestions from '../component/CategorySuggestions';
-import { importExcelData, exportExcelData } from '../component/Card'; // Import utility functions
+import { importExcelData, exportExcelData } from '../component/Card'; 
+import axiosInstance from '../axiosConfig';
 
 const Inventory = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
   const [fullName, setFullName] = useState('');
   const { products, status } = useSelector((state) => state.products);
   const { categories } = useSelector((state) => state.categories);
@@ -31,7 +33,6 @@ const Inventory = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Refs for category input field and suggestions container
   const categoryInputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
@@ -41,7 +42,7 @@ const Inventory = () => {
     if (token) {
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
-    } else { // Redirect to login if no token found
+    } else { 
       navigate('/login');
     }
   }, [navigate]);
@@ -119,7 +120,7 @@ const Inventory = () => {
         (formValues.category === '' || (product.category && product.category.name && product.category.name.toLowerCase().includes(formValues.category.toLowerCase()))) &&
         (formValues.brand === '' || (product.brand && product.brand.toLowerCase().includes(formValues.brand.toLowerCase()))) &&
         (formValues.size === '' || (product.size && product.size === formValues.size)) &&
-        (formValues.expiringDays === '' || (product.expiringDays && product.ageing<= parseInt(formValues.expiringDays)))
+        (formValues.expiringDays === '' || (product.expiringDays && product.ageing <= parseInt(formValues.expiringDays)))
        );
     });
 
@@ -162,11 +163,20 @@ const Inventory = () => {
   const handleImport = (e) => {
     const file = e.target.files[0];
     if (file) {
-      importExcelData(file, (data) => {
-        // Update the state with the imported data
-        // This example assumes the imported data is an array of products
+      importExcelData(file, async (data) => {
         setProd(data);
-        dispatch({ type: 'products/import', payload: data });
+  
+        try {
+          const response = await axiosInstance.post('/product/importProducts', { products: data });
+          console.log('Data imported successfully:', response.data);
+  
+          dispatch((response.data.data));
+          if (response.data.skipped.length > 0) {
+            console.log('Skipped products:', response.data.skipped);
+          }
+        } catch (error) {
+          console.error('Error importing data:', error);
+        }
       });
     }
   };
@@ -181,7 +191,7 @@ const Inventory = () => {
         <h1 className="text-3xl font-bold">Inventory</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
-          <button  onClick={handleLogout}  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
+          <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
         </div>
       </div>
 
@@ -290,7 +300,6 @@ const Inventory = () => {
               <button type="button" onClick={handleClearFilters} className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded">Clear</button>
             </div>
           </form>  
-         
         </div>
 
         <div className="bg-gray-100 rounded-lg text-foreground p-4 space-y-4 mt-5 overflow-scroll h-[100vh] z-0">
