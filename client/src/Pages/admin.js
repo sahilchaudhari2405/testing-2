@@ -4,8 +4,48 @@ import ChartWithDropdown from '../component/lineGraphSales';
 import ChartofProducts from '../component/lineGraphProduct';
 import ChartofVisitors from '../component/lineGraphVisitors';
 import Chartofdonut from '../component/donutChart';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { useEffect } from 'react';
+
+
+
+const fetchUsers = async (token) => {
+  try {
+    if (!token) {
+      throw new Error('No token found in localStorage');
+    }
+    const response = await axios.get('http://localhost:4000/api/auth/users', {
+      withCredentials: true
+    });
+    console.log("CounterUsers: ", response.data);
+  } catch (error) {
+    console.error('Error fetching users:', error); 
+  }
+};
 
 const Admin = ({ selectedCounter, onCounterChange }) => {
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        fetchUsers(token);
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    } else {
+      console.error('No token found in localStorage');
+    }
+  }, []);
+
+
+
+
+
+
   return (
     <div className='flex flex-col justify-center items-center '>
 

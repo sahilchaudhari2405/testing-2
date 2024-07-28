@@ -41,10 +41,11 @@ const getOneBill = asyncHandler(async (req, res) => {
         return res.status(404).json(new ApiResponse(404, 'Cart not found', null));
     }
 
-        return res.status(200).json(new ApiResponse(200, 'Order placed successfully', cart));
+        return res.status(200).json(new ApiResponse(200, 'Order retreived successfully', cart));
 
     }
 );
+
 const getAllBill = asyncHandler(async (req, res) => {
     const cart = await OfflineOrder.find().populate(
         {

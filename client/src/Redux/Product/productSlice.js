@@ -10,6 +10,15 @@ export const createProduct = createAsyncThunk('products/createProduct', async (p
   }
 });
 
+export const importProducts = createAsyncThunk('products/importProducts', async (products, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post('/product/importProducts', { products });
+    return response.data.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.get('/product/view');
