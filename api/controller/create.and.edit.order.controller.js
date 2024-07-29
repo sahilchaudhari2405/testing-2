@@ -297,7 +297,9 @@ const updateOrder = asyncHandler(async (req, res) => {
       return res.status(500).json({ statusCode: 500, success: false, message: 'Error updating order', data: error.message });
     }
   });
-  const cancelledOrder = asyncHandler(async (req, res) => {
+
+// to cancel an Order
+const cancelledOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
     const { orderId } = req.body;
 
