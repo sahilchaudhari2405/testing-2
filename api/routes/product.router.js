@@ -3,6 +3,7 @@ import { createProduct, deleteProduct, updateProduct, viewProducts, viewProduct 
 import { generateOrderWithProductCheck } from '../controller/add.product.js';
 import { authenticateToken } from '../middleware/verify.js';
 import { importProducts } from '../controller/importExportProduct.js';
+import generateRandomBarcode from '../controller/QR-Create.controller.js';
 
 const router = express.Router();
 
@@ -13,5 +14,5 @@ router.delete('/delete/:id', authenticateToken, deleteProduct);
 router.get('/view', viewProducts);
 router.post('/purchaseOrder', authenticateToken, generateOrderWithProductCheck);
 router.post('/importProducts', importProducts);
-
+router.get('/getBarcode',authenticateToken,generateRandomBarcode);
 export default router;
