@@ -5,11 +5,20 @@ import axiosInstance from '../../axiosConfig';
 // Async thunks for handling API requests
 export const fetchOrders = createAsyncThunk('orders/fetchOrders', async () => {
   try {
-    const response = await axiosInstance.get('/order/getAllOrderByCounter');
+    const response = await axiosInstance.get('/order/getCounterOrder');
     console.log(response.data)
     return response.data.data;  // Return the data directly from axios response
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to fetch orders');
+  }
+});
+
+export const sortOrders = createAsyncThunk('orders/sortOrders', async ({ fromDate, toDate,name}) => {
+  try {
+    const response = await axiosInstance.post('/order/sortOrder', { fromDate, toDate,name });
+    return response.data;  // Return the sorted orders data
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to sort orders');
   }
 });
 
@@ -123,6 +132,17 @@ const ordersSlice = createSlice({
         state.purchaseOrders.push(action.payload);
       })
       .addCase(createPurchaseOrder.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(sortOrders.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(sortOrders.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.orders = action.payload;
+      })
+      .addCase(sortOrders.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       });

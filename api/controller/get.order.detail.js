@@ -64,4 +64,38 @@ const getAllBill = asyncHandler(async (req, res) => {
 
     }
 );
-export {getAllBill,getCounterBill,getOneBill};
+
+const sortOrder = asyncHandler(async (req, res) => {
+    const { fromDate, toDate, name } = req.body;
+    const { id } = req.user;
+  
+    let query = { user: id };
+  
+    // Add date range filter if fromDate and toDate are provided
+    if (fromDate && toDate) {
+      query.updatedAt = {
+        $gte: new Date(fromDate),
+        $lte: new Date(toDate),
+      };
+    }
+  
+    // Add name filter if provided
+    if (name) {
+        query.Name = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
+      }
+  
+    try {
+      const orders = await OfflineOrder.find(query)
+        .populate({
+          path: 'user',
+          model: 'CounterUser',
+        })
+        .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
+  
+      res.json(orders);
+    } catch (err) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+export {getAllBill,getCounterBill,getOneBill,sortOrder};

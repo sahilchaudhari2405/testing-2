@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { FaArrowDown, FaEdit, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchOrders, updateOrder, deleteOrder } from '../Redux/Orders/orderSlice';
+import { fetchOrders,sortOrders } from '../Redux/Orders/orderSlice';
 import { useNavigate } from 'react-router-dom';
 import { TbEyeEdit } from "react-icons/tb";
 import ReactToPrint from "react-to-print";
@@ -27,14 +27,26 @@ const View = () => {
   const orders = useSelector((state) => state.orders.orders);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
+  // const sortedOrders = useSelector((state) => state.orders.sortedOrders);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [name, setName] = useState('');
 
-  
+
   const handlePrint = (item) => {
     setDetails(item);
   };
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
+
+
+  useEffect(() => {
+    if (status === 'succeeded') {
+      console.log('Sorted Orders:',orders);
+      // Do something with the sorted orders
+    }
+  }, [status, orders]);
 
   useEffect(() => {
     if (details && printRef.current) {
@@ -46,13 +58,17 @@ const View = () => {
     setSelectedView(view);
   };
 
-  const handleDelete = (item) => {
-    dispatch(deleteOrder(item._id));
+  const handleSort = (e) => {
+    e.preventDefault();
+    dispatch(sortOrders({ fromDate, toDate,name }));
   };
+  // const handleDelete = (item) => {
+  //   dispatch(deleteOrder(item._id));
+  // };
 
-  const handleEdit = (item) => {
-    navigate(`/sales/${item._id}`);
-  };
+  // const handleEdit = (item) => {
+  //   navigate(`/sales/${item._id}`);
+  // };
 
   // const handlePrint = (item) => {
   //   setDetails(item);
@@ -73,10 +89,12 @@ const View = () => {
           <th className="border border-zinc-800 px-4 py-2">Payment Mode</th>
           <th className="border border-zinc-800 px-4 py-2">Pending</th>
           <th className="border border-zinc-800 px-4 py-2">Counter</th>
+          <th className="border border-zinc-800 px-4 py-2">Date</th>
           <th className="border border-zinc-800 px-4 py-2">Action</th>
         </tr>
       </thead>
       <tbody>
+        {console.log(orders)}
         {orders?.map((item, i) => (
           <tr key={item._id} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
             <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
@@ -89,7 +107,8 @@ const View = () => {
             <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
             <td className="border border-zinc-800 px-4 py-2">CASH:{item.paymentType.cash}|CARD:{item.paymentType.Card}|UPI:{item.paymentType.UPI}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.user}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.user.fullName||item.user}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.updatedAt}</td>
             <td className="border border-zinc-800 px-4 py-2">
               <div className='flex justify-around'>
                 <button className="text-blue-500" onClick={() => handlePrint(item)}>
@@ -140,6 +159,55 @@ const View = () => {
               </select>
             </div>
           </label>
+     <form onSubmit={handleSort} className="flex items-center space-x-2 mb-4 bg-gray-100 p-3 mt-[-5px] rounded-md">
+          <div>
+            <label htmlFor="from" >
+              From
+            </label>
+            <input
+          id="from"
+          type="date"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+          className="bg-white border border-zinc-300 px-4 py-2 rounded"
+        />
+        
+           </div>
+          <div>
+            <label htmlFor="to" >
+              To
+            </label>
+        <input
+          id="to"
+          type="date"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+          className="bg-white border border-zinc-300 px-4 py-2 rounded"
+        />
+                  </div>
+
+                  <div>
+            <label htmlFor="from" >
+              Customer
+            </label>
+            <input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder='Customer Name'
+          className="bg-white border border-zinc-300 px-4 py-2 rounded w-fit"
+        />
+        
+           </div>
+          <button
+                type="submit"
+                className="w-full bg-blue-500 mt-6 text-white py-2 rounded font-medium hover:bg-green-800 transition-colors"
+             
+             >
+                Enter
+              </button>
+          </form>
         </div>
 
         <div>
@@ -149,65 +217,6 @@ const View = () => {
 <div className='hidden'>
       {details && (
         <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200">
-          {/* <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
-            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-              <div>
-                <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
-                <p>APALA BAJAR</p>
-                <p>SHRIGONDA, AHMADNAGAR</p>
-                <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
-                <p>PHONE: 9849589588</p>
-                <p>EMAIL: aaplabajar1777@gmail.com</p>
-              </div>
-              <div className="w-24 h-24 border flex items-center justify-center">
-                <img src={logo} alt="Insert Logo Above" />
-              </div>
-            </div>
-            <hr className="mb-4" />
-            <div className="mb-4">
-              <h2 className="text-lg font-bold">Customer Details:</h2>
-              <p>Name: {details.Name}</p>
-              <p>Mobile: {details.mobileNumber}</p>
-            </div>
-            <hr className="mb-4" />
-            <div className="mb-4">
-              <h2 className="text-lg font-bold">Order Summary:</h2>
-              <p>Order Date: {details.orderDate}</p>
-              <p>Payment Type: Cash</p>
-            </div>
-            <hr className="mb-4" />
-            <div className="mb-4">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th className={`${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.fontBold}`}>Item</th>
-                    <th className={`${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.fontBold}`}>Quantity</th>
-                    <th className={`${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.fontBold}`}>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {details.items?.map((item, index) => (
-                    <tr key={index}>
-                      <td className={`${sharedClasses.border} ${sharedClasses.p2}`}>{item.name}</td>
-                      <td className={`${sharedClasses.border} ${sharedClasses.p2}`}>{item.quantity}</td>
-                      <td className={`${sharedClasses.border} ${sharedClasses.p2}`}>{item.price}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <hr className="mb-4" />
-            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-              <p className="font-bold">Discount: 50 Rs</p>
-              <p className="font-bold">Tax: 50 Rs</p>
-              <p className="font-bold">Total: 400 Rs</p>
-            </div>
-            <hr className="mb-4" />
-            <div className="text-center">
-              <p>Thank you for your business!</p>
-              <p>Terms and conditions apply</p>
-            </div>
-          </div> */}
            <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
           <div>
