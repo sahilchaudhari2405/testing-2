@@ -8,7 +8,7 @@ import Dashboard from './Pages/dashboard';
 import Purchase from './Pages/purchase';
 import Inventory from './Pages/inventory';
 // import Sales from './pages/Sales';
-import View from './Pages/View.js';
+import View from './Pages/view.js';
 import Login from './Pages/login';
 import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
