@@ -33,8 +33,7 @@ const productSchema = new mongoose.Schema({
   },
   slug: {
     type: String,
-    unique: true,
-    required: true,
+    
   },
   ratings: [
     {
@@ -66,10 +65,10 @@ const productSchema = new mongoose.Schema({
     default: Date.now,
   },
   // New fields for offline counter sales
-  BarCode:{
-    type: Number,
-    default: 0,
-  },
+  BarCode: { type: String, 
+    required: true, 
+    unique: true }
+  ,
   stockType:{
     type: String,
     default: "TYPE NONE"
