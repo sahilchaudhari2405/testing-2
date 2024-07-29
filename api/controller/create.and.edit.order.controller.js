@@ -297,7 +297,60 @@ const updateOrder = asyncHandler(async (req, res) => {
       return res.status(500).json({ statusCode: 500, success: false, message: 'Error updating order', data: error.message });
     }
   });
+  const cancelledOrder = asyncHandler(async (req, res) => {
+    const { id } = req.user;
+    const { orderId } = req.body;
+
+    try {
+        const cart = await OfflineOrder.findById(orderId);
+        if (!cart) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        const oldOrder = cart.toObject(); // Creating a plain object copy of the cart
+        const cancelFields = {
+            totalPrice: 0,
+            totalDiscountedPrice: 0,
+            GST: 0,
+            discount: 0,
+            totalItem: 0,
+            totalPurchaseRate: 0,
+            totalProfit: 0,
+            finalPriceWithGST: 0,
+        };
+
+        cart.user = id;
+        cart.orderStatus = 'Cancel';
+        cart.totalPrice = cancelFields.totalPrice;
+        cart.totalDiscountedPrice = cancelFields.totalDiscountedPrice;
+        cart.GST = cancelFields.GST;
+        cart.discount = cancelFields.discount;
+        cart.totalItem = cancelFields.totalItem;
+        cart.totalPurchaseRate = cancelFields.totalPurchaseRate;
+        cart.totalProfit = cancelFields.totalProfit;
+        cart.finalPriceWithGST = cancelFields.finalPriceWithGST;
+
+        await cart.save();
+
+        for (const item of cart.orderItems) {
+            const product = await Product.findById(item.product);
+            if (product) {
+                product.quantity += item.quantity;
+                await product.save();
+            }
+        }
+
+        await updateSalesData(oldOrder.user, oldOrder, cancelFields);
+        await TotalAllupdateSalesData(oldOrder, cancelFields);
+        await TotalOfflineupdateSalesData(oldOrder, cancelFields);
+
+        return res.status(200).json(new ApiResponse(200, 'Order cancelled successfully', cart));
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+});
 
 
 // Export functions
-export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById,updateOrder };
+export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById,updateOrder,cancelledOrder };

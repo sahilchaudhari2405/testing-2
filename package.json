@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "file-saver": "^2.0.5",
-    "js-cookie": "^3.0.5",
-    "react-barcode-reader": "^0.0.2",
-    "xlsx": "^0.18.5"
-  }
-}
