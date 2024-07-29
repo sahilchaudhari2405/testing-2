@@ -94,7 +94,7 @@ const View = () => {
             CASH: {item.paymentType?.cash || 0} | CARD: {item.paymentType?.Card || 0} | UPI: {item.paymentType?.UPI || 0}
           </td>
             <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.user}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.user && item.user.fullName }</td>
             <td className="border border-zinc-800 px-4 py-2">
               <div className='flex justify-around'>
                 <button className="text-blue-500">
