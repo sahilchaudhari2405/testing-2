@@ -6,7 +6,7 @@ import cart from '../routes/cart.router.js'; // Ensure .js extension
 import productRouter from '../routes/product.router.js'
 import categoryRouter from '../routes/category.routes.js'
 import test from '../controller/test.js';
-
+import { importProducts } from '../controller/importExportProduct.js';
 import userRoutes from '../routes/users.route.js'
 
 
@@ -21,4 +21,5 @@ allRouter.use('/product', productRouter);
 allRouter.use('/category' ,categoryRouter );
 allRouter.use('/admin',cart);
 allRouter.use('/test',test);
+allRouter.use('/import',importProducts);
 export default allRouter;
