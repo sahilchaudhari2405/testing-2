@@ -4,12 +4,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders, updateOrder, deleteOrder } from '../Redux/Orders/orderSlice';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
+import {jwtDecode} from 'jwt-decode';
 import { saveAs } from 'file-saver';
+import { logoutUser } from '../Redux/User/userSlices';
+import { toast } from 'react-toastify';
 
 const View = () => {
   const navigate = useNavigate();
   const [selectedView, setSelectedView] = useState('Sales');
   const [importedData, setImportedData] = useState([]);
+  const [fullName, setFullName] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.orders.orders);
@@ -20,6 +24,21 @@ const View = () => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setFullName(decodedToken.fullName);
+    } else { // Redirect to login if no token found
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    localStorage.removeItem('token');
+    toast.error("Logout Successfully!")
+    navigate('/');
+  };
   const handleSelect = (view) => {
     setSelectedView(view);
   };
@@ -114,10 +133,10 @@ const View = () => {
   return (
     <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
       <div className="bg-slate-700 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h1 className="text-lg font-bold">View Data</h1>
+        <h1 className="text-3xl font-bold">View Data</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>salescounter1</span></span>
-          <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
+          <span className="text-sm">Online Orders | Hi, <span className='font-bold'>{fullName}</span></span>
+          <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">LogOut</button>
         </div>
       </div>
 
