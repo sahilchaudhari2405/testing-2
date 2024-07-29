@@ -14,7 +14,7 @@ import Login from './Pages/login';
 import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
 import Admin from './Pages/admin';
-// import Accounts from './pages/Accounts';
+import Accounts from './Pages/accounts.js';
 // import Reports from './pages/Reports';
 // import Msg from './pages/Msg';
 // import Import from './pages/Import';
@@ -46,6 +46,14 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="admin">
                 <PageWithNavbar><Admin /></PageWithNavbar>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/accounts"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PageWithNavbar><Accounts /></PageWithNavbar>
               </ProtectedRoute>
             }
           />
