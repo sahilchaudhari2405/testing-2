@@ -26,7 +26,7 @@ export const importProducts = async (req, res) => {
         let isUnique = false;
 
         while (!isUnique) {
-            newBarcode = Math.floor(Math.random() * 10 ** 22).toString().padStart(22, '0');
+            newBarcode = Math.floor(1000000000000 + Math.random() * 9000000000000).toString();  
             const checkBarcode = await Product.findOne({ BarCode: newBarcode });
 
           if (!checkBarcode) {
