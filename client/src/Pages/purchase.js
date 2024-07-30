@@ -243,46 +243,43 @@ const Purchase = () => {
     try {
       const createdOrder=  dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform}))
       .unwrap()
-  console.log(createdOrder);
-
- 
-      
-      // setFinal({
-      //   type: "Purchase",
-      //   name: "",
-      //   date: '',
-      //   mobileNumber: "",
-      //   ShipTo: "",
-      //   address: "",
-      //   ref: "",
-      //   state: "Maharastra",
-      //   GSTNo: "",
-      //   totalGst: "",
-      //   TotalAmount: "",
-      //   AmountPaid: "",
-      //   orderStatus: "first time",
-      //   paymentType: {
-      //     cash: "",
-      //     card: "",
-      //     upi: ""
-      //   },
-      // })
-      // setFormData({
-      //   barcode:"",
-      //   brand:"",
-      //   description:"",
-      //   category:"",
-      //   stockType:"",
-      //   unit:"",
-      //   qty: "",
-      //   saleRate: "",
-      //   purchaseRate:"",
-      //   profit:"",
-      //   hsn:"",
-      //   gst:"",
-      //   amountpaid: "",
-      //   image:null
-      // })
+  console.log(createdOrder); 
+      setFinal({
+        type: "Purchase",
+        name: "",
+        date: '',
+        mobileNumber: "",
+        ShipTo: "",
+        address: "",
+        ref: "",
+        state: "Maharastra",
+        GSTNo: "",
+        totalGst: "",
+        TotalAmount: "",
+        AmountPaid: "",
+        orderStatus: "first time",
+        paymentType: {
+          cash: "",
+          card: "",
+          upi: ""
+        },
+      })
+      setFormData({
+        barcode:"",
+        brand:"",
+        description:"",
+        category:"",
+        stockType:"",
+        unit:"",
+        qty: "",
+        saleRate: "",
+        purchaseRate:"",
+        profit:"",
+        hsn:"",
+        gst:"",
+        amountpaid: "",
+        image:null
+      })
 
       alert('Order created successfully!');
     } catch (err) {

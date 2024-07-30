@@ -63,12 +63,12 @@ const Invoice = ({ componentRef, details }) => {
           <tbody>
             {details?.orderItems?.map((e, index) => (
               <tr key={index}>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product?.title ||e.productId.title }</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product.title ||e.productId.title }</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.GST}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)||(e.productId?.price-e.retailPrice)}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price || e.productId.price}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice || e.productId?.discountedPrice}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)||(e.productId.price-e.retailPrice)}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price || e.retailPrice}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice || e.retailPrice}</td>
                 
               </tr>
             ))}
@@ -82,7 +82,7 @@ const Invoice = ({ componentRef, details }) => {
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>DISCOUNT</span>
-              <span>₹{details.totalPrice-details.totalDiscountedPrice}</span>
+              <span>₹{details.totalPrice-(details.totalDiscountedPrice||details.totalPurchaseRate)}</span>
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>GST</span>
@@ -94,7 +94,7 @@ const Invoice = ({ componentRef, details }) => {
             </div> */}
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
               <span>Amount Pay</span>
-              <span>₹{details.finalPriceWithGST}</span>
+              <span>₹{details.finalPriceWithGST ||(details.totalPrice+details.GST) }</span>
             </div>
           </div>
         </div>
