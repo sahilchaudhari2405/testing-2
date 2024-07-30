@@ -128,3 +128,21 @@ export const generateOrderWithProductCheck = async (req, res) => {
         res.status(500).json({ message: "Failed to create order", error: error.message });
     }
 };
+export const GetPurchaseOrder = async (req, res) => {
+    const {id ,role} =req.user;
+    if(role==='admin')
+    {
+        const results = await OfflinePurchaseOrder.find().populate({
+            path: 'orderItems.productId',
+            model: 'products'
+        });
+        res.status(201).json({ message: "Order created successfully", order: results });
+    }
+    else{
+        const results = await OfflinePurchaseOrder.findOne({user:id}).populate({
+            path: 'orderItems.productId',
+            model: 'products'
+        });
+        res.status(201).json({ message: "Order created successfully", order: results });
+    }
+};
