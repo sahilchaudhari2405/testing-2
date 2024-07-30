@@ -146,7 +146,7 @@ const View = () => {
             <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
             <td className="border border-zinc-800 px-4 py-2 flex flex-col"><span>CASH:{item.paymentType.cash}/</span><span>CARD:{item.paymentType.Card}/</span><span>UPI:{item.paymentType.UPI}</span></td>
             <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.user.fullName||item.user}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.user?.fullName}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.updatedAt.substring(0, 10)}</td>
             <td className="border border-zinc-800 px-4 py-2">
               <div className='flex justify-around'>

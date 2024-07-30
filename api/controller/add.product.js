@@ -36,7 +36,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                 await existingProduct.save();
                 orderItems.push({
                     productId: existingProduct._id,
-                    quantity: existingProduct.quantity,
+                    quantity: productData.qty,
                     purchaseRate: existingProduct.purchaseRate,
                     GST: existingProduct.GST,
                     retailPrice: existingProduct.retailPrice,
