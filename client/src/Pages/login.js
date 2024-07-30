@@ -23,10 +23,10 @@ const Login = () => {
 
         // Extract role or any other user information
         const role = decodedToken.role;
-
+console.log(role)
         if (role === 'admin') {
           navigate('/admin');
-        } else if (role === 'user') {
+        } else if (role === 'COUNTERBOY') {
           navigate('/dashboard');
         }
       } catch (error) {

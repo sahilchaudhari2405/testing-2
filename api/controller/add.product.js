@@ -57,7 +57,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     ratings: productData.ratings || [],
                     reviews: productData.reviews || [],
                     numRatings: parseInt(productData.numRatings, 10) || 0,
-                    category: '66a53078bf12d3157bd6e041',
+                    category: productData.category,
                     createdAt: productData.createdAt || null,
                     updatedAt: productData.updatedAt || null,
                     BarCode: productData.barcode || null,
@@ -93,7 +93,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalPrice += item.retailPrice * item.quantity;
             totalPurchaseRate += item.purchaseRate * item.quantity;
             totalGST += item.GST * item.quantity;
-            totalItem += item.quantity;
+            totalItem += 1;
         }
 
         const newOrder = new OfflinePurchaseOrder({

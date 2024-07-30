@@ -20,7 +20,7 @@ import Accounts from './Pages/accounts.js';
 // import Import from './pages/Import';
 // import More from './pages/More';
 // import Company from './pages/Company';
-import Users from './Pages/users.js';
+import Users from './Pages/Users.js';
 // import Settings from './pages/Settings';
 import { ToastContainer } from 'react-toastify';
 import ProtectedRoute from './component/ProtectedRoute';
