@@ -12,16 +12,17 @@ import { toast } from "react-toastify";
 import { fetchCart, removeFromCart, clearCart, updateCartQuantity, addToCart } from '../Redux/Cart/cartSlice';
 import {createOrder} from '../Redux/Orders/orderSlice';
 import Invoice from "../component/invoice.js";
-
+import axiosInstance from "../axiosConfig.js";
 const Sale = () => {
   const [details, setDetails] = useState([]);
+  const [productDetails,setProductDetails] = useState()
   const dispatch = useDispatch();
-  const productDetails = useSelector((state) => state.products.productDetails);
+  // let productDetails = useSelector((state) => state.products.productDetails);
 const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const { orderId } = useParams();
-  const { items, status, fetchCartError } = useSelector((state) => state.cart);
+  let { items, status, fetchCartError } = useSelector((state) => state.cart);
   const [currentDate, setCurrentDate] = useState('');
   const [cardPay,setCardPay]=useState('');
   const [cashPay,setCashPay]=useState('');
@@ -42,8 +43,8 @@ setTotalPrice(items[1]&&items[1].totalPrice)
 setGst(items[1]&&items[1].GST)
 setFinalTotal(items[1]&&items[1].final_price_With_GST)
 
-    // console.log(details);
-    console.log(items);
+    //console.log(details);
+    console.log(items[1]);
   }, [items]);
 
 
@@ -57,11 +58,35 @@ setFinalTotal(items[1]&&items[1].final_price_With_GST)
     }
   }, [navigate]);
 
+  const handleKeys = (e) => {
+    console.log(e.key)
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission on Enter
+      const form = e.target.form;
+      const index = Array.prototype.indexOf.call(form, e.target);
+      form.elements[index + 1].focus();
+    }
+
+  };
+
   const handleLogout = () => {
     dispatch(logoutUser());
     localStorage.removeItem("token");
     toast.error("Logout Successfully!");
     navigate("/");
+  };
+  
+  const fetchProducts = async (id) => {
+    console.log(id+"hallo")
+    try {
+      const response = await axiosInstance.get(`/product/view/${id}`); // Adjust the URL to your API endpoint
+      // setProducts(response.data);
+      console.log(response)
+      setProductDetails(response.data.data)
+    } catch (err) {
+      // setError();
+console.log(err.message)
+    }
   };
 
   useEffect(() => {
@@ -79,12 +104,14 @@ setFinalTotal(items[1]&&items[1].final_price_With_GST)
   
   const handleScan = (data) => {
     if (data) {
-      dispatch(fetchProduct(data));
+      // dispatch(fetchProduct(data));
+      fetchProducts(data);
     }
   };
 
   const handleError = (err) => {
-    dispatch(fetchProduct("2345632900700"));
+    fetchProducts('123456')
+    // dispatch(fetchProduct("5345435334"));
   };
 
   // State variables for form fields
@@ -122,6 +149,7 @@ try {
   console.log(createdOrder);
 
   setInvoice(createdOrder.data)
+  items=[]
   setFinal({
     type:"Sale",
     name:"",
@@ -147,13 +175,6 @@ try {
     total: "",
   })
 dispatch(fetchCart())
-  setCardPay('');
-  setCashPay('');
-  setUPIPay('')
-  setFinalTotal('');
-  setTotalPrice('');
-  setDiscount('');
-  setGst('');
   alert('Order created successfully!');
 } catch (err) {
   alert(`Failed to create order: ${err.message}`);
@@ -200,12 +221,12 @@ dispatch(fetchCart())
         barcode: productDetails.BarCode || "",
         brand: productDetails.brand || "",
         description: productDetails.title || "",
-        category: productDetails.category.name || "",
+        category: productDetails.category?.name|| "",
         stockType: productDetails.stockType || "",
         unit: productDetails.unit || "",
         qty: 1,
         saleRate: productDetails.discountedPrice || "",
-        // profit: productDetails.profit || "",
+        profit: productDetails.profit || "",
         hsn: productDetails.HSN || "0",
         gst: productDetails.GST || "",
       });
@@ -221,13 +242,16 @@ dispatch(fetchCart())
         dispatch(fetchCart());
       });
     }
+    setProductDetails({...productDetails,['qty']:" "});
 
   };
 
   const handleKeyPress = (e) => {
-    console.log(e);
     if (e.key === "Enter") {
-      handleSubmit(e);
+
+      if (e.target.value.trim()!="") {
+      fetchProducts(e.target.value);
+      }
     }
   };
   const componentRef = useRef();
@@ -255,6 +279,7 @@ dispatch(fetchCart())
         </div>
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
+      <form>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="block text-gray-700 font-medium">Type</label>
@@ -269,6 +294,7 @@ dispatch(fetchCart())
               id="name"
               required
               value={finalform.name}
+              onKeyDown={handleKeys}
               onChange={handleFinal}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -278,6 +304,7 @@ dispatch(fetchCart())
             <input
               type="date"
               id="Date"
+              onKeyDown={handleKeys}
               value={currentDate}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -289,19 +316,10 @@ dispatch(fetchCart())
               type="text"
               id="mobileNumber"
               required
+              onKeyDown={handleKeys}
               maxLength={10}
               minLength={10}
               value={finalform.mobileNumber}
-              onChange={handleFinal}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">GST No.</label>
-            <input
-              type="text"
-              id="GSTNo"
-              value={finalform.GSTNo}
               onChange={handleFinal}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -313,6 +331,7 @@ dispatch(fetchCart())
               id="ShipTo"
               value={finalform.ShipTo}
               onChange={handleFinal}
+              onKeyDown={handleKeys}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -323,6 +342,7 @@ dispatch(fetchCart())
               id="address"
               value={finalform.address}
               onChange={handleFinal}
+              onKeyDown={handleKeys}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -334,12 +354,13 @@ dispatch(fetchCart())
             </input>
           </div>
         </div>
+        </form>
 
 
         {/* New Input Fields */}
-        <form onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
+        <form onSubmit={handleSubmit}>
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
-            <div className=" mb-4">
+            {/* <div className=" mb-4"> 
               <label
                 htmlFor="list"
                 className="block text-gray-700 text-sm font-medium"
@@ -351,13 +372,13 @@ dispatch(fetchCart())
                 id="list"
                 className="border border-gray-300 rounded p-2"
               />
-            </div>
-            <div className=" m-4">
+            </div> */}
+            {/* <div className=" m-4">
               <button id="scan">
                 {" "}
                 <FaBarcode className="h-12" />
               </button>
-            </div>
+            </div> */}
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="barcode"
@@ -369,6 +390,7 @@ dispatch(fetchCart())
                 type="text"
                 id="barcode"
                 value={formData.barcode}
+                onKeyDown={handleKeyPress}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter barcode"
@@ -383,6 +405,7 @@ dispatch(fetchCart())
               </label>
               <input
                 type="text"
+                onKeyDown={handleKeys}
                 value={formData.brand}
                 onChange={handleChange}
                 id="brand"
@@ -400,6 +423,7 @@ dispatch(fetchCart())
               <input
                 type="text"
                 id="description"
+                onKeyDown={handleKeys}
                 value={formData.description}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -417,6 +441,7 @@ dispatch(fetchCart())
                 type="text"
                 id="category"
                 value={formData.category}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter category"
@@ -433,6 +458,7 @@ dispatch(fetchCart())
                 type="text"
                 id="stockType"
                 value={formData.stockType}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter stock type"
@@ -449,6 +475,7 @@ dispatch(fetchCart())
                 type="text"
                 id="unit"
                 value={formData.unit}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter unit"
@@ -465,6 +492,7 @@ dispatch(fetchCart())
                 type="number"
                 id="qty"
                 value={formData.qty}
+                onKeyDown={handleKeys}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter quantity"
               />
@@ -480,6 +508,7 @@ dispatch(fetchCart())
                 type="text"
                 id="sale-rate"
                 value={formData.saleRate}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter Sale rate"
@@ -496,6 +525,7 @@ dispatch(fetchCart())
                 type="text"
                 id="hsn"
                 value={formData.hsn}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter HSN"
@@ -512,6 +542,7 @@ dispatch(fetchCart())
                 type="text"
                 id="gst"
                 value={formData.gst}
+                onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter GST percentage"

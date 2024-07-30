@@ -8,7 +8,7 @@ import generateRandomBarcode from '../controller/QR-Create.controller.js';
 const router = express.Router();
 
 router.post('/create', authenticateToken, createProduct);
-router.get('/view/:id', viewProduct);
+router.get('/view/:id', authenticateToken, viewProduct);
 router.put('/update/:id', authenticateToken, updateProduct);
 router.delete('/delete/:id', authenticateToken, deleteProduct);
 router.get('/view', viewProducts);

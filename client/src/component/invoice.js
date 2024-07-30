@@ -16,7 +16,7 @@ const Invoice = ({ componentRef, details }) => {
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
           <div>
             <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
-            <p>AAPLA BAJAR</p>
+            <p>APALA BAJAR</p>
             <p>SHRIGONDA, AHMADNAGAR</p>
             <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
             <p>PHONE: 9849589588</p>
