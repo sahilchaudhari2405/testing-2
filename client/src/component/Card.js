@@ -5,6 +5,7 @@ import Modal from './Modal'; // Import the Modal component
 import * as XLSX from 'xlsx';
 import { jsPDF } from "jspdf";
 import JsBarcode from 'jsbarcode';
+import { toast } from "react-toastify";
 
 // Existing styles
 const cardClasses = "bg-white p-4 rounded-lg flex items-center justify-between";
@@ -27,6 +28,7 @@ const ProductCard = ({ items }) => {
   const [quantity, setQuantity] = useState(1);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [barcodePreviews, setBarcodePreviews] = useState([]); // New state for barcode previews
+  const startsWithLetter = (code) => /^[A-Za-z]/.test(code);
   const popupRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -59,11 +61,12 @@ const ProductCard = ({ items }) => {
   const generateBarcodes = () => {
     const previews = [];
     for (let i = 0; i < quantity; i++) {
+      if (startsWithLetter(items.BarCode)) {
         // Create canvas elements
         const titleCanvas = document.createElement("canvas");
         const textCanvas = document.createElement("canvas");
         const barcodeCanvas = document.createElement("canvas");
-
+  
         // Set up title canvas
         const titleContext = titleCanvas.getContext('2d');
         titleCanvas.width = 200; // Adjust width as needed
@@ -72,10 +75,10 @@ const ProductCard = ({ items }) => {
         titleContext.textAlign = "center";
         titleContext.textBaseline = "middle";
         titleContext.fillText("आपला बाजार श्रीगोंदा", titleCanvas.width / 2, titleCanvas.height / 2);
-
+  
         // Truncate title to first 20 characters
         const truncatedTitle = items.title.length > 20 ? items.title.substring(0, 20) + '...' : items.title;
-
+  
         // Set up additional text canvas
         const textContext = textCanvas.getContext('2d');
         textCanvas.width = 200; // Adjust width as needed
@@ -84,40 +87,45 @@ const ProductCard = ({ items }) => {
         textContext.textAlign = "center";
         textContext.textBaseline = "middle";
         textContext.fillText(truncatedTitle, textCanvas.width / 2, textCanvas.height / 2);
-
+  
         // Set up barcode canvas
         JsBarcode(barcodeCanvas, items.BarCode, {
-            format: "CODE128",
-            lineColor: "#000",
-            width: 2,
-            height: 100,
-            displayValue: true,
-            text: `BARCODE: ${items.BarCode}\nMRP: ₹${items.price}`,
-            fontSize: 10,
-            textAlign: "center",
-            textPosition: "bottom",
+          format: "CODE128",
+          lineColor: "#000",
+          width: 2,
+          height: 100,
+          displayValue: true,
+          text: `BARCODE: ${items.BarCode}\nMRP: ₹${items.price}`,
+          fontSize: 10,
+          textAlign: "center",
+          textPosition: "bottom",
         });
-
+  
         // Combine canvases
         const finalCanvas = document.createElement("canvas");
         const finalContext = finalCanvas.getContext('2d');
         finalCanvas.width = Math.max(titleCanvas.width, textCanvas.width, barcodeCanvas.width);
         finalCanvas.height = titleCanvas.height + textCanvas.height + barcodeCanvas.height;
-
+  
         // Draw title canvas
         finalContext.drawImage(titleCanvas, 0, 0);
         
         // Draw additional text canvas below title
         finalContext.drawImage(textCanvas, 0, titleCanvas.height);
-
+  
         // Draw barcode canvas below additional text
         finalContext.drawImage(barcodeCanvas, 0, titleCanvas.height + textCanvas.height);
-
+  
         previews.push(finalCanvas.toDataURL("image/png"));
+      }
+      else{
+        toast.error("Sorry don't Have barcode for this!!")
+      }
     }
     setBarcodePreviews(previews);
     setIsQuantityPopupVisible(false);
-};
+  };
+  
 
 
 
