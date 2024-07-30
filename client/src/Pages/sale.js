@@ -21,8 +21,7 @@ const Sale = () => {
 const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
-  const { orderId } = useParams();
-  let { items, status, fetchCartError } = useSelector((state) => state.cart);
+  const { items, status, fetchCartError } = useSelector((state) => state.cart);
   const [currentDate, setCurrentDate] = useState('');
   const [cardPay,setCardPay]=useState('');
   const [cashPay,setCashPay]=useState('');
@@ -104,14 +103,12 @@ console.log(err.message)
   
   const handleScan = (data) => {
     if (data) {
-      // dispatch(fetchProduct(data));
-      fetchProducts(data);
+      dispatch(fetchProduct(data));
     }
   };
 
   const handleError = (err) => {
-    fetchProducts('123456')
-    // dispatch(fetchProduct("5345435334"));
+    dispatch(fetchProduct("123456"));
   };
 
   // State variables for form fields
@@ -149,7 +146,7 @@ try {
   console.log(createdOrder);
 
   setInvoice(createdOrder.data)
-  items=[]
+
   setFinal({
     type:"Sale",
     name:"",
@@ -242,8 +239,8 @@ dispatch(fetchCart())
         dispatch(fetchCart());
       });
     }
-    setProductDetails({...productDetails,['qty']:" "});
-
+    setProductDetails({});
+ 
   };
 
   const handleKeyPress = (e) => {
@@ -324,17 +321,7 @@ dispatch(fetchCart())
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Ship To</label>
-            <input
-              type="text"
-              id="ShipTo"
-              value={finalform.ShipTo}
-              onChange={handleFinal}
-              onKeyDown={handleKeys}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+
           <div>
             <label className="block text-gray-700 font-medium">Address</label>
             <input
@@ -360,25 +347,7 @@ dispatch(fetchCart())
         {/* New Input Fields */}
         <form onSubmit={handleSubmit}>
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
-            {/* <div className=" mb-4"> 
-              <label
-                htmlFor="list"
-                className="block text-gray-700 text-sm font-medium"
-              >
-                List
-              </label>
-              <input
-                type="checkbox"
-                id="list"
-                className="border border-gray-300 rounded p-2"
-              />
-            </div> */}
-            {/* <div className=" m-4">
-              <button id="scan">
-                {" "}
-                <FaBarcode className="h-12" />
-              </button>
-            </div> */}
+         
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="barcode"
@@ -389,6 +358,7 @@ dispatch(fetchCart())
               <input
                 type="text"
                 id="barcode"
+                required
                 value={formData.barcode}
                 onKeyDown={handleKeyPress}
                 onChange={handleChange}
