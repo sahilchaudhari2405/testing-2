@@ -118,8 +118,11 @@ export const generateOrderWithProductCheck = async (req, res) => {
         });
 
         await newOrder.save();
-
-        res.status(201).json({ message: "Order created successfully", order: newOrder });
+        const results = await OfflinePurchaseOrder.findById(newOrder._id).populate({
+            path: 'orderItems.productId',
+            model: 'products'
+        });
+        res.status(201).json({ message: "Order created successfully", order: results });
     } catch (error) {
         console.error("Error creating order:", error); // Added logging for debugging
         res.status(500).json({ message: "Failed to create order", error: error.message });
