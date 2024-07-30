@@ -33,7 +33,6 @@ const productSchema = new mongoose.Schema({
   },
   slug: {
     type: String,
-    
   },
   ratings: [
     {
