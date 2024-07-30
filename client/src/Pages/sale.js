@@ -103,14 +103,12 @@ console.log(err.message)
   
   const handleScan = (data) => {
     if (data) {
-      // dispatch(fetchProduct(data));
-      fetchProducts(data);
+      dispatch(fetchProduct(data));
     }
   };
 
   const handleError = (err) => {
-    fetchProducts('123456')
-    // dispatch(fetchProduct("5345435334"));
+    dispatch(fetchProduct("123456"));
   };
 
   // State variables for form fields
@@ -241,8 +239,8 @@ dispatch(fetchCart())
         dispatch(fetchCart());
       });
     }
-    setProductDetails({...productDetails,['qty']:" "});
-
+    setProductDetails({});
+ 
   };
 
   const handleKeyPress = (e) => {

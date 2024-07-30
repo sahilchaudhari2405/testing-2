@@ -299,18 +299,6 @@ const Purchase = () => {
 
   //======================barcode genration====================================
 
-  const genrateBarcode = async () => {
-    try {
-      const response = await axiosInstance.get('/order/getAllOrderByCounter');
-      setFormData({
-        ...formData,
-        ['barcode']:'09230239203',
-      });
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to genrate barcode');
-    }
-  };
-
   const componentRef = useRef();
   return (
     <div className="bg-gray-100 mt-28 mx-6 rounded-lg shadow-lg">
@@ -431,10 +419,7 @@ const Purchase = () => {
         </div>
         </form>
 
-        {/* New Input Fields */}
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded" onClick={genrateBarcode}>Generate Barcode</button>
-    
-        <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
       
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
     
@@ -648,41 +633,6 @@ const Purchase = () => {
                 placeholder="Enter GST percentage"
               />
             </div>
-            {/* <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-              <label
-                htmlFor="total"
-                className="block text-gray-700 text-sm font-medium"
-              >
-                Total
-              </label>
-              <input
-                type="text"
-                id="total"
-                value={formData.total}
-                required
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter total amount"
-              />
-            </div> */}
-            {/* <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-              <label
-                htmlFor="amount-paid"
-                className="block text-gray-700 text-sm font-medium"
-              >
-                Amount Paid
-              </label>
-              <input
-                type="text"
-                id="amountpaid"
-                required
-                value={formData.amountpaid}
-                onKeyDown={handleKeys}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter amount paid"
-              />
-            </div> */}
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="profit"

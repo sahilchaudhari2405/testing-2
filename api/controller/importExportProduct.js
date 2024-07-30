@@ -1,14 +1,31 @@
 import Product from '../model/product.model.js';
+function generateRandomString() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
 
+  let randomString = '';
+
+  for (let i = 0; i < 3; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters[randomIndex];
+  }
+
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * numbers.length);
+    randomString += numbers[randomIndex];
+  }
+
+  return randomString;
+}
 export const importProducts = async (req, res) => {
   const products = req.body.products;
-
+    console.log(products);
   try {
     const importedProducts = [];
     const skippedProducts = [];
 
     for (const productData of products) {
-      // Remove the _id field if it exists to avoid duplicate key error
+      // Remove the _id field if it exists to avoid duplicate key erro
       delete productData._id;
 
       let existingProduct = await Product.findOne({ slug: productData.slug });
