@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, updateUser, deleteUser, signupUser } from '../Redux/User/userSlices';
+import { fetchUsers, updateUser,  signupUser } from '../Redux/User/userSlices';
 import { UserIcon, MailIcon, LockClosedIcon, PhoneIcon, DeviceMobileIcon, BriefcaseIcon } from '@heroicons/react/outline';
 import { toast } from 'react-toastify'; // Import toast
 
@@ -53,16 +53,7 @@ const Users = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        try {
-            await dispatch(deleteUser(id)).unwrap();
-            dispatch(fetchUsers());
-            toast.success('User deleted successfully!');
-        } catch (error) {
-            console.error('Failed to delete user:', error);
-            toast.error('Failed to delete user: ' + error.message);
-        }
-    };
+
 
     const handleEdit = (user) => {
         setForm({ 
@@ -105,12 +96,6 @@ const Users = () => {
                                             className="bg-yellow-500 text-white px-2 py-1 rounded-lg"
                                         >
                                             Edit
-                                        </button>
-                                        <button 
-                                            onClick={() => handleDelete(user._id)} 
-                                            className="bg-red-500 text-white px-2 py-1 rounded-lg"
-                                        >
-                                            Delete
                                         </button>
                                     </div>
                                 </li>
