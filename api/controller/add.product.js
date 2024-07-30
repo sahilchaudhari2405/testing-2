@@ -132,14 +132,14 @@ export const GetPurchaseOrder = async (req, res) => {
     const {id ,role} =req.user;
     if(role==='admin')
     {
-        const results = await OfflinePurchaseOrder.find().populate({
+        const results = await OfflinePurchaseOrder.find().populate('user').populate({
             path: 'orderItems.productId',
             model: 'products'
         });
         res.status(201).json({ message: "Order created successfully", order: results });
     }
     else{
-        const results = await OfflinePurchaseOrder.findOne({user:id}).populate({
+        const results = await OfflinePurchaseOrder.findOne({user:id}).populate('user').populate({
             path: 'orderItems.productId',
             model: 'products'
         });
