@@ -20,5 +20,7 @@ OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
 OrderRouter.get('/getCounterOrderbyID/:id',getOrderById);
 OrderRouter.put('/updateOrderbyID/:id',updateOrder);
 OrderRouter.put('/cancelOrder',authenticateToken,cancelledOrder);
+OrderRouter.put('/decreaseQuantity',authenticateToken,removeItemQuantityOrder);
+
 
 export default OrderRouter;
