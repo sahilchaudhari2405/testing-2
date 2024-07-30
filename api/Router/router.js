@@ -8,6 +8,7 @@ import categoryRouter from '../routes/category.routes.js'
 import test from '../controller/test.js';
 import { importProducts } from '../controller/importExportProduct.js';
 import userRoutes from '../routes/users.route.js'
+import admin from '../routes/admin.route.js';
 
 
 const allRouter = express.Router();
@@ -19,7 +20,7 @@ allRouter.use('/cart', cart);
 allRouter.use('/users', userRoutes);
 allRouter.use('/product', productRouter);
 allRouter.use('/category' ,categoryRouter );
-allRouter.use('/admin',cart);
+allRouter.use('/admin',admin);
 allRouter.use('/test',test);
 allRouter.use('/import',importProducts);
 export default allRouter;

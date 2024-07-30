@@ -13,5 +13,5 @@ admin.get('/getTotalSale', authenticateToken, getTotalSale);
 admin.get('/getTotalOfflineSale', authenticateToken, getTotalOfflineSale);
 admin.get('/getAllOrderBill', authenticateToken,getAllBill );
 admin.get('/getAllCounterSales', authenticateToken,getAllCounterSale );
-admin.get('PurchaseOrderGet',authenticateToken,GetPurchaseOrder);
+admin.get('/PurchaseOrderGet',authenticateToken,GetPurchaseOrder);
 export default admin;
