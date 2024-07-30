@@ -3,7 +3,7 @@ function generateRandomString() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const numbers = '0123456789';
 
-  let randomString = '';
+  let randomString = 'B';
 
   // for (let i = 0; i < 3; i++) {
   //   const randomIndex = Math.floor(Math.random() * characters.length);
