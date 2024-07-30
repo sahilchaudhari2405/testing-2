@@ -76,9 +76,7 @@ const Purchase = () => {
       const index = Array.prototype.indexOf.call(form, e.target);
       form.elements[index + 1].focus();
     }
-    // if (e.key === "Enter"&&e.target.value=="") {
-    //   handleSubmit(e);
-    // }
+
   };
 
   const handleLogout = () => {
@@ -185,12 +183,12 @@ const Purchase = () => {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-
-      if (e.target.value) {
+      if (e.target.value.trim()!="") {
         dispatch(fetchProduct(e.target.value));
       }
     }
   };
+  
 
   const handleDelete = (id) => {
     const updatedProducts = cart.filter((product) => product.barcode !== id);
@@ -243,50 +241,55 @@ const Purchase = () => {
 
   
     try {
-      const createdOrder=  await dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform}))
-      console.log(createdOrder);
-    
-      setInvoice(createdOrder.data)
-      setFinal({
-        type: "Purchase",
-        name: "",
-        date: '',
-        mobileNumber: "",
-        ShipTo: "",
-        address: "",
-        ref: "",
-        state: "Maharastra",
-        GSTNo: "",
-        totalGst: "",
-        TotalAmount: "",
-        AmountPaid: "",
-        orderStatus: "first time",
-        paymentType: {
-          cash: "",
-          card: "",
-          upi: ""
-        },
-      })
-      setFormData({
-        barcode:"",
-        brand:"",
-        description:"",
-        category:"",
-        stockType:"",
-        unit:"",
-        qty: "",
-        saleRate: "",
-        purchaseRate:"",
-        profit:"",
-        hsn:"",
-        gst:"",
-        amountpaid: "",
-        image:null
-      })
+      const createdOrder=  dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform}))
+      .unwrap()
+  console.log(createdOrder);
+
+ 
+      
+      // setFinal({
+      //   type: "Purchase",
+      //   name: "",
+      //   date: '',
+      //   mobileNumber: "",
+      //   ShipTo: "",
+      //   address: "",
+      //   ref: "",
+      //   state: "Maharastra",
+      //   GSTNo: "",
+      //   totalGst: "",
+      //   TotalAmount: "",
+      //   AmountPaid: "",
+      //   orderStatus: "first time",
+      //   paymentType: {
+      //     cash: "",
+      //     card: "",
+      //     upi: ""
+      //   },
+      // })
+      // setFormData({
+      //   barcode:"",
+      //   brand:"",
+      //   description:"",
+      //   category:"",
+      //   stockType:"",
+      //   unit:"",
+      //   qty: "",
+      //   saleRate: "",
+      //   purchaseRate:"",
+      //   profit:"",
+      //   hsn:"",
+      //   gst:"",
+      //   amountpaid: "",
+      //   image:null
+      // })
+
       alert('Order created successfully!');
     } catch (err) {
+      console.log(err)
       alert("Failed to create order: ",err.message);
     }
+
   }else{
     alert("enter all details")
   }
@@ -301,7 +304,7 @@ const Purchase = () => {
       const response = await axiosInstance.get('/order/getAllOrderByCounter');
       setFormData({
         ...formData,
-        ['barcode']: response.data.data||'09230239203',
+        ['barcode']:'09230239203',
       });
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to genrate barcode');
@@ -811,15 +814,13 @@ const Purchase = () => {
 
             <ReactToPrint
               trigger={() => (
-                <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
-                  Print
+                <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" >
+                   Save & Print
                 </button>
               )}
               content={() => componentRef.current}
             />
-            <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
-              PDF
-            </button>
+          
           </div>
         </div>
 
@@ -886,10 +887,10 @@ const Purchase = () => {
       </div>
 
       {/* ---------------------invoice ganrator------------------------- */}
-      {/* <Invoice 
+      <Invoice 
         componentRef={componentRef} 
-        details={invoice} 
-      /> */}
+        details={purchaseOrders} 
+      />
     </div>
   );
 };

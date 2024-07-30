@@ -10,6 +10,8 @@ const Invoice = ({ componentRef, details }) => {
         p2: 'p-2',
         fontBold:'font-bold',
       };
+
+      console.log(details)
   return (
     details&&<div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200 hidden">
       <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
@@ -39,7 +41,7 @@ const Invoice = ({ componentRef, details }) => {
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
           <div className="w-1/2 pr-2">
             <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
-            <p>{details.Name.toUpperCase()}</p>
+            <p>{details.Name?.toUpperCase()}</p>
             <p>{details.Address?.toUpperCase()}</p>
             {/* <p>{details.email}</p> */}
             <p>PHONE:{details.mobileNumber}</p>
@@ -57,7 +59,7 @@ const Invoice = ({ componentRef, details }) => {
             </tr>
           </thead>
           <tbody>
-            {details.orderItems.map((e, index) => (
+            {details?.orderItems?.map((e, index) => (
               <tr key={index}>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product.title}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
