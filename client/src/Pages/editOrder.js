@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axiosInstance from '../axiosConfig';
+import { toast } from 'react-toastify';
 
 const EditOrder = () => {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const EditOrder = () => {
   const [orderId, setOrderId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  const [fetchedOrder, setfetchedOrder] = useState(false);
   const handleOrderIdChange = (e) => {
     setOrderId(e.target.value);
   };
@@ -69,6 +70,7 @@ const EditOrder = () => {
         finalPriceWithGST: orderData.finalPriceWithGST,
       });
       console.log("setFormData: ",formData);
+      setfetchedOrder(true);
 
 
       setError('');
@@ -162,6 +164,43 @@ const EditOrder = () => {
         alert('Failed to update order.');
       });
   };
+
+  const cancelOrder =() => {
+    const cancelOrder_payload = {
+      orderId : orderId
+    }
+
+    axiosInstance.put('/order/cancelOrder', cancelOrder_payload)
+      .then(response => {
+        toast.success('Order cancelled successfully!');
+      })
+      .catch(err => {
+        toast.error('Failed to cancel order');
+      });
+      setFormData({
+        Name: '',
+        mobileNumber: '',
+        email: 'No',
+        orderDate: '',
+        orderItems: [],
+        paymentType: {
+          cash: 0,
+          Card: 0,
+          UPI: 0,
+        },
+        billImageURL: '',
+        totalPrice: '',
+        totalDiscountedPrice: '',
+        totalPurchaseRate: '',
+        GST: '',
+        discount: 0,
+        orderStatus: 'first time',
+        totalItem: '',
+        totalProfit: '',
+        finalPriceWithGST: '',
+      });
+
+  }
 
   return (
     <div className="bg-gray-100 mt-20 mx-6 rounded-lg shadow-lg">
@@ -401,10 +440,15 @@ const EditOrder = () => {
             ))}
           </div>
           <div className="flex justify-end space-x-4">
-            <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">
+            <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
               Save
             </button>
-            <button type="button" className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors" onClick={() => {
+            <div onClick={cancelOrder}
+              className={`bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors ${ fetchedOrder ? '' : 'opacity-50 cursor-not-allowed'}`}
+            >
+              Cancel
+            </div>
+            <button type="button" className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors" onClick={() => {
               setFormData({
                 Name: '',
                 mobileNumber: '',
@@ -430,7 +474,7 @@ const EditOrder = () => {
               setOrderId('');
               setError('');
             }}>
-              Cancel
+              Reset
             </button>
           </div>
         </form>
