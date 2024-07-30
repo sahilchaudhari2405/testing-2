@@ -6,7 +6,7 @@ const generateAccessToken = (user) => {
         fullName: user.fullName,
         email: user.email,
         role: user.role,
-    }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    }, process.env.JWT_SECRET, { expiresIn: '7h' });
 };
 
 const generateRefreshToken = (user) => {
@@ -26,7 +26,8 @@ const setTokens = (user, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 15 * 60 * 1000, // 15 minutes
+         maxAge : 7 * 60 * 60 * 1000, // 7 hours in milliseconds
+        // 15 minutes
     });
 
     res.cookie('refreshToken', refreshToken, {

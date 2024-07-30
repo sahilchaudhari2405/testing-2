@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../axiosConfig'; // Import the axios instance
 import Cookies from 'js-cookie';
 
-
 const initialState = {
   user: null,
   token: null,
@@ -16,7 +15,7 @@ export const loginUser = createAsyncThunk('user/login', async (credentials, { re
     const response = await axiosInstance.post(`/auth/login`, credentials);
     return response.data;
   } catch (error) {
-    return rejectWithValue(error.response.data);
+    return rejectWithValue(error.response.data.message || error.message); // Ensure error message is passed
   }
 });
 
@@ -25,7 +24,7 @@ export const signupUser = createAsyncThunk('user/signup', async (newUser, { reje
     const response = await axiosInstance.post(`/auth/signup`, newUser);
     return response.data;
   } catch (error) {
-    return rejectWithValue(error.response.data);
+    return rejectWithValue(error.response.data.message || error.message);
   }
 });
 
@@ -34,7 +33,7 @@ export const logoutUser = createAsyncThunk('user/logout', async (_, { rejectWith
     const response = await axiosInstance.post(`/auth/logout`);
     return response.data;
   } catch (error) {
-    return rejectWithValue(error.response.data);
+    return rejectWithValue(error.response.data.message || error.message);
   }
 });
 
@@ -44,7 +43,7 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { rejec
     return response.data;
   } catch (error) {
     console.error('Error fetching users:', error.message);
-    return rejectWithValue(error.response.data);
+    return rejectWithValue(error.response.data.message || error.message);
   }
 });
 
@@ -55,7 +54,7 @@ export const updateUser = createAsyncThunk('users/updateUser', async (userData, 
     return response.data;
   } catch (error) {
     console.error('Error updating user:', error.message);
-    return rejectWithValue(error.response.data);
+    return rejectWithValue(error.response.data.message || error.message);
   }
 });
 
@@ -65,7 +64,7 @@ export const deleteUser = createAsyncThunk('users/deleteUser', async (id, { reje
     return response.data;
   } catch (error) {
     console.error('Error deleting user:', error.message);
-    return rejectWithValue(error.response.data);
+    return rejectWithValue(error.response.data.message || error.message);
   }
 });
 
@@ -106,8 +105,6 @@ const userSlice = createSlice({
       .addCase(signupUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.user = action.payload.user;
-        state.token = action.payload.accessToken;
-        localStorage.setItem('token', action.payload.accessToken);
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.status = 'failed';

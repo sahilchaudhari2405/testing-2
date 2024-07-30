@@ -8,12 +8,13 @@ import Dashboard from './Pages/dashboard';
 import Purchase from './Pages/purchase';
 import Inventory from './Pages/inventory';
 // import Sales from './pages/Sales';
+import EditOrder from './Pages/editOrder.js';
 import View from './Pages/view.js';
 import Login from './Pages/login';
 import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
 import Admin from './Pages/admin';
-// import Accounts from './pages/Accounts';
+import Accounts from './Pages/accounts.js';
 // import Reports from './pages/Reports';
 // import Msg from './pages/Msg';
 // import Import from './pages/Import';
@@ -34,7 +35,7 @@ const App = () => {
           <Route path="/purchase" element={<PageWithNavbar><Purchase /></PageWithNavbar>} />
           <Route path="/inventory" element={<PageWithNavbar><Inventory /></PageWithNavbar>} />
           <Route path="/sales" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
-          <Route path="/sales/:orderId" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
+          <Route path="/editOrder" element={<PageWithNavbar><EditOrder /></PageWithNavbar>} />
           <Route path="/forbidden" element={<Forbidden />} />
           <Route path="/users" element={<PageWithNavbar><Users /></PageWithNavbar>} />
           <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
@@ -45,6 +46,14 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="admin">
                 <PageWithNavbar><Admin /></PageWithNavbar>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/accounts"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PageWithNavbar><Accounts /></PageWithNavbar>
               </ProtectedRoute>
             }
           />

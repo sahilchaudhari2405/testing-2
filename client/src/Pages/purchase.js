@@ -106,7 +106,7 @@ const Purchase = () => {
   };
 
   const handleError = (err) => {
-    dispatch(fetchProduct("2345632900700"));
+    dispatch(fetchProduct("123456"));
   };
 
   const [formData, setFormData] = useState({
@@ -185,7 +185,10 @@ const Purchase = () => {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      handleSubmit(e);
+
+      if (e.target.value) {
+        dispatch(fetchProduct(e.target.value));
+      }
     }
   };
 
@@ -240,7 +243,7 @@ const Purchase = () => {
 
   
     try {
-      const createdOrder=  await dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform})).unwrap()
+      const createdOrder=  await dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform}))
       console.log(createdOrder);
     
       setInvoice(createdOrder.data)
@@ -338,9 +341,9 @@ const Purchase = () => {
             <input
               type="text"
               id="name"
-              required
-              onKeyDown={handleKeys}
+              require
               value={finalform.name}
+              onKeyDown={handleKeys}
               onChange={handleFinal}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -446,7 +449,7 @@ const Purchase = () => {
                 required
                 value={formData.barcode}
                 onChange={handleChange}
-                onKeyDown={handleKeys}
+                onKeyDown={handleKeyPress}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter barcode"
               />
@@ -698,8 +701,9 @@ const Purchase = () => {
               <button
                 type="submit"
                 className="w-full bg-green-700 text-white py-3 rounded font-medium hover:bg-green-800 transition-colors"
-             
-             >
+              >
+                    <BarcodeReader onError={handleError} onScan={handleScan} />
+
                 Enter
               </button>
             </div>

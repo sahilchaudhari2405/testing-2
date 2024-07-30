@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: dockerfile.prod
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - BASE_URL = http://apalabajar.shop
+    networks:
+      - app-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: dockerfile.prod
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_BASE_URL=http://apalabajar.shop:4000/api
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge

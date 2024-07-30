@@ -4,7 +4,8 @@ import Product from '../model/product.model.js';
 import slugify from 'slugify';
 // import { uploadImageOnCloudinary } from '../cloud/cloudinary.js';
 import fs from 'fs';
-
+import mongoose from 'mongoose';
+// mongoose.set('debug', true);
 // Create product
 // export const createProduct = async (req, res) => {
 //   const { title, description, price, discountedPrice, discountPercent, quantity, brand, category, ratings, reviews } = req.body;
@@ -51,11 +52,15 @@ import fs from 'fs';
 // View single product
 export const viewProduct = async (req, res) => {
 
-  const { id } = req.params;
-  // console.log(id,"hallo")
+  const {id}  = req.params;
+  console.log(id,"hallo")
   try {
     // Fetch product details using the barcode
-    const product = await Product.findOne({ BarCode: id }).populate('category');
+    const product = await Product.findOne({ BarCode:id}).populate('category');
+   
+   console.log(product)
+
+
     if (!product) {
       return res.status(404).send({ message: "Product not found", status: false });
     }

@@ -1,6 +1,8 @@
 // models/OfflineOrder.js
 import mongoose, { Schema } from "mongoose";
+
 //import Address from "../../../apalabazar/api/src/models/address.model";
+
 
 const offlinePurchaseOrderSchema = new Schema({
     user: {
@@ -9,74 +11,43 @@ const offlinePurchaseOrderSchema = new Schema({
         // required: true,
     },
     orderItems: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "products",
+        productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "products",
+        },
         quantity: {
             type: Number,
-          },
-          purchaseRate: {
+        },
+        purchaseRate: {
             type: Number,
-            default : 0
-          },
-          GST: {
+            default: 0
+        },
+        GST: {
             type: Number,
-            default : 0
-          },
-          retailPrice: {
+            default: 0
+        },
+        AmountPaid: {
             type: Number,
-            default : 0
-          },
+            default: 0
+        },
+        retailPrice: {
+            type: Number,
+            default: 0
+        },
     }],
-    Address:{
-        streetAddress:{
-            type:String,
-            required:true,
-        },
-    
-        area: {
-            type: String,
-        },
-    
-        houseNumber: {
-            type: String,
-        
-        },
-    
-        landMark: {
-            type: String,
-            
-        },
-        city:{
-            type:String,
-            required:true,
-        },
-    
-        district:{
-            type:String,
-            required:true,
-        },
-    
-        state:{
-            type:String,
-            required:true,
-        },
-    
-        zipCode:{
-            type:String,
-            required:true,
-        },
-    
+    Address: {
+     type:String,
     },
-    Name:{
-        type:String,
-        required:true,
+    Name: {
+        type: String,
+        required: true,
     },
-    mobileNumber:{
-        type:Number,
+    mobileNumber: {
+        type: Number,
     },
-    email:{
-        type:String,
-        default:'No',
+    email: {
+        type: String,
+        default: 'No',
     },
     orderDate: {
         type: Date,
@@ -111,6 +82,10 @@ const offlinePurchaseOrderSchema = new Schema({
         type: Number,
         required: true,
     },
+    GSTNB: {
+        type:String,
+     
+    },
     orderStatus: {
         type: String,
         required: true,
@@ -119,6 +94,9 @@ const offlinePurchaseOrderSchema = new Schema({
     totalItem: {
         type: Number,
         required: true,
+    },
+    AmountPaid:{
+        type:Number,
     },
     createdAt: {
         type: Date,
@@ -134,6 +112,6 @@ offlinePurchaseOrderSchema.pre('save', function (next) {
     next();
 });
 
-const offlinePurchaseOrder = mongoose.model("offlinePurchaseOrder", offlinePurchaseOrderSchema);
+const OfflinePurchaseOrder = mongoose.model("offlinePurchaseOrder", offlinePurchaseOrderSchema);
 
-export default offlinePurchaseOrder;
+export default OfflinePurchaseOrder;
