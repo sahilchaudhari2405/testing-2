@@ -11,14 +11,39 @@ import { toast } from "react-toastify";
 const cardClasses = "bg-white p-4 rounded-lg flex items-center justify-between";
 const textClasses = "text-muted-foreground text-primary text-destructive";
 
+
 // Import data from Excel file
 export const importExcelData = (file, callback) => {
-  // Existing code...
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const data = new Uint8Array(event.target.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    // Convert the array of arrays into an array of objects
+    const headers = jsonData[0];
+    const rows = jsonData.slice(1);
+    const formattedData = rows.map((row) => {
+      const obj = {};
+      row.forEach((cell, index) => {
+        obj[headers[index]] = cell;
+      });
+      return obj;
+    });
+
+    callback(formattedData);
+  };
+  reader.readAsArrayBuffer(file);
 };
 
 // Export data to Excel file
 export const exportExcelData = (data) => {
-  // Existing code...
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventory Data');
+  XLSX.writeFile(workbook, 'inventory_data.xlsx');
 };
 
 const ProductCard = ({ items }) => {
