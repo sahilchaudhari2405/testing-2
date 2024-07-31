@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import logo from "../logo.png";
+import Barcode from 'react-barcode';
 const Invoice = ({ componentRef, details }) => {
     const sharedClasses = {
         flex: 'flex ',
@@ -10,6 +11,8 @@ const Invoice = ({ componentRef, details }) => {
         p2: 'p-2',
         fontBold:'font-bold',
       };
+
+      console.log(details)  
   return (
     details&&<div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200 hidden">
       <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
@@ -27,9 +30,10 @@ const Invoice = ({ componentRef, details }) => {
           </div>
         </div>
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
-          <div>
-            <span className={sharedClasses.fontBold}>INVOICE #: </span>
-            <span>{details._id}</span>
+        <div>
+            <span className={sharedClasses.fontBold}>INVOICE: </span>
+            <div><Barcode value={details._id} width={0.8} // Adjust the width of the bars
+            height={70}   /></div>
           </div>
           <div>
             <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
@@ -39,10 +43,10 @@ const Invoice = ({ componentRef, details }) => {
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
           <div className="w-1/2 pr-2">
             <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
-            <p>{details.Name.toUpperCase()}</p>
+            <p>{details.Name?.toUpperCase()}</p>
             <p>{details.Address?.toUpperCase()}</p>
-            {/* <p>{details.email}</p> */}
             <p>PHONE:{details.mobileNumber}</p>
+            <p>EMAIL:{details.email}</p>
           </div>
         </div>
         <table className="w-full border-collapse border mb-4">
@@ -57,14 +61,14 @@ const Invoice = ({ componentRef, details }) => {
             </tr>
           </thead>
           <tbody>
-            {details.orderItems.map((e, index) => (
+            {details?.orderItems?.map((e, index) => (
               <tr key={index}>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product.title}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product.title ||e.productId.title }</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.GST}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price - e.discountedPrice}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)||(e.productId.price-e.retailPrice)}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price || e.retailPrice}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice || e.retailPrice}</td>
                 
               </tr>
             ))}
@@ -78,15 +82,19 @@ const Invoice = ({ componentRef, details }) => {
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>DISCOUNT</span>
-              <span>₹{details.totalPrice-details.totalDiscountedPrice}</span>
+              <span>₹{details.totalPrice-(details.totalDiscountedPrice||details.totalPurchaseRate)}</span>
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>GST</span>
               <span>₹{details.GST}</span>
             </div>
+            {/* <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
+              <span>Pay By</span>
+              <span>₹{details.finalPriceWithGST}</span>
+            </div> */}
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
               <span>Amount Pay</span>
-              <span>₹{details.finalPriceWithGST}</span>
+              <span>₹{details.finalPriceWithGST ||(details.totalPrice+details.GST) }</span>
             </div>
           </div>
         </div>

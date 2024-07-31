@@ -55,6 +55,10 @@ const offlineOrderSchema = new Schema({
         type: Number,
         required: true,
     },
+    type:{
+        type:String,
+        default:'customer'
+        },
     GST: {
         type: Number,
         required: true,

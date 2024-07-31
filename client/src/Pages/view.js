@@ -11,7 +11,7 @@ import { saveAs } from 'file-saver';
 import { logoutUser } from '../Redux/User/userSlices';
 import { toast } from 'react-toastify';
 import logo from "../logo.png";
-
+import Barcode from 'react-barcode';
 const sharedClasses = {
   flex: 'flex ',
   justifyBetween: 'justify-between',
@@ -267,7 +267,7 @@ const View = () => {
            </div>
           <button
                 type="submit"
-                className="w-full bg-blue-500 mt-6 text-white py-2 rounded font-medium hover:bg-green-800 transition-colors"
+                className="w-full bg-blue-600 mt-6 text-white py-2 rounded font-medium hover:bg-green-800 transition-colors"
              
              >
                 Enter
@@ -298,12 +298,13 @@ const View = () => {
         </div>
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
           <div>
-            <span className={sharedClasses.fontBold}>INVOICE #: </span>
-            <span>{details._id}</span>
+            <span className={sharedClasses.fontBold}>INVOICE: </span>
+            <div><Barcode value={details._id} width={0.8} // Adjust the width of the bars
+            height={70}   /></div>
           </div>
           <div>
             <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-            <span>{details.updatedAt}</span>
+            <span>{details.updatedAt.substring(0, 10)}</span>
           </div>
         </div>
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
