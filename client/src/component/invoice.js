@@ -12,7 +12,7 @@ const Invoice = ({ componentRef, details }) => {
         fontBold:'font-bold',
       };
 
-      console.log(details)
+      console.log(details)  
   return (
     details&&<div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200 hidden">
       <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">

@@ -95,6 +95,10 @@ const offlinePurchaseOrderSchema = new Schema({
         type: Number,
         required: true,
     },
+    type:{
+    type:String,
+    default:'purchase'
+    },
     AmountPaid:{
         type:Number,
     },
