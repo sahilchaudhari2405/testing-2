@@ -44,6 +44,7 @@ const View = () => {
   const handlePrint = (item) => {
     setDetails(item);
   };
+  console.log(purchaseOrders)
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -314,95 +315,3 @@ const View = () => {
 
 export default View;
 
-
-{/* <div className='hidden'>
-{details && (
-  <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200">
-     <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
-  <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-    <div>
-      <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
-      <p>APALA BAJAR</p>
-      <p>SHRIGONDA, AHMADNAGAR</p>
-      <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
-      <p>PHONE: 9849589588</p>
-      <p>EMAIL: aaplabajar1777@gmail.com</p>
-    </div>
-    <div className="w-24 h-24 border flex items-center justify-center">
-      <img src={logo} alt="Insert Logo Above" />
-    </div>
-  </div>
-  <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
-    <div>
-      <span className={sharedClasses.fontBold}>INVOICE: </span>
-      <div><Barcode value={details._id} width={0.8} // Adjust the width of the bars
-      height={70}   /></div>
-    </div>
-    <div>
-      <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-      <span>{details.updatedAt.substring(0, 10)}</span>
-    </div>
-  </div>
-  <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
-    <div className="w-1/2 pr-2">
-      <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
-      <p>{details.Name.toUpperCase()}</p>
-      <p>{details.Address?.toUpperCase()}</p>
-      <p>PHONE:{details.mobileNumber}</p>
-      <p>EMAIL:{details.email}</p>
-    </div>
-  </div>
-  <table className="w-full border-collapse border mb-4">
-    <thead>
-      <tr className="bg-black text-white">
-        <th className={sharedClasses.border + " " + sharedClasses.p2}>DESCRIPTION</th>
-        <th className={sharedClasses.border + " " + sharedClasses.p2}>QUANTITY</th>
-        <th className={sharedClasses.border + " " + sharedClasses.p2}>GST</th>
-        <th className={sharedClasses.border + " " + sharedClasses.p2}>DISCOUNT</th>
-        <th className={sharedClasses.border + " " + sharedClasses.p2}>PRICE</th>
-        <th className={sharedClasses.border + " " + sharedClasses.p2}>UNIT PRICE</th>
-      </tr>
-    </thead>
-    <tbody>
-      {details.orderItems.map((e, index) => (
-        <tr key={index}>
-          <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product?.title || e.productId?.title}</td>
-          <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
-          <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.GST}</td>
-          <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)||(e.productId?.price-e.retailPrice)} </td>
-          <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price || e.productId?.price}</td>
-          <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice || e.retailPrice}</td>
-          
-        </tr>
-      ))}
-    </tbody>
-  </table>
-  <div className={`${sharedClasses.flex} justify-end ${sharedClasses.mb4}`}>
-    <div className="w-1/4">
-      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-        <span>SUBTOTAL</span>
-        <span>₹{details.totalPrice}</span>
-      </div>
-      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-        <span>DISCOUNT</span>
-        <span>₹{details.totalPrice-details.totalDiscountedPrice || details.totalPrice-details.totalPurchaseRate}</span>
-      </div>
-      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-        <span>GST</span>
-        <span>₹{details.GST}</span>
-      </div>
-      <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
-        <span>Amount Pay</span>
-        <span>₹{details.finalPriceWithGST ||(details.totalPrice+details.GST) }</span>
-      </div>
-    </div>
-  </div>
-  <div className="mb-4">
-    <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2>
-    <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div>
-  </div>
-  <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
-</div>
-  </div>
-)}
-</div> */}

@@ -141,7 +141,7 @@ const ordersSlice = createSlice({
       })
       .addCase(createPurchaseOrder.fulfilled, (state, action) => {
         state.status = 'succeeded';
-       // console.log(action.payload)
+       console.log(action.payload)
          state.purchaseOrders=action.payload;
       })
       .addCase(createPurchaseOrder.rejected, (state, action) => {

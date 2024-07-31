@@ -103,11 +103,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             mobileNumber: orderDetails.mobileNumber || 'Not Provided',
             email: orderDetails.email || 'No',
             Address: `${orderDetails.address || 'No Address'} ${orderDetails.state || ''}`,
-            paymentType: {
-                Card:orderDetails.paymentType.card,
-                UPI:orderDetails.paymentType.upi,
-                cash:orderDetails.paymentType.cash,
-            },
+            paymentType: orderDetails.paymentType || { cash: 0, Card: 0, UPI: 0 },
             billImageURL: orderDetails.billImageURL || null,
             discount: orderDetails.discount || 0,
             orderStatus: orderDetails.orderStatus || 'first time',
@@ -143,7 +139,7 @@ export const GetPurchaseOrder = async (req, res) => {
         res.status(201).json({ message: "Order created successfully", order: results });
     }
     else{
-        const results = await OfflinePurchaseOrder.findOne({user:id}).populate('user').populate({
+        const results = await OfflinePurchaseOrder.find({user:id}).populate('user').populate({
             path: 'orderItems.productId',
             model: 'products'
         });
