@@ -27,46 +27,29 @@ export const importProducts = async (req, res) => {
     const skippedProducts = [];
 
     for (const productData of products) {
-      const category = await Category.findOne({name: productData.Category});
-       if(productData.Barcode)
+         delete productData._id;
+      const category = await Category.findOne({name: 'GENERAL'});
+       const barcode = productData.BarCode || productData.Barcode
+       console.log(productData.BarCode , 'new product');
+       console.log(productData.Barcode , 'GST pad product');
+       if(barcode)
        {
-        let existingProduct = await Product.findOne({ BarCode: productData.Barcode });
-        
+        let existingProduct = await Product.findOne({ BarCode: barcode });
+         
         if (existingProduct) {
           
           skippedProducts.push(productData);
           continue;
         }
-        const product = new  Product({
-          title: productData.Name || null,
-          description: productData.Name || null,
-          price: parseFloat(productData.MRP) || 0,
-          discountedPrice: parseFloat(productData['Net Sale']) || 0,
-          discountPercent: parseFloat(productData.discountPercent) || 0,
-          weight: parseFloat(productData.weight) || 0,
-          quantity: parseInt(productData['Qty.'], 10) || 0,
-          brand: productData.brand || null,
-          imageUrl: productData.imageUrl || null,
-          slug: productData.Name || 'default-slug',
-          ratings: productData.ratings || [],
-          reviews: productData.reviews || [],
-          numRatings: parseInt(productData.numRatings, 10) || 0,
-          category: category._id,
-          createdAt: productData.createdAt || null,
-          updatedAt: productData.updatedAt || null,
-          BarCode: productData.Barcode || null,
-          stockType: productData.stockType || null,
-          unit: productData.Unit || null,
-          purchaseRate: parseFloat(productData['Purchase Rate']) || 0,
-          profitPercentage: parseFloat(productData.profit) || 0,
-          HSN: productData.CESS || null,
-          GST: parseFloat(productData.TAX) || 0,
-          retailPrice: parseFloat(productData['Net Sale']) || 0,
-          totalAmount: parseFloat(productData['Net Sale']) || 0,
-          amountPaid: parseFloat(productData.amountpaid) || 0
-      });
-        const savedProduct = await product.save();
-        importedProducts.push(savedProduct);
+        if(productData.BarCode)
+        {
+          const result = await  NewimportGSTData(productData,category);
+          importedProducts.push(result);
+        }
+        else{
+          const result =await  importGSTData(productData,category);
+          importedProducts.push(result);
+        }
        }
        else{
                  let newBarcode;
@@ -81,38 +64,18 @@ export const importProducts = async (req, res) => {
           }
         }
 
-        productData.Barcode = newBarcode;
-  
-        const product = new  Product({
-          title: productData.Name || null,
-          description: productData.Name || null,
-          price: parseFloat(productData.MRP) || 0,
-          discountedPrice: parseFloat(productData['Net Sale']) || 0,
-          discountPercent: parseFloat(productData.discountPercent) || 0,
-          weight: parseFloat(productData.weight) || 0,
-          quantity: parseInt(productData['Qty.'], 10) || 0,
-          brand: productData.brand || null,
-          imageUrl: productData.imageUrl || null,
-          slug: productData.Name || 'default-slug',
-          ratings: productData.ratings || [],
-          reviews: productData.reviews || [],
-          numRatings: parseInt(productData.numRatings, 10) || 0,
-          category: category._id,
-          createdAt: productData.createdAt || null,
-          updatedAt: productData.updatedAt || null,
-          BarCode: productData.Barcode || null,
-          stockType: productData.stockType || null,
-          unit: productData.Unit || null,
-          purchaseRate: parseFloat(productData['Purchase Rate']) || 0,
-          profitPercentage: parseFloat(productData.profit) || 0,
-          HSN: productData.CESS || null,
-          GST: parseFloat(productData.TAX) || 0,
-          retailPrice: parseFloat(productData['Net Sale']) || 0,
-          totalAmount: parseFloat(productData['Net Sale']) || 0,
-          amountPaid: parseFloat(productData.amountpaid) || 0
-      });
-        const savedProduct = await product.save();
-        importedProducts.push(savedProduct);
+      
+        if(productData.BarCode)
+          {
+            productData.BarCode = newBarcode;
+            const result = await  NewimportGSTData(productData,category);
+            importedProducts.push(result);
+          }
+          else{
+            productData.Barcode = newBarcode;
+            const result =await  importGSTData(productData,category);
+            importedProducts.push(result);
+          }
        }
 
     }
@@ -132,9 +95,80 @@ export const importProducts = async (req, res) => {
 
 
 
+async function importGSTData(productData,category){
+  if(productData['Qty']<0)
+  {
+    productData['Qty'] =0;
+  }
+  const product = new  Product({
+    title: productData.Name || null,
+    description: productData.Name || null,
+    price: parseFloat(productData.MRP) || 0,
+    discountedPrice: parseFloat(productData['Net Sale']) || 0,
+    discountPercent: parseFloat(productData.discountPercent) || 0,
+    weight: parseFloat(productData.weight) || 0,
+    quantity: parseInt(productData['Qty.'], 10) || 0,
+    brand: productData.brand || null,
+    imageUrl: productData.imageUrl || 'https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png',
+    slug: productData.Name || 'default-slug',
+    ratings: productData.ratings || [],
+    reviews: productData.reviews || [],
+    numRatings: parseInt(productData.numRatings, 10) || 0,
+    category: category._id,
+    createdAt: productData.createdAt || null,
+    updatedAt: productData.updatedAt || null,
+    BarCode: productData.Barcode || null,
+    stockType: productData.stockType || null,
+    unit: productData.Unit || null,
+    purchaseRate: parseFloat(productData['Purchase Rate']) || 0,
+    profitPercentage: parseFloat(productData.profit) || 0,
+    HSN: productData.CESS || null,
+    GST: parseFloat(productData.TAX) || 0,
+    retailPrice: parseFloat(productData['Net Sale']) || 0,
+    totalAmount: parseFloat(productData['Net Sale']) || 0,
+    amountPaid: parseFloat(productData.amountpaid) || 0
+});
+  const save = await product.save();
+  return save;
+}
 
 
-
+async function NewimportGSTData(productData,category){
+  if(productData.quantity<0)
+    {
+      productData.quantity =0;
+    }
+  const product = new Product({
+    title: productData.title || null,
+    description: productData.description || null,
+    price: parseFloat(productData.price) || 0,
+    discountedPrice: parseFloat(productData.discountedPrice) || 0,
+    discountPercent: parseFloat(productData.discountPercent) || 0,
+    weight: parseFloat(productData.weight) || 0,
+    quantity: parseInt(productData.quantity, 10) || 0,
+    brand: productData.brand || null,
+    imageUrl: productData.imageUrl || 'https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png',
+    slug: productData.slug || 'default-slug',
+    ratings: productData.ratings || [],
+    reviews: productData.reviews || [],
+    numRatings: parseInt(productData.numRatings, 10) || 0,
+    category:category._id,
+    createdAt: productData.createdAt || null,
+    updatedAt: productData.updatedAt || null,
+    BarCode: productData.BarCode || null,
+    stockType: productData.stockType || null,
+    unit: productData.unit || null,
+    purchaseRate: parseFloat(productData.purchaseRate) || 0,
+    profitPercentage: parseFloat(productData.profitPercentage) || 0,
+    HSN: productData.HSN || null,
+    GST: parseFloat(productData.GST) || 0,
+    retailPrice: parseFloat(productData.retailPrice) || 0,
+    totalAmount: parseFloat(productData.totalAmount) || 0,
+    amountPaid: parseFloat(productData.amountpaid) || 0
+});
+  const save = await product.save();
+  return save;
+}
 
 
 
