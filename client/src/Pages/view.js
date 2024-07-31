@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { FaArrowDown, FaEdit, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchOrders, updateOrder, deleteOrder,sortOrders } from '../Redux/Orders/orderSlice';
+import { fetchOrders, fetchPurchaseOrders, deleteOrder, sortOrders } from '../Redux/Orders/orderSlice';
 import { useNavigate } from 'react-router-dom';
 import { TbEyeEdit } from "react-icons/tb";
 import ReactToPrint from "react-to-print"
@@ -12,6 +12,7 @@ import { logoutUser } from '../Redux/User/userSlices';
 import { toast } from 'react-toastify';
 import logo from "../logo.png";
 import Barcode from 'react-barcode';
+
 const sharedClasses = {
   flex: 'flex ',
   justifyBetween: 'justify-between',
@@ -19,8 +20,9 @@ const sharedClasses = {
   mb4: 'mb-4',
   border: 'border text-center',
   p2: 'p-2',
-  fontBold:'font-bold',
+  fontBold: 'font-bold',
 };
+
 const View = () => {
   const navigate = useNavigate();
   const [selectedView, setSelectedView] = useState('Sales');
@@ -32,12 +34,12 @@ const View = () => {
   const [details, setDetails] = useState(null);
   const printRef = useRef();
   const orders = useSelector((state) => state.orders.orders);
+  const purchaseOrders = useSelector(state =>state.orders.purchaseOrders);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [name, setName] = useState('');
-
 
   const handlePrint = (item) => {
     setDetails(item);
@@ -51,26 +53,38 @@ const View = () => {
     if (details && printRef.current) {
       printRef.current.handlePrint();
     }
-  }, [handlePrint]);
+  }, [details]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
-    } else { // Redirect to login if no token found
+    } else {
+      // Redirect to login if no token found
+      navigate('/');
     }
   }, [navigate]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
     localStorage.removeItem('token');
-    toast.error("Logout Successfully!")
+    toast.error("Logout Successfully!");
     navigate('/');
   };
+
   const handleSelect = (view) => {
     setSelectedView(view);
+    if (view === 'Purchase') {
+      dispatch(fetchPurchaseOrders());
+    } else {
+      dispatch(fetchOrders());
+    }
   };
+
+  useEffect(() => {
+    console.log('Purchase Orders:', purchaseOrders);
+  }, [purchaseOrders]);
 
   const handleDelete = (item) => {
     dispatch(deleteOrder(item._id));
@@ -82,8 +96,9 @@ const View = () => {
 
   const handleSort = (e) => {
     e.preventDefault();
-    dispatch(sortOrders({ fromDate, toDate,name }));
+    dispatch(sortOrders({ fromDate, toDate, name }));
   };
+
   const exportToExcel = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -133,18 +148,22 @@ const View = () => {
         </tr>
       </thead>
       <tbody>
-        {/* {console.log(orders)} */}
-        {orders?.map((item, i) => (
+        {console.log(data)}
+        {data?.map((item, i) => (
           <tr key={item._id} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
             <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.Name}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.mobileNumber}</td>
             <td className="border border-zinc-800 px-4 py-2">(Maharastra)</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.discount}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.GST}%</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice}</td>
-            <td className="border border-zinc-800 px-4 py-2 flex flex-col"><span>CASH:{item.paymentType.cash}/</span><span>CARD:{item.paymentType.Card}/</span><span>UPI:{item.paymentType.UPI}</span></td>
+            <td className="border border-zinc-800 px-4 py-2">{item.discount }</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice ||item.totalPrice}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.GST}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice ||item.totalPrice}</td>
+            <td className="border border-zinc-800 px-4 py-2 flex flex-col">
+              <span>CASH: {item.paymentType?.cash}/</span>
+              <span>CARD: {item.paymentType?.Card}/</span>
+              <span>UPI: {item.paymentType?.UPI}</span>
+            </td>
             <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.user?.fullName}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.updatedAt.substring(0, 10)}</td>
@@ -163,8 +182,7 @@ const View = () => {
       </tbody>
     </table>
   );
-  
-        // {selectedView === 'Sales' && renderTable(orders)}
+       // {selectedView === 'Sales' && renderTable(orders)}
         // {selectedView === 'Purchase' && renderTable(orders)}
 
 
@@ -276,7 +294,8 @@ const View = () => {
         </div>
 
         {selectedView === 'Sales' && renderTable(orders)}
-        {selectedView === 'Purchase' && renderTable(importedData.length ? importedData : orders)}
+        {/* //importedData.length ? importedData : orders */}
+        {selectedView === 'Purchase' && renderTable(purchaseOrders)}  
       </div>
 
       <div className='hidden'>
@@ -312,8 +331,8 @@ const View = () => {
             <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
             <p>{details.Name.toUpperCase()}</p>
             <p>{details.Address?.toUpperCase()}</p>
-            {/* <p>{details.email}</p> */}
             <p>PHONE:{details.mobileNumber}</p>
+            <p>EMAIL:{details.email}</p>
           </div>
         </div>
         <table className="w-full border-collapse border mb-4">
@@ -330,12 +349,12 @@ const View = () => {
           <tbody>
             {details.orderItems.map((e, index) => (
               <tr key={index}>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product.title}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product?.title || e.productId?.title}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.GST}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price - e.discountedPrice}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)||(e.productId?.price-e.retailPrice)} </td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price || e.productId?.price}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice || e.retailPrice}</td>
                 
               </tr>
             ))}
@@ -349,7 +368,7 @@ const View = () => {
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>DISCOUNT</span>
-              <span>₹{details.totalPrice-details.totalDiscountedPrice}</span>
+              <span>₹{details.totalPrice-details.totalDiscountedPrice || details.totalPrice-details.totalPurchaseRate}</span>
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>GST</span>
@@ -357,7 +376,7 @@ const View = () => {
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
               <span>Amount Pay</span>
-              <span>₹{details.finalPriceWithGST}</span>
+              <span>₹{details.finalPriceWithGST ||(details.totalPrice+details.GST) }</span>
             </div>
           </div>
         </div>

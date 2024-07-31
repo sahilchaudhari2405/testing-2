@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import logo from "../logo.png";
 import Barcode from 'react-barcode';
 const Invoice = ({ componentRef, details }) => {
@@ -37,7 +37,7 @@ const Invoice = ({ componentRef, details }) => {
           </div>
           <div>
             <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-            <span>{details.updatedAt}</span>
+            <span>{details.updatedAt.substring(0, 10)}</span>
           </div>
         </div>
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
@@ -63,11 +63,11 @@ const Invoice = ({ componentRef, details }) => {
           <tbody>
             {details?.orderItems?.map((e, index) => (
               <tr key={index}>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product.title ||e.productId.title }</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.productId?.title }{e.product?.title }</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.GST}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)||(e.productId.price-e.retailPrice)}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price || e.retailPrice}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price || e.productId.price}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice || e.retailPrice}</td>
                 
               </tr>
@@ -82,7 +82,7 @@ const Invoice = ({ componentRef, details }) => {
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>DISCOUNT</span>
-              <span>₹{details.totalPrice-(details.totalDiscountedPrice||details.totalPurchaseRate)}</span>
+              <span>₹{(details.totalPrice-details.totalDiscountedPrice)||(details.totalPrice-details.totalPurchaseRate)}</span>
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>GST</span>

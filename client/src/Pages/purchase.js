@@ -243,7 +243,6 @@ const Purchase = () => {
     try {
       const createdOrder=  dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform}))
       .unwrap()
-  console.log(createdOrder); 
       setFinal({
         type: "Purchase",
         name: "",
