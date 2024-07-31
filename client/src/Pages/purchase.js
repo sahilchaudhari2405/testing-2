@@ -183,7 +183,7 @@ const Purchase = () => {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      if (e.target.value.trim()!="") {
+      if (e.target.value) {
         dispatch(fetchProduct(e.target.value));
       }
     }
@@ -237,13 +237,12 @@ const Purchase = () => {
 
   const bill = async() => {
 
-    if(cart.length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
+    if(cart.length>0&&finalform.name&&finalform.mobileNumber&&finalform.address&&finalform.paymentType.cash&&finalform.paymentType.card&&finalform.paymentType.upi){
 
   
     try {
       const createdOrder=  dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform}))
       .unwrap()
-  console.log(createdOrder); 
       setFinal({
         type: "Purchase",
         name: "",
@@ -280,7 +279,12 @@ const Purchase = () => {
         amountpaid: "",
         image:null
       })
+      
+      setInvoicePrice('');
+      setTotalGst('');
+      setPaid('');
 
+setCart([])
       alert('Order created successfully!');
     } catch (err) {
       console.log(err)

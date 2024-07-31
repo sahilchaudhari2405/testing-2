@@ -64,9 +64,20 @@ export const createPurchaseOrder = createAsyncThunk('purchaseOrders/createPurcha
   }
 });
 
+export const fetchPurchaseOrders = createAsyncThunk('purchaseOrders/fetchPurchaseOrders', async () => {
+  try {
+    const response = await axiosInstance.get('/admin/PurchaseOrderGet');
+    console.log(response.order)
+    return response.data.order;  // Return the data directly from axios response
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch purchase orders');
+  }
+});
+
 // Initial state
 const initialState = {
   orders: [],
+  purchaseOrders: [],
   status: 'idle',
   error: null,
 };
@@ -130,7 +141,7 @@ const ordersSlice = createSlice({
       })
       .addCase(createPurchaseOrder.fulfilled, (state, action) => {
         state.status = 'succeeded';
-       // console.log(action.payload)
+       console.log(action.payload)
          state.purchaseOrders=action.payload;
       })
       .addCase(createPurchaseOrder.rejected, (state, action) => {
@@ -145,6 +156,17 @@ const ordersSlice = createSlice({
         state.orders = action.payload;
       })
       .addCase(sortOrders.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(fetchPurchaseOrders.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchPurchaseOrders.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.purchaseOrders = action.payload;
+      })
+      .addCase(fetchPurchaseOrders.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       });
