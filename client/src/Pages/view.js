@@ -149,7 +149,6 @@ const View = () => {
         </tr>
       </thead>
       <tbody>
-        {console.log(data)}
         {data?.map((item, i) => (
           <tr key={item._id} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
             <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>

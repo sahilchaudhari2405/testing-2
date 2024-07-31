@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 
 const test = async (req,res) => {
-    await OfflineOrder.collection.drop()
+    await Product.collection.drop()
     return res.status(200).json(new ApiResponse(200, 'deleted successfully'));
 };
 

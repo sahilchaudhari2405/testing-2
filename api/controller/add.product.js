@@ -1,3 +1,4 @@
+import Category from "../model/category.model.js";
 import Product from "../model/product.model.js";
 import OfflinePurchaseOrder from "../model/purchaseOrder.js";
 
@@ -18,21 +19,26 @@ export const generateOrderWithProductCheck = async (req, res) => {
         }
 
         const orderItems = [];
-
+       
         for (const productData of products) {
+            let imageUrl = '';
+
             if (!productData.barcode) {
                 return res.status(400).json({ message: "Product barcode is missing" });
             }
-
+            const category = await Category.findOne({name: productData.category});
+            if(!category)
+            {
+                return res.status(400).json({ message: "category missing" });
+            }
             let existingProduct = await Product.findOne({ BarCode: productData.barcode });
-
+             
             if (existingProduct) {
                 // Update the existing product
                 existingProduct.quantity = (existingProduct.quantity || 0) + (parseInt(productData.qty, 10) || 0);
                 existingProduct.purchaseRate = parseFloat(productData.purchaseRate) || 0;
                 existingProduct.retailPrice = parseFloat(productData.saleRate) || 0;
                 existingProduct.GST = parseFloat(productData.gst) || 0;
-
                 await existingProduct.save();
                 orderItems.push({
                     productId: existingProduct._id,
@@ -57,7 +63,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     ratings: productData.ratings || [],
                     reviews: productData.reviews || [],
                     numRatings: parseInt(productData.numRatings, 10) || 0,
-                    category: productData.category,
+                    category:category,
                     createdAt: productData.createdAt || null,
                     updatedAt: productData.updatedAt || null,
                     BarCode: productData.barcode || null,
