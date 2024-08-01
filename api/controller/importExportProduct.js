@@ -23,9 +23,9 @@ function generateRandomStringCategory() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const numbers = '0123456789';
 
-  let randomString = '';
+  let randomString = 'A';
 
-  for (let i = 0; i < characters.length; i++) { 
+  for (let i = 0; i < 10; i++) { 
     const randomIndex = Math.floor(Math.random() * characters.length);
     randomString += characters[randomIndex];
   }
