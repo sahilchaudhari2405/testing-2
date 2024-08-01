@@ -148,8 +148,8 @@ const View = () => {
           <th className="border border-zinc-800 px-4 py-2">Action</th>
         </tr>
       </thead>
-      <tbody>
-        {data?.map((item, i) => (
+      <tbody> 
+        {Array.isArray(data ) && data?.map((item, i) => (
           <tr key={item._id} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
             <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.Name}</td>
@@ -160,9 +160,10 @@ const View = () => {
             <td className="border border-zinc-800 px-4 py-2">{item.GST}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice ||item.totalPrice}</td>
             <td className="border border-zinc-800 px-4 py-2 flex flex-col">
-              <span>CASH: {item.paymentType?.cash}/</span>
-              <span>CARD: {item.paymentType?.Card}/</span>
+              <span>CASH: {item.paymentType?.cash}</span>
+              <span>CARD: {item.paymentType?.Card}</span>
               <span>UPI: {item.paymentType?.UPI}</span>
+              <span>Borrow: {item.paymentType?.borrow}</span>
             </td>
             <td className="border border-zinc-800 px-4 py-2">{item.orderStatus}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.user?.fullName}</td>
