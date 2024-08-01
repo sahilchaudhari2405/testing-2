@@ -42,9 +42,9 @@ export const importProducts = async (req, res) => {
   const { products } = req.body;
   console.log(products);
 
-  try {
-    const importedProducts = [];
-    const skippedProducts = [];
+  // try {
+  //   const importedProducts = [];
+  //   const skippedProducts = [];
 
     for (const productData of products) {
       delete productData._id;
@@ -118,16 +118,16 @@ export const importProducts = async (req, res) => {
       }
     }
 
-    res.json({
-      message: "Products imported successfully",
-      status: true,
-      data: importedProducts,
-      skipped: skippedProducts,
-    });
-  } catch (error) {
-    console.error('Error processing products:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
+  //   res.json({
+  //     message: "Products imported successfully",
+  //     status: true,
+  //     data: importedProducts,
+  //     skipped: skippedProducts,
+  //   });
+  // } catch (error) {
+  //   console.error('Error processing products:', error);
+  //   res.status(500).json({ success: false, error: 'Internal Server Error' });
+  // }
 };
 
 

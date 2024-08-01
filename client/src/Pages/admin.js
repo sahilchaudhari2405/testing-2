@@ -7,24 +7,19 @@ import Chartofdonut from '../component/donutChart';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect } from 'react';
+import axiosInstance from '../axiosConfig';
+import { useState } from 'react';
 
 
 
-const fetchUsers = async (token) => {
-  try {
-    if (!token) {
-      throw new Error('No token found in localStorage');
-    }
-    const response = await axios.get('http://localhost:4000/api/auth/users', {
-      withCredentials: true
-    });
-    console.log("CounterUsers: ", response.data);
-  } catch (error) {
-    console.error('Error fetching users:', error); 
-  }
-};
 
-const Admin = ({ selectedCounter, onCounterChange }) => {
+// { selectedCounter, onCounterChange }
+const Admin = () => {
+  const [ourUsers, setourUsers] = useState([]);
+
+  const [selectedCounter, setSelectedUserID] = useState('');
+  const [counterUser, setCounterUser] = useState(null);
+  const [orders, setOrders] = useState([]);
 
 
   useEffect(() => {
@@ -41,26 +36,84 @@ const Admin = ({ selectedCounter, onCounterChange }) => {
     }
   }, []);
 
+  
+  const fetchUsers = async (token) => {
+    try {
+      if (!token) {
+        throw new Error('No token found in localStorage');
+      }
+      const response = await axiosInstance.get('/auth/users', {
+        withCredentials: true
+      });
+      const resData = response.data;
+      console.log("CounterUsers: ", resData);
+      setourUsers(resData);
+    } catch (error) {
+      console.error('Error fetching users:', error); 
+    }
+  };
 
+  const onCounterChange = (event) => {
+    const selectedValue = event.target.value;
+    console.log("isndie counter chaneg: ",selectedValue);
+    setSelectedUserID(selectedValue);
 
+    const selectedUser = ourUsers.find(
+      (user, index) => (user._id) == selectedValue
+    );
+    setCounterUser(selectedUser);
+    console.log("selecteduser is: ", counterUser);
+  };
 
+  const fetchOrders = async (token=null) => {
+    try {
+      if (!token) {
+          throw new Error('No token found in localStorage');
+      }
+      const response = await axiosInstance.get('/order/getAllOrderByCounter', {
+          headers: { Authorization: `Bearer ${token}` }
+      });
+        // setOrders(response.data.data);
+        const resData = response.data.data;
+        console.log("getAllOrderByCounter : ",resData);
+      
+        const matchingOrder = resData.find(order => order?.user?._id === counterUser?._id);
+        if (matchingOrder) {
+          setOrders(matchingOrder);
+          console.log("matchingOrder is: ",matchingOrder);
+        } else {
+          console.log(`No order found for user ID: ${counterUser._id}`);
+        }
+        
+    } catch (error) {
+        console.error('Error fetching orders:', error); 
+    }
+  };
+
+  useEffect(() => {
+    console.log("indie fetch");
+    const token = localStorage.getItem('token');
+    if (token) {  
+      const decodedToken = jwtDecode(token);
+      console.log("decoded token is: ",decodedToken);
+      console.log("decoded token userid is: ",decodedToken.id);
+      fetchOrders(token);
+    }
+  },[]);
 
 
   return (
     <div className='flex flex-col justify-center items-center '>
 
       <div className="p-8 w-[95vw] mt-20">
-        <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-        <p className="mb-8">Welcome to Apala Bazaar </p>
+        <h1 className="text-3xl font-bold mb-4">Counter Wise Dashboards</h1>
 
-        <select className='my-5' value={selectedCounter} onChange={onCounterChange}>
-          <option value="1">Counter 1</option>
-          <option value="2">Counter 2</option>
-          <option value="3">Counter 3</option>
-          <option value="4">Counter 4</option>
-          <option value="4">Online Total</option>
-          <option value="4">Offline Total</option>
-          <option value="4">Grand Total</option>
+        <select className="my-5" value={selectedCounter} onChange={onCounterChange}>
+          {ourUsers.filter(user => user.role !== 'admin').map((user, index) => (
+            <option key={user._id} value={user._id}>
+              {user.counterNumber ? 'Counter Number: ' + user.counterNumber : ''} Name: {user.fullName}
+            </option>
+          ))}
         </select>
 
 
