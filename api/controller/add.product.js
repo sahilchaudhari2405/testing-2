@@ -93,7 +93,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalPrice += item.retailPrice * item.quantity;
             totalPurchaseRate += item.purchaseRate * item.quantity;
             totalGST += item.GST * item.quantity;
-            totalItem += 1;
+            totalItem += 1; 
         }
 
         const newOrder = new OfflinePurchaseOrder({
