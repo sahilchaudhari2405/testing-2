@@ -23,9 +23,9 @@ function generateRandomStringCategory() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const numbers = '0123456789';
 
-  let randomString = 'A';
+  let randomString = '';
 
-  for (let i = 0; i < 10; i++) { 
+  for (let i = 0; i < characters.length; i++) { 
     const randomIndex = Math.floor(Math.random() * characters.length);
     randomString += characters[randomIndex];
   }
@@ -42,13 +42,12 @@ export const importProducts = async (req, res) => {
   const { products } = req.body;
   console.log(products);
 
-  // try {
-  //   const importedProducts = [];
-  //   const skippedProducts = [];
+  try {
+    const importedProducts = [];
+    const skippedProducts = [];
 
     for (const productData of products) {
       delete productData._id;
-
       let categoriesName = await generateRandomStringCategory();
       const parentCategory = await Category.findOne({ name: 'GENERAL' });
 
@@ -58,29 +57,23 @@ export const importProducts = async (req, res) => {
         categoriesName = productData.Name.trim().substring(0, 50);
       }
 
-      if (!categoriesName) {
-        console.log('Skipping product due to missing category name:', productData);
-        skippedProducts.push(productData);
-        continue;
-      }
-
       let category = await Category.findOne({ name: categoriesName });
 
       if (!category) {
         if (!parentCategory) {
-          console.log('No GENERAL category found, creating it.');
+          console.log('no genral', category)
           const generalCategory = await CreateCategory('GENERAL', 1, 'general', null);
           category = await CreateCategory(categoriesName, 2, categoriesName, generalCategory._id);
         } else {
           category = await CreateCategory(categoriesName, 2, categoriesName, parentCategory._id);
         }
       }
-
+ 
       const barcode = productData.BarCode || productData.Barcode;
-      console.log(productData.BarCode, 'New product barcode');
-      console.log(productData.Barcode, 'Existing product barcode');
+      console.log(productData.BarCode, 'new product');
+      console.log(productData.Barcode, 'GST pad product');
 
-      if (barcode && barcode !== '0') {
+      if (barcode && barcode !=0) {
         const existingProduct = await Product.findOne({ BarCode: barcode });
 
         if (existingProduct) {
@@ -88,10 +81,7 @@ export const importProducts = async (req, res) => {
           continue;
         }
 
-        const result = productData.BarCode
-          ? await NewimportGSTData(productData, category)
-          : await importGSTData(productData, category);
-
+        const result = productData.BarCode ? await NewimportGSTData(productData, category) : await importGSTData(productData, category);
         importedProducts.push(result);
       } else {
         let newBarcode;
@@ -118,18 +108,17 @@ export const importProducts = async (req, res) => {
       }
     }
 
-  //   res.json({
-  //     message: "Products imported successfully",
-  //     status: true,
-  //     data: importedProducts,
-  //     skipped: skippedProducts,
-  //   });
-  // } catch (error) {
-  //   console.error('Error processing products:', error);
-  //   res.status(500).json({ success: false, error: 'Internal Server Error' });
-  // }
+    res.json({
+      message: "Products imported successfully",
+      status: true,
+      data: importedProducts,
+      skipped: skippedProducts,
+    });
+  } catch (error) {
+    console.error('Error processing products:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
 };
-
 
 async function importGSTData(productData, category) {
   const product = new Product({
@@ -196,22 +185,11 @@ async function NewimportGSTData(productData, category) {
 }
 
 async function CreateCategory(name, level, slug, parentCategory) {
-  if (!name || !slug) {
-    throw new Error('Category name and slug are required');
-  }
-  
   const category = new Category({
-    name,
+    name:name || "no data",
     level,
-    slug,
+    slug:slug || "no data",
     parentCategory
   });
-
-  try {
-    return await category.save();
-  } catch (error) {
-    console.error('Error creating category:', error);
-    throw error;
-  }
+  return await category.save();
 }
-

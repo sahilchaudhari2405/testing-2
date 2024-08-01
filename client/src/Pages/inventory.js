@@ -203,16 +203,16 @@ const Inventory = () => {
             type="file"
             accept=".xlsx, .xls, .csv"
             onChange={handleImport}
-            // className="hidden"
+            className="hidden"
             id="import-file"
             placeholder=''
           />
-          {/*  <label */}
-            {/* // htmlFor="import-file" */}
-            {/* // className="bg-white border border-zinc-300 text-black px-4 py-2 rounded cursor-pointer" */}
-          {/* // > */}
-            {/* Import Report */}
-          {/* </label> */}
+           <label
+          htmlFor="import-file"
+             className="bg-white border border-zinc-300 text-black px-4 py-2 rounded cursor-pointer"
+           >
+            Import Report
+          </label>
           <button
             onClick={handleExport}
             className="bg-white border border-zinc-300 text-black px-4 py-2 rounded"
