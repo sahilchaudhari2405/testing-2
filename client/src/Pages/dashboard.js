@@ -355,14 +355,16 @@ const fetchOrders = async (token=null) => {
 
       if( userRole === "admin"){
         setisAdmin(true);
-        setOrders(resData);
+        resData.length > 0 ? setOrders(resData) : setOrders([]);
       }
       else {
         console.log("inside of else of admin rol");
         setisAdmin(false);
         const matchingOrder = resData.find(order => order?.user?._id === userId);
         if (matchingOrder) {
-          setOrders(matchingOrder);
+          // setOrders(matchingOrder);
+          matchingOrder ? setOrders(matchingOrder) : setOrders({});
+
           console.log("matchingOrder is: ",matchingOrder);
         } else {
           console.log(`No order found for user ID: ${userId}`);
@@ -374,24 +376,24 @@ const fetchOrders = async (token=null) => {
   }
 };
 
-  const calculateCustomers = (orders_data) => {
-    const dateWiseCustomers = orders_data.dailySales?.map(entry => ({
-      name: entry.date,
-      bills: entry.DayBill
-    }));
+const calculateCustomers = (orders_data) => {
+  const dateWiseCustomers = orders_data.dailySales?.map(entry => ({
+    name: entry.date,
+    bills: entry.DayBill
+  }));
 
-    const weekWiseCustomers = orders_data.weekSales?.map(entry => ({
-      name: entry.week,
-      bills: entry.WeekBill
-    }));
+  const weekWiseCustomers = orders_data.weekSales?.map(entry => ({
+    name: entry.week,
+    bills: entry.WeekBill
+  }));
 
-    const monthWiseCustomers = {
-      name: orders_data.month,
-      bills: orders_data.MonthsBill
-    };
-
-    return {dateWiseCustomers, weekWiseCustomers, monthWiseCustomers };
+  const monthWiseCustomers = {
+    name: orders_data.month,
+    bills: orders_data.MonthsBill
   };
+
+  return {dateWiseCustomers, weekWiseCustomers, monthWiseCustomers };
+};
 
   
 
