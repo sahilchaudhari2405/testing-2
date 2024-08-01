@@ -47,6 +47,7 @@ const addToCart = asyncHandler(async (req, res) => {
 
         let cart = await Offline_Cart.findOne({ userId: id });
         if (!cart) {
+            const discount =await Math.max(cartItem.price - cartItem.discountedPrice, 0);
             cart = await Offline_Cart.create({
                 userId: id,
                 cartItems: [cartItem._id],
@@ -55,10 +56,11 @@ const addToCart = asyncHandler(async (req, res) => {
                 GST: cartItem.GST, 
                 final_price_With_GST: cartItem.finalPrice_with_GST,
                 totalDiscountedPrice: cartItem.discountedPrice,
-                discount: cartItem.price - cartItem.discountedPrice,
+                discount:discount,
             });
             await cart.save();
         } else {
+            const discount =await Math.max(product.price - product.discountedPrice, 0);
             if (!cart.cartItems.includes(cartItem._id)) {
                 cart.cartItems.push(cartItem._id);
                 cart.totalItem += 1;
@@ -67,7 +69,7 @@ const addToCart = asyncHandler(async (req, res) => {
             cart.final_price_With_GST +=  product.discountedPrice + product.GST;
             cart.totalPrice += product.price;
             cart.totalDiscountedPrice += product.discountedPrice;
-            cart.discount += (product.price - product.discountedPrice);
+            cart.discount += discount;
             await cart.save();
         }
         return res.status(200).json(new ApiResponse(200, 'Product added to cart successfully', { cartItem, cart })); 
@@ -163,13 +165,14 @@ const removeOneCart = asyncHandler(async (req, res) => {
         let cart = await Offline_Cart.findOne({ userId: id });
         const cartItemExists = cart.cartItems.some(item => item.toString() === cartItem._id.toString());
         if (cartItem.quantity > 0 && cartItemExists) { 
+            const discount = await Math.max(cartItem.price - cartItem.discountedPrice, 0);
             cart.cartItems.pull(cartItem._id);
             cart.totalPrice -= cartItem.price;
             cart.totalItem -= 1;
             cart.totalDiscountedPrice -= cartItem.discountedPrice;
             cart.GST -= cartItem.GST;
             cart.final_price_With_GST -= cartItem.finalPrice_with_GST;
-            cart.discount -= (cartItem.price - cartItem.discountedPrice);
+            cart.discount -= discount;
             await cart.save();
             await Offline_CartItem.findOneAndDelete({ _id: itemId });
         }
@@ -248,11 +251,12 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
             let cart = await Offline_Cart.findOne({ userId: id });
             const cartItemExists = cart.cartItems.some(item => item.toString() === cartItem._id.toString());
             if (cart && cartItemExists) {
+                const discount =await Math.max(product.price - product.discountedPrice, 0);
                 cart.totalPrice -= product.price;
                 cart.GST -= product.GST;
                 cart.final_price_With_GST -= (product.discountedPrice + product.GST);
                 cart.totalDiscountedPrice -= product.discountedPrice;
-                cart.discount -= (product.price - product.discountedPrice);
+                cart.discount -= discount;
                 await cart.save();
             }
 

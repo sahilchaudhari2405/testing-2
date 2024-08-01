@@ -395,9 +395,9 @@ const Admin = () => {
           <div>
             <ChartofCustomers dateWiseCustomers={dateWiseCustomers} weekWiseCustomers = {weekWiseCustomers}  />
           </div>
-          {/* <div>
+          {<div>
             <Chartofdonut dateWiseCustomers={dateWiseCustomers} weekWiseCustomers = {weekWiseCustomers} monthWiseCustomers ={monthWiseCustomers} />
-          </div> */}
+          </div>}
         </div>
 
       

@@ -146,6 +146,7 @@ export const deleteProduct = async (req, res) => {
 };
 
 // View all products
+// Assuming you have a model named Product
 export const viewProducts = async (req, res) => {
   try {
     const products = await Product.find().populate('category')
@@ -155,7 +156,6 @@ export const viewProducts = async (req, res) => {
     return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
   }
 };
-
 
 export const createProduct = async (req, res) => {
   const { 
