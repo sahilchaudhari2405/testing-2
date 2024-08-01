@@ -32,7 +32,7 @@ export const importProducts = async (req, res) => {
        const barcode = productData.BarCode || productData.Barcode
        console.log(productData.BarCode , 'new product');
        console.log(productData.Barcode , 'GST pad product');
-       if(barcode)
+       if(barcode && barcode!=0)
        {
         let existingProduct = await Product.findOne({ BarCode: barcode });
          
