@@ -115,6 +115,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
             if (cart) {
                 const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
                 if (cartItemExists) {
+                    const discount = Math.max(product.price - product.discountedPrice, 0);
                     cart.user=id,
                     cart.paymentType=paymentType,
                     cart.orderStatus='Update',
@@ -122,7 +123,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
                     cart.totalDiscountedPrice -= product.discountedPrice;
                     cart.totalPurchaseRate -= product.purchaseRate;
                     cart.GST -= product.GST;
-                    cart.discount -= (product.price - product.discountedPrice);
+                    cart.discount -= discount;
                     cart.totalProfit -= (product.discountedPrice - product.purchaseRate);
                     cart.finalPriceWithGST -= (product.discountedPrice + product.GST);
                     await cart.save();
@@ -162,6 +163,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
         const oldOrder = JSON.parse(JSON.stringify(cart));  
         const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
         if (cartItem.quantity > 0 && cartItemExists) {
+            const discount = Math.max(cartItem.price - cartItem.discountedPrice, 0);
             cart.user = id,
             cart.orderItems.pull(cartItem._id);
             cart.paymentType=paymentType,
@@ -171,7 +173,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
             cart.totalPurchaseRate -= cartItem.purchaseRate;
             cart.GST -= cartItem.GST;
             cart.totalItem-=1,
-            cart.discount -= (cartItem.price-cartItem.discountedPrice);
+            cart.discount -= discount;
             cart.totalProfit -= cartItem.totalProfit;
             cart.finalPriceWithGST -= cartItem.finalPriceWithGST;
             await cart.save();

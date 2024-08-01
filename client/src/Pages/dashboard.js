@@ -180,7 +180,29 @@ const Dashboard = () => {
       }
       return acc;
     }, []);
-   
+    if (daywiseArray.length > 0) {
+      console.log("transformdataforadmin daywisearrauyeln > 0");
+
+       const latestSale = daywiseArray[daywiseArray.length - 1].sales;
+       setlastestSale(latestSale);
+       const latestRevenue = daywiseArray[daywiseArray.length - 1].revenue;
+       setlastestRevenue(latestRevenue);
+       const latestSaleDate = new Date(daywiseArray[daywiseArray.length - 1].date);
+     
+      console.log("transformdataforadmin daywisearrauyeln > 0 latestSale: ",latestSale);
+      console.log("transformdataforadmin daywisearrauyeln > 0 latestRevenue: ",latestRevenue);
+      console.log("transformdataforadmin daywisearrauyeln > 0 latestSaleDate: ",latestSaleDate);
+
+       const today = new Date();
+       // const latestSaleDate = new Date(daywise[daywise.length - 1].date);
+       
+       if (latestSaleDate.toDateString() === today.toDateString()) {
+           setlatestDay('Today');
+       } else {
+         setlatestDay('Last Day');
+
+   }
+ }
     return {
       daywise: daywiseArray,
       weekwise: weekwiseArray,
@@ -506,9 +528,9 @@ const calculateCustomers = (orders_data) => {
           <div>
             <ChartofCustomers dateWiseCustomers={dateWiseCustomers} weekWiseCustomers = {weekWiseCustomers}  />
           </div>
-          {/* <div>
+          { <div>
             <Chartofdonut dateWiseCustomers={dateWiseCustomers} weekWiseCustomers = {weekWiseCustomers} monthWiseCustomers ={monthWiseCustomers} />
-          </div> */}
+           </div>}
         </div>
       </div>
     </div>
