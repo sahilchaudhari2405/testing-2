@@ -55,7 +55,7 @@ const ChartofCustomers = ({dateWiseCustomers, weekWiseCustomers }) => {
         <div className='mx-3 my-10 p-5 bg-white rounded-md flex flex-col shadow-2xl' style={{ width: '400px', height: '350px' }}>
             <div className='flex flex-row justify-between mb-2'>
                 <label className='text-lg font-semibold'>
-                    Customer's Trend on this Counter
+                    Customer's Trend
                 </label>
                 <select value={timeFrame} onChange={handleTimeFrameChange} className='border rounded p-1'>
                     <option value="day">Day</option>
