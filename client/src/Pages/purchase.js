@@ -116,14 +116,14 @@ const Purchase = () => {
   };
 
   const handleError = (err) => {
-    console.log("hallo")
-    if (isChecked) {
-      dispatch(fetchProduct("766576577878")).then(()=>{
-        if (formData.barcode&&formData.description&&formData.purchaseRate) {
-          setCart([...cart, formData]);
-        }
-      });
-    }
+    alert("Connnect the Barcode Scanner")
+    // if (isChecked) {
+    //   dispatch(fetchProduct("766576577878")).then(()=>{
+    //     if (formData.barcode&&formData.description&&formData.purchaseRate) {
+    //       setCart([...cart, formData]);
+    //     }
+    //   });
+    // }
 
   };
 
@@ -223,7 +223,7 @@ const Purchase = () => {
     date: "",
     mobileNumber: "",
     ShipTo: "",
-    address: "",
+    address:"Shrigonda",
     ref: "",
     state: "Maharastra",
     GSTNo: "",
@@ -282,7 +282,7 @@ const Purchase = () => {
             date: "",
             mobileNumber: "",
             ShipTo: "",
-            address: "",
+            address:"Shrigonda",
             ref: "",
             state: "Maharastra",
             GSTNo: "",
@@ -827,8 +827,8 @@ const Purchase = () => {
 
             <ReactToPrint
               trigger={() => (
-                <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
-                  Save & Print
+                <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={bill}>
+                  Print
                 </button>
               )}
               content={() => componentRef.current}
@@ -853,7 +853,7 @@ const Purchase = () => {
 
               <tr>
                 <td className="border p-3">INVOICE TOTAL :</td>
-                <td className="border p-3">{invoice && totalGst}</td>
+                <td className="border p-3">{(invoice?parseInt(invoice):0)+(totalGst?parseInt(totalGst):0)}</td>
               </tr>
               <tr>
                 <td className="border p-3">PAYMENT IN CASH:</td>
