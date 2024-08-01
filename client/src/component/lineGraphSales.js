@@ -36,12 +36,12 @@ const dataYear = [
 
 const ChartWithDropdown = ({daywiseData,weekwiseData,monthwiseData}) => {
     const [timeFrame, setTimeFrame] = useState('day');
-    const [chartData, setChartData] = useState(dataDay);
+    const [chartData, setChartData] = useState(daywiseData);
     const [chartType, setChartType] = useState('bar');
 
     useEffect(() => {
         setChartData(daywiseData);
-        console.log("this is daywiseData: ",daywiseData );
+        // console.log("this is daywiseData: ",daywiseData );
     },[daywiseData]);
 
     const handleTimeFrameChange = (event) => {

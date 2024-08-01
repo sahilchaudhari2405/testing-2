@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart, LineChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
+import { useEffect } from 'react';
 const dataDay = [
     { name: 'Day 1', sales: 4000, revenue: 2400 },
     { name: 'Day 2', sales: 3000, revenue: 1398 },
@@ -33,32 +33,33 @@ const dataYear = [
     { name: 'Dec', sales: 90000, revenue: 75000 },
 ];
 
-const ChartofVisitors = () => {
+const ChartofCustomers = ({dateWiseCustomers, weekWiseCustomers }) => {
     const [timeFrame, setTimeFrame] = useState('day');
-    const [chartData, setChartData] = useState(dataDay);
+    const [chartData, setChartData] = useState(dateWiseCustomers);
+
+    useEffect(() => {
+        setChartData(dateWiseCustomers);
+    },[dateWiseCustomers]);
 
     const handleTimeFrameChange = (event) => {
         const value = event.target.value;
         setTimeFrame(value);
         if (value === 'day') {
-            setChartData(dataDay);
+            setChartData(dateWiseCustomers);
         } else if (value === 'week') {
-            setChartData(dataWeek);
-        } else if (value === 'year') {
-            setChartData(dataYear);
-        }
+            setChartData(weekWiseCustomers);
+        } 
     };
 
     return (
         <div className='mx-3 my-10 p-5 bg-white rounded-md flex flex-col shadow-2xl' style={{ width: '400px', height: '350px' }}>
             <div className='flex flex-row justify-between mb-2'>
                 <label className='text-lg font-semibold'>
-                    Total Visitors
+                    Customer's Trend on this Counter
                 </label>
                 <select value={timeFrame} onChange={handleTimeFrameChange} className='border rounded p-1'>
                     <option value="day">Day</option>
                     <option value="week">Week</option>
-                    <option value="year">Year</option>
                 </select>
             </div>
 
@@ -69,11 +70,11 @@ const ChartofVisitors = () => {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="sales" stroke="#ff6361" strokeWidth={2} />
+                    <Line type="monotone" dataKey="bills" stroke="#ff6361" strokeWidth={2} />
                 </LineChart>
             </ResponsiveContainer>
         </div>
     );
 };
 
-export default ChartofVisitors;
+export default ChartofCustomers;
