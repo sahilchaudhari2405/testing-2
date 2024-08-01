@@ -109,7 +109,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             mobileNumber: orderDetails.mobileNumber || 'Not Provided',
             email: orderDetails.email || 'No',
             Address: `${orderDetails.address || 'No Address'} ${orderDetails.state || ''}`,
-            paymentType: orderDetails.paymentType || { cash: 0, Card: 0, UPI: 0 },
+            paymentType: orderDetails.paymentType || { cash: 0, Card: 0, UPI: 0,borrow:0 },
             billImageURL: orderDetails.billImageURL || null,
             discount: orderDetails.discount || 0,
             orderStatus: orderDetails.orderStatus || 'first time',

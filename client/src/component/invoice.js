@@ -105,7 +105,7 @@ const Invoice = ({ componentRef, details }) => {
       <span>Cash:₹{details.paymentType.cash}</span>
       <span>Card:₹{details.paymentType.Card}</span>
       <span>UPI:₹{details.paymentType.UPI}</span>
-      
+      <span>Borrow:₹{details.paymentType?.borrow}</span>
       </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
               <span>Amount Pay</span>
@@ -184,7 +184,7 @@ details && (
     <div className="w-1/4">
       <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
         <span>SUBTOTAL</span>
-        <span>₹{details.totalPrice}</span>
+        <span>₹{details.totalPurchaseRate}</span>
       </div>
       <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
         <span>TOTAL ITEMS</span>
@@ -196,6 +196,7 @@ details && (
       <span>Cash:₹{details.paymentType?.cash}</span>
       <span>Card:₹{details.paymentType?.Card}</span>
       <span>UPI:₹{details.paymentType?.UPI}</span>
+      <span>Borrow:₹{details.paymentType?.borrow}</span>
       </div>
       </div>
       <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>

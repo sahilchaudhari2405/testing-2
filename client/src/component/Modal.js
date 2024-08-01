@@ -38,29 +38,29 @@ const Modal = ({ show, onClose, product }) => {
   useEffect(() => {
     dispatch(fetchCategories());
     if (product) {
-      // console.log(product)
+      console.log(product)
       setForm({
-        title: product.items.title,
-        description: product.items.description,
-        price: product.items.price,
-        discountedPrice:product.items.discountedPrice,
-        discountPercent:product.items.discountPercent,
-        quantity:product.items. quantity,
-        weight:product.items.weight,
-        category:product.items.category,
-        brand:product.items.brand,
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        discountedPrice:product.discountedPrice,
+        discountPercent:product.discountPercent,
+        quantity:product. quantity,
+        weight:product.weight,
+        category:product.category,
+        brand:product.brand,
         image: null,
-        slug:product.items.slug,
-        BarCode:product.items.BarCode,
-        stockType: product.items.stockType,
-        unit:product.items.unit,
-        purchaseRate: product.items.purchaseRate,
-        profitPercentage:product.items.profitPercentage,
-        HSN:product.items.HSN,
-        GST:product.items.GST,
-        retailPrice:product.items.retailPrice,
-        totalAmount:product.items.totalAmount,
-        amountPaid:product.items.amountPaid,
+        slug:product.slug,
+        BarCode:product.BarCode,
+        stockType: product.stockType,
+        unit:product.unit,
+        purchaseRate: product.purchaseRate,
+        profitPercentage:product.profitPercentage,
+        HSN:product.HSN,
+        GST:product.GST,
+        retailPrice:product.retailPrice,
+        totalAmount:product.totalAmount,
+        amountPaid:product.amountPaid,
       });
       setImagePreview(product.imgSrc);
     }
@@ -163,7 +163,7 @@ const Modal = ({ show, onClose, product }) => {
                </div>
                <div className="mb-4">
                  <label htmlFor="quantity" className="block text-sm font-medium text-zinc-700 mb-3">Quantity</label>
-                 <input type="number" id="quantity" name="quantity" value={form.quantity} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter quantity" />
+                 <input type="number" id="quantity" name="quantity" value={form.quantity} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter quantity" />
                </div>
                <div className="mb-4">
                  <label htmlFor="weight" className="block text-sm font-medium text-zinc-700 mb-3">Weight</label>

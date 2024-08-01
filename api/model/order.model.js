@@ -39,6 +39,10 @@ const offlineOrderSchema = new Schema({
             type: Number,
             default: 0,
         },
+        borrow:{
+            type:Number ,
+            default:0
+        }
     },
     billImageURL: {
         type: String,
