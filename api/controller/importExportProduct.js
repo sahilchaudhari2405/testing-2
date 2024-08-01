@@ -48,14 +48,15 @@ export const importProducts = async (req, res) => {
 
     for (const productData of products) {
       delete productData._id;
-      let categoriesName = generateRandomStringCategory();
+      let categoriesName = await generateRandomStringCategory();
       const parentCategory = await Category.findOne({ name: 'GENERAL' });
-      if (productData.title) {
+
+      if (productData.title && typeof productData.title === 'string') {
         categoriesName = productData.title.trim().substring(0, 50);
-      } else if (productData.Name) {
+      } else if (productData.Name && typeof productData.Name === 'string') {
         categoriesName = productData.Name.trim().substring(0, 50);
       }
-      
+
       let category = await Category.findOne({ name: categoriesName });
 
       if (!category) {
