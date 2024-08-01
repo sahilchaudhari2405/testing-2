@@ -26,6 +26,7 @@ const EditOrder = () => {
     finalPriceWithGST: '',
   });
   const [orderId, setOrderId] = useState('');
+  const [paymenttype, setpaymenttype] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fetchedOrder, setfetchedOrder] = useState(false);
@@ -70,6 +71,7 @@ const EditOrder = () => {
         finalPriceWithGST: orderData.finalPriceWithGST,
       });
       console.log("setFormData: ",formData);
+      setpaymenttype(orderData.paymentType);
       setfetchedOrder(true);
 
 
@@ -136,7 +138,9 @@ const EditOrder = () => {
     }));
   };
 
-  const handleRemoveOrderItem = (orderId, itemId) => {
+  const handleRemoveOrderItem = (e,orderId, itemId) => {
+    e.preventDefault();
+
     const remove_payload = {
       itemId : itemId,
       orderId : orderId
@@ -144,12 +148,11 @@ const EditOrder = () => {
 
     axiosInstance.put('/order/RemoveOneItem', remove_payload)
       .then(response => {
-        alert('Order item removed successfully!');
+        toast.success('Order item removed successfully!');
       })
       .catch(err => {
-        alert('Failed to remove item.');
+        toast.error('Failed to remove item.');
       });
-
     fetchOrderData();
     console.log("changed formdata: ",formData);
   };
@@ -158,7 +161,7 @@ const EditOrder = () => {
     e.preventDefault();
     axiosInstance.put(`/order/updateOrderbyID/${orderId}`, formData)
       .then(response => {
-        alert('Order updated successfully!');
+        toast.success('Order updated successfully!');
       })
       .catch(err => {
         alert('Failed to update order.');
@@ -202,14 +205,34 @@ const EditOrder = () => {
 
   }
 
+  const handleDecreaseQuantity = (e,iteamId) => {
+    //fefds decreaseQuantity
+    e.preventDefault();
+    const decreaseQuantity_payload = {
+      orderId : orderId,
+      iteamId : iteamId,
+      paymentType : paymenttype
+    }
+
+    axiosInstance.put('/order/decreaseQuantity', decreaseQuantity_payload)
+      .then(response => {
+        toast.success('Quantity decreased successfully!');
+      })
+      .catch(err => {
+        toast.error('Failed to decrease quantity');
+      });
+      fetchOrderData();
+
+  }
+
   return (
-    <div className="bg-gray-100 mt-20 mx-6 rounded-lg shadow-lg">
+    <div className="bg-gray-100 mt-20  mx-6 rounded-lg shadow-lg">
       <div className="bg-blue-700 text-white p-4 rounded-t-lg">
         <h1 className="text-xl font-bold">Edit Order</h1>
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
         <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">Enter Order ID or Scan Barcode</label>
+          <label className="block text-gray-700 font-medium mb-2">Enter Order ID</label>
           <div className="flex space-x-4">
             <input
               type="text"
@@ -228,8 +251,8 @@ const EditOrder = () => {
           </div>
           {error && <p className="text-red-500 mt-2">{error}</p>}
         </div>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        { fetchedOrder && (<form onSubmit={handleSubmit} className='bg-blue-100 rounded' >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-4 gap-4 mb-6">
             <div>
               <label className="block text-gray-700 font-medium">Name</label>
               <input
@@ -272,7 +295,7 @@ const EditOrder = () => {
                 required
               />
             </div>
-            <div>
+            {/* <div>
               <label className="block text-gray-700 font-medium">Payment (Cash)</label>
               <input
                 type="number"
@@ -301,7 +324,7 @@ const EditOrder = () => {
                 onChange={handlePaymentChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
             <div>
               <label className="block text-gray-700 font-medium">Bill Image URL</label>
               <input
@@ -410,43 +433,99 @@ const EditOrder = () => {
                 required
               />
             </div>
-            {formData.orderItems.map((item, index) => (
-              <div key={item._id} className="flex items-center justify-between p-4 mb-2 border border-gray-300 rounded">
-              <div>
-                <p className="text-gray-700 font-medium">{item.product.title}</p>
-                <p className="text-gray-500">Quantity: {item.quantity}</p>
-                <p className="text-gray-500">Price: ${item.price}</p>
+            {/* {formData.orderItems.map((item, index) => (
+            <div key={item._id} className="flex items-center justify-between p-4 mb-2 border border-gray-300 rounded-lg shadow-sm">
+              <div className="flex-grow">
+                <p className="text-gray-700 font-medium text-lg">{item.product.title}</p>
+                <div className="flex items-center space-x-4 mt-1">
+                  <p className="text-gray-500">Quantity: {item.quantity}</p>
+                  <p className="text-gray-500">Price: ${item.price}</p>
+                </div>
               </div>
-              <button
-                onClick={() => handleRemoveOrderItem(orderId, item._id)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="w-6 h-6"
+              <div className="flex items-center space-x-2">
+                <button
+                  // onClick={() => handleDecreaseQuantity(item._id)}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  -
+                </button>
+                <button
+                  onClick={() => handleRemoveOrderItem(orderId, item._id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-            ))}
+            ))} */}
+
           </div>
-          <div className="flex justify-end space-x-4">
+          <div className='p-4 bg-blue-300'>
+          <h1 className='text-xl font-bold  mb-4'>Order Items</h1>
+          { formData.orderItems.length > 0 ? (
+          formData.orderItems.map((item, index) => (
+            <div key={item._id} className="flex items-center justify-between p-4 bg-white  mb-2 max-w-fit border border-gray-300 rounded-lg shadow-sm">
+              <div className="flex-grow flex flex-row">
+                <p className="text-gray-700 font-medium text-lg">{item.product.title}</p>
+                <div className="flex items-center ml-4 mr-4 space-x-4">
+                  <p className="text-gray-500">Quantity: {item.quantity}</p>
+                  <p className="text-gray-500">Price: ${item.price}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={(e) => handleDecreaseQuantity(e,item._id)}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded"
+                >
+                  Decrease Quantity
+                </button>
+                <button
+                  onClick={(e) => handleRemoveOrderItem(e,orderId, item._id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))) :
+           ( <h1 className='text-lg font-semibold text-red-500 mb-4'>OrderItems are Empty</h1> ) 
+          }
+          </div> 
+          
+          <div className="flex p-4 bg-blue-700 rounded-b-lg justify-end space-x-4">
             <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
-              Save
+              Save changes
             </button>
             <div onClick={cancelOrder}
               className={`bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors ${ fetchedOrder ? '' : 'opacity-50 cursor-not-allowed'}`}
             >
-              Cancel
+              Cancel this Order
             </div>
             <button type="button" className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors" onClick={() => {
               setFormData({
@@ -477,7 +556,9 @@ const EditOrder = () => {
               Reset
             </button>
           </div>
-        </form>
+        </form> )
+        }
+        
       </div>
     </div>
   );
