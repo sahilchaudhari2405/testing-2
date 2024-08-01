@@ -24,10 +24,10 @@ const [invoice,setInvoice] = useState()
   const { orderId } = useParams();
   let { items, status, fetchCartError } = useSelector((state) => state.cart);
   const [currentDate, setCurrentDate] = useState('');
-  const [cardPay,setCardPay]=useState(0);
-  const [borrow,setBorrow]=useState(0);
-  const [cashPay,setCashPay]=useState(0);
-  const [upiPay,setUPIPay]=useState(0);
+  const [cardPay,setCardPay]=useState("");
+  const [borrow,setBorrow]=useState("");
+  const [cashPay,setCashPay]=useState("");
+  const [upiPay,setUPIPay]=useState("");
   const [totalPrice,setTotalPrice]=useState('');
   const [discount,setDiscount]= useState('');
   const [gst,setGst]= useState('');
@@ -53,11 +53,11 @@ const [invoice,setInvoice] = useState()
     }
 
 
-    //console.log(details);
  
   }, [items]);
 
 
+    console.log(details);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -124,10 +124,11 @@ console.log(err.message)
   const handleError = (err) => {
 
     // console.log(isChecked)
-    if (isChecked) {
+    // if (isChecked) {
 
-      fetchProducts('766576577878')
-    }
+    //   fetchProducts('766576577878')
+    // }
+    alert("Connnect the Barcode Scanner")
     // dispatch(fetchProduct("5345435334"));
   };
 
@@ -159,7 +160,7 @@ console.log(err.message)
     Date:currentDate,
     mobileNumber:"",
     ShipTo:"",
-    address:"",
+    address:"Shrigonda",
     state:"Maharastra",
     GSTNo:"",
   });
@@ -182,7 +183,7 @@ console.log(err.message)
           Date:currentDate,
           mobileNumber:"",
           ShipTo:"",
-          address:"",
+          address:"Shrigonda",
           state:"Maharastra",
           GSTNo:"",
         })
@@ -202,14 +203,14 @@ console.log(err.message)
         })
       dispatch(fetchCart())
       setMessage("")
-      setCardPay(0);
-      setCashPay(0);
-      setUPIPay(0);
-      setBorrow(0);
-      setDiscount(0)
-      setTotalPrice(0)
-      setGst(0)
-      setFinalTotal(0)
+      setCardPay("");
+      setCashPay("");
+      setUPIPay("");
+      setBorrow("");
+      setDiscount("")
+      setTotalPrice("")
+      setGst("")
+      setFinalTotal("")
 
         alert('Order created successfully!');
       } catch (err) {

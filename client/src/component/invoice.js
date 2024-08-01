@@ -1,7 +1,8 @@
-import React from 'react';
+import React ,{useState,useEffect}from 'react';
 import logo from "../logo.png";
 import Barcode from 'react-barcode';
 const Invoice = ({ componentRef, details }) => {
+  const [currentDate, setCurrentDate] = useState('');
     const sharedClasses = {
         flex: 'flex ',
         justifyBetween: 'justify-between',
@@ -11,7 +12,17 @@ const Invoice = ({ componentRef, details }) => {
         p2: 'p-2',
         fontBold:'font-bold',
       };
-
+      useEffect(() => {
+        // Get the current date in the required format (YYYY-MM-DD)
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+    
+        // Set the current date as the default value
+        setCurrentDate(formattedDate);
+      }, []);
       console.log(details)  
   return (
     details&&details.type=="customer"?
@@ -23,8 +34,8 @@ const Invoice = ({ componentRef, details }) => {
             <p>APALA BAJAR</p>
             <p>SHRIGONDA, AHMADNAGAR</p>
             <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
-            <p>PHONE: 9849589588</p>
-            <p>EMAIL: aaplabajar1777@gmail.com</p>
+            <p>PHONE:9423750349</p>
+            <p>EMAIL:aaplabajar@gmail.com</p>
           </div>
           <div className="w-24 h-24 border flex items-center justify-center">
             <img src={logo} alt="Insert Logo Above" />
@@ -38,7 +49,7 @@ const Invoice = ({ componentRef, details }) => {
           </div>
           <div>
             <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-            <span>{details.updatedAt}</span>
+            <span>{currentDate}</span>
           </div>
         </div>
         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
