@@ -17,5 +17,4 @@ COPY . .
 EXPOSE 4000
 
 # Start the Node.js app
-# CMD ["node", "index.js"]
-CMD ["npm", "run", "dev"]
+CMD ["node", "index.js"]
