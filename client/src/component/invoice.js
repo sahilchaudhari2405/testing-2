@@ -78,7 +78,7 @@ const Invoice = ({ componentRef, details }) => {
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product?.title }</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.GST}</td>
-                <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)}</td>
+                <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)>=0?(e.price - e.discountedPrice):0}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price}</td>
                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice}</td>
                 
@@ -94,7 +94,7 @@ const Invoice = ({ componentRef, details }) => {
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>DISCOUNT</span>
-              <span>₹{(details.totalPrice-details.totalDiscountedPrice)}</span>
+              <span>₹{(details.totalPrice-details.totalDiscountedPrice)>=0?(details.totalPrice-details.totalDiscountedPrice):0}</span>
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
               <span>GST</span>
