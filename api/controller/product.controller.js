@@ -149,41 +149,13 @@ export const deleteProduct = async (req, res) => {
 // Assuming you have a model named Product
 export const viewProducts = async (req, res) => {
   try {
-    // Get the page and limit from query parameters, with default values
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-
-    // Calculate the number of documents to skip
-    const skip = (page - 1) * limit;
-
-    // Fetch the products with pagination
-    const products = await Product.find()
-      .skip(skip)
-      .limit(limit)
-      .populate('category'); // Assuming you have a category field to populate
-
-    // Get the total count of products
-    const totalProducts = await Product.countDocuments();
-
-    // Calculate if there are more products to load
-    const hasMore = skip + limit < totalProducts;
-
-    // Respond with the products and pagination details
-    res.status(200).json({
-      message: "Products retrieved successfully",
-      status: true,
-      data: products,
-      currentPage: page,
-      hasMore: hasMore,
-      totalProducts: totalProducts,
-    });
+    const products = await Product.find().populate('category')
+    return res.status(200).send({ message: "Products retrieved successfully", status: true, data: products });
   } catch (error) {
-    console.error("Error retrieving products:", error);
-    res.status(500).json({ message: "Internal server error", status: false, error: error.message });
+    console.error(error);
+    return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
   }
 };
-
-
 
 export const createProduct = async (req, res) => {
   const { 

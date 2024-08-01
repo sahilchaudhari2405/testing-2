@@ -43,7 +43,10 @@ const placeOrder = asyncHandler(async (req, res) => {
             purchaseRate += orderItem.purchaseRate;
             totalProfit += orderItem.totalProfit;
         }
-
+           if(cart.discount<0)
+           {
+            cart.discount=0;
+           }
         const order = new OfflineOrder({
             user: id,
             orderItems: orderItems,
@@ -115,7 +118,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
             if (cart) {
                 const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
                 if (cartItemExists) {
-                    const discount = Math.max(product.price - product.discountedPrice, 0);
+                    const discount =await Math.max(product.price - product.discountedPrice, 0);
                     cart.user=id,
                     cart.paymentType=paymentType,
                     cart.orderStatus='Update',
@@ -163,7 +166,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
         const oldOrder = JSON.parse(JSON.stringify(cart));  
         const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
         if (cartItem.quantity > 0 && cartItemExists) {
-            const discount = Math.max(cartItem.price - cartItem.discountedPrice, 0);
+            const discount =await Math.max(cartItem.price - cartItem.discountedPrice, 0);
             cart.user = id,
             cart.orderItems.pull(cartItem._id);
             cart.paymentType=paymentType,
