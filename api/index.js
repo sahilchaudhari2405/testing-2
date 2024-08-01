@@ -39,7 +39,7 @@ app.use(cors({
 dotenv.config();
 let orderDate = new Date().setDate()+1;
 
-app.use(express.json());
+app.use(express.json({ limit: '100mb' })); // Increase limit as needed
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }))
 
