@@ -4,7 +4,7 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: dockerfile.dev
+      dockerfile: dockerfile.prod
     ports:
       - "4000:4000"
     environment:
