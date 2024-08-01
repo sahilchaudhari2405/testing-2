@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaBarcode } from "react-icons/fa"; // Import the barcode icon from react-icons
 import ReactToPrint from "react-to-print";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import logo from "../logo.png";
 import { logoutUser } from "../Redux/User/userSlices";
 import { toast } from "react-toastify";
@@ -24,8 +24,9 @@ const Purchase = () => {
   const [invoice, setInvoicePrice] = useState();
   const [totalGst, setTotalGst] = useState();
   const [paid, setPaid] = useState();
-  const [invoiceData,setInvoice] = useState();
-
+  const [invoiceData, setInvoice] = useState();
+  const [isChecked, setIsChecked] = useState(false);
+  const [message, setMessage] = useState(false);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -50,9 +51,12 @@ const Purchase = () => {
 
   useEffect(() => {
     if (cart.length > 0) {
-      const totalAmount = cart.reduce((acc, e) => acc + (e.purchaseRate * e.qty), 0);
-      const totalGST = cart.reduce((acc, e) => acc + (e.gst * e.qty), 0);
-   
+      const totalAmount = cart.reduce(
+        (acc, e) => acc + e.purchaseRate * e.qty,
+        0
+      );
+      const totalGST = cart.reduce((acc, e) => acc + e.gst * e.qty, 0);
+
       setInvoicePrice(totalAmount);
       setTotalGst(totalGST);
       setPaid(paid);
@@ -62,21 +66,19 @@ const Purchase = () => {
         TotalAmount: totalAmount,
         AmountPaid: paid,
         totalGst: totalGST,
-        date:currentDate
+        date: currentDate,
       }));
     }
   }, [cart]);
 
-
   const handleKeys = (e) => {
-    console.log(e.key)
-    if (e.key === 'Enter') {
+    console.log(e.key);
+    if (e.key === "Enter") {
       e.preventDefault(); // Prevent form submission on Enter
       const form = e.target.form;
       const index = Array.prototype.indexOf.call(form, e.target);
       form.elements[index + 1].focus();
     }
-
   };
 
   const handleLogout = () => {
@@ -84,6 +86,11 @@ const Purchase = () => {
     localStorage.removeItem("token");
     toast.error("Logout Successfully!");
     navigate("/");
+  };
+
+  const handleCheckboxChange = (event) => {
+    const checked = event.target.checked;
+    setIsChecked(checked);
   };
 
   const sharedClasses = {
@@ -98,13 +105,26 @@ const Purchase = () => {
 
   // ============================functions for scanning product===============================
   const handleScan = (data) => {
-    if (data) {
-      dispatch(fetchProduct(data));
+    // console.log(isChecked)
+    if (isChecked && data) {
+      dispatch(fetchProduct(data)).then(()=>{
+        if (formData.barcode&&formData.description&&formData.purchaseRate) {
+          setCart([...cart, formData]);
+        }
+      });
     }
   };
 
   const handleError = (err) => {
-    dispatch(fetchProduct("123456"));
+    alert("Connnect the Barcode Scanner")
+    // if (isChecked) {
+    //   dispatch(fetchProduct("766576577878")).then(()=>{
+    //     if (formData.barcode&&formData.description&&formData.purchaseRate) {
+    //       setCart([...cart, formData]);
+    //     }
+    //   });
+    // }
+
   };
 
   const [formData, setFormData] = useState({
@@ -122,7 +142,7 @@ const Purchase = () => {
     gst: "",
     total: "",
     amountpaid: "",
-    image:null
+    image: null,
   });
 
   useEffect(() => {
@@ -131,17 +151,18 @@ const Purchase = () => {
         barcode: productDetails.BarCode || "",
         brand: productDetails.brand || "",
         description: productDetails.title || "",
-        category: productDetails.category.name || "",
+        category: productDetails?.category?.name || "",
         stockType: productDetails.stockType || "",
         unit: productDetails.unit || "",
         qty: 1,
         saleRate: productDetails.discountedPrice || "",
         purchaseRate: productDetails.purchaseRate || "",
-        profit: (productDetails.discountedPrice - productDetails.purchaseRate) || "",
+        profit:
+          productDetails.discountedPrice - productDetails.purchaseRate || "",
         hsn: productDetails.HSN || "",
         gst: productDetails.GST || "",
         amountpaid: "",
-        image:null
+        image: null,
       });
     }
   }, [productDetails]);
@@ -173,22 +194,22 @@ const Purchase = () => {
       qty: productDetails.BarCode ? 1 : "",
       saleRate: productDetails.discountedPrice || "",
       purchaseRate: productDetails.purchaseRate || "",
-      profit: (productDetails.discountedPrice - productDetails.purchaseRate) || "",
+      profit:
+      productDetails.discountedPrice - productDetails.purchaseRate || "",
       hsn: productDetails.HSN || "",
       gst: productDetails.GST || "",
       amountpaid: "",
-      image:null
+      image: null,
     });
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      if (e.target.value.trim()!="") {
+      if (e.target.value) {
         dispatch(fetchProduct(e.target.value));
       }
     }
   };
-  
 
   const handleDelete = (id) => {
     const updatedProducts = cart.filter((product) => product.barcode !== id);
@@ -199,10 +220,10 @@ const Purchase = () => {
   const [finalform, setFinal] = useState({
     type: "Purchase",
     name: "",
-    date: '',
+    date: "",
     mobileNumber: "",
     ShipTo: "",
-    address: "",
+    address:"Shrigonda",
     ref: "",
     state: "Maharastra",
     GSTNo: "",
@@ -213,7 +234,8 @@ const Purchase = () => {
     paymentType: {
       cash: "",
       card: "",
-      upi: ""
+      upi: "",
+      borrow: "",
     },
   });
 
@@ -235,63 +257,86 @@ const Purchase = () => {
     }));
   };
 
-  const bill = async() => {
+  const bill = async () => {
+    const amount =
+      (finalform?.paymentType?.cash ? parseInt(finalform?.paymentType?.cash) : 0) +
+      (finalform?.paymentType?.upi ? parseInt(finalform?.paymentType?.upi) : 0) +
+      (finalform?.paymentType?.card ? parseInt(finalform?.paymentType?.card) : 0) +
+      (finalform?.paymentType?.borrow? parseInt(finalform?.paymentType?.borrow) : 0);
+ const total = invoice+totalGst
+ console.log(amount," and ",total)
+    if (amount == total) {
+      if (
+        cart.length > 0 &&
+        finalform.name &&
+        finalform.mobileNumber &&
+        finalform.address
+      ) {
+        try {
+          dispatch(
+            createPurchaseOrder({ products: cart, orderDetails: finalform })
+          ).unwrap();
+          setFinal({
+            type: "Purchase",
+            name: "",
+            date: "",
+            mobileNumber: "",
+            ShipTo: "",
+            address:"Shrigonda",
+            ref: "",
+            state: "Maharastra",
+            GSTNo: "",
+            totalGst: "",
+            TotalAmount: "",
+            AmountPaid: "",
+            orderStatus: "first time",
+            paymentType: {
+              cash: "",
+              card: "",
+              upi: "",
+              borrow: "",
+            },
+          });
+          setFormData({
+            barcode: "",
+            brand: "",
+            description: "",
+            category: "",
+            stockType: "",
+            unit: "",
+            qty: "",
+            saleRate: "",
+            purchaseRate: "",
+            profit: "",
+            hsn: "",
+            gst: "",
+            amountpaid: "",
+            image: null,
+          });
 
-    if(cart.length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
+          setInvoicePrice("");
+          setTotalGst("");
+          setPaid("");
 
-  
-    try {
-      const createdOrder=  dispatch(createPurchaseOrder({ products:cart, orderDetails:finalform}))
-      .unwrap()
-  console.log(createdOrder); 
-      setFinal({
-        type: "Purchase",
-        name: "",
-        date: '',
-        mobileNumber: "",
-        ShipTo: "",
-        address: "",
-        ref: "",
-        state: "Maharastra",
-        GSTNo: "",
-        totalGst: "",
-        TotalAmount: "",
-        AmountPaid: "",
-        orderStatus: "first time",
-        paymentType: {
-          cash: "",
-          card: "",
-          upi: ""
-        },
-      })
-      setFormData({
-        barcode:"",
-        brand:"",
-        description:"",
-        category:"",
-        stockType:"",
-        unit:"",
-        qty: "",
-        saleRate: "",
-        purchaseRate:"",
-        profit:"",
-        hsn:"",
-        gst:"",
-        amountpaid: "",
-        image:null
-      })
-
-      alert('Order created successfully!');
-    } catch (err) {
-      console.log(err)
-      alert("Failed to create order: ",err.message);
+          setCart([]);
+          setMessage("")
+          alert("Order created successfully!");
+        } catch (err) {
+          console.log(err);
+          alert("Failed to create order: ", err.message);
+        }
+      } else {
+        alert(`fill the client details`);
+      }
+    } else if (amount > total) {
+      setMessage(`Return ${amount - total} rs `);
+    } else {
+      setMessage(
+        `Need ${
+          total - amount
+        } rs to place order or add amount in borrow field `
+      );
     }
-
-  }else{
-    alert("enter all details")
-  }
-
-    
   };
 
   //======================barcode genration====================================
@@ -314,112 +359,124 @@ const Purchase = () => {
           </button>
         </div>
       </div>
-    
-      <div className="bg-white p-6 rounded-b-lg shadow-inner">
-      <form>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div>
-            <label className="block text-gray-700 font-medium">Type</label>
-            <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>Purchase</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Name</label>
-            <input
-              type="text"
-              id="name"
-              require
-              value={finalform.name}
-              onKeyDown={handleKeys}
-              onChange={handleFinal}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Invoice</label>
-            <input
-              type="date"
-              id="Date"
-              onKeyDown={handleKeys}
-              value={currentDate}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-     
-          <div>
-            <label className="block text-gray-700 font-medium">Mobile</label>
-            <input
-              type="text"
-              id="mobileNumber"
-              required
-              onKeyDown={handleKeys}
-              maxLength={10}
-              minLength={10}
-              value={finalform.mobileNumber}
-              onChange={handleFinal}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
 
-          <div>
-            <label className="block text-gray-700 font-medium">Ref.</label>
-            <input
-              type="text"
-              id="ref"
-              onKeyDown={handleKeys}
-              value={finalform.ref}
-              onChange={handleFinal}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+      <div className="bg-white p-6 rounded-b-lg shadow-inner">
+        <form>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div>
+              <label className="block text-gray-700 font-medium">Type</label>
+              <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option>Purchase</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium">Name</label>
+              <input
+                type="text"
+                id="name"
+                require
+                value={finalform.name}
+                onKeyDown={handleKeys}
+                onChange={handleFinal}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium">Invoice</label>
+              <input
+                type="date"
+                id="Date"
+                onKeyDown={handleKeys}
+                value={currentDate}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium">Mobile</label>
+              <input
+                type="text"
+                id="mobileNumber"
+                required
+                onKeyDown={handleKeys}
+                maxLength={10}
+                minLength={10}
+                value={finalform.mobileNumber}
+                onChange={handleFinal}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium">Ref.</label>
+              <input
+                type="text"
+                id="ref"
+                onKeyDown={handleKeys}
+                value={finalform.ref}
+                onChange={handleFinal}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium">GST No.</label>
+              <input
+                type="text"
+                id="GSTNo"
+                onKeyDown={handleKeys}
+                value={finalform.GSTNo}
+                onChange={handleFinal}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium">Vendor</label>
+              <input
+                type="text"
+                onKeyDown={handleKeys}
+                id="ShipTo"
+                value={finalform.ShipTo}
+                onChange={handleFinal}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium">Address</label>
+              <input
+                type="text"
+                id="address"
+                onKeyDown={handleKeys}
+                value={finalform.address}
+                onChange={handleFinal}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium">State</label>
+              <input
+                id="state"
+                value={finalform.state}
+                onChange={handleFinal}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium">GST No.</label>
-            <input
-              type="text"
-              id="GSTNo"
-              onKeyDown={handleKeys}
-              value={finalform.GSTNo}
-              onChange={handleFinal}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Vendor</label>
-            <input
-              type="text"
-              onKeyDown={handleKeys}
-              id="ShipTo"
-              value={finalform.ShipTo}
-              onChange={handleFinal}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Address</label>
-            <input
-              type="text"
-              id="address"
-              onKeyDown={handleKeys}
-              value={finalform.address}
-              onChange={handleFinal}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">State</label>
-            <input id="state"
-              value={finalform.state}
-             onChange={handleFinal} className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </input>
-          </div>
-        </div>
         </form>
 
-          <form onSubmit={handleSubmit}>
-      
+        <form onSubmit={handleSubmit}>
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
-    
+            <div className=" mb-4 text-center">
+              <label htmlFor="scanner" className="block text-sm font-medium">
+                Scanner
+              </label>
+              <input
+                type="checkbox"
+                id="scanner"
+                checked={isChecked}
+                onChange={handleCheckboxChange}
+                className="border border-gray-300 rounded mt-4 p-2"
+              />
+            </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="barcode"
@@ -442,7 +499,7 @@ const Purchase = () => {
             <div className="w-25 mb-4">
               <label
                 htmlFor="image"
-                className="block text-gray-700 text-sm font-medium"
+                className="block text-gray-700 text-sm w-max font-medium"
               >
                 Upload Image
               </label>
@@ -452,8 +509,7 @@ const Purchase = () => {
                 id="image"
                 onKeyDown={handleKeys}
                 onChange={handleChange}
-                className="w-full border border-white "
-            
+                className="border border-white w-28 bg-white rounded py-3 pl-2  "
               />
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
@@ -501,7 +557,7 @@ const Purchase = () => {
               <input
                 type="text"
                 id="category"
-              required
+                required
                 value={formData.category.toUpperCase()}
                 onChange={handleChange}
                 onKeyDown={handleKeys}
@@ -565,7 +621,7 @@ const Purchase = () => {
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="purchaseRate"
-                className="block text-gray-700 text-sm font-medium"
+                className="block text-gray-700 text-sm w-max font-medium"
               >
                 Purchase Rate
               </label>
@@ -652,8 +708,6 @@ const Purchase = () => {
                 type="submit"
                 className="w-full bg-green-700 text-white py-3 rounded font-medium hover:bg-green-800 transition-colors"
               >
-                    <BarcodeReader onError={handleError} onScan={handleScan} />
-
                 Enter
               </button>
             </div>
@@ -701,7 +755,7 @@ const Purchase = () => {
             <tbody>
               {/* Add rows dynamically here */}
 
-              {cart.length > 0 ?
+              {cart.length > 0 ? (
                 cart.map((item, i) => (
                   <tr key={item.barcode}>
                     <td className="p-3 border border-gray-600">{i + 1}</td>
@@ -709,7 +763,9 @@ const Purchase = () => {
                       {item.barcode}
                     </td>
                     <td className="p-3 border border-gray-600">{item.brand}</td>
-                    <td className="p-3 border border-gray-600">{item.description}</td>
+                    <td className="p-3 border border-gray-600">
+                      {item.description}
+                    </td>
                     <td className="p-3 border border-gray-600">
                       {item.category}
                     </td>
@@ -717,9 +773,7 @@ const Purchase = () => {
                       {item.stockType}
                     </td>
                     <td className="p-3 border border-gray-600">{item.unit}</td>
-                    <td className="p-3 border border-gray-600">
-                      {item.qty}
-                    </td>
+                    <td className="p-3 border border-gray-600">{item.qty}</td>
                     <td className="p-3 border border-gray-600">
                       {item.saleRate}
                     </td>
@@ -731,18 +785,27 @@ const Purchase = () => {
                     </td>
                     <td className="p-3 border border-gray-600">{item.hsn}</td>
                     <td className="p-3 border border-gray-600">{item.gst}</td>
-                 
+
                     <td className="p-3 border border-gray-600 text-center">
-                      <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 " onClick={() => handleDelete(item.barcode)}>
+                      <button
+                        className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 "
+                        onClick={() => handleDelete(item.barcode)}
+                      >
                         Delete
                       </button>
                     </td>
                   </tr>
-                )): <tr>
-                <td colSpan="15" className="p-3 border border-gray-600 text-center">
-                  No items in the cart
-                </td>
-              </tr>}
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="15"
+                    className="p-3 border border-gray-600 text-center"
+                  >
+                    No items in the cart
+                  </td>
+                </tr>
+              )}
 
               {/* Repeat rows as needed */}
             </tbody>
@@ -755,89 +818,104 @@ const Purchase = () => {
             <span class="text-primary px-3">{cart.length}</span>
           </div>
           <div class="flex space-x-2">
-            <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={bill}>
+            <button
+              class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md"
+              onClick={bill}
+            >
               Save
             </button>
 
             <ReactToPrint
               trigger={() => (
-                <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" >
-                   Save & Print
+                <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={bill}>
+                  Print
                 </button>
               )}
               content={() => componentRef.current}
             />
-          
           </div>
         </div>
 
         <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
-            <h2 className="text-lg font-semibold mb-4">Expense</h2>
-            <table className="w-full border-collapse">
-              <tbody>
-     
+        <div className="text-center"><h3 className=" text-red-500 text-lg font-semibold">{message}</h3></div>
+          <h2 className="text-lg font-semibold mb-4">Expense</h2>
+          <table className="w-full border-collapse">
+            <tbody>
               <tr>
-                  <td className="border p-3">SUBTOTAL:</td>
-                  <td className="border p-3"> {invoice}
-            </td>
-                </tr>
-             
-                <tr>
-                  <td className="border p-3">TAXES:</td>
-                  <td className="border p-3">{totalGst}</td>
-                </tr>
-        
-                <tr>
-                  <td className="border p-3">INVOICE TOTAL :</td>
-                  <td className="border p-3">{invoice&&totalGst&&invoice+totalGst}</td>
-                </tr>
-                <tr>
-                  <td className="border p-3">PAYMENT IN CASH:</td>
-                  <td className="border p-3">  
-                    <input
-                type="text"
-                id="cash"
-                required
-                value={finalform.paymentType.cash}
-                onChange={handlePaymentTypeChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter payed cash"
-              /></td>
-                </tr>
-                <tr>
-                  <td className="border p-3">PAYMENT IN CARD:</td>
-                  <td className="border p-3"><input
-                type="text"
-                id="card"
-                value={finalform.paymentType.card}
-                onChange={handlePaymentTypeChange}
-                required
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter payed cash or enter 0"
-              /></td>
-                </tr>
-                <tr>
-                  <td className="border p-3">PAYMENT IN UPI:</td>
-                  <td className="border p-3"><input
-                type="text"
-                id="upi"
-                value={finalform.paymentType.upi}
-                required
-                onChange={handlePaymentTypeChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter payed cash or enter 0"
-              /></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                <td className="border p-3">SUBTOTAL:</td>
+                <td className="border p-3"> {invoice}</td>
+              </tr>
+
+              <tr>
+                <td className="border p-3">TAXES:</td>
+                <td className="border p-3">{totalGst}</td>
+              </tr>
+
+              <tr>
+                <td className="border p-3">INVOICE TOTAL :</td>
+                <td className="border p-3">{(invoice?parseInt(invoice):0)+(totalGst?parseInt(totalGst):0)}</td>
+              </tr>
+              <tr>
+                <td className="border p-3">PAYMENT IN CASH:</td>
+                <td className="border p-3">
+                  <input
+                    type="text"
+                    id="cash"
+                    required
+                    value={finalform.paymentType.cash}
+                    onChange={handlePaymentTypeChange}
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter payed cash"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className="border p-3">PAYMENT IN CARD:</td>
+                <td className="border p-3">
+                  <input
+                    type="text"
+                    id="card"
+                    value={finalform.paymentType.card}
+                    onChange={handlePaymentTypeChange}
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter payed cash"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className="border p-3">PAYMENT IN UPI:</td>
+                <td className="border p-3">
+                  <input
+                    type="text"
+                    id="upi"
+                    value={finalform.paymentType.upi}
+                    onChange={handlePaymentTypeChange}
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter payed cash "
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className="border p-3">BORROW:</td>
+                <td className="border p-3">
+                  <input
+                    type="text"
+                    id="borrow"
+                    value={finalform.paymentType.borrow}
+                    onChange={handlePaymentTypeChange}
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter Borrow amount"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* ---------------------invoice ganrator------------------------- */}
-      <Invoice 
-        componentRef={componentRef} 
-        details={purchaseOrders} 
-      />
+      
+      <Invoice componentRef={componentRef} details={purchaseOrders} />
     </div>
   );
 };

@@ -17,36 +17,47 @@ const Sale = () => {
   const [details, setDetails] = useState([]);
   const [productDetails,setProductDetails] = useState()
   const dispatch = useDispatch();
-  // let productDetails = useSelector((state) => state.products.productDetails);
+  //   let productDetails = useSelector((state) => state.products.productDetails);
 const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
-  const { items, status, fetchCartError } = useSelector((state) => state.cart);
+  const { orderId } = useParams();
+  let { items, status, fetchCartError } = useSelector((state) => state.cart);
   const [currentDate, setCurrentDate] = useState('');
-  const [cardPay,setCardPay]=useState('');
-  const [cashPay,setCashPay]=useState('');
-  const [upiPay,setUPIPay]=useState('');
+  const [cardPay,setCardPay]=useState("");
+  const [borrow,setBorrow]=useState("");
+  const [cashPay,setCashPay]=useState("");
+  const [upiPay,setUPIPay]=useState("");
   const [totalPrice,setTotalPrice]=useState('');
   const [discount,setDiscount]= useState('');
   const [gst,setGst]= useState('');
   const [total,setFinalTotal]= useState('');
+  const [isChecked, setIsChecked] = useState(false);
+  const [message, setMessage] = useState(false);
+
+
 
   useEffect(() => {
+    // clearCart()
     dispatch(fetchCart());
   }, [dispatch]);
 
   useEffect(() => {
+    console.log(items);
     setDetails(items[0]);
-setDiscount(items[1]&&items[1].discount)
-setTotalPrice(items[1]&&items[1].totalPrice)
-setGst(items[1]&&items[1].GST)
-setFinalTotal(items[1]&&items[1].final_price_With_GST)
+    if(items[0]?.length>0){
+      setDiscount(items[1]&&items[1].discount)
+      setTotalPrice(items[1]&&items[1].totalPrice)
+      setGst(items[1]&&items[1].GST)
+      setFinalTotal(items[1]&&items[1].final_price_With_GST)
+    }
 
-    //console.log(details);
-    console.log(items[1]);
+
+ 
   }, [items]);
 
 
+    console.log(details);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -81,7 +92,9 @@ setFinalTotal(items[1]&&items[1].final_price_With_GST)
       const response = await axiosInstance.get(`/product/view/${id}`); // Adjust the URL to your API endpoint
       // setProducts(response.data);
       console.log(response)
-      setProductDetails(response.data.data)
+      dispatch(addToCart(id)).then(() => {
+        dispatch(fetchCart());})
+      setProductDetails({})
     } catch (err) {
       // setError();
 console.log(err.message)
@@ -102,13 +115,27 @@ console.log(err.message)
   //  console.log(details);
   
   const handleScan = (data) => {
-    if (data) {
+    // console.log(isChecked)
+    if (isChecked&&data) {
       dispatch(fetchProduct(data));
     }
   };
 
   const handleError = (err) => {
-    dispatch(fetchProduct("123456"));
+
+    // console.log(isChecked)
+    // if (isChecked) {
+
+    //   fetchProducts('766576577878')
+    // }
+    alert("Connnect the Barcode Scanner")
+    // dispatch(fetchProduct("5345435334"));
+  };
+
+
+  const handleCheckboxChange = (event) => {
+    const checked = event.target.checked;
+    setIsChecked(checked);
   };
 
   // State variables for form fields
@@ -133,49 +160,72 @@ console.log(err.message)
     Date:currentDate,
     mobileNumber:"",
     ShipTo:"",
-    address:"",
+    address:"Shrigonda",
     state:"Maharastra",
     GSTNo:"",
   });
 
 
-  const bill =async ()=>{
-//  console.log(Type);
-try {
-  const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay}, BillUser:finalform })).unwrap()
-  console.log(createdOrder);
+  const bill = async()=>{    
+    const amount =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
+    console.log(amount == total)        
+  if(amount == total){
+    if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
+      try {
+        const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
+        console.log(createdOrder);
+      
+        setInvoice(createdOrder.data)
+        items=[]
+        setFinal({
+          type:"Sale",
+          name:"",
+          Date:currentDate,
+          mobileNumber:"",
+          ShipTo:"",
+          address:"Shrigonda",
+          state:"Maharastra",
+          GSTNo:"",
+        })
+        setFormData({
+          barcode: "",
+          brand: "",
+          description: "",
+          category: "",
+          stockType: "",
+          unit: "",
+          qty: "",
+          saleRate: "",
+          profit: "",
+          hsn: "",
+          gst: "",
+          total: "",
+        })
+      dispatch(fetchCart())
+      setMessage("")
+      setCardPay("");
+      setCashPay("");
+      setUPIPay("");
+      setBorrow("");
+      setDiscount("")
+      setTotalPrice("")
+      setGst("")
+      setFinalTotal("")
 
-  setInvoice(createdOrder.data)
+        alert('Order created successfully!');
+      } catch (err) {
+        alert(`Failed to create order: ${err.message}`);
+      }
+    }else{
+      alert(`fill the client details`);
+    }
+ 
+  }else if(amount>total){
+    setMessage(`Return ${amount-total} rs `)
+  }else{
+    setMessage(`Need ${total-amount} rs to place order or add amount in borrow field `)
+  }
 
-  setFinal({
-    type:"Sale",
-    name:"",
-    Date:currentDate,
-    mobileNumber:"",
-    ShipTo:"",
-    address:"",
-    state:"Maharastra",
-    GSTNo:"",
-  })
-  setFormData({
-    barcode: "",
-    brand: "",
-    description: "",
-    category: "",
-    stockType: "",
-    unit: "",
-    qty: "",
-    saleRate: "",
-    profit: "",
-    hsn: "",
-    gst: "",
-    total: "",
-  })
-dispatch(fetchCart())
-  alert('Order created successfully!');
-} catch (err) {
-  alert(`Failed to create order: ${err.message}`);
-}
   }
 
   const handleChange = (e) => {
@@ -221,10 +271,10 @@ dispatch(fetchCart())
         category: productDetails.category?.name|| "",
         stockType: productDetails.stockType || "",
         unit: productDetails.unit || "",
-        qty: 1,
+        qty: "",
         saleRate: productDetails.discountedPrice || "",
         profit: productDetails.profit || "",
-        hsn: productDetails.HSN || "0",
+        hsn: productDetails.HSN,
         gst: productDetails.GST || "",
       });
     }
@@ -239,8 +289,8 @@ dispatch(fetchCart())
         dispatch(fetchCart());
       });
     }
-    setProductDetails({});
- 
+    setProductDetails({...productDetails,['qty']:" "});
+
   };
 
   const handleKeyPress = (e) => {
@@ -321,7 +371,17 @@ dispatch(fetchCart())
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
+          <div>
+            <label className="block text-gray-700 font-medium">Ship To</label>
+            <input
+              type="text"
+              id="ShipTo"
+              value={finalform.ShipTo}
+              onChange={handleFinal}
+              onKeyDown={handleKeys}
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
           <div>
             <label className="block text-gray-700 font-medium">Address</label>
             <input
@@ -347,7 +407,21 @@ dispatch(fetchCart())
         {/* New Input Fields */}
         <form onSubmit={handleSubmit}>
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
-         
+          <div className=" mb-4 text-center"> 
+              <label
+                htmlFor="scanner"
+                className="block text-sm font-medium"
+              >
+                Scanner
+              </label>
+              <input
+                type="checkbox"
+                id="scanner"
+                checked={isChecked}
+                onChange={handleCheckboxChange} 
+                className="border border-gray-300 rounded mt-4 p-2"
+              />
+            </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="barcode"
@@ -358,7 +432,6 @@ dispatch(fetchCart())
               <input
                 type="text"
                 id="barcode"
-                required
                 value={formData.barcode}
                 onKeyDown={handleKeyPress}
                 onChange={handleChange}
@@ -525,7 +598,7 @@ dispatch(fetchCart())
                 type="submit"
                 className="w-full bg-green-700 text-white py-3 rounded font-medium hover:bg-green-800 transition-colors"
               >
-                    <BarcodeReader onError={handleError} onScan={handleScan} />
+          
 
                 Enter
               </button>
@@ -564,14 +637,14 @@ dispatch(fetchCart())
               {/* Add rows dynamically here */}
             { 
              details&&details.map((item,i)=>(
-         <tr key={item._id}>
+         <tr key={item?._id}>
          <td className="py-3 px-6 border border-gray-600 text-left whitespace-nowrap">
            {i+1}
          </td>
          <td className="py-3 px-6 border border-gray-600 text-left">
-         {item.product.title}
+         {item?.product?.title}
          </td>
-         <td className="p-3 border border-gray-600"> {item.product.price}</td>
+         <td className="p-3 border border-gray-600"> {item?.product?.price}</td>
          <td className="p-3 border border-gray-600">
          <div className="flex flex-row items-center">
                  <input type="number" value={item.quantity} readOnly min="1" className="w-12 sm:w-12 text-center border m-1 sm:mb-0" />
@@ -579,12 +652,12 @@ dispatch(fetchCart())
        
             </div>
          </td>
-         <td className="p-3 border border-gray-600"> {item.discountedPrice}</td>
-         <td className="p-3 border border-gray-600"> {item.price-item.discountedPrice}</td>
-         <td className="p-3 border border-gray-600"> {item.GST}</td>
-         <td className="p-3 border border-gray-600"> {item.finalPrice_with_GST}</td>
+         <td className="p-3 border border-gray-600"> {item?.discountedPrice}</td>
+         <td className="p-3 border border-gray-600"> {item?.price-item?.discountedPrice}</td>
+         <td className="p-3 border border-gray-600"> {item?.GST}</td>
+         <td className="p-3 border border-gray-600"> {item?.finalPrice_with_GST}</td>
          <td className="p-3 border border-gray-600 text-center">
-           <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 " onClick={() => removeItem(item._id)}>
+           <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 " onClick={() => removeItem(item?._id)}>
              Delete
            </button>
          </td>
@@ -625,6 +698,7 @@ dispatch(fetchCart())
 
       
           <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
+          <div className="text-center"><h3 className=" text-red-500 text-lg font-semibold">{message}</h3></div>
             <h2 className="text-lg font-semibold mb-4">Expense</h2>
             <table className="w-full border-collapse">
               <tbody>
@@ -653,7 +727,6 @@ dispatch(fetchCart())
                     <input
                 type="text"
                 id="cash"
-                required
                 value={cashPay}
                 onChange={(e)=>setCashPay(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -665,7 +738,6 @@ dispatch(fetchCart())
                   <td className="border p-3"><input
                 type="text"
                 id="card"
-                required
                 value={cardPay}
                 onChange={(e)=>setCardPay(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -678,12 +750,23 @@ dispatch(fetchCart())
                 type="text"
                 id="upi"
                 value={upiPay}
-                required
                 onChange={(e)=>setUPIPay(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter payed cash or enter 0"
               /></td>
                 </tr>
+                <tr>
+                  <td className="border p-3">BORROW:</td>
+                  <td className="border p-3"><input
+                type="text"
+                id="borrow"
+                value={borrow}
+                onChange={(e)=>setBorrow(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter payed cash or enter 0"
+              /></td>
+                </tr>
+               
               </tbody>
             </table>
           </div>

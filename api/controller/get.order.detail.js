@@ -106,6 +106,13 @@ const sortOrder = asyncHandler(async (req, res) => {
         .populate({
           path: 'user',
           model: 'CounterUser',
+        },
+         {
+            path:'orderItems',
+            populate: {
+                path: 'product',
+                model: 'products'
+            }
         })
         .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
   

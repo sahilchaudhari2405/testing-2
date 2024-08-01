@@ -1,3 +1,4 @@
+import Category from "../model/category.model.js";
 import Product from "../model/product.model.js";
 import OfflinePurchaseOrder from "../model/purchaseOrder.js";
 
@@ -18,21 +19,26 @@ export const generateOrderWithProductCheck = async (req, res) => {
         }
 
         const orderItems = [];
-
+       
         for (const productData of products) {
+            let imageUrl = '';
+
             if (!productData.barcode) {
                 return res.status(400).json({ message: "Product barcode is missing" });
             }
-
+            const category = await Category.findOne({name: productData.category});
+            if(!category)
+            {
+                return res.status(400).json({ message: "category missing" });
+            }
             let existingProduct = await Product.findOne({ BarCode: productData.barcode });
-
+             
             if (existingProduct) {
                 // Update the existing product
                 existingProduct.quantity = (existingProduct.quantity || 0) + (parseInt(productData.qty, 10) || 0);
                 existingProduct.purchaseRate = parseFloat(productData.purchaseRate) || 0;
                 existingProduct.retailPrice = parseFloat(productData.saleRate) || 0;
                 existingProduct.GST = parseFloat(productData.gst) || 0;
-
                 await existingProduct.save();
                 orderItems.push({
                     productId: existingProduct._id,
@@ -52,12 +58,12 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     weight: parseFloat(productData.weight) || 0,
                     quantity: parseInt(productData.qty, 10) || 0,
                     brand: productData.brand || null,
-                    imageUrl: productData.imageUrl || null,
+                    imageUrl: productData.imageUrl || 'https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png',
                     slug: productData.slug || 'default-slug',
                     ratings: productData.ratings || [],
                     reviews: productData.reviews || [],
                     numRatings: parseInt(productData.numRatings, 10) || 0,
-                    category: productData.category,
+                    category:category._id,
                     createdAt: productData.createdAt || null,
                     updatedAt: productData.updatedAt || null,
                     BarCode: productData.barcode || null,
@@ -93,7 +99,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalPrice += item.retailPrice * item.quantity;
             totalPurchaseRate += item.purchaseRate * item.quantity;
             totalGST += item.GST * item.quantity;
-            totalItem += 1;
+            totalItem += 1; 
         }
 
         const newOrder = new OfflinePurchaseOrder({
@@ -103,11 +109,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             mobileNumber: orderDetails.mobileNumber || 'Not Provided',
             email: orderDetails.email || 'No',
             Address: `${orderDetails.address || 'No Address'} ${orderDetails.state || ''}`,
-            paymentType: {
-                Card:orderDetails.paymentType.card,
-                UPI:orderDetails.paymentType.upi,
-                cash:orderDetails.paymentType.cash,
-            },
+            paymentType: orderDetails.paymentType || { cash: 0, Card: 0, UPI: 0,borrow:0 },
             billImageURL: orderDetails.billImageURL || null,
             discount: orderDetails.discount || 0,
             orderStatus: orderDetails.orderStatus || 'first time',
@@ -143,7 +145,7 @@ export const GetPurchaseOrder = async (req, res) => {
         res.status(201).json({ message: "Order created successfully", order: results });
     }
     else{
-        const results = await OfflinePurchaseOrder.findOne({user:id}).populate('user').populate({
+        const results = await OfflinePurchaseOrder.find({user:id}).populate('user').populate({
             path: 'orderItems.productId',
             model: 'products'
         });
