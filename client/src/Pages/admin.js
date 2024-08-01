@@ -230,6 +230,7 @@ const Admin = () => {
       const resData = response.data;
       console.log("CounterUsers: ", resData);
       setOurUsers(resData);
+      setSelectedUserID(resData[0]);
     } catch (error) {
       console.error('Error fetching users:', error); 
     }
@@ -246,6 +247,8 @@ const Admin = () => {
       const resData = response.data.data;
       console.log("getAllOrderByCounter : ", resData);
       setOrders(resData);
+      setFilteredOrders(resData[0])
+
     } catch (error) {
       console.error('Error fetching orders:', error); 
     }
