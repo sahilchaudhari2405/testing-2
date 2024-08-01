@@ -1,11 +1,10 @@
 import express from 'express'
-import generateQR_Code from '../controller/QR-Create.controller';
-import { authenticateToken } from '../middleware/verify';
-import test from '../controller/test';
+import { authenticateToken } from '../middleware/verify.js';
+import test from '../controller/test.js';
 // Ensure correct path and file name
 
 const QR_Routes = express.Router();
 
-QR_Routes.get('/check',authenticateToken, );
+QR_Routes.delete('/check',authenticateToken,test );
 
-export default test;
+export default QR_Routes;

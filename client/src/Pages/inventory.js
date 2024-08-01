@@ -199,7 +199,7 @@ const Inventory = () => {
         <div className="flex space-x-2 mb-4">
           <input
             type="file"
-            accept=".xlsx, .xls"
+            accept=".xlsx, .xls, .csv"
             onChange={handleImport}
             className="hidden"
             id="import-file"
