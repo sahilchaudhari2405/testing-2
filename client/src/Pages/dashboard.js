@@ -78,22 +78,22 @@ const Dashboard = () => {
     console.log("This is the order inside transform: ",data);
     const daywise = (data.dailySales || []).map((sale, index) => ({
       name: `Day ${index + 1}`,
-      sales: sale.totalPrice,
-      revenue: sale.finalPriceWithGST,
+      sales: sale.finalPriceWithGST,
+      revenue: sale.totalProfit,
       date: sale.date
     }));
 
     const weekwise = ( data.weekSales || [] ).map((sale, index) => ({
       name: `Week ${index + 1}`,
-      sales: sale.totalPrice,
-      revenue: sale.finalPriceWithGST
+      sales: sale.finalPriceWithGST,
+      revenue: sale.totalProfit
     }));
 
     const monthwise = [
       {
         name: new Date(data.month + '-01').toLocaleString('default', { month: 'short' }),
-        sales: data.monthTotalPrice,
-        revenue: data.monthFinalPriceWithGST
+        sales: data.monthFinalPriceWithGST,
+        revenue: data.monthTotalProfit
       }
     ];
 
@@ -135,8 +135,8 @@ const Dashboard = () => {
       (order.dailySales || []).forEach(sale => {
         const dayKey = `Day ${sale.date}`;
         addToAggregation(daywise, dayKey, {
-          sales: sale.totalPrice,
-          revenue: sale.finalPriceWithGST
+          sales: sale.finalPriceWithGST,
+          revenue: sale.totalProfit
         });
       });
   
@@ -144,8 +144,8 @@ const Dashboard = () => {
       (order.weekSales || []).forEach(sale => {
         const weekKey = `Week ${sale.week}`;
         addToAggregation(weekwise, weekKey, {
-          sales: sale.totalPrice,
-          revenue: sale.finalPriceWithGST
+          sales: sale.finalPriceWithGST,
+          revenue: sale.totalProfit
         });
       });
   
@@ -153,8 +153,8 @@ const Dashboard = () => {
       const monthKey = new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' });
       monthwise.push({
         name: monthKey,
-        sales: order.monthTotalPrice,
-        revenue: order.monthFinalPriceWithGST
+        sales: order.monthFinalPriceWithGST,
+        revenue: order.monthTotalProfit
       });
     });
   

@@ -43,8 +43,10 @@ const addToCart = asyncHandler(async (req, res) => {
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
+            
         }
-
+       product.quantity-=1;
+       await product.save();
         let cart = await Offline_Cart.findOne({ userId: id });
         if (!cart) {
             const discount =await Math.max(cartItem.price - cartItem.discountedPrice, 0);
@@ -152,6 +154,8 @@ const removeOneCart = asyncHandler(async (req, res) => {
     }
 
     try {
+  
+
         const cartItem = await Offline_CartItem.findById({ _id: itemId });
 
         if (!cartItem) {        
@@ -161,7 +165,10 @@ const removeOneCart = asyncHandler(async (req, res) => {
                 return res.status(403).json(new ApiResponse(403, 'Unauthorized to delete this cart item', null));
             }
         }
-
+        const product = await Product.findById(cartItem.product);
+        if (!product) {
+            return res.status(404).json(new ApiResponse(404, 'Product not found', null)); 
+        }
         let cart = await Offline_Cart.findOne({ userId: id });
         const cartItemExists = cart.cartItems.some(item => item.toString() === cartItem._id.toString());
         if (cartItem.quantity > 0 && cartItemExists) { 
@@ -174,6 +181,8 @@ const removeOneCart = asyncHandler(async (req, res) => {
             cart.final_price_With_GST -= cartItem.finalPrice_with_GST;
             cart.discount -= discount;
             await cart.save();
+            product.quantity+=cartItem.quantity,
+            await product.save();
             await Offline_CartItem.findOneAndDelete({ _id: itemId });
         }
 
@@ -247,7 +256,8 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
             cartItem.discountedPrice -= product.discountedPrice;
             cartItem.updatedAt = new Date();
             await cartItem.save();
-
+            product.quantity+=1;
+            await product.save();
             let cart = await Offline_Cart.findOne({ userId: id });
             const cartItemExists = cart.cartItems.some(item => item.toString() === cartItem._id.toString());
             if (cart && cartItemExists) {

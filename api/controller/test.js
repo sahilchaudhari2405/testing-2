@@ -36,4 +36,3 @@ const PurchaseOrder = async (req,res) => {
 };
 
 export {product,categories,counterSale,order,orderItem,PurchaseOrder};
- 
