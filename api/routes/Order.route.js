@@ -11,14 +11,13 @@ OrderRouter.put('/RemoveOneItem', authenticateToken, RemoveOneItemOnOrder);
 OrderRouter.put('/RemoveOneQuantity', authenticateToken, removeItemQuantityOrder);
 OrderRouter.get('/getAllOrderByCounter',getAllCounterSale );
 OrderRouter.get('/getCounterSales', authenticateToken,getCounterSale);
-OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
+OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill); 
 OrderRouter.get('/getEditOrder', authenticateToken,getOneBill);
 OrderRouter.post('/sortOrder', authenticateToken,sortOrder);
 // OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
-
-OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
+ 
 OrderRouter.get('/getCounterOrderbyID/:id',getOrderById);
-OrderRouter.put('/updateOrderbyID/:id',updateOrder);
+OrderRouter.put('/updateOrderbyID/:id',updateOrder); 
 OrderRouter.put('/cancelOrder',authenticateToken,cancelledOrder);
 OrderRouter.put('/decreaseQuantity',authenticateToken,removeItemQuantityOrder);
 

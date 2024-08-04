@@ -27,23 +27,47 @@ const placeOrder = asyncHandler(async (req, res) => {
         const orderItems = [];
         for (const cartItem of cart.cartItems) {
             const product = await Product.findById(cartItem.product);
-            const orderItem = new OfflineOrderItem({
-                product: cartItem.product,
-                quantity: cartItem.quantity,
-                price: cartItem.price,
-                purchaseRate: product.purchaseRate * cartItem.quantity,
-                GST: cartItem.GST,
-                totalProfit: (product.discountedPrice-product.purchaseRate)*cartItem.quantity,
-                finalPriceWithGST: cartItem.finalPrice_with_GST,
-                discountedPrice: cartItem.discountedPrice,
-                userId: id,
-            });
-            await orderItem.save();
-            orderItems.push(orderItem._id);
-            purchaseRate += orderItem.purchaseRate;
-            totalProfit += orderItem.totalProfit;
-        }
+            if(cartItem.type=='custom'){
+                const orderItem = new OfflineOrderItem({
+                    product: cartItem.product,
+                    quantity: cartItem.quantity,
+                    price: cartItem.price,
+                    purchaseRate: product.purchaseRate * cartItem.quantity,
+                    GST: cartItem.GST,
+                    type:cartItem.type,
+                    totalProfit:(cartItem.discountedPrice)-(product.purchaseRate*cartItem.quantity),
+                    finalPriceWithGST: cartItem.finalPrice_with_GST,
+                    discountedPrice: cartItem.discountedPrice,
+                    userId: id,
+                });
+                await orderItem.save();
+                orderItems.push(orderItem._id);
+                purchaseRate += orderItem.purchaseRate;
+                totalProfit += orderItem.totalProfit;
+            }
+            else{
+                const orderItem = new OfflineOrderItem({
+                    product: cartItem.product,
+                    quantity: cartItem.quantity,
+                    price: cartItem.price,
+                    purchaseRate: product.purchaseRate * cartItem.quantity,
+                    GST: cartItem.GST,
+                    totalProfit:(product.discountedPrice-product.purchaseRate)*cartItem.quantity ,
+                    finalPriceWithGST: cartItem.finalPrice_with_GST,
+                    discountedPrice: cartItem.discountedPrice,
+                    userId: id,
+                });
+                await orderItem.save();
+                orderItems.push(orderItem._id);
+                purchaseRate += orderItem.purchaseRate;
+                totalProfit += orderItem.totalProfit;
+            }
 
+        }
+           if(cart.discount<0)
+           {
+            cart.discount=0;
+           }
         const order = new OfflineOrder({
             user: id,
             orderItems: orderItems,
@@ -94,9 +118,12 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
         if (!cartItem) {
             return res.status(404).json(new ApiResponse(404, 'Cart item not found', null));
         }
+        if (cartItem.type=='custom') {
+            return res.status(404).json(new ApiResponse(404, 'Cart item is custom', null));
+        }
 
         const product = await Product.findById(cartItem.product);
-
+            
         if (cartItem.quantity > 1) {
             cartItem.quantity -= 1;
             cartItem.price -= product.price;
@@ -115,6 +142,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
             if (cart) {
                 const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
                 if (cartItemExists) {
+                    const discount =await Math.max(product.price - product.discountedPrice, 0);
                     cart.user=id,
                     cart.paymentType=paymentType,
                     cart.orderStatus='Update',
@@ -122,7 +150,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
                     cart.totalDiscountedPrice -= product.discountedPrice;
                     cart.totalPurchaseRate -= product.purchaseRate;
                     cart.GST -= product.GST;
-                    cart.discount -= (product.price - product.discountedPrice);
+                    cart.discount -= discount;
                     cart.totalProfit -= (product.discountedPrice - product.purchaseRate);
                     cart.finalPriceWithGST -= (product.discountedPrice + product.GST);
                     await cart.save();
@@ -162,6 +190,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
         const oldOrder = JSON.parse(JSON.stringify(cart));  
         const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
         if (cartItem.quantity > 0 && cartItemExists) {
+            const discount =await Math.max(cartItem.price - cartItem.discountedPrice, 0);
             cart.user = id,
             cart.orderItems.pull(cartItem._id);
             cart.paymentType=paymentType,
@@ -171,7 +200,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
             cart.totalPurchaseRate -= cartItem.purchaseRate;
             cart.GST -= cartItem.GST;
             cart.totalItem-=1,
-            cart.discount -= (cartItem.price-cartItem.discountedPrice);
+            cart.discount -= discount;
             cart.totalProfit -= cartItem.totalProfit;
             cart.finalPriceWithGST -= cartItem.finalPriceWithGST;
             await cart.save();

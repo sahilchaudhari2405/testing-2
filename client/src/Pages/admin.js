@@ -271,22 +271,22 @@ const Admin = () => {
     console.log("This is the order inside transform: ",data);
     const daywise = (data?.dailySales || []).map((sale, index) => ({
       name: `Day ${index + 1}`,
-      sales: sale.totalPrice,
-      revenue: sale.finalPriceWithGST,
+      sales: sale.finalPriceWithGST,
+      revenue: sale.totalProfit,
       date: sale.date
     }));
 
     const weekwise = ( data?.weekSales || [] ).map((sale, index) => ({
       name: `Week ${index + 1}`,
-      sales: sale.totalPrice,
-      revenue: sale.finalPriceWithGST
+      sales: sale.finalPriceWithGST,
+      revenue: sale.totalProfit
     }));
 
     const monthwise = [
       {
         name: new Date(data?.month + '-01').toLocaleString('default', { month: 'short' }),
-        sales: data?.monthTotalPrice,
-        revenue: data?.monthFinalPriceWithGST
+        sales: data?.monthFinalPriceWithGST,
+        revenue: data?.monthTotalProfit
       }
     ];
 
@@ -395,9 +395,9 @@ const Admin = () => {
           <div>
             <ChartofCustomers dateWiseCustomers={dateWiseCustomers} weekWiseCustomers = {weekWiseCustomers}  />
           </div>
-          {/* <div>
+          {<div>
             <Chartofdonut dateWiseCustomers={dateWiseCustomers} weekWiseCustomers = {weekWiseCustomers} monthWiseCustomers ={monthWiseCustomers} />
-          </div> */}
+          </div>}
         </div>
 
       

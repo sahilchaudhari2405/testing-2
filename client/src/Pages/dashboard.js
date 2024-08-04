@@ -75,22 +75,22 @@ const Dashboard = () => {
     console.log("This is the order inside transform: ",data);
     const daywise = (data.dailySales || []).map((sale, index) => ({
       name: `Day ${index + 1}`,
-      sales: sale.totalPrice,
-      revenue: sale.finalPriceWithGST,
+      sales: sale.finalPriceWithGST,
+      revenue: sale.totalProfit,
       date: sale.date
     }));
 
     const weekwise = ( data.weekSales || [] ).map((sale, index) => ({
       name: `Week ${index + 1}`,
-      sales: sale.totalPrice,
-      revenue: sale.finalPriceWithGST
+      sales: sale.finalPriceWithGST,
+      revenue: sale.totalProfit
     }));
 
     const monthwise = [
       {
         name: new Date(data.month + '-01').toLocaleString('default', { month: 'short' }),
-        sales: data.monthTotalPrice,
-        revenue: data.monthFinalPriceWithGST
+        sales: data.monthFinalPriceWithGST,
+        revenue: data.monthTotalProfit
       }
     ];
 
@@ -109,8 +109,11 @@ const Dashboard = () => {
 
     return { daywise, weekwise, monthwise };
   };
-
   const transformDataforAdmin = (data) => {
+    if (!data || data.length === 0) {
+      return { daywise: [], weekwise: [], monthwise: [] };
+    }
+  
     if (!data || data.length === 0) {
       return { daywise: [], weekwise: [], monthwise: [] };
     }
@@ -119,6 +122,7 @@ const Dashboard = () => {
     const weekwise = [];
     const monthwise = [];
   
+  
     // Helper function to add data to the right container
     const addToAggregation = (aggregation, key, value) => {
       if (!aggregation[key]) {
@@ -126,15 +130,21 @@ const Dashboard = () => {
       }
       aggregation[key].totalSales += value.sales;
       aggregation[key].totalRevenue += value.revenue;
+      if (!aggregation[key]) {
+        aggregation[key] = { totalSales: 0, totalRevenue: 0 };
+      }
+      aggregation[key].totalSales += value.sales;
+      aggregation[key].totalRevenue += value.revenue;
     };
+  
   
     // Aggregate daily sales
     data.forEach(order => {
       (order.dailySales || []).forEach(sale => {
         const dayKey = `Day ${sale.date}`;
         addToAggregation(daywise, dayKey, {
-          sales: sale.totalPrice,
-          revenue: sale.finalPriceWithGST
+          sales: sale.finalPriceWithGST,
+          revenue: sale.totalProfit
         });
       });
   
@@ -142,8 +152,8 @@ const Dashboard = () => {
       (order.weekSales || []).forEach(sale => {
         const weekKey = `Week ${sale.week}`;
         addToAggregation(weekwise, weekKey, {
-          sales: sale.totalPrice,
-          revenue: sale.finalPriceWithGST
+          sales: sale.finalPriceWithGST,
+          revenue: sale.totalProfit
         });
       });
   
@@ -151,18 +161,26 @@ const Dashboard = () => {
       const monthKey = new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' });
       monthwise.push({
         name: monthKey,
-        sales: order.monthTotalPrice,
-        revenue: order.monthFinalPriceWithGST
+        sales: order.monthFinalPriceWithGST,
+        revenue: order.monthTotalProfit
       });
     });
+  
   
     const daywiseArray = Object.entries(daywise).map(([name, { totalSales, totalRevenue }]) => ({
       name,
       sales: totalSales,
       revenue: totalRevenue
+      name,
+      sales: totalSales,
+      revenue: totalRevenue
     }));
   
+  
     const weekwiseArray = Object.entries(weekwise).map(([name, { totalSales, totalRevenue }]) => ({
+      name,
+      sales: totalSales,
+      revenue: totalRevenue
       name,
       sales: totalSales,
       revenue: totalRevenue
@@ -177,43 +195,45 @@ const Dashboard = () => {
         acc.push(cur);
       }
       return acc;
+      const existing = acc.find(item => item.name === cur.name);
+      if (existing) {
+        existing.sales += cur.sales;
+        existing.revenue += cur.revenue;
+      } else {
+        acc.push(cur);
+      }
+      return acc;
     }, []);
-
-
-
     if (daywiseArray.length > 0) {
-             console.log("transformdataforadmin daywisearrauyeln > 0");
-      
-              const latestSale = daywiseArray[daywiseArray.length - 1].sales;
-              setlastestSale(latestSale);
-              const latestRevenue = daywiseArray[daywiseArray.length - 1].revenue;
-              setlastestRevenue(latestRevenue);
-              const latestSaleDate = new Date(daywiseArray[daywiseArray.length - 1].date);
-            
-             console.log("transformdataforadmin daywisearrauyeln > 0 latestSale: ",latestSale);
-             console.log("transformdataforadmin daywisearrauyeln > 0 latestRevenue: ",latestRevenue);
-             console.log("transformdataforadmin daywisearrauyeln > 0 latestSaleDate: ",latestSaleDate);
-      
-              const today = new Date();
-              // const latestSaleDate = new Date(daywise[daywise.length - 1].date);
-              
-              if (latestSaleDate.toDateString() === today.toDateString()) {
-                  setlatestDay('Today');
-              } else {
-                setlatestDay('Last Day');
-      
-          }
-        }
+      console.log("transformdataforadmin daywisearrauyeln > 0");
 
+       const latestSale = daywiseArray[daywiseArray.length - 1].sales;
+       setlastestSale(latestSale);
+       const latestRevenue = daywiseArray[daywiseArray.length - 1].revenue;
+       setlastestRevenue(latestRevenue);
+       const latestSaleDate = new Date(daywiseArray[daywiseArray.length - 1].date);
+     
+      console.log("transformdataforadmin daywisearrauyeln > 0 latestSale: ",latestSale);
+      console.log("transformdataforadmin daywisearrauyeln > 0 latestRevenue: ",latestRevenue);
+      console.log("transformdataforadmin daywisearrauyeln > 0 latestSaleDate: ",latestSaleDate);
 
-   
+       const today = new Date();
+       // const latestSaleDate = new Date(daywise[daywise.length - 1].date);
+       
+       if (latestSaleDate.toDateString() === today.toDateString()) {
+           setlatestDay('Today');
+       } else {
+         setlatestDay('Last Day');
+
+   }
+ }
     return {
       daywise: daywiseArray,
       weekwise: weekwiseArray,
       monthwise: uniqueMonthwise,
     };
   };
-
+  
 //   const transformDataforAdmin = (data) => {
 //     // Initialize containers for aggregation
 //     const daywise = [];
@@ -532,9 +552,9 @@ const calculateCustomers = (orders_data) => {
           <div>
             <ChartofCustomers dateWiseCustomers={dateWiseCustomers} weekWiseCustomers = {weekWiseCustomers}  />
           </div>
-          {/* <div>
+          { <div>
             <Chartofdonut dateWiseCustomers={dateWiseCustomers} weekWiseCustomers = {weekWiseCustomers} monthWiseCustomers ={monthWiseCustomers} />
-          </div> */}
+           </div>}
         </div>
       </div>
     </div>

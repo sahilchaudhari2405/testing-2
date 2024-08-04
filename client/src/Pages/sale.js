@@ -653,7 +653,7 @@ console.log(err.message)
             </div>
          </td>
          <td className="p-3 border border-gray-600"> {item?.discountedPrice}</td>
-         <td className="p-3 border border-gray-600"> {item?.price-item?.discountedPrice}</td>
+         <td className="p-3 border border-gray-600"> {(item?.price-item?.discountedPrice)<0?0:item?.price-item?.discountedPrice}</td>
          <td className="p-3 border border-gray-600"> {item?.GST}</td>
          <td className="p-3 border border-gray-600"> {item?.finalPrice_with_GST}</td>
          <td className="p-3 border border-gray-600 text-center">

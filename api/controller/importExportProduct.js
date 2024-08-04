@@ -42,20 +42,21 @@ export const importProducts = async (req, res) => {
   const { products } = req.body;
   console.log(products);
 
-  // try {
-  //   const importedProducts = [];
-  //   const skippedProducts = [];
+  try {
+    const importedProducts = [];
+    const skippedProducts = [];
 
     for (const productData of products) {
       delete productData._id;
-      let categoriesName = generateRandomStringCategory();
+      let categoriesName = await generateRandomStringCategory();
       const parentCategory = await Category.findOne({ name: 'GENERAL' });
-      if (productData.title) {
+
+      if (productData.title && typeof productData.title === 'string') {
         categoriesName = productData.title.trim().substring(0, 50);
-      } else if (productData.Name) {
+      } else if (productData.Name && typeof productData.Name === 'string') {
         categoriesName = productData.Name.trim().substring(0, 50);
       }
-      
+
       let category = await Category.findOne({ name: categoriesName });
 
       if (!category) {
@@ -107,16 +108,16 @@ export const importProducts = async (req, res) => {
       }
     }
 
-  //   res.json({
-  //     message: "Products imported successfully",
-  //     status: true,
-  //     data: importedProducts,
-  //     skipped: skippedProducts,
-  //   });
-  // } catch (error) {
-  //   console.error('Error processing products:', error);
-  //   res.status(500).json({ success: false, error: 'Internal Server Error' });
-  // }
+    res.json({
+      message: "Products imported successfully",
+      status: true,
+      data: importedProducts,
+      skipped: skippedProducts,
+    });
+  } catch (error) {
+    console.error('Error processing products:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
 };
 
 async function importGSTData(productData, category) {
@@ -185,9 +186,9 @@ async function NewimportGSTData(productData, category) {
 
 async function CreateCategory(name, level, slug, parentCategory) {
   const category = new Category({
-    name,
+    name:name || "no data",
     level,
-    slug,
+    slug:slug || "no data",
     parentCategory
   });
   return await category.save();
