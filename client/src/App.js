@@ -24,6 +24,7 @@ import Users from './Pages/users.js';
 // import Settings from './pages/Settings';
 import { ToastContainer } from 'react-toastify';
 import ProtectedRoute from './component/ProtectedRoute';
+import InvoiceTest from './component/invoicetest.js';
 
 const App = () => {
   return (
@@ -39,6 +40,7 @@ const App = () => {
           <Route path="/forbidden" element={<Forbidden />} />
           <Route path="/users" element={<PageWithNavbar><Users /></PageWithNavbar>} />
           <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
+          <Route path="/invoicetest" element={<PageWithNavbar><InvoiceTest /></PageWithNavbar>} />
 
           {/* Admin protected routes */}
           <Route
