@@ -68,6 +68,12 @@ const [invoice,setInvoice] = useState()
     }
   }, [navigate]);
 
+  useEffect(() => {
+    if (invoice && componentRef.current) {
+      componentRef.current.handlePrint();
+    }
+  }, [invoice]);
+
   const handleKeys = (e) => {
     console.log(e.key)
     if (e.key === 'Enter') {
@@ -113,6 +119,10 @@ console.log(err.message)
     setCurrentDate(formattedDate);
   }, []);
   //  console.log(details);
+
+
+
+
   
   const handleScan = (data) => {
     // console.log(isChecked)
@@ -126,7 +136,7 @@ console.log(err.message)
     // console.log(isChecked)
     // if (isChecked) {
 
-    //   fetchProducts('766576577878')
+    //   fetchProducts(766576577878')
     // }
     alert("Connnect the Barcode Scanner")
     // dispatch(fetchProduct("5345435334"));
@@ -227,6 +237,12 @@ console.log(err.message)
   }
 
   }
+
+
+  const handlePrint = () => {
+    bill()
+      };
+
 
   const handleChange = (e) => {
     setFormData({
@@ -680,21 +696,38 @@ console.log(err.message)
               Save
             </button>
 
-            <ReactToPrint
+            {/* <ReactToPrint
               trigger={() => (
                 <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
-                  Print
+                 Save & Print
                 </button>
               )}
               content={() => componentRef.current}
-            />
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold</button> */}
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">
-              View
-            </button> */}
-      
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold(1)</button> */}
-          </div>
+            /> */}
+
+
+
+
+<button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={() => handlePrint}>
+                  <span className='text-center'>
+                    Invoice
+                  </span>
+                </button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div>
 
       
           <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
@@ -780,6 +813,12 @@ console.log(err.message)
         details={invoice} 
       />
  
+
+ <ReactToPrint
+        trigger={() => <button style={{ display: 'none' }} />}
+        content={() => componentRef.current}
+        ref={componentRef}
+      />
      
       </div>
 
