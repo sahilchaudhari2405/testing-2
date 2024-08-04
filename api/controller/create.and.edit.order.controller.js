@@ -27,21 +27,42 @@ const placeOrder = asyncHandler(async (req, res) => {
         const orderItems = [];
         for (const cartItem of cart.cartItems) {
             const product = await Product.findById(cartItem.product);
-            const orderItem = new OfflineOrderItem({
-                product: cartItem.product,
-                quantity: cartItem.quantity,
-                price: cartItem.price,
-                purchaseRate: product.purchaseRate * cartItem.quantity,
-                GST: cartItem.GST,
-                totalProfit: (product.discountedPrice-product.purchaseRate)*cartItem.quantity,
-                finalPriceWithGST: cartItem.finalPrice_with_GST,
-                discountedPrice: cartItem.discountedPrice,
-                userId: id,
-            });
-            await orderItem.save();
-            orderItems.push(orderItem._id);
-            purchaseRate += orderItem.purchaseRate;
-            totalProfit += orderItem.totalProfit;
+            if(cartItem.type=='custom'){
+                const orderItem = new OfflineOrderItem({
+                    product: cartItem.product,
+                    quantity: cartItem.quantity,
+                    price: cartItem.price,
+                    purchaseRate: product.purchaseRate * cartItem.quantity,
+                    GST: cartItem.GST,
+                    type:cartItem.type,
+                    totalProfit:(cartItem.discountedPrice)-(product.purchaseRate*cartItem.quantity),
+                    finalPriceWithGST: cartItem.finalPrice_with_GST,
+                    discountedPrice: cartItem.discountedPrice,
+                    userId: id,
+                });
+                await orderItem.save();
+                orderItems.push(orderItem._id);
+                purchaseRate += orderItem.purchaseRate;
+                totalProfit += orderItem.totalProfit;
+            }
+            else{
+                const orderItem = new OfflineOrderItem({
+                    product: cartItem.product,
+                    quantity: cartItem.quantity,
+                    price: cartItem.price,
+                    purchaseRate: product.purchaseRate * cartItem.quantity,
+                    GST: cartItem.GST,
+                    totalProfit:(product.discountedPrice-product.purchaseRate)*cartItem.quantity ,
+                    finalPriceWithGST: cartItem.finalPrice_with_GST,
+                    discountedPrice: cartItem.discountedPrice,
+                    userId: id,
+                });
+                await orderItem.save();
+                orderItems.push(orderItem._id);
+                purchaseRate += orderItem.purchaseRate;
+                totalProfit += orderItem.totalProfit;
+            }
+
         }
            if(cart.discount<0)
            {
@@ -97,9 +118,12 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
         if (!cartItem) {
             return res.status(404).json(new ApiResponse(404, 'Cart item not found', null));
         }
+        if (cartItem.type=='custom') {
+            return res.status(404).json(new ApiResponse(404, 'Cart item is custom', null));
+        }
 
         const product = await Product.findById(cartItem.product);
-
+            
         if (cartItem.quantity > 1) {
             cartItem.quantity -= 1;
             cartItem.price -= product.price;
