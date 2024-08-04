@@ -24,7 +24,7 @@ services:
       - "80:80"
     environment:
       - NODE_ENV=production
-      - REACT_APP_BASE_URL=http://backend-api:4000/api
+      - REACT_APP_BASE_URL=http://0.0.0.0:4000/api
     depends_on:
       - api
     networks:
