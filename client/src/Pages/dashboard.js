@@ -171,9 +171,6 @@ const Dashboard = () => {
       name,
       sales: totalSales,
       revenue: totalRevenue
-      name,
-      sales: totalSales,
-      revenue: totalRevenue
     }));
   
   
@@ -181,9 +178,7 @@ const Dashboard = () => {
       name,
       sales: totalSales,
       revenue: totalRevenue
-      name,
-      sales: totalSales,
-      revenue: totalRevenue
+      
     }));
   
     const uniqueMonthwise = monthwise.reduce((acc, cur) => {
@@ -195,14 +190,7 @@ const Dashboard = () => {
         acc.push(cur);
       }
       return acc;
-      const existing = acc.find(item => item.name === cur.name);
-      if (existing) {
-        existing.sales += cur.sales;
-        existing.revenue += cur.revenue;
-      } else {
-        acc.push(cur);
-      }
-      return acc;
+      
     }, []);
     if (daywiseArray.length > 0) {
       console.log("transformdataforadmin daywisearrauyeln > 0");
