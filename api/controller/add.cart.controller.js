@@ -65,7 +65,7 @@ const addToCart = asyncHandler(async (req, res) => {
             const discount =await Math.max(product.price - product.discountedPrice, 0);
             if (!cart.cartItems.includes(cartItem._id)) {
                 cart.cartItems.push(cartItem._id);
-                cart.totalItem += 1;
+                cart.totalItem +=1;
             }
             cart.GST += product.GST;
             cart.final_price_With_GST +=  product.discountedPrice + product.GST;
@@ -101,7 +101,7 @@ const updateToCart = asyncHandler(async (req, res) => {
             cartItem.price += price;
             cartItem.discountedPrice += discountedPrice;
             cartItem.GST += product.GST;
-            cartItem.type = 'custom'
+            cartItem.type = 'custom',
             cartItem.finalPrice_with_GST += (discountedPrice + product.GST);
             cartItem.updatedAt = new Date();
             await cartItem.save();
