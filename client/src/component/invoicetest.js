@@ -301,13 +301,14 @@ const InvoiceTest = () => {
           
         </div>
         <div className={`${sharedClasses.flex} flex-col w-full ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
-          <div>
-            <span className={sharedClasses.fontBold}>INVOICE: </span>
-            <div><Barcode value={details._id} width={0.8} height={70} /></div>
-          </div>
+          
           <div>
             <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
             <span>{currentDate}</span>
+          </div>
+          <div>
+            {/* <span className={sharedClasses.fontBold}>INVOICE: </span> */}
+            <div><Barcode value={details._id} width={1.5} height={40} /></div>
           </div>
         </div>
         <div className={`${sharedClasses.flex} justify-self-start  w-full ${sharedClasses.mb4}`}>
