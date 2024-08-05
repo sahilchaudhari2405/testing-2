@@ -52,13 +52,19 @@ export async function signup(req, res) {
     }
 };
 
+
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await CounterUser.findOne({ email });
-        const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
-
-        if (!user || !isPasswordCorrect) {
+        const user = await CounterUser.findOne({ email }) || await CounterUser.findOne({ fullName: email });
+        
+        if (!user) {
+            return res.status(400).json({ error: "Invalid email or password" });
+        }
+        
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        
+        if (!isPasswordCorrect) {
             return res.status(400).json({ error: "Invalid email or password" });
         }
 
@@ -72,7 +78,8 @@ export async function login(req, res) {
         console.log("Error in login controller", error.message);
         res.status(500).json({ error: "Internal Server Error" });
     }
-};
+}
+
 
 export async function logout(req, res) {
     try {

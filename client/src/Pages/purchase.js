@@ -26,7 +26,9 @@ const Purchase = () => {
   const [paid, setPaid] = useState();
   const [invoiceData, setInvoice] = useState();
   const [isChecked, setIsChecked] = useState(false);
+  const handlePrintRef = useRef();
   const [message, setMessage] = useState(false);
+  const [print,setPrint] = useState(false);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -70,6 +72,15 @@ const Purchase = () => {
       }));
     }
   }, [cart]);
+
+
+  
+  useEffect(() => {
+    if (print&&purchaseOrders && handlePrintRef.current) {
+      console.log(handlePrintRef.current)
+      handlePrintRef.current.handlePrint();
+    }
+  }, [purchaseOrders]);
 
   const handleKeys = (e) => {
     console.log(e.key);
@@ -258,13 +269,18 @@ const Purchase = () => {
   };
 
   const bill = async () => {
-    const amount =
+    const gen =
       (finalform?.paymentType?.cash ? parseInt(finalform?.paymentType?.cash) : 0) +
       (finalform?.paymentType?.upi ? parseInt(finalform?.paymentType?.upi) : 0) +
       (finalform?.paymentType?.card ? parseInt(finalform?.paymentType?.card) : 0) +
       (finalform?.paymentType?.borrow? parseInt(finalform?.paymentType?.borrow) : 0);
- const total = invoice+totalGst
+
+    const amount = Math.round(gen)
+ const all= invoice+totalGst
+ const total = Math.round(all)
  console.log(amount," and ",total)
+
+
     if (amount == total) {
       if (
         cart.length > 0 &&
@@ -339,6 +355,11 @@ const Purchase = () => {
     }
   };
 
+
+  const handlePrint = () => {
+    setPrint(true)
+    bill()
+      };
   //======================barcode genration====================================
 
   const componentRef = useRef();
@@ -825,14 +846,21 @@ const Purchase = () => {
               Save
             </button>
 
-            <ReactToPrint
+            {/* <ReactToPrint
               trigger={() => (
                 <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={bill}>
                   Print
                 </button>
               )}
               content={() => componentRef.current}
-            />
+            /> */}
+
+            
+<button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handlePrint}>
+                  <span className='text-center'>
+                   Save & Print
+                  </span>
+                </button>
           </div>
         </div>
 
@@ -915,7 +943,13 @@ const Purchase = () => {
 
       {/* ---------------------invoice ganrator------------------------- */}
       
-      <Invoice componentRef={componentRef} details={purchaseOrders} />
+      <Invoice componentRef={componentRef} setPrint={setPrint} details={purchaseOrders} />
+ <ReactToPrint
+        trigger={() => <button style={{ display: 'none' }} />}
+        content={() => componentRef.current}
+        ref={(el) => (handlePrintRef.current = el)}
+      />
+   
     </div>
   );
 };

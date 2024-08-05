@@ -21,6 +21,7 @@ const Sale = () => {
   const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
+  const handlePrintRef = useRef();
   const { orderId } = useParams();
   let { items, status, fetchCartError } = useSelector((state) => state.cart);
   const [currentDate, setCurrentDate] = useState('');
@@ -34,6 +35,7 @@ const Sale = () => {
   const [total,setFinalTotal]= useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [message, setMessage] = useState(false);
+  const [print,setPrint] = useState(false);
 
   const [editId, setEditId] = useState(null);
   const [editItem, setEditItem] = useState({});
@@ -161,6 +163,13 @@ const Sale = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    if (print&&invoice && handlePrintRef.current) {
+      console.log(handlePrintRef.current)
+      handlePrintRef.current.handlePrint();
+    }
+  }, [invoice]);
+
   const handleKeys = (e) => {
     console.log(e.key)
     if (e.key === 'Enter') {
@@ -206,6 +215,10 @@ console.log(err.message)
     setCurrentDate(formattedDate);
   }, []);
   //  console.log(details);
+
+
+
+
   
   const handleScan = (data) => {
     // console.log(isChecked)
@@ -219,7 +232,7 @@ console.log(err.message)
     // console.log(isChecked)
     // if (isChecked) {
 
-    //   fetchProducts('766576577878')
+    //   fetchProducts(766576577878')
     // }
     alert("Connnect the Barcode Scanner")
     // dispatch(fetchProduct("5345435334"));
@@ -260,7 +273,10 @@ console.log(err.message)
 
 
   const bill = async()=>{    
-    const amount =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
+    const gen =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
+    const amount = Math.round(gen)
+   
+    const total = Math.round(total)
     console.log(amount == total)        
   if(amount == total){
     if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
@@ -320,6 +336,13 @@ console.log(err.message)
   }
 
   }
+
+
+  const handlePrint = () => {
+    setPrint(true)
+    bill()
+      };
+
 
   const handleChange = (e) => {
     setFormData({
@@ -875,21 +898,38 @@ console.log(err.message)
               Save
             </button>
 
-            <ReactToPrint
+            {/* <ReactToPrint
               trigger={() => (
                 <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
-                  Print
+                 Save & Print
                 </button>
               )}
               content={() => componentRef.current}
-            />
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold</button> */}
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">
-              View
-            </button> */}
-      
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold(1)</button> */}
-          </div>
+            /> */}
+
+
+
+
+<button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handlePrint}>
+                  <span className='text-center'>
+                   Save & Print
+                  </span>
+                </button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div>
 
       
           <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
@@ -973,8 +1013,14 @@ console.log(err.message)
       <Invoice 
         componentRef={componentRef} 
         details={invoice} 
+        setPrint={setPrint}
       />
  
+ <ReactToPrint
+        trigger={() => <button style={{ display: 'none' }} />}
+        content={() => componentRef.current}
+        ref={(el) => (handlePrintRef.current = el)}
+      />
      
       </div>
 

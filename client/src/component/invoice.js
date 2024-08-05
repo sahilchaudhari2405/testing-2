@@ -418,33 +418,36 @@
 import React, { useState, useEffect } from 'react';
 import logo from "../logo.png";
 import Barcode from 'react-barcode';
-
-const Invoice = ({ componentRef, details }) => {
+const Invoice = ({ componentRef, details,setPrint}) => {
   const [currentDate, setCurrentDate] = useState('');
+    const sharedClasses = {
+        flex: 'flex ',
+        justifyBetween: 'justify-between',
+        itemsCenter: 'items-center',
+        mb4: 'mb-4',
+        border: 'border text-center',
+        p2: 'p-2',
+        fontBold:'font-bold',
+      };
 
-  const sharedClasses = {
-    flex: 'flex',
-    justifyBetween: 'justify-between',
-    itemsCenter: 'items-center',
-    mb4: 'mb-4',
-    border: 'border text-center',
-    p2: 'p-2',
-    fontBold: 'font-bold',
-  };
+      useEffect(() => {
+        // Get the current date in the required format (YYYY-MM-DD)
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        if (setPrint) {
+          setPrint(false);
+        }
+        // Set the current date as the default value
+        setCurrentDate(formattedDate);
+      }, []);
+      console.log(details)  
 
-  useEffect(() => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    setCurrentDate(formattedDate);
-  }, []);
-
-  if (!details) return null;
-
+   
   return (
-    details.type === "customer" ? (
+    details?.type === "customer" ? (
       <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200">
         <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
           <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
