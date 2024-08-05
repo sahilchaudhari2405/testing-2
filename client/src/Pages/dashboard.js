@@ -44,13 +44,10 @@ const Dashboard = () => {
       setWeekwiseData(weekwise);
       setMonthwiseData(monthwise);
       const aggregatedDataofCustomers =  calculateCustomersforAdmin(orders);
-      const {dateWiseCustomers, weekWiseCustomers, monthWiseCustomers, latestSale, latestRevenue,latestDay } = aggregatedDataofCustomers;
+      const {dateWiseCustomers, weekWiseCustomers, monthWiseCustomers } = aggregatedDataofCustomers;
       console.log("inside admin dateWiseCustomers: ",dateWiseCustomers);
       console.log("inside admin weekWiseCustomers: ",weekWiseCustomers);
       console.log("inside admin monthWiseCustomers: ",monthWiseCustomers);
-      console.log("inside admin latestSale: ",latestSale);
-      console.log("inside admin latestRevenue: ",latestRevenue);
-      console.log("inside admin latestDay: ",latestDay);
       setdateWiseCustomers(dateWiseCustomers);
       setweekWiseCustomers(weekWiseCustomers);
       setmonthWiseCustomers(monthWiseCustomers);
@@ -117,9 +114,14 @@ const Dashboard = () => {
       return { daywise: [], weekwise: [], monthwise: [] };
     }
   
+    if (!data || data.length === 0) {
+      return { daywise: [], weekwise: [], monthwise: [] };
+    }
+  
     const daywise = [];
     const weekwise = [];
     const monthwise = [];
+  
   
     // Helper function to add data to the right container
     const addToAggregation = (aggregation, key, value) => {
@@ -128,7 +130,13 @@ const Dashboard = () => {
       }
       aggregation[key].totalSales += value.sales;
       aggregation[key].totalRevenue += value.revenue;
+      if (!aggregation[key]) {
+        aggregation[key] = { totalSales: 0, totalRevenue: 0 };
+      }
+      aggregation[key].totalSales += value.sales;
+      aggregation[key].totalRevenue += value.revenue;
     };
+  
   
     // Aggregate daily sales
     data.forEach(order => {
@@ -158,16 +166,19 @@ const Dashboard = () => {
       });
     });
   
+  
     const daywiseArray = Object.entries(daywise).map(([name, { totalSales, totalRevenue }]) => ({
       name,
       sales: totalSales,
       revenue: totalRevenue
     }));
   
+  
     const weekwiseArray = Object.entries(weekwise).map(([name, { totalSales, totalRevenue }]) => ({
       name,
       sales: totalSales,
       revenue: totalRevenue
+      
     }));
   
     const uniqueMonthwise = monthwise.reduce((acc, cur) => {
@@ -179,6 +190,7 @@ const Dashboard = () => {
         acc.push(cur);
       }
       return acc;
+      
     }, []);
     if (daywiseArray.length > 0) {
       console.log("transformdataforadmin daywisearrauyeln > 0");
