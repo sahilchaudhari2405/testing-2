@@ -1,7 +1,7 @@
 import React ,{useState,useEffect}from 'react';
 import logo from "../logo.png";
 import Barcode from 'react-barcode';
-const Invoice = ({ componentRef, details }) => {
+const Invoice = ({ componentRef, details,setPrint}) => {
   const [currentDate, setCurrentDate] = useState('');
     const sharedClasses = {
         flex: 'flex ',
@@ -12,6 +12,7 @@ const Invoice = ({ componentRef, details }) => {
         p2: 'p-2',
         fontBold:'font-bold',
       };
+
       useEffect(() => {
         // Get the current date in the required format (YYYY-MM-DD)
         const today = new Date();
@@ -19,11 +20,15 @@ const Invoice = ({ componentRef, details }) => {
         const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
         const day = String(today.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-    
+        if (setPrint) {
+          setPrint(false);
+        }
         // Set the current date as the default value
         setCurrentDate(formattedDate);
       }, []);
       console.log(details)  
+
+   
   return (
     details&&details.type=="customer"?
     <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200 hidden">

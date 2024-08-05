@@ -40,6 +40,7 @@ const View = () => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [name, setName] = useState('');
+  const [print,setPrint] = useState(false);
 
   const handlePrint = (item) => {
     setDetails(item);
@@ -301,6 +302,7 @@ const View = () => {
       <Invoice 
         componentRef={componentRef} 
         details={details} 
+        setPrint={setPrint}
       />
 
 

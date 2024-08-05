@@ -21,6 +21,7 @@ const Sale = () => {
 const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
+  const handlePrintRef = useRef();
   const { orderId } = useParams();
   let { items, status, fetchCartError } = useSelector((state) => state.cart);
   const [currentDate, setCurrentDate] = useState('');
@@ -34,7 +35,7 @@ const [invoice,setInvoice] = useState()
   const [total,setFinalTotal]= useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [message, setMessage] = useState(false);
-
+  const [print,setPrint] = useState(false);
 
 
   useEffect(() => {
@@ -69,8 +70,9 @@ const [invoice,setInvoice] = useState()
   }, [navigate]);
 
   useEffect(() => {
-    if (invoice && componentRef.current) {
-      componentRef.current.handlePrint();
+    if (print&&invoice && handlePrintRef.current) {
+      console.log(handlePrintRef.current)
+      handlePrintRef.current.handlePrint();
     }
   }, [invoice]);
 
@@ -177,7 +179,10 @@ console.log(err.message)
 
 
   const bill = async()=>{    
-    const amount =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
+    const gen =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
+    const amount = Math.round(gen)
+   
+    const total = Math.round(total)
     console.log(amount == total)        
   if(amount == total){
     if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
@@ -240,6 +245,7 @@ console.log(err.message)
 
 
   const handlePrint = () => {
+    setPrint(true)
     bill()
       };
 
@@ -708,9 +714,9 @@ console.log(err.message)
 
 
 
-<button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={() => handlePrint}>
+<button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handlePrint}>
                   <span className='text-center'>
-                    Invoice
+                   Save & Print
                   </span>
                 </button>
 
@@ -811,13 +817,13 @@ console.log(err.message)
       <Invoice 
         componentRef={componentRef} 
         details={invoice} 
+        setPrint={setPrint}
       />
  
-
  <ReactToPrint
         trigger={() => <button style={{ display: 'none' }} />}
         content={() => componentRef.current}
-        ref={componentRef}
+        ref={(el) => (handlePrintRef.current = el)}
       />
      
       </div>

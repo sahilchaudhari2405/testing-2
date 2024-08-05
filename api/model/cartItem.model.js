@@ -29,6 +29,10 @@ const Offline_cartItemSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  type: {
+    type: String,
+    default:'normal',
+  },
   GST:{
     type:Number,
     required:true,
