@@ -5,12 +5,13 @@ services:
     build:
       context: ./api
       dockerfile: dockerfile.prod
+    container_name: backend-api
     ports:
       - "4000:4000"
     environment:
       - NODE_ENV=production
       - PORT=4000
-      - BASE_URL = http://apalabajar.shop
+      - BASE_URL=http://apalabajar.shop  # Removed space around '='
     networks:
       - app-network
 
@@ -18,13 +19,20 @@ services:
     build:
       context: ./client
       dockerfile: dockerfile.prod
+    container_name: front-end
     ports:
       - "80:80"
     environment:
       - NODE_ENV=production
+<<<<<<< HEAD
       - REACT_APP_BASE_URL=http://apalabajar.shop:4000/api
+=======
+    depends_on:
+      - api
+>>>>>>> 31647d1e252157a7a38b09c83a917ec4037a575c
     networks:
       - app-network
+
 networks:
   app-network:
     driver: bridge

@@ -18,9 +18,10 @@ const Sale = () => {
   const [productDetails,setProductDetails] = useState()
   const dispatch = useDispatch();
   //   let productDetails = useSelector((state) => state.products.productDetails);
-const [invoice,setInvoice] = useState()
+  const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
+  const handlePrintRef = useRef();
   const { orderId } = useParams();
   let { items, status, fetchCartError } = useSelector((state) => state.cart);
   const [currentDate, setCurrentDate] = useState('');
@@ -34,6 +35,100 @@ const [invoice,setInvoice] = useState()
   const [total,setFinalTotal]= useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [message, setMessage] = useState(false);
+  const [print,setPrint] = useState(false);
+
+  const [editId, setEditId] = useState(null);
+  const [editItem, setEditItem] = useState({});
+
+  const handleEditClick = (item) => {
+    setEditId(item._id);
+    setEditItem({...item});
+  };
+
+  // const handleInputChange = (e, field) => {
+  //   console.log("field is :", field);
+  //   console.log("value is :", e.target.value);
+  //   setEditItem({
+  //     ...editItem,
+  //     [field]: e.target.value,
+  //   });
+  // };
+
+  const handleInputChange = (e, field) => {
+    const { value } = e.target;
+
+    setEditItem(prevState => {
+      const newState = { ...prevState };
+      if (field.includes('.')) {
+        const [outerKey, innerKey] = field.split('.');
+        newState[outerKey] = { ...newState[outerKey], [innerKey]: value };
+      } else {
+        newState[field] = value;
+      }
+
+      const mrp = parseFloat(newState.product?.price || 0);
+      const quantity = parseInt(newState.quantity || 0);
+      const discountedPrice = parseFloat(newState.discountedPrice || 0);
+      const gst = parseFloat(newState.GST || 0);
+
+      // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
+      const totalValue = (discountedPrice * quantity);
+      newState.finalPrice_with_GST = totalValue;
+      const discount = mrp-discountedPrice;
+      newState.discount = discount;
+
+      return newState;
+    });
+    console.log("edittem after input change: ",editItem);
+  };
+
+  
+  // const handleSaveClick = (itemId) => {
+  //   // Implement save functionality here
+  //   console.log("Save changes for item:", editItem);
+
+  //   setEditId(null);
+  // };
+
+  const handleSaveClick = async (itemId) => {
+    // Extract necessary fields from editItem
+    const { product } = editItem;
+    const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
+    const { title: productTitle, price: productPrice  } = product;
+  
+    // Construct the payload for the API request
+    const payload = {
+      productCode: product.BarCode, 
+      discountedPrice: parseFloat(discountedPrice),
+      quantity: parseInt(quantity),
+      price: parseFloat(productPrice),
+      discount: parseFloat(productPrice)*parseFloat(quantity) - parseFloat(discountedPrice),
+      GST: parseFloat(GST),
+      finalPrice_with_GST: parseFloat(finalPrice_with_GST)
+    };
+  
+    try {
+      const response = await axiosInstance.put('cart/adjustment', payload);
+  
+      // if (!response.ok) {
+      //   throw new Error('Network response was not ok' + response.statusText);
+      // }
+      const resData = response.data;
+      console.log("Save changes for item:", resData);
+  
+      setEditId(null);
+      setEditItem({});
+      dispatch(fetchCart());
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
+  };
+  
+
+  const handleCancelClick = () => {
+    setEditId(null);
+    setEditItem({});
+  };
 
 
 
@@ -67,6 +162,13 @@ const [invoice,setInvoice] = useState()
       // Redirect to login if no token found
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (print&&invoice && handlePrintRef.current) {
+      console.log(handlePrintRef.current)
+      handlePrintRef.current.handlePrint();
+    }
+  }, [invoice]);
 
   const handleKeys = (e) => {
     console.log(e.key)
@@ -113,6 +215,10 @@ console.log(err.message)
     setCurrentDate(formattedDate);
   }, []);
   //  console.log(details);
+
+
+
+
   
   const handleScan = (data) => {
     // console.log(isChecked)
@@ -126,7 +232,7 @@ console.log(err.message)
     // console.log(isChecked)
     // if (isChecked) {
 
-    //   fetchProducts('766576577878')
+    //   fetchProducts(766576577878')
     // }
     alert("Connnect the Barcode Scanner")
     // dispatch(fetchProduct("5345435334"));
@@ -167,7 +273,10 @@ console.log(err.message)
 
 
   const bill = async()=>{    
-    const amount =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
+    const gen =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
+    const amount = Math.round(gen)
+   
+    const total = Math.round(total)
     console.log(amount == total)        
   if(amount == total){
     if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
@@ -227,6 +336,13 @@ console.log(err.message)
   }
 
   }
+
+
+  const handlePrint = () => {
+    setPrint(true)
+    bill()
+      };
+
 
   const handleChange = (e) => {
     setFormData({
@@ -622,7 +738,7 @@ console.log(err.message)
                 <th className="p-3 border border-gray-600 text-left w-[60px]">
                   Net Qty
                 </th>
-                <th className="p-3 border border-gray-600 text-left">Rate</th>
+                <th className="p-3 border border-gray-600 text-left">Apla Price</th>
                 <th className="p-3 border border-gray-600 text-left">Disc.</th>
                 <th className="p-3 border border-gray-600 text-left">GST%</th>
                 <th className="p-3 border border-gray-600 text-left">
@@ -633,42 +749,144 @@ console.log(err.message)
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {/* Add rows dynamically here */}
-            { 
-             details&&details.map((item,i)=>(
-         <tr key={item?._id}>
-         <td className="py-3 px-6 border border-gray-600 text-left whitespace-nowrap">
-           {i+1}
-         </td>
-         <td className="py-3 px-6 border border-gray-600 text-left">
-         {item?.product?.title}
-         </td>
-         <td className="p-3 border border-gray-600"> {item?.product?.price}</td>
-         <td className="p-3 border border-gray-600">
-         <div className="flex flex-row items-center">
-                 <input type="number" value={item.quantity} readOnly min="1" className="w-12 sm:w-12 text-center border m-1 sm:mb-0" />
-                 <button className=" bg-blue-500 mt-1 px-2 py-0 rounded-sm text-lg" onClick={() => decreaseQuantity(item._id)}>-</button>
-       
-            </div>
-         </td>
-         <td className="p-3 border border-gray-600"> {item?.discountedPrice}</td>
-         <td className="p-3 border border-gray-600"> {(item?.price-item?.discountedPrice)<0?0:item?.price-item?.discountedPrice}</td>
-         <td className="p-3 border border-gray-600"> {item?.GST}</td>
-         <td className="p-3 border border-gray-600"> {item?.finalPrice_with_GST}</td>
-         <td className="p-3 border border-gray-600 text-center">
-           <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 " onClick={() => removeItem(item?._id)}>
-             Delete
-           </button>
-         </td>
-       </tr>
+            {/* //<tbody> */}
+            {/* // Add rows dynamically here */}
+            {/* { 
+            //  details&&details.map((item,i)=>(
+            //     <tr key={item?._id}>
+            //     <td className="py-1 px-3 border border-gray-600 text-left whitespace-nowrap">
+            //       {i+1}
+            //     </td>
+            //     <td className="py-1 px-3 border border-gray-600 text-left">
+            //     {item?.product?.title}
+            //     </td>
+            //     <td className="p-1 border border-gray-600"> {item?.product?.price}</td>
+            //     <td className="p-1 border border-gray-600">
+            //     <div className="flex flex-row items-center">
+            //             <input type="number" value={item.quantity} readOnly min="1" className="w-12 sm:w-12 text-center border m-1 sm:mb-0" />
+            //             <button className=" bg-blue-500 mt-1 px-2 py-0 rounded-sm text-lg" onClick={() => decreaseQuantity(item._id)}>-</button>
+              
+            //         </div>
+            //     </td>
+            //     <td className="p-1 border border-gray-600"> {item?.discountedPrice}</td>
+            //     <td className="p-1 border border-gray-600"> {(item?.price-item?.discountedPrice)<0?0:item?.price-item?.discountedPrice}</td>
+            //     <td className="p-1 border border-gray-600"> {item?.GST}</td>
+            //     <td className="p-1 border border-gray-600"> {item?.finalPrice_with_GST}</td>
+            //     <td className="p-1 border flex gap-2 justify-center text-sm border-gray-600 text-center">
+            //       <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 ">
+            //         Edit
+            //       </button>
+            //       <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 ">
+            //         Save
+            //       </button>
+            //       <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 " onClick={() => removeItem(item?._id)}>
+            //         Delete
+            //       </button>
+                  
+            //     </td>
+            //   </tr>
 
 
       // console.log(item)
-             ))
-              }
+             // ))
+              // }
 
-              {/* Repeat rows as needed */}
+              // Repeat rows as needed
+            </tbody>   */}
+            <tbody>
+              {details && details.map((item, i) => (
+                <tr key={item._id}>
+                  <td className="py-1 px-3 border border-gray-600 text-left whitespace-nowrap">{i + 1}</td>
+                  <td className="py-1 px-3 border border-gray-600 text-left">
+                      {item.product?.title}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                      {item.product?.price}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    <div className="flex flex-row items-center">
+                      <input
+                        type="number"
+                        value={editId === item._id ? editItem.quantity : item.quantity}
+                        // readOnly={editId !== item._id}
+                        min="1"
+                        className="w-12 sm:w-12 text-center border m-1 sm:mb-0"
+                        onChange={(e) => handleInputChange(e, "quantity")}
+                      />
+                     
+                      {editId !== item._id &&  
+                      <button
+                        className=" bg-blue-500 mt-1 px-2 py-0 rounded-sm text-lg"
+                        onClick={() => decreaseQuantity(item._id)}
+                      >
+                        -
+                      </button>
+                        }
+                    </div>
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editId === item._id ? (
+                      <input
+                        type="number"
+                        value={editItem.discountedPrice}
+                        onChange={(e) => handleInputChange(e, "discountedPrice")}
+                      />
+                    ) : (
+                      item.discountedPrice
+                    )}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editId === item._id ? (
+                      <input
+                        type="number"
+                        value={editItem?.discount}
+                        readOnly
+                      />
+                    ) : (
+                      (item.price - item.discountedPrice) < 0 ? 0 : item.price - item.discountedPrice
+                       )}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editId === item._id ? (
+                      <input
+                        type="number"
+                        value={editItem.GST}
+                        onChange={(e) => handleInputChange(e, "GST")}
+                      />
+                    ) : (
+                      item.GST
+                    )}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editId === item._id ? (
+                      <div>{editItem.finalPrice_with_GST}</div>
+                    ) : (
+                      item.finalPrice_with_GST
+                    )}
+                  </td>
+                  <td className="p-1 border flex gap-2 justify-center text-sm border-gray-600 text-center">
+                    {editId === item._id ? (
+                      <>
+                        <button className="bg-green-500 text-white px-2 py-2 rounded hover:bg-green-600" onClick={() => handleSaveClick(item._id)}>
+                          Save
+                        </button>
+                        <button className="bg-gray-500 text-white px-2 py-2 rounded hover:bg-gray-600" onClick={handleCancelClick}>
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button className="bg-yellow-500 text-white px-2 py-2 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
+                          Edit
+                        </button>
+                        <button className="bg-red-500 text-white px-2 py-2 rounded hover:bg-red-600" onClick={() => removeItem(item._id)}>
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -680,21 +898,38 @@ console.log(err.message)
               Save
             </button>
 
-            <ReactToPrint
+            {/* <ReactToPrint
               trigger={() => (
                 <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md">
-                  Print
+                 Save & Print
                 </button>
               )}
               content={() => componentRef.current}
-            />
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold</button> */}
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">
-              View
-            </button> */}
-      
-            {/* <button class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">Hold(1)</button> */}
-          </div>
+            /> */}
+
+
+
+
+<button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handlePrint}>
+                  <span className='text-center'>
+                   Save & Print
+                  </span>
+                </button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div>
 
       
           <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
@@ -778,8 +1013,14 @@ console.log(err.message)
       <Invoice 
         componentRef={componentRef} 
         details={invoice} 
+        setPrint={setPrint}
       />
  
+ <ReactToPrint
+        trigger={() => <button style={{ display: 'none' }} />}
+        content={() => componentRef.current}
+        ref={(el) => (handlePrintRef.current = el)}
+      />
      
       </div>
 
