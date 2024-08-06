@@ -336,10 +336,10 @@ const Purchase = () => {
 
           setCart([]);
           setMessage("")
-          alert("Order created successfully!");
+          toast.success("Order created successfully!");
         } catch (err) {
           console.log(err);
-          alert("Failed to create order: ", err.message);
+          toast.error("Failed to create order: ", err.message);
         }
       } else {
         alert(`fill the client details`);

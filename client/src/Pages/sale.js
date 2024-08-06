@@ -226,10 +226,10 @@ console.log(err.message)
       setTotalPrice("")
       setGst("")
       setFinalTotal("")
-
-        alert('Order created successfully!');
+      toast.success("Order created successfully!");
       } catch (err) {
-        alert(`Failed to create order: ${err.message}`);
+        toast.error(`Failed to create order: ${err.message}`);
+    
       }
     }else{
       alert(`fill the client details`);
