@@ -9,7 +9,7 @@ cart.get('/getCart',  authenticateToken, getCartDetails);
 cart.get('/getCartById', authenticateToken, getCartItemsById);
 cart.delete('/removeOneCart', authenticateToken, removeOneCart);
 cart.delete('/removeItemQuantity',  authenticateToken, removeItemQuantityCart);
-cart.delete('/adjustment',  authenticateToken, updateToCart);
+cart.put('/adjustment',  authenticateToken, updateToCart);
 // authenticateToken,
 
 export default cart;

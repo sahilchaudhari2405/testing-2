@@ -80,6 +80,8 @@ const addToCart = asyncHandler(async (req, res) => {
         return res.status(500).json({ success: false, message: error.message }); 
     }
 });
+
+
 const updateToCart = asyncHandler(async (req, res) => {
     const { id } = req.user; 
     // const id=`669b9afa72e1e9138e2a64a3`;
@@ -97,12 +99,13 @@ const updateToCart = asyncHandler(async (req, res) => {
 
         let cartItem = await Offline_CartItem.findOne({ userId: id, product: product._id });
         if (cartItem) {
-            cartItem.quantity += quantity;
-            cartItem.price += price;
-            cartItem.discountedPrice += discountedPrice;
-            cartItem.GST += product.GST;
+            cartItem.quantity = quantity;
+            cartItem.quantity = quantity;
+            cartItem.price = price;
+            cartItem.discountedPrice = discountedPrice;
+            cartItem.GST = product.GST;
             cartItem.type = 'custom',
-            cartItem.finalPrice_with_GST += (discountedPrice + product.GST);
+            cartItem.finalPrice_with_GST = (discountedPrice + product.GST);
             cartItem.updatedAt = new Date();
             await cartItem.save();
         } else {
