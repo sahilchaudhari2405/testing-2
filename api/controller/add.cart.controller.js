@@ -73,17 +73,20 @@ const addToCart = asyncHandler(async (req, res) => {
             cart.totalDiscountedPrice += product.discountedPrice;
             cart.discount += discount;
             await cart.save();
-        }
+        } 
         return res.status(200).json(new ApiResponse(200, 'Product added to cart successfully', { cartItem, cart })); 
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: error.message }); 
     }
 });
+
+
 const updateToCart = asyncHandler(async (req, res) => {
     const { id } = req.user; 
     // const id=`669b9afa72e1e9138e2a64a3`;
-    const { productCode,discountedPrice,quantity,price,discount} = req.body; 
+    const { productCode,discountedPrice,quantity,price,discount,GST,finalPrice_with_GST} = req.body; 
+    console.log(req.body);
     const user = await counter.findById(id); 
     if (!user) {
         return res.status(401).json(new ApiResponse(401, 'User not found', null)); 
@@ -96,59 +99,54 @@ const updateToCart = asyncHandler(async (req, res) => {
         }
 
         let cartItem = await Offline_CartItem.findOne({ userId: id, product: product._id });
+        const oldItem= JSON.parse(JSON.stringify(cartItem)); 
         if (cartItem) {
-            cartItem.quantity += quantity;
-            cartItem.price += price;
-            cartItem.discountedPrice += discountedPrice;
-            cartItem.GST += product.GST;
+            cartItem.quantity=0;
+            cartItem.price =0;
+            cartItem.discountedPrice =0;
+            cartItem.GST = 0;
             cartItem.type = 'custom',
-            cartItem.finalPrice_with_GST += (discountedPrice + product.GST);
+            cartItem.finalPrice_with_GST =0;
             cartItem.updatedAt = new Date();
             await cartItem.save();
-        } else {
-            cartItem = await Offline_CartItem.create({
-                quantity: quantity,
-                price: price,
-                discountedPrice: discountedPrice,
-                userId: id,
-                GST: product.GST, 
-                type :'custom',
-                finalPrice_with_GST: discountedPrice + product.GST,
-                product: product._id,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            });
-            
-        }
-       product.quantity-=quantity;
+        } 
+       product.quantity+=oldItem.quantity;
        await product.save();
         let cart = await Offline_Cart.findOne({ userId: id });
-        if (!cart) {
-            // const discount =await Math.max(cartItem.price - cartItem.discountedPrice, 0);
-            cart = await Offline_Cart.create({
-                userId: id,
-                cartItems: [cartItem._id],
-                totalPrice: cartItem.price,
-                totalItem: 1,
-                GST: cartItem.GST, 
-                final_price_With_GST: cartItem.finalPrice_with_GST,
-                totalDiscountedPrice: cartItem.discountedPrice,
-                discount:discount,
-            });
-            await cart.save();
-        } else {
             // const discount =await Math.max(price - discountedPrice, 0);
             if (!cart.cartItems.includes(cartItem._id)) {
                 cart.cartItems.push(cartItem._id);
                 cart.totalItem += 1;
             }
-            cart.GST += product.GST;
-            cart.final_price_With_GST +=  discountedPrice + product.GST;
-            cart.totalPrice += price
-            cart.totalDiscountedPrice +=discountedPrice ;
-            cart.discount += discount;
+            const discounted =await Math.max(oldItem.price - oldItem.discountedPrice, 0);
+            cart.GST-=oldItem.GST,
+            cart.final_price_With_GST-=oldItem.finalPrice_with_GST;
+            cart.totalPrice-=oldItem.price;
+            cart.totalDiscountedPrice-=oldItem.discountedPrice
+            cart.discount-=discounted;
+            product.quantity-=quantity;
+            await product.save();
+            console.log(cart);
             await cart.save();
-        }
+            if (cartItem) {
+                cartItem.quantity = quantity;
+                cartItem.price = price*quantity;
+                cartItem.discountedPrice = discountedPrice*quantity;
+                cartItem.GST = GST*quantity;
+                cartItem.type = 'custom';
+                cartItem.finalPrice_with_GST = finalPrice_with_GST;
+                cartItem.updatedAt = new Date();
+                await cartItem.save();
+            }
+            cart.GST += cartItem.GST;
+            cart.final_price_With_GST += cartItem.finalPrice_with_GST;
+            cart.totalPrice += cartItem.price;
+            cart.totalDiscountedPrice += cartItem.discountedPrice;
+            cart.discount += discount;
+                                
+            console.log('Updated Cart:', cart);
+        
+            await cart.save();
         return res.status(200).json(new ApiResponse(200, 'custom Product added to cart successfully', { cartItem, cart })); 
     } catch (error) {
         console.error(error);

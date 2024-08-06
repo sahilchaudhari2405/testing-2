@@ -5,10 +5,10 @@ import OfflineOrderItem from "../model/orderItems.js";
 import Product from "../model/product.model.js";
 import OfflinePurchaseOrder from "../model/purchaseOrder.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+ 
 
 const product = async (req,res) => {
-    await Product.collection.drop()
+    await Product.collection.drop() 
     return res.status(200).json(new ApiResponse(200, 'deleted successfully'));
 };
 const categories = async (req,res) => {
