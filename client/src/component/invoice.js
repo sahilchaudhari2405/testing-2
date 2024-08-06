@@ -437,9 +437,9 @@ const Invoice = ({ componentRef, details,setPrint}) => {
         const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
         const day = String(today.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-        if (setPrint) {
-          setPrint(false);
-        }
+        // if (setPrint) {
+        //   setPrint(false);
+        // }
         // Set the current date as the default value
         setCurrentDate(formattedDate);
       }, []);
@@ -448,7 +448,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
    
   return (
     details?.type === "customer" ? (
-      <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200">
+      <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200 hidden">
         <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
           <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
             <div className="w-24 h-24 border flex items-center justify-center">
@@ -498,7 +498,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
                   <td className="border p-1 truncate">{e.product?.title}</td>
                   <td className="border p-1 text-center">{e.quantity}</td>
                   <td className="border p-1 text-center">{e.GST}</td>
-                  <td className="border p-1 text-center">{(e.price - e.discountedPrice)}</td>
+                  <td className="border p-1 text-center">{(e.price - e.discountedPrice?e.price - e.discountedPrice:0)}</td>
                   <td className="border p-1 text-center">{e.price}</td>
                   <td className="border p-1 text-center">{e.discountedPrice}</td>
                 </tr>
@@ -543,7 +543,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
       </div>
     ) : (
       details && (
-        <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200">
+        <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200 hidden">
           <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
               <div>
@@ -592,12 +592,12 @@ const Invoice = ({ componentRef, details,setPrint}) => {
               <tbody>
                 {details.orderItems?.map((e, index) => (
                   <tr key={index}>
-                    <td className="border p-1 truncate">{e.product?.title}</td>
+                    <td className="border p-1 truncate">{e.productId?.title}</td>
                     <td className="border p-1 text-center">{e.quantity}</td>
                     <td className="border p-1 text-center">{e.GST}</td>
-                    <td className="border p-1 text-center">{(e.price - e.discountedPrice)}</td>
-                    <td className="border p-1 text-center">{e.price}</td>
-                    <td className="border p-1 text-center">{e.discountedPrice}</td>
+                    <td className="border p-1 text-center">{(e.retailPrice - e.purchaseRate?e.retailPrice - e.purchaseRate:0)}</td>
+                    <td className="border p-1 text-center">{e.retailPrice}</td>
+                    <td className="border p-1 text-center">{e.purchaseRate}</td>
                   </tr>
                 ))}
               </tbody>
@@ -610,7 +610,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
                 </div>
                 <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                   <span>DISCOUNT</span>
-                  <span>₹{(details.totalPrice - details.totalDiscountedPrice)}</span>
+                  <span>₹{(details.totalPrice - details.totalPurchaseRate)?(details.totalPrice - details.totalPurchaseRate):0}</span>
                 </div>
                 <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                   <span>GST</span>

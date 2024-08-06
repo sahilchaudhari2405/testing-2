@@ -182,9 +182,9 @@ console.log(err.message)
     const gen =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
     const amount = Math.round(gen)
    
-    const total = Math.round(total)
-    console.log(amount == total)        
-  if(amount == total){
+    const sum = Math.round(total)
+    console.log(amount == sum)        
+  if(amount == sum){
     if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
       try {
         const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
@@ -235,10 +235,10 @@ console.log(err.message)
       alert(`fill the client details`);
     }
  
-  }else if(amount>total){
-    setMessage(`Return ${amount-total} rs `)
+  }else if(amount>sum){
+    setMessage(`Return ${amount-sum} rs `)
   }else{
-    setMessage(`Need ${total-amount} rs to place order or add amount in borrow field `)
+    setMessage(`Need ${sum-amount} rs to place order or add amount in borrow field `)
   }
 
   }

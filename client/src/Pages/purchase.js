@@ -942,8 +942,9 @@ const Purchase = () => {
       </div>
 
       {/* ---------------------invoice ganrator------------------------- */}
-      
+      <div className='hidden'>
       <Invoice componentRef={componentRef} setPrint={setPrint} details={purchaseOrders} />
+      </div>
  <ReactToPrint
         trigger={() => <button style={{ display: 'none' }} />}
         content={() => componentRef.current}
