@@ -162,7 +162,6 @@ const Sale = () => {
 
   };
 
-
   const handleInputChange = (e, field) => {
     const { value } = e.target;
 
@@ -233,6 +232,77 @@ const Sale = () => {
       console.error('Error saving changes:', error);
     }
   };
+  
+  // const handleInputChange = (e, field) => {
+  //   const { value } = e.target;
+
+  //   setEditItem(prevState => {
+  //     const newState = { ...prevState };
+  //     if (field.includes('.')) {
+  //       const [outerKey, innerKey] = field.split('.');
+  //       newState[outerKey] = { ...newState[outerKey], [innerKey]: value };
+  //     } else {
+  //       newState[field] = value;
+  //     }
+
+  //     const mrp = parseFloat(newState.product?.price || 0);
+  //     const quantity = parseInt(newState.quantity || 0);
+  //     const discountedPrice = parseFloat(newState.discountedPrice || 0);
+  //     const gst = parseFloat(newState.GST || 0);
+
+  //     // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
+  //     const totalValue = (discountedPrice * quantity);
+  //     newState.finalPrice_with_GST = totalValue;
+  //     const discount = mrp-discountedPrice;
+  //     newState.discount = discount;
+
+  //     return newState;
+  //   });
+  //   console.log("edittem after input change: ",editItem);
+  // };
+
+  
+  // // const handleSaveClick = (itemId) => {
+  // //   // Implement save functionality here
+  // //   console.log("Save changes for item:", editItem);
+
+  // //   setEditId(null);
+  // // };
+
+  // const handleSaveClick = async (itemId) => {
+  //   // Extract necessary fields from editItem
+  //   const { product } = editItem;
+  //   const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
+  //   const { title: productTitle, price: productPrice  } = product;
+  
+  //   // Construct the payload for the API request
+  //   const payload = {
+  //     productCode: product.BarCode, 
+  //     discountedPrice: parseFloat(discountedPrice),
+  //     quantity: parseInt(quantity),
+  //     price: parseFloat(productPrice),
+  //     discount: parseFloat(productPrice)*parseFloat(quantity) - parseFloat(discountedPrice),
+  //     GST: parseFloat(GST),
+  //     finalPrice_with_GST: parseFloat(finalPrice_with_GST)
+  //   };
+  
+  //   try {
+  //     const response = await axiosInstance.put('cart/adjustment', payload);
+  
+  //     // if (!response.ok) {
+  //     //   throw new Error('Network response was not ok' + response.statusText);
+  //     // }
+  //     const resData = response.data;
+  //     console.log("Save changes for item:", resData);
+  
+  //     setEditId(null);
+  //     setEditItem({});
+  //     dispatch(fetchCart());
+
+  //   } catch (error) {
+  //     console.error('Error saving changes:', error);
+  //   }
+  // };
   
 
   const handleCancelClick = () => {
@@ -337,7 +407,16 @@ console.log(err.message)
       dispatch(fetchProduct(data));
     }
   };
-
+ const handleRemoveAllItem=async () =>
+ {
+  const response = await axiosInstance.delete(`/cart/removeAllItem`); 
+  if(response.status==200)
+  {dispatch(fetchCart());
+  }
+  else{
+    alert("somthing went wrong")
+  }
+ }
   const handleError = (err) => {
 
     // console.log(isChecked)
@@ -431,10 +510,10 @@ console.log(err.message)
       setTotalPrice("")
       setGst("")
       setFinalTotal("")
-
-        alert('Order created successfully!');
+      toast.success("Order created successfully!");
       } catch (err) {
-        alert(`Failed to create order: ${err.message}`);
+        toast.error(`Failed to create order: ${err.message}`);
+    
       }
     }else{
       alert(`fill the client details`);
@@ -443,7 +522,7 @@ console.log(err.message)
   }else if(amount>total){
     setMessage(`Return ${amount-total} rs `)
   }else{
-    setMessage(`Need ${total-amount} rs to place order or add amount in borrow field `)
+    setMessage(`Need ${Total-amount} rs to place order or add amount in borrow field `)
   }
 
   }
@@ -933,8 +1012,7 @@ console.log(err.message)
               // Repeat rows as needed
             </tbody>    */}
             <tbody>
-              {/* { details && (reverseOrder ? [...details].reverse() : details).map((item, i)  => ( */}
-              { details && details.map((item, i)  => (
+              { details && (reverseOrder ? [...details].reverse() : details).map((item, i)  => (
                 <tr key={item._id}>
                   <td className="py-1 px-3 border border-gray-600 text-left whitespace-nowrap">{i + 1}</td>
                   <td className="py-1 px-3 border border-gray-600 text-left">
@@ -1016,9 +1094,9 @@ console.log(err.message)
                       </>
                     ) : (
                       <>
-                        <button className="bg-yellow-500 text-white px-2 py-2 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
+                      {item.type!='custom' && <button className="bg-yellow-500 text-white px-2 py-2 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
                           Edit
-                        </button>
+                        </button>}
                         <button className="bg-red-500 text-white px-2 py-2 rounded hover:bg-red-600" onClick={() => removeItem(item._id)}>
                           Delete
                         </button>
@@ -1033,7 +1111,13 @@ console.log(err.message)
 
         <div class="mt-4 flex justify-between items-center">
 
+
           <div class="flex space-x-2">
+          <button className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-md" onClick={handleRemoveAllItem}>
+                  <span className='text-center'>
+                   Remove all item
+                  </span>
+                </button>
             <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={bill}>
               Save
             </button>
@@ -1050,18 +1134,17 @@ console.log(err.message)
 
 
 
-<button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handlePrint}>
+
+
+
+
+
+
+                <button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handlePrint}>
                   <span className='text-center'>
                    Save & Print
                   </span>
                 </button>
-
-
-
-
-
-
-
 
 
 

@@ -41,16 +41,22 @@ const View = () => {
   const [toDate, setToDate] = useState('');
   const [name, setName] = useState('');
   const [print,setPrint] = useState(false);
-
+const [sort , setSort] = useState([])
   const handlePrint = (item) => {
     setDetails(item);
   };
-  console.log(purchaseOrders)
+  
+  console.log(orders)
 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
+
+  
+  useEffect(() => {
+   setSort(orders)
+  }, [orders]);
   useEffect(() => {
     if (details && printRef.current) {
       printRef.current.handlePrint();
@@ -86,6 +92,7 @@ const View = () => {
 
   useEffect(() => {
     console.log('Purchase Orders:', purchaseOrders);
+    setSort(purchaseOrders)
   }, [purchaseOrders]);
 
   const handleDelete = (item) => {
@@ -98,7 +105,7 @@ const View = () => {
 
   const handleSort = (e) => {
     e.preventDefault();
-    dispatch(sortOrders({ fromDate, toDate, name }));
+    dispatch(sortOrders({ fromDate, toDate, name ,selectedView}));
   };
 
   const exportToExcel = (data) => {
@@ -295,14 +302,16 @@ const View = () => {
           </form>
         </div>
 
-        {selectedView === 'Sales' && renderTable(orders)}
+        {selectedView === 'Sales' && renderTable(sort)}
         {/* //importedData.length ? importedData : orders */}
-        {selectedView === 'Purchase' && renderTable(purchaseOrders)}  
+        {selectedView === 'Purchase' && renderTable(sort)}  
       </div>
+
+      
       <Invoice 
         componentRef={componentRef} 
         details={details} 
-        setPrint={setPrint}
+
       />
 
 

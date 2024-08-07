@@ -219,6 +219,7 @@ const ProductCard = ({ items }) => {
             {items.title}{" "}/
             <span className="text-md font-bold">
               <span className=" font-semibold">Category: </span>
+              {/* {console.log(items.category)} */}
               {items.category == null ? "GENERAL" : items.category.name}
             </span>{" "}
           </h2>{" "}
