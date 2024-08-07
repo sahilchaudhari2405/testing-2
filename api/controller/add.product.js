@@ -4,7 +4,7 @@ import OfflinePurchaseOrder from "../model/purchaseOrder.js";
 
 export const generateOrderWithProductCheck = async (req, res) => {
     console.log(req.body);
-
+    
     // Handle early response scenario
     if (!req.body || !req.body.products || !req.body.orderDetails) {
         return res.status(400).json({ message: "Invalid input", error: "Missing products or orderDetails" });
