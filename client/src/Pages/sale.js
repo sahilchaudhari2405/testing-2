@@ -58,6 +58,47 @@ const Sale = () => {
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [matchingMobileNumbers, setMatchingMobileNumbers] = useState([]);
   const [reverseOrder, setReverseOrder] = useState(false);
+  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState({
+    "_id": "66ab771af4df2f3e3c09ecb4",
+    "title": "POSH COCOA POWDER",
+    "description": "POSH COCOA POWDER",
+    "price": 65,
+    "discountedPrice": 64,
+    "discountPercent": 0,
+    "weight": 0,
+    "quantity": -155,
+    "brand": "Brand Name",
+    "imageUrl": "https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png",
+    "slug": "POSH COCOA POWDER",
+    "ratings": [],
+    "reviews": [],
+    "numRatings": 0,
+    "category": "66ab771af4df2f3e3c09ecb1",
+    "createdAt": null,
+    "updatedAt": null,
+    "BarCode": "8906017232378",
+    "stockType": "Stock Type",
+    "unit": "PCS",
+    "purchaseRate": 50,
+    "profitPercentage": 0,
+    "HSN": "HSN Code",
+    "GST": 0,
+    "retailPrice": 64,
+    "totalAmount": 64,
+    "amountPaid": 0,
+    "__v": 0
+  });
+
+  const handleViewProduct = (product) => {
+    setSelectedProduct(product);
+    setIsViewProductModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsViewProductModalOpen(false);
+    setSelectedProduct(null);
+  };
 
   const handleReverseOrder = () => {
     setReverseOrder(!reverseOrder);
@@ -182,7 +223,14 @@ const Sale = () => {
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
       const totalValue = (discountedPrice * quantity);
       newState.finalPrice_with_GST = totalValue;
-      const discount = mrp-discountedPrice;
+      const {product} = editItem;
+      let discount = mrp-discountedPrice;
+      if(mrp==0)
+      {
+       discount=product.discountedPrice-discountedPrice;
+      }
+   
+      // console.log(discount);
       newState.discount = discount;
 
       return newState;
@@ -201,16 +249,22 @@ const Sale = () => {
   const handleSaveClick = async (itemId) => {
     // Extract necessary fields from editItem
     const { product } = editItem;
+    console.log(items);
     const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
-    const { title: productTitle, price: productPrice  } = product;
-  
+    let { title: productTitle, price: productPrice,  } = product;
+    const ProductApalaBajarPrice = product.discountedPrice;
+    if(productPrice==0)
+    {
+      productPrice=ProductApalaBajarPrice;
+    }
+console.log(editItem);
     // Construct the payload for the API request
     const payload = {
       productCode: product.BarCode, 
       discountedPrice: parseFloat(discountedPrice),
       quantity: parseInt(quantity),
       price: parseFloat(productPrice),
-      discount: parseFloat(productPrice)*parseFloat(quantity) - parseFloat(discountedPrice),
+      discount: (parseFloat(productPrice) - parseFloat(discountedPrice))*parseFloat(quantity),
       GST: parseFloat(GST),
       finalPrice_with_GST: parseFloat(finalPrice_with_GST)
     };
@@ -227,7 +281,6 @@ const Sale = () => {
       setEditId(null);
       setEditItem({});
       dispatch(fetchCart());
-
     } catch (error) {
       console.error('Error saving changes:', error);
     }
@@ -466,9 +519,9 @@ console.log(err.message)
     const gen =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
     const amount = Math.round(gen)
    
-    const total = Math.round(total)
-    console.log(amount == total)        
-  if(amount == total){
+    const Total = Math.round(total)
+    console.log(amount == Total)        
+  if(amount == Total){
     if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
       try {
         const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
@@ -519,8 +572,8 @@ console.log(err.message)
       alert(`fill the client details`);
     }
  
-  }else if(amount>total){
-    setMessage(`Return ${amount-total} rs `)
+  }else if(amount>Total){
+    setMessage(`Return ${amount-Total} rs `)
   }else{
     setMessage(`Need ${Total-amount} rs to place order or add amount in borrow field `)
   }
@@ -540,6 +593,7 @@ console.log(err.message)
       [e.target.id]: e.target.value,
     });
   };
+
   const handleFinal = (e) => {
     setFinal({
       ...finalform,
@@ -607,6 +661,7 @@ console.log(err.message)
       }
     }
   };
+  
   const componentRef = useRef();
   return (
     <div className="bg-gray-100 mt-28 mx-6 rounded-lg shadow-lg">
@@ -1083,6 +1138,62 @@ console.log(err.message)
                     )}
                   </td>
                   <td className="p-1 border flex gap-2 justify-center text-sm border-gray-600 text-center">
+                      <button className="bg-amber-600 text-white px-2 py-2 rounded hover:bg-amber-700" onClick={() => handleViewProduct(item.product)}>
+                        View Product
+                      </button>
+                      {isviewProductModalOpen && selectedProduct && (
+                        // <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        //   <div className="bg-white p-6 rounded-lg shadow-lg">
+                        //     <h2 className="text-2xl font-bold mb-4">{selectedProduct.name}</h2>
+                        //     <p className="text-gray-700 mb-4">{selectedProduct.description}</p>
+                        //     <button
+                        //       className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                        //       onClick={closeModal}
+                        //     >
+                        //       Close
+                        //     </button>
+                        //   </div>
+                        // </div>
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl mx-4">
+                            <div className="flex justify-between items-start">
+                              <h2 className="text-2xl font-bold mb-4">{selectedProduct.title}</h2>
+                              <button
+                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                onClick={closeModal}
+                              >
+                                Close
+                              </button>
+                            </div>
+                            <div className="flex flex-col md:flex-row">
+                              <img
+                                src={selectedProduct.imageUrl}
+                                alt={selectedProduct.title}
+                                className="w-full md:w-1/2 rounded-lg mb-4 md:mb-0 md:mr-4"
+                              />
+                              <div className="flex flex-col items-start w-full justify-start">
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Description:</strong></div> <div>{selectedProduct.description}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Price:</strong> </div> <div> ${selectedProduct.price}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Discounted Price:</strong> </div> <div>${selectedProduct.discountedPrice}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Discount Percent:</strong></div> <div> {selectedProduct.discountPercent}%</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Weight:</strong></div> <div> {selectedProduct.weight} kg</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Quantity:</strong></div> <div> {selectedProduct.quantity}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Brand:</strong></div> <div> {selectedProduct.brand || 'N/A'}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Category:</strong></div> <div> {selectedProduct.category}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Bar Code:</strong></div> <div> {selectedProduct.BarCode}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Stock Type:</strong></div> <div> {selectedProduct.stockType || 'N/A'}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Unit:</strong></div> <div> {selectedProduct.unit}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Purchase Rate:</strong></div> <div> ${selectedProduct.purchaseRate}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>HSN:</strong></div> <div> {selectedProduct.HSN || 'N/A'}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>GST:</strong></div> <div> {selectedProduct.GST}%</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Retail Price:</strong></div> <div> ${selectedProduct.retailPrice}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Total Amount:</strong></div> <div> ${selectedProduct.totalAmount}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Amount Paid:</strong></div> <div> ${selectedProduct.amountPaid}</div></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     {editId === item._id ? (
                       <>
                         <button className="bg-green-500 text-white px-2 py-2 rounded hover:bg-green-600" onClick={() => handleSaveClick(item._id)}>
@@ -1237,6 +1348,7 @@ console.log(err.message)
         componentRef={componentRef} 
         details={invoice} 
         setPrint={setPrint}
+
       />
  
  <ReactToPrint
