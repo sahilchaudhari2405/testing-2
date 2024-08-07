@@ -13,6 +13,15 @@ import { fetchCart, removeFromCart, clearCart, updateCartQuantity, addToCart } f
 import {createOrder} from '../Redux/Orders/orderSlice';
 import Invoice from "../component/invoice.js";
 import axiosInstance from "../axiosConfig.js";
+import { fetchUsers } from '../Redux/User/userSlices';
+import { fetchOrders } from '../Redux/Orders/orderSlice';
+
+
+
+
+
+
+
 const Sale = () => {
   const [details, setDetails] = useState([]);
   const [productDetails,setProductDetails] = useState()
@@ -39,20 +48,119 @@ const Sale = () => {
 
   const [editId, setEditId] = useState(null);
   const [editItem, setEditItem] = useState({});
+  const [searchuser, setSearchuser] = useState([]);
+  const users = useSelector((state) => state.user.users);
+  const orders = useSelector((state) => state.orders.orders);
+
+  const [searchInput, setSearchInput] = useState('');
+  const [matchingOrders, setMatchingOrders] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [matchingMobileNumbers, setMatchingMobileNumbers] = useState([]);
+  const [reverseOrder, setReverseOrder] = useState(false);
+
+  const handleReverseOrder = () => {
+    setReverseOrder(!reverseOrder);
+  };
 
   const handleEditClick = (item) => {
     setEditId(item._id);
     setEditItem({...item});
   };
 
-  // const handleInputChange = (e, field) => {
-  //   console.log("field is :", field);
-  //   console.log("value is :", e.target.value);
-  //   setEditItem({
-  //     ...editItem,
-  //     [field]: e.target.value,
+  useEffect(() => {
+    dispatch(fetchUsers());
+    dispatch(fetchOrders());
+  }, [dispatch]);
+
+  useEffect(() => {
+    console.log("users are: ",users);
+    console.log("orders are: ",orders);
+    setSearchuser(users);
+  }, [users,orders]);
+
+  const handleKeyDown = (e) => {
+    console.log(e.key);
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission on Enter
+      const form = e.target.form;
+      const index = Array.prototype.indexOf.call(form, e.target);
+      form.elements[index + 1].focus();
+    }
+  };
+
+  // const handleFinal = (e) => {
+  //   const value = e.target.value;
+  //   setFinal({
+  //     ...finalform,
+  //     [e.target.id]: value,
   //   });
+  //   if (value) {
+  //     const filteredUsers = users.filter((user) =>
+  //       user.name.toLowerCase().includes(value.toLowerCase())
+  //     );
+  //     setMatchingUsers(filteredUsers);
+  //     setShowModal(true);
+  //   } else {
+  //     setShowModal(false);
+  //   }
   // };
+
+  const handlesearchChange = (e) => {
+    const value = e.target.value;
+    console.log("value is: ",value);
+    setFinal({
+      ...finalform,
+      [e.target.id]: value,
+    });
+    // setSearchInput(value);
+    console.log("searchusers are: ",searchuser);
+    if (value) {
+      const filteredOrders = orders.filter((order) =>
+        order.Name?.toLowerCase().includes(value.toLowerCase())
+      );
+      console.log("filtered suers are: ", filteredOrders);
+      setMatchingOrders(filteredOrders);
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+  };
+
+  const handleMobileSearchChange = (e) => {
+    const value = e.target.value;
+    console.log("Mobile number is: ", value);
+    setFinal({
+      ...finalform,
+      [e.target.id]: value,
+    });
+    if (value) {
+      const filteredOrders = orders.filter((order) =>
+        String(order.mobileNumber).includes(value)
+      );
+      console.log("Filtered orders by mobile number: ", filteredOrders);
+      setMatchingMobileNumbers(filteredOrders);
+      setShowMobileModal(true);
+    } else {
+      setShowMobileModal(false);
+    }
+  };
+
+  const handleSelectOrder = (order) => {
+    console.log("handlie select form mobile number");
+    setFinal({
+      ...finalform,
+      name: order.Name,
+      Date: order.Date || currentDate,
+      mobileNumber: order.mobileNumber || '',
+      ShipTo: order.ShipTo || '',
+      address: order.address || 'Shrigonda',
+      state: order.state || 'Maharastra',
+    });
+    setShowModal(false);
+    setShowMobileModal(false);
+
+  };
 
   const handleInputChange = (e, field) => {
     const { value } = e.target;
@@ -137,6 +245,77 @@ console.log(editItem);
     }
   };
   
+  // const handleInputChange = (e, field) => {
+  //   const { value } = e.target;
+
+  //   setEditItem(prevState => {
+  //     const newState = { ...prevState };
+  //     if (field.includes('.')) {
+  //       const [outerKey, innerKey] = field.split('.');
+  //       newState[outerKey] = { ...newState[outerKey], [innerKey]: value };
+  //     } else {
+  //       newState[field] = value;
+  //     }
+
+  //     const mrp = parseFloat(newState.product?.price || 0);
+  //     const quantity = parseInt(newState.quantity || 0);
+  //     const discountedPrice = parseFloat(newState.discountedPrice || 0);
+  //     const gst = parseFloat(newState.GST || 0);
+
+  //     // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
+  //     const totalValue = (discountedPrice * quantity);
+  //     newState.finalPrice_with_GST = totalValue;
+  //     const discount = mrp-discountedPrice;
+  //     newState.discount = discount;
+
+  //     return newState;
+  //   });
+  //   console.log("edittem after input change: ",editItem);
+  // };
+
+  
+  // // const handleSaveClick = (itemId) => {
+  // //   // Implement save functionality here
+  // //   console.log("Save changes for item:", editItem);
+
+  // //   setEditId(null);
+  // // };
+
+  // const handleSaveClick = async (itemId) => {
+  //   // Extract necessary fields from editItem
+  //   const { product } = editItem;
+  //   const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
+  //   const { title: productTitle, price: productPrice  } = product;
+  
+  //   // Construct the payload for the API request
+  //   const payload = {
+  //     productCode: product.BarCode, 
+  //     discountedPrice: parseFloat(discountedPrice),
+  //     quantity: parseInt(quantity),
+  //     price: parseFloat(productPrice),
+  //     discount: parseFloat(productPrice)*parseFloat(quantity) - parseFloat(discountedPrice),
+  //     GST: parseFloat(GST),
+  //     finalPrice_with_GST: parseFloat(finalPrice_with_GST)
+  //   };
+  
+  //   try {
+  //     const response = await axiosInstance.put('cart/adjustment', payload);
+  
+  //     // if (!response.ok) {
+  //     //   throw new Error('Network response was not ok' + response.statusText);
+  //     // }
+  //     const resData = response.data;
+  //     console.log("Save changes for item:", resData);
+  
+  //     setEditId(null);
+  //     setEditItem({});
+  //     dispatch(fetchCart());
+
+  //   } catch (error) {
+  //     console.error('Error saving changes:', error);
+  //   }
+  // };
+  
 
   const handleCancelClick = () => {
     setEditId(null);
@@ -149,6 +328,10 @@ console.log(editItem);
     // clearCart()
     dispatch(fetchCart());
   }, [dispatch]);
+
+  useEffect(() => {
+   console.log("This is cart item: ",items )
+  }, [items]);
 
   useEffect(() => {
     console.log(items);
@@ -165,14 +348,14 @@ console.log(editItem);
   }, [items]);
 
 
-    console.log(details);
+  console.log(details);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
     } else {
-      // Redirect to login if no token found
+      // Redirect to login if no token found hhhh
     }
   }, [navigate]);
 
@@ -229,9 +412,6 @@ console.log(err.message)
   }, []);
   //  console.log(details);
 
-
-
-
   
   const handleScan = (data) => {
     // console.log(isChecked)
@@ -239,7 +419,16 @@ console.log(err.message)
       dispatch(fetchProduct(data));
     }
   };
-
+ const handleRemoveAllItem=async () =>
+ {
+  const response = await axiosInstance.delete(`/cart/removeAllItem`); 
+  if(response.status==200)
+  {dispatch(fetchCart());
+  }
+  else{
+    alert("somthing went wrong")
+  }
+ }
   const handleError = (err) => {
 
     // console.log(isChecked)
@@ -289,9 +478,9 @@ console.log(err.message)
     const gen =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
     const amount = Math.round(gen)
    
-    const Total = Math.round(total)
-    console.log(amount == Total)        
-  if(amount == Total){
+    const total = Math.round(total)
+    console.log(amount == total)        
+  if(amount == total){
     if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
       try {
         const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
@@ -342,8 +531,8 @@ console.log(err.message)
       alert(`fill the client details`);
     }
  
-  }else if(amount>Total){
-    setMessage(`Return ${amount-Total} rs `)
+  }else if(amount>total){
+    setMessage(`Return ${amount-total} rs `)
   }else{
     setMessage(`Need ${total-amount} rs to place order or add amount in borrow field `)
   }
@@ -470,10 +659,19 @@ console.log(err.message)
               id="name"
               required
               value={finalform.name}
-              onKeyDown={handleKeys}
-              onChange={handleFinal}
+              onKeyDown={handleKeyDown}
+              onChange={handlesearchChange}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {showModal && (
+              <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
+                {matchingOrders.map((order) => (
+                  <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+                    {order.Name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-gray-700 font-medium">Invoice</label>
@@ -496,9 +694,18 @@ console.log(err.message)
               maxLength={10}
               minLength={10}
               value={finalform.mobileNumber}
-              onChange={handleFinal}
+              onChange={handleMobileSearchChange}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {showMobileModal && (
+              <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
+                {matchingMobileNumbers.map((order) => (
+                  <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid hover:bg-gray-200 cursor-pointer">
+                    {order.mobileNumber}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-gray-700 font-medium">Ship To</label>
@@ -536,7 +743,16 @@ console.log(err.message)
         {/* New Input Fields */}
         <form onSubmit={handleSubmit}>
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
-          <div className=" mb-4 text-center"> 
+            <div className="mb-2 flex justify-center items-center text-center">
+              <button
+                type="button"
+                onClick={handleReverseOrder}
+                className="w-full bg-blue-700 text-white py-2 px-4 rounded font-medium hover:bg-blue-800 transition-colors"
+              >
+                Reverse
+              </button>
+            </div>
+            <div className=" mb-4 text-center"> 
               <label
                 htmlFor="scanner"
                 className="block text-sm font-medium"
@@ -551,6 +767,7 @@ console.log(err.message)
                 className="border border-gray-300 rounded mt-4 p-2"
               />
             </div>
+            
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="barcode"
@@ -805,9 +1022,9 @@ console.log(err.message)
               // }
 
               // Repeat rows as needed
-            </tbody>   */}
+            </tbody>    */}
             <tbody>
-              {details && details.map((item, i) => (
+              { details && (reverseOrder ? [...details].reverse() : details).map((item, i)  => (
                 <tr key={item._id}>
                   <td className="py-1 px-3 border border-gray-600 text-left whitespace-nowrap">{i + 1}</td>
                   <td className="py-1 px-3 border border-gray-600 text-left">
@@ -889,9 +1106,9 @@ console.log(err.message)
                       </>
                     ) : (
                       <>
-                        <button className="bg-yellow-500 text-white px-2 py-2 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
+                      {item.type!='custom' && <button className="bg-yellow-500 text-white px-2 py-2 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
                           Edit
-                        </button>
+                        </button>}
                         <button className="bg-red-500 text-white px-2 py-2 rounded hover:bg-red-600" onClick={() => removeItem(item._id)}>
                           Delete
                         </button>
@@ -906,7 +1123,13 @@ console.log(err.message)
 
         <div class="mt-4 flex justify-between items-center">
 
+
           <div class="flex space-x-2">
+          <button className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-md" onClick={handleRemoveAllItem}>
+                  <span className='text-center'>
+                   Remove all item
+                  </span>
+                </button>
             <button class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={bill}>
               Save
             </button>
@@ -923,18 +1146,17 @@ console.log(err.message)
 
 
 
-<button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handlePrint}>
+
+
+
+
+
+
+                <button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handlePrint}>
                   <span className='text-center'>
                    Save & Print
                   </span>
                 </button>
-
-
-
-
-
-
-
 
 
 
@@ -952,7 +1174,7 @@ console.log(err.message)
               <tbody>
      
               <tr>
-                  <td className="border p-3">MRP:</td>
+                  <td className="border p-3">SUBTOTAL:</td>
                   <td className="border p-3"> {totalPrice}
             </td>
                 </tr>
@@ -966,7 +1188,7 @@ console.log(err.message)
                 </tr>
         
                 <tr>
-                  <td className="border p-3">APALA BAJAR TOTAL :</td>
+                  <td className="border p-3">INVOICE TOTAL :</td>
                   <td className="border p-3">{total}</td>
                 </tr>
                 <tr>
