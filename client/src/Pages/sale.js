@@ -183,14 +183,7 @@ const Sale = () => {
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
       const totalValue = (discountedPrice * quantity);
       newState.finalPrice_with_GST = totalValue;
-      const {product} = editItem;
-      let discount = mrp-discountedPrice;
-      if(mrp==0)
-      {
-       discount=product.discountedPrice-discountedPrice;
-      }
-   
-      // console.log(discount);
+      const discount = mrp-discountedPrice;
       newState.discount = discount;
 
       return newState;
@@ -209,22 +202,16 @@ const Sale = () => {
   const handleSaveClick = async (itemId) => {
     // Extract necessary fields from editItem
     const { product } = editItem;
-    console.log(items);
     const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
-    let { title: productTitle, price: productPrice,  } = product;
-    const ProductApalaBajarPrice = product.discountedPrice;
-    if(productPrice==0)
-    {
-      productPrice=ProductApalaBajarPrice;
-    }
-console.log(editItem);
+    const { title: productTitle, price: productPrice  } = product;
+  
     // Construct the payload for the API request
     const payload = {
       productCode: product.BarCode, 
       discountedPrice: parseFloat(discountedPrice),
       quantity: parseInt(quantity),
       price: parseFloat(productPrice),
-      discount: (parseFloat(productPrice) - parseFloat(discountedPrice))*parseFloat(quantity),
+      discount: parseFloat(productPrice)*parseFloat(quantity) - parseFloat(discountedPrice),
       GST: parseFloat(GST),
       finalPrice_with_GST: parseFloat(finalPrice_with_GST)
     };
@@ -241,6 +228,7 @@ console.log(editItem);
       setEditId(null);
       setEditItem({});
       dispatch(fetchCart());
+
     } catch (error) {
       console.error('Error saving changes:', error);
     }
@@ -258,6 +246,10 @@ console.log(editItem);
     // clearCart()
     dispatch(fetchCart());
   }, [dispatch]);
+
+  useEffect(() => {
+   console.log("This is cart item: ",items )
+  }, [items]);
 
   useEffect(() => {
     console.log(items);
@@ -281,7 +273,7 @@ console.log(editItem);
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
     } else {
-      // Redirect to login if no token found
+      // Redirect to login if no token found hhhh
     }
   }, [navigate]);
 
@@ -395,9 +387,9 @@ console.log(err.message)
     const gen =(cashPay?parseInt(cashPay):0)+(upiPay?parseInt(upiPay):0)+(cardPay?parseInt(cardPay):0)+(borrow?parseInt(borrow):0)
     const amount = Math.round(gen)
    
-    const Total = Math.round(total)
-    console.log(amount == Total)        
-  if(amount == Total){
+    const total = Math.round(total)
+    console.log(amount == total)        
+  if(amount == total){
     if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
       try {
         const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
@@ -448,8 +440,8 @@ console.log(err.message)
       alert(`fill the client details`);
     }
  
-  }else if(amount>Total){
-    setMessage(`Return ${amount-Total} rs `)
+  }else if(amount>total){
+    setMessage(`Return ${amount-total} rs `)
   }else{
     setMessage(`Need ${total-amount} rs to place order or add amount in borrow field `)
   }
@@ -939,9 +931,10 @@ console.log(err.message)
               // }
 
               // Repeat rows as needed
-            </tbody>   */}
+            </tbody>    */}
             <tbody>
-              { details && (reverseOrder ? [...details].reverse() : details).map((item, i)  => (
+              {/* { details && (reverseOrder ? [...details].reverse() : details).map((item, i)  => ( */}
+              { details && details.map((item, i)  => (
                 <tr key={item._id}>
                   <td className="py-1 px-3 border border-gray-600 text-left whitespace-nowrap">{i + 1}</td>
                   <td className="py-1 px-3 border border-gray-600 text-left">
@@ -1086,7 +1079,7 @@ console.log(err.message)
               <tbody>
      
               <tr>
-                  <td className="border p-3">MRP:</td>
+                  <td className="border p-3">SUBTOTAL:</td>
                   <td className="border p-3"> {totalPrice}
             </td>
                 </tr>
@@ -1100,7 +1093,7 @@ console.log(err.message)
                 </tr>
         
                 <tr>
-                  <td className="border p-3">APALA BAJAR TOTAL :</td>
+                  <td className="border p-3">INVOICE TOTAL :</td>
                   <td className="border p-3">{total}</td>
                 </tr>
                 <tr>

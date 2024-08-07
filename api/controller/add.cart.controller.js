@@ -23,6 +23,11 @@ const addToCart = asyncHandler(async (req, res) => {
         }
 
         let cartItem = await Offline_CartItem.findOne({ userId: id, product: product._id });
+        console.log(cartItem);
+
+            if(cartItem && cartItem.type=='custom')
+            return res.status(404).json(new ApiResponse(404, 'Cart item is custom', null));
+        
         if (cartItem) {
             cartItem.quantity += 1;
             cartItem.price += product.price;
@@ -109,7 +114,7 @@ const updateToCart = asyncHandler(async (req, res) => {
             cartItem.finalPrice_with_GST =0;
             cartItem.updatedAt = new Date();
             await cartItem.save();
-        } 
+        }  
        product.quantity+=oldItem.quantity;
        await product.save();
         let cart = await Offline_Cart.findOne({ userId: id });
@@ -135,7 +140,7 @@ const updateToCart = asyncHandler(async (req, res) => {
                 cartItem.GST = GST*quantity;
                 cartItem.type = 'custom';
                 cartItem.finalPrice_with_GST = finalPrice_with_GST;
-                cartItem.updatedAt = new Date();
+                cartItem.updatedAt = new Date();  
                 await cartItem.save();
             }
             cart.GST += cartItem.GST;
@@ -283,7 +288,7 @@ const removeAllCart = asyncHandler(async (req, res) => {
         }
 
         await Offline_CartItem.deleteMany({ _id: { $in: cart.cartItems } });
-        await Offline_Cart.findOneAndRemove({ userId: id });
+        await Offline_Cart.findOneAndDelete({ userId: id });
 
         return res.status(200).json(new ApiResponse(200, 'Cart deleted successfully'));
     } catch (error) {
