@@ -58,7 +58,7 @@ const Sale = () => {
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [matchingMobileNumbers, setMatchingMobileNumbers] = useState([]);
   const [reverseOrder, setReverseOrder] = useState(false);
-  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(true);
+  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({
     "_id": "66ab771af4df2f3e3c09ecb4",
     "title": "POSH COCOA POWDER",
@@ -1205,7 +1205,7 @@ console.log(err.message)
                       </>
                     ) : (
                       <>
-                      {item.type!='custom' && <button className="bg-yellow-500 text-white px-2 py-2 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
+                      {item.quantity!=1 || item.type!='custom' && <button className="bg-yellow-500 text-white px-2 py-2 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
                           Edit
                         </button>}
                         <button className="bg-red-500 text-white px-2 py-2 rounded hover:bg-red-600" onClick={() => removeItem(item._id)}>
