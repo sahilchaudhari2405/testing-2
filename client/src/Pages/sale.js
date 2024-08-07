@@ -13,6 +13,15 @@ import { fetchCart, removeFromCart, clearCart, updateCartQuantity, addToCart } f
 import {createOrder} from '../Redux/Orders/orderSlice';
 import Invoice from "../component/invoice.js";
 import axiosInstance from "../axiosConfig.js";
+import { fetchUsers } from '../Redux/User/userSlices';
+import { fetchOrders } from '../Redux/Orders/orderSlice';
+
+
+
+
+
+
+
 const Sale = () => {
   const [details, setDetails] = useState([]);
   const [productDetails,setProductDetails] = useState()
@@ -39,20 +48,120 @@ const Sale = () => {
 
   const [editId, setEditId] = useState(null);
   const [editItem, setEditItem] = useState({});
+  const [searchuser, setSearchuser] = useState([]);
+  const users = useSelector((state) => state.user.users);
+  const orders = useSelector((state) => state.orders.orders);
+
+  const [searchInput, setSearchInput] = useState('');
+  const [matchingOrders, setMatchingOrders] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [matchingMobileNumbers, setMatchingMobileNumbers] = useState([]);
+  const [reverseOrder, setReverseOrder] = useState(false);
+
+  const handleReverseOrder = () => {
+    setReverseOrder(!reverseOrder);
+  };
 
   const handleEditClick = (item) => {
     setEditId(item._id);
     setEditItem({...item});
   };
 
-  // const handleInputChange = (e, field) => {
-  //   console.log("field is :", field);
-  //   console.log("value is :", e.target.value);
-  //   setEditItem({
-  //     ...editItem,
-  //     [field]: e.target.value,
+  useEffect(() => {
+    dispatch(fetchUsers());
+    dispatch(fetchOrders());
+  }, [dispatch]);
+
+  useEffect(() => {
+    console.log("users are: ",users);
+    console.log("orders are: ",orders);
+    setSearchuser(users);
+  }, [users,orders]);
+
+  const handleKeyDown = (e) => {
+    console.log(e.key);
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission on Enter
+      const form = e.target.form;
+      const index = Array.prototype.indexOf.call(form, e.target);
+      form.elements[index + 1].focus();
+    }
+  };
+
+  // const handleFinal = (e) => {
+  //   const value = e.target.value;
+  //   setFinal({
+  //     ...finalform,
+  //     [e.target.id]: value,
   //   });
+  //   if (value) {
+  //     const filteredUsers = users.filter((user) =>
+  //       user.name.toLowerCase().includes(value.toLowerCase())
+  //     );
+  //     setMatchingUsers(filteredUsers);
+  //     setShowModal(true);
+  //   } else {
+  //     setShowModal(false);
+  //   }
   // };
+
+  const handlesearchChange = (e) => {
+    const value = e.target.value;
+    console.log("value is: ",value);
+    setFinal({
+      ...finalform,
+      [e.target.id]: value,
+    });
+    // setSearchInput(value);
+    console.log("searchusers are: ",searchuser);
+    if (value) {
+      const filteredOrders = orders.filter((order) =>
+        order.Name?.toLowerCase().includes(value.toLowerCase())
+      );
+      console.log("filtered suers are: ", filteredOrders);
+      setMatchingOrders(filteredOrders);
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+  };
+
+  const handleMobileSearchChange = (e) => {
+    const value = e.target.value;
+    console.log("Mobile number is: ", value);
+    setFinal({
+      ...finalform,
+      [e.target.id]: value,
+    });
+    if (value) {
+      const filteredOrders = orders.filter((order) =>
+        String(order.mobileNumber).includes(value)
+      );
+      console.log("Filtered orders by mobile number: ", filteredOrders);
+      setMatchingMobileNumbers(filteredOrders);
+      setShowMobileModal(true);
+    } else {
+      setShowMobileModal(false);
+    }
+  };
+
+  const handleSelectOrder = (order) => {
+    console.log("handlie select form mobile number");
+    setFinal({
+      ...finalform,
+      name: order.Name,
+      Date: order.Date || currentDate,
+      mobileNumber: order.mobileNumber || '',
+      ShipTo: order.ShipTo || '',
+      address: order.address || 'Shrigonda',
+      state: order.state || 'Maharastra',
+    });
+    setShowModal(false);
+    setShowMobileModal(false);
+
+  };
+
 
   const handleInputChange = (e, field) => {
     const { value } = e.target;
@@ -152,7 +261,7 @@ const Sale = () => {
   }, [items]);
 
 
-    console.log(details);
+  console.log(details);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -215,9 +324,6 @@ console.log(err.message)
     setCurrentDate(formattedDate);
   }, []);
   //  console.log(details);
-
-
-
 
   
   const handleScan = (data) => {
@@ -457,10 +563,19 @@ console.log(err.message)
               id="name"
               required
               value={finalform.name}
-              onKeyDown={handleKeys}
-              onChange={handleFinal}
+              onKeyDown={handleKeyDown}
+              onChange={handlesearchChange}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {showModal && (
+              <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
+                {matchingOrders.map((order) => (
+                  <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+                    {order.Name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-gray-700 font-medium">Invoice</label>
@@ -483,9 +598,18 @@ console.log(err.message)
               maxLength={10}
               minLength={10}
               value={finalform.mobileNumber}
-              onChange={handleFinal}
+              onChange={handleMobileSearchChange}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {showMobileModal && (
+              <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
+                {matchingMobileNumbers.map((order) => (
+                  <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid hover:bg-gray-200 cursor-pointer">
+                    {order.mobileNumber}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-gray-700 font-medium">Ship To</label>
@@ -523,7 +647,16 @@ console.log(err.message)
         {/* New Input Fields */}
         <form onSubmit={handleSubmit}>
           <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
-          <div className=" mb-4 text-center"> 
+            <div className="mb-2 flex justify-center items-center text-center">
+              <button
+                type="button"
+                onClick={handleReverseOrder}
+                className="w-full bg-blue-700 text-white py-2 px-4 rounded font-medium hover:bg-blue-800 transition-colors"
+              >
+                Reverse
+              </button>
+            </div>
+            <div className=" mb-4 text-center"> 
               <label
                 htmlFor="scanner"
                 className="block text-sm font-medium"
@@ -538,6 +671,7 @@ console.log(err.message)
                 className="border border-gray-300 rounded mt-4 p-2"
               />
             </div>
+            
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
                 htmlFor="barcode"
@@ -794,7 +928,7 @@ console.log(err.message)
               // Repeat rows as needed
             </tbody>   */}
             <tbody>
-              {details && details.map((item, i) => (
+              { details && (reverseOrder ? [...details].reverse() : details).map((item, i)  => (
                 <tr key={item._id}>
                   <td className="py-1 px-3 border border-gray-600 text-left whitespace-nowrap">{i + 1}</td>
                   <td className="py-1 px-3 border border-gray-600 text-left">
