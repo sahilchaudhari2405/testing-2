@@ -286,7 +286,7 @@ const InvoiceTest = () => {
 
   return (
     <div className="invoice__preview mt-20 bg-white p-5 w-fit  rounded-2xl border-4 border-blue-200">
-      <div className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black">
+      <div  ref={componentRef} className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black">
           <div className="w-24 h-24 border flex items-center justify-center">
             <img src={logo} alt="Insert Logo Above" />
           </div>
@@ -294,6 +294,7 @@ const InvoiceTest = () => {
           <div className='flex flex-col items-center'>
             <h1 className="text-2xl font-bold mt-2">APLA BAJAR</h1>
             <p>SHRIGONDA, AHMADNAGAR</p>
+            <p>Customer Care +91 9576383726</p>
             {/* <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
             <p>PHONE: 9423750349</p>
             <p>EMAIL: aaplabajar@gmail.com</p> */}
@@ -306,18 +307,15 @@ const InvoiceTest = () => {
             <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
             <span>{currentDate}</span>
           </div>
-          <div>
-            {/* <span className={sharedClasses.fontBold}>INVOICE: </span> */}
-            <div><Barcode value={details._id} width={1.5} height={40} /></div>
-          </div>
+          
         </div>
         <div className={`${sharedClasses.flex} justify-self-start  w-full ${sharedClasses.mb4}`}>
-          <div className="w- pr-2">
-            <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
-            <p>{details.Name?.toUpperCase()}</p>
-            <p>{details.Address?.toUpperCase()}</p>
-            <p>PHONE:{details.mobileNumber}</p>
-            <p>EMAIL:{details.email}</p>
+          <div className="w-full flex gap-4 pr-2">
+            <div><h2 className={sharedClasses.fontBold}>BILL TO:   </h2></div>
+            <div><p>{details.Name?.toUpperCase()}</p></div>
+            {/* <p>{details.Address?.toUpperCase()}</p> */}
+            {/* <p>PHONE:{details.mobileNumber}</p>
+            <p>EMAIL:{details.email}</p> */}
           </div>
         </div>
         <table className="w-fit border-collapse border mb-2 text-xs">
@@ -362,13 +360,10 @@ const InvoiceTest = () => {
             <div className='flex flex-col items-center'>
               <span className='font-semibold'>PAYMENT BY</span>
               <div className='flex flex-col w-full'>
-                <div className='flex justify-between'><span>Cash:</span><span> ₹{details.paymentType.cash}</span></div>
-                <div className='flex justify-between'><span>Card:</span><span>₹{details.paymentType.Card}</span></div>
-                <div className='flex justify-between'><span>UPI:</span><span>₹{details.paymentType.UPI}</span></div>
-                <div className='flex justify-between'><span>Borrow:</span><span>₹{details.paymentType.borrow}</span></div>
-                
-                
-                
+                {details.paymentType.cash > 0 && <div className='flex justify-between'><span>Cash:</span><span> ₹{details.paymentType.cash}</span></div>}
+                {details.paymentType.Card > 0 && <div className='flex justify-between'><span>Card:</span><span>₹{details.paymentType.Card}</span></div>}
+                {details.paymentType.UPI > 0 && <div className='flex justify-between'><span>UPI:</span><span>₹{details.paymentType.UPI}</span></div>}
+                {details.paymentType.borrow > 0 && <div className='flex justify-between'><span>Borrow:</span><span>₹{details.paymentType.borrow}</span></div>}
               </div>
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
@@ -378,8 +373,12 @@ const InvoiceTest = () => {
           </div>
         </div>
         <div className="mb-4">
-          <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2>
-          <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div>
+          {/* <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2> */}
+          {/* <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div> */}
+        </div>
+        <div>
+          {/* <span className={sharedClasses.fontBold}>INVOICE: </span> */}
+          <div><Barcode value={details._id} width={1.5} height={40} /></div>
         </div>
         <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
       </div>

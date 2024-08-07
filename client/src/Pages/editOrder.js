@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axiosInstance from '../axiosConfig';
 import { toast } from 'react-toastify';
+import BarcodeReader from 'react-barcode';
 
 const EditOrder = () => {
   const [formData, setFormData] = useState({
@@ -30,9 +31,38 @@ const EditOrder = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fetchedOrder, setfetchedOrder] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+
+
+  const handleCheckboxChange = (event) => {
+    const checked = event.target.checked;
+    setIsChecked(checked);
+  };
+
+
+  const handleScan = (data) => {
+    // console.log(isChecked)
+    if (isChecked&&data) {
+      setOrderId(data);
+      fetchOrderData();
+    }
+  };
+
+  const handleError = (err) => {
+    // console.log(isChecked)
+    // if (isChecked) {
+
+    //   fetchProducts(766576577878')
+    // }
+    alert("Connnect the Barcode Scanner")
+    // dispatch(fetchProduct("5345435334"));
+  };
+
+
   const handleOrderIdChange = (e) => {
     setOrderId(e.target.value);
   };
+
   const formatDateToDisplay = (date) => {
     const [year, month, day] = date.split('-');
     return `${day}/${month}/${year}`;
@@ -225,6 +255,7 @@ const EditOrder = () => {
 
   }
 
+
   return (
     <div className="bg-gray-100 mt-20  mx-6 rounded-lg shadow-lg">
       <div className="bg-blue-700 text-white p-4 rounded-t-lg">
@@ -232,8 +263,25 @@ const EditOrder = () => {
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
         <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">Enter Order ID</label>
+          <BarcodeReader onError={handleError} onScan={handleScan} />
+              
+          <label className="block text-gray-700 font-medium mb-2">Enter Order ID or Scan the Barcode</label>
           <div className="flex space-x-4">
+            <div>
+              <label
+                  htmlFor="scanner"
+                  className="block text-sm font-medium"
+                >
+                  Scanner
+                </label>
+                <input
+                  type="checkbox"
+                  id="scanner"
+                  checked={isChecked}
+                  onChange={handleCheckboxChange} 
+                  className="border border-gray-300 rounded mt-4 p-2"
+                />
+              </div>
             <input
               type="text"
               value={orderId}
