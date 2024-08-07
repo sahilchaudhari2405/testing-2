@@ -333,10 +333,10 @@ console.log(err.message)
       setTotalPrice("")
       setGst("")
       setFinalTotal("")
-
-        alert('Order created successfully!');
+      toast.success("Order created successfully!");
       } catch (err) {
-        alert(`Failed to create order: ${err.message}`);
+        toast.error(`Failed to create order: ${err.message}`);
+    
       }
     }else{
       alert(`fill the client details`);
@@ -345,7 +345,7 @@ console.log(err.message)
   }else if(amount>Total){
     setMessage(`Return ${amount-Total} rs `)
   }else{
-    setMessage(`Need ${total-amount} rs to place order or add amount in borrow field `)
+    setMessage(`Need ${Total-amount} rs to place order or add amount in borrow field `)
   }
 
   }

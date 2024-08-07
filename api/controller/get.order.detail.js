@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import OfflineOrder from "../model/order.model.js";
+import OfflinePurchaseOrder from "../model/purchaseOrder.js"
 // Function to place an order
 const getCounterBill = asyncHandler(async (req, res) => {
     const { id ,role} = req.user;
@@ -83,10 +84,10 @@ const getAllBill = asyncHandler(async (req, res) => {
 );
 
 const sortOrder = asyncHandler(async (req, res) => {
-    const { fromDate, toDate, name } = req.body;
-    const { id } = req.user;
+    const { fromDate, toDate, name,type } = req.body;
+    const { id ,role} = req.user;
   
-    let query = { user: id };
+    let query = {};
   
     // Add date range filter if fromDate and toDate are provided
     if (fromDate && toDate) {
@@ -100,26 +101,95 @@ const sortOrder = asyncHandler(async (req, res) => {
     if (name) {
         query.Name = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
       }
+    console.log(role)
+
+
+
   
-    try {
-      const orders = await OfflineOrder.find(query)
-        .populate({
-          path: 'user',
-          model: 'CounterUser',
-        },
-         {
-            path:'orderItems',
-            populate: {
-                path: 'product',
-                model: 'products'
-            }
-        })
-        .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
+      if(type=='Purchase'){
+        try {
+            
   
-      res.json(orders);
-    } catch (err) {
-      res.status(500).json({ error: 'Internal server error' });
-    }
+          if(role=='admin'){
+            const orders = await OfflinePurchaseOrder.find(query)
+            .populate({
+              path: 'user',
+              model: 'CounterUser',
+            })
+            .populate({
+              path: 'orderItems.productId',
+              model: 'products',
+            })
+            .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
+        
+          console.log(orders, "hallo");
+          res.json(orders);
+          }else{
+            query = { user: id };
+            const orders = await OfflinePurchaseOrder.find(query)
+              .populate({
+                path: 'user',
+                model: 'CounterUser',
+              })
+              .populate({
+                path: 'orderItems.productId',
+                model: 'products',
+              })
+              .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
+          
+            console.log(orders, "hallo");
+            res.json(orders);
+          }
+
+          } catch (err) {
+            res.status(500).json({ error: 'Internal server error' });
+          }
+      }else{
+        try {
+            
+          if(role=='admin'){
+            const orders = await OfflineOrder.find(query)
+              .populate(
+                  {
+                path: 'user',
+                model: 'CounterUser',
+              }).populate(
+              {
+                  path: 'orderItems',
+                  populate: {
+                      path: 'product',
+                      model: 'products', 
+                  },
+              }
+          )
+              .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
+        
+            res.json(orders);
+        }else{
+          query = { user: id };
+          const orders = await OfflineOrder.find(query)
+          .populate(
+              {
+            path: 'user',
+            model: 'CounterUser',
+          }).populate(
+          {
+              path: 'orderItems',
+              populate: {
+                  path: 'product',
+                  model: 'products', 
+              },
+          }
+      )
+          .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
+    
+        res.json(orders);
+        }
+          } catch (err) {
+            res.status(500).json({ error: 'Internal server error' });
+          }
+      }
+
   });
 
 export {getAllBill,getCounterBill,getOneBill,sortOrder};

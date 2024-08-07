@@ -26,7 +26,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             if (!productData.barcode) {
                 return res.status(400).json({ message: "Product barcode is missing" });
             }
-            console.log(productData)
+           // console.log(productData)
             const category = await Category.findOne({name: productData.category});
             if(!category)
             {
