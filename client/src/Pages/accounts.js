@@ -32,7 +32,7 @@ const Accounts = () => {
   useEffect(() => {
     if (orders.length > 0) {
       orders.forEach(order => {
-        console.log(order);
+        console.log("Client fecthed!!");
       });
     }
   }, [orders]);
@@ -108,7 +108,7 @@ const Accounts = () => {
 
   const filteredOrders = orders.filter(order => {
     const orderDate = new Date(order.orderDate);
-    const orderCreatedAt = new Date(order.createdAt);
+    const orderCreatedAt = new Date(order.orderDate);
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -166,7 +166,7 @@ const Accounts = () => {
               <td className="border border-zinc-800 px-4 py-2">{order.email}</td>
               <td className="border border-zinc-800 px-4 py-2">{order.orderStatus}</td>
               <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleTimeString()}</td>
-              <td className="border border-zinc-800 px-4 py-2">{new Date(order.createdAt).toLocaleDateString()}</td>
+              <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleDateString()}</td>
               <td className="border border-zinc-800 px-4 py-2">
                 <div className='flex justify-around'>
                   <button className="text-green-500 text-xl">
