@@ -5,6 +5,7 @@ import slugify from 'slugify';
 // import { uploadImageOnCloudinary } from '../cloud/cloudinary.js';
 import fs from 'fs';
 import mongoose from 'mongoose';
+import categoryModel from '../model/category.model.js';
 // mongoose.set('debug', true);
 // Create product
 // export const createProduct = async (req, res) => {
@@ -71,7 +72,22 @@ export const viewProduct = async (req, res) => {
     return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
   }
 };
+export const SuggestProduct = async (req, res) => {
+  const { CategoriesId } = req.query;
+  try {
+     const parentCategory = await categoryModel.findById(CategoriesId);
+    const categories = await  categoryModel.find({ parentCategory: parentCategory.parentCategory});
 
+    const categoryIds = categories.map(category => category._id);
+
+    const products = await Product.find({ category: { $in: categoryIds } });
+
+    return products;
+  } catch (error) {
+    console.error('Error finding products by parent category:', error);
+    throw error;
+  }
+};
 // Update product
 // export const updateProduct = async (req, res) => {
 //   const { id } = req.params;
@@ -149,7 +165,7 @@ export const deleteProduct = async (req, res) => {
 // Assuming you have a model named Product
 export const viewProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate('category')
+    const products = await Product.find().limit(500).populate('category')
     return res.status(200).send({ message: "Products retrieved successfully", status: true, data: products });
   } catch (error) {
     console.error(error);

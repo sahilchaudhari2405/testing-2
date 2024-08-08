@@ -13,9 +13,10 @@ export const fetchOrders = createAsyncThunk('orders/fetchOrders', async () => {
   }
 });
 
-export const sortOrders = createAsyncThunk('orders/sortOrders', async ({ fromDate, toDate,name}) => {
+export const sortOrders = createAsyncThunk('orders/sortOrders', async ({ fromDate, toDate,name,selectedView}) => {
+  const type = selectedView;
   try {
-    const response = await axiosInstance.post('/order/sortOrder', { fromDate, toDate,name });
+    const response = await axiosInstance.post('/order/sortOrder', { fromDate, toDate,name,type });
     return response.data;  // Return the sorted orders data
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to sort orders');
@@ -60,6 +61,7 @@ export const createPurchaseOrder = createAsyncThunk('purchaseOrders/createPurcha
      console.log(response);
     return response.data.order;  // Return the data directly from axios response
   } catch (error) {
+    console.log(error)
     throw new Error(error.response?.data?.message || 'Failed to create purchase order');
   }
 });
