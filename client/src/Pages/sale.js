@@ -664,47 +664,48 @@ console.log(err.message)
   
   const componentRef = useRef();
   return (
-    <div className="bg-gray-100 mt-28 mx-6 rounded-lg shadow-lg">
+    <div className="bg-gray-100 mt-20 mx-6 rounded-lg shadow-lg">
       <BarcodeReader onError={handleError} onScan={handleScan} />
-      <div className="bg-green-700 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Sale</h1>
+      <div className="bg-green-700 text-white p-1 px-6 rounded-t-lg flex justify-between items-center">
+        <h1 className="text-xl font-bold">Sale</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm">
             Online Orders | Hi, <span className="font-bold">{fullName}</span>
           </span>
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+            className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition-colors"
           >
             LogOut
           </button>
           <button
             onClick={() => navigate("/editOrder")}
-            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors"
+            className="bg-yellow-500 text-white px-4 py-1 rounded hover:bg-yellow-600 transition-colors"
           >
             Edit Order
           </button>
         </div>
       </div>
-      <div className="bg-white p-6 rounded-b-lg shadow-inner">
+      <div className="bg-white p-2 rounded-b-lg shadow-inner">
       <form>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div>
-            <label className="block text-gray-700 font-medium">Type</label>
-            <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label className=" text-gray-700 mr-2 font-medium">Type</label>
+            <select className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option>Sale</option>
             </select>
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Name</label>
+            <label className="mr-2 text-gray-700 font-medium">Name</label>
             <input
               type="text"
               id="name"
               required
               value={finalform.name}
+              placeholder="Enter name"
               onKeyDown={handleKeyDown}
               onChange={handlesearchChange}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {showModal && (
               <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
@@ -717,28 +718,29 @@ console.log(err.message)
             )}
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Invoice</label>
+            <label className="mr-2 text-gray-700 font-medium">Invoice</label>
             <input
               type="date"
               id="Date"
               onKeyDown={handleKeys}
               value={currentDate}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
      
           <div>
-            <label className="block text-gray-700 font-medium">Mobile</label>
+            <label className=" mr-2 text-gray-700 font-medium">Mobile</label>
             <input
               type="text"
               id="mobileNumber"
               required
               onKeyDown={handleKeys}
+              placeholder="Enter num"
               maxLength={10}
               minLength={10}
               value={finalform.mobileNumber}
               onChange={handleMobileSearchChange}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {showMobileModal && (
               <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
@@ -751,32 +753,32 @@ console.log(err.message)
             )}
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Ship To</label>
+            <label className=" mr-2 text-gray-700 font-medium">Ship To</label>
             <input
               type="text"
               id="ShipTo"
               value={finalform.ShipTo}
               onChange={handleFinal}
               onKeyDown={handleKeys}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Address</label>
+            <label className=" mr-2 text-gray-700 font-medium">Address</label>
             <input
               type="text"
               id="address"
               value={finalform.address}
               onChange={handleFinal}
               onKeyDown={handleKeys}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">State</label>
+            <label className=" mr-2 text-gray-700 font-medium">State</label>
             <input id="state"
               value={finalform.state}
-             onChange={handleFinal} className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+             onChange={handleFinal} className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
             </input>
           </div>
         </div>
@@ -785,12 +787,12 @@ console.log(err.message)
 
         {/* New Input Fields */}
         <form onSubmit={handleSubmit}>
-          <div className="flex flex-nowrap bg-gray-200 px-3 pt-3 rounded-md space-x-2 mb-6">
+          <div className="flex flex-nowrap bg-gray-200 px-3  text-center rounded-md space-x-2 mb-2">
             <div className="mb-2 flex justify-center items-center text-center">
               <button
                 type="button"
                 onClick={handleReverseOrder}
-                className="w-full bg-blue-700 text-white py-2 px-4 rounded font-medium hover:bg-blue-800 transition-colors"
+                className="w-full bg-blue-700 text-white py-1 px-4 rounded font-medium hover:bg-blue-800 transition-colors"
               >
                 Reverse
               </button>
@@ -807,7 +809,7 @@ console.log(err.message)
                 id="scanner"
                 checked={isChecked}
                 onChange={handleCheckboxChange} 
-                className="border border-gray-300 rounded mt-4 p-2"
+                className="border border-gray-300 rounded mt-4 "
               />
             </div>
             
@@ -824,11 +826,11 @@ console.log(err.message)
                 value={formData.barcode}
                 onKeyDown={handleKeyPress}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter barcode"
               />
             </div>
-            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+            <div className="w-full sm:w-1/2 lg:w-1/4 ">
               <label
                 htmlFor="brand"
                 className="block text-gray-700 text-sm font-medium"
@@ -841,7 +843,7 @@ console.log(err.message)
                 value={formData.brand}
                 onChange={handleChange}
                 id="brand"
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter brand"
               />
             </div>
@@ -858,7 +860,7 @@ console.log(err.message)
                 onKeyDown={handleKeys}
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter description"
               />
             </div>
@@ -875,7 +877,7 @@ console.log(err.message)
                 value={formData.category}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter category"
               />
             </div>
@@ -892,7 +894,7 @@ console.log(err.message)
                 value={formData.stockType}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter stock type"
               />
             </div>
@@ -909,7 +911,7 @@ console.log(err.message)
                 value={formData.unit}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter unit"
               />
             </div>
@@ -925,7 +927,7 @@ console.log(err.message)
                 id="qty"
                 value={formData.qty}
                 onKeyDown={handleKeys}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter quantity"
               />
             </div>
@@ -942,7 +944,7 @@ console.log(err.message)
                 value={formData.saleRate}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter Sale rate"
               />
             </div>
@@ -959,7 +961,7 @@ console.log(err.message)
                 value={formData.hsn}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter HSN"
               />
             </div>
@@ -976,16 +978,16 @@ console.log(err.message)
                 value={formData.gst}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter GST percentage"
               />
             </div>
      
 
-            <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 my-6">
+            <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 mt-5">
               <button
                 type="submit"
-                className="w-full bg-green-700 text-white py-3 rounded font-medium hover:bg-green-800 transition-colors"
+                className="w-full bg-green-700 text-white py-1 rounded font-medium hover:bg-green-800 transition-colors"
               >
           
 
@@ -1000,24 +1002,24 @@ console.log(err.message)
             <span class="text-muted-foreground">ITEMS</span>
             <span class="text-primary px-3">{items[1]&&items[1].totalItem}</span>
           </div>
-          <table className="w-full mb-6 border-collapse bg-white rounded-lg shadow-md overflow-hidden">
+          <table className="w-full mb-2 border-collapse bg-white rounded-lg shadow-md overflow-hidden">
             <thead>
               <tr className="bg-gray-300 text-gray-600">
-                <th className="p-3 border border-gray-600 text-left">#</th>
-                <th className="p-3 border border-gray-600 text-left">
+                <th className="p-1 border border-gray-600 text-left">#</th>
+                <th className="p-1 border border-gray-600 text-left">
                   Description
                 </th>
-                <th className="p-3 border border-gray-600 text-left">MRP</th>
-                <th className="p-3 border border-gray-600 text-left w-[60px]">
+                <th className="p-1 border border-gray-600 text-left">MRP</th>
+                <th className="p-1 border border-gray-600 text-left w-[60px]">
                   Net Qty
                 </th>
-                <th className="p-3 border border-gray-600 text-left">Apla Price</th>
-                <th className="p-3 border border-gray-600 text-left">Disc.</th>
-                <th className="p-3 border border-gray-600 text-left">GST%</th>
-                <th className="p-3 border border-gray-600 text-left">
+                <th className="p-1 border border-gray-600 text-left">Apla Price</th>
+                <th className="p-1 border border-gray-600 text-left">Disc.</th>
+                <th className="p-1 border border-gray-600 text-left">GST%</th>
+                <th className="p-1 border border-gray-600 text-left">
                   Total Value
                 </th>
-                <th className="p-3 border border-gray-600 text-left">
+                <th className="p-1 border border-gray-600 text-left">
                   Actions
                 </th>
               </tr>
@@ -1155,7 +1157,7 @@ console.log(err.message)
                         //   </div>
                         // </div>
                         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl mx-4">
+                          <div className="bg-white p-2 rounded-lg shadow-lg w-full max-w-3xl mx-4">
                             <div className="flex justify-between items-start">
                               <h2 className="text-2xl font-bold mb-4">{selectedProduct.title}</h2>
                               <button
@@ -1169,7 +1171,7 @@ console.log(err.message)
                               <img
                                 src={selectedProduct.imageUrl}
                                 alt={selectedProduct.title}
-                                className="w-full md:w-1/2 rounded-lg mb-4 md:mb-0 md:mr-4"
+                                className="w-full md:w-1/2 rounded-lg  md:mb-0 md:mr-4"
                               />
                               <div className="flex flex-col items-start w-full justify-start">
                                 <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Description:</strong></div> <div>{selectedProduct.description}</div></div>
@@ -1196,19 +1198,19 @@ console.log(err.message)
                       )}
                     {editId === item._id ? (
                       <>
-                        <button className="bg-green-500 text-white px-2 py-2 rounded hover:bg-green-600" onClick={() => handleSaveClick(item._id)}>
+                        <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600" onClick={() => handleSaveClick(item._id)}>
                           Save
                         </button>
-                        <button className="bg-gray-500 text-white px-2 py-2 rounded hover:bg-gray-600" onClick={handleCancelClick}>
+                        <button className="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600" onClick={handleCancelClick}>
                           Cancel
                         </button>
                       </>
                     ) : (
                       <>
-                      {item.quantity!=1 || item.type!='custom' && <button className="bg-yellow-500 text-white px-2 py-2 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
+                      {item.quantity!=1 || item.type!='custom' && <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
                           Edit
                         </button>}
-                        <button className="bg-red-500 text-white px-2 py-2 rounded hover:bg-red-600" onClick={() => removeItem(item._id)}>
+                        <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" onClick={() => removeItem(item._id)}>
                           Delete
                         </button>
                       </>
@@ -1256,82 +1258,78 @@ console.log(err.message)
                    Save & Print
                   </span>
                 </button>
-
-
-
-
-
-
-
                    </div>
 
       
-          <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6 max-w-2xl">
+          <div className="bg-gray-200  rounded-lg shadow-md  max-w-2xl">
           <div className="text-center"><h3 className=" text-red-500 text-lg font-semibold">{message}</h3></div>
-            <h2 className="text-lg font-semibold mb-4">Expense</h2>
+            <h2 className="text-lg font-semibold ">Expense</h2>
             <table className="w-full border-collapse">
               <tbody>
      
               <tr>
-                  <td className="border p-3">SUBTOTAL:</td>
-                  <td className="border p-3"> {totalPrice}
+                  <td className="border p-1">SUBTOTAL:</td>
+                  <td className="border p-1"> {totalPrice}
             </td>
                 </tr>
                 <tr>
-                  <td className="border p-3">DISCOUNT:</td>
-                  <td className="border p-3">{discount}</td>
+                  <td className="border p-1">DISCOUNT:</td>
+                  <td className="border p-1">{discount}</td>
                 </tr>
                 <tr>
-                  <td className="border p-3">TAXES:</td>
-                  <td className="border p-3">{gst}</td>
+                  <td className="border p-1">TAXES:</td>
+                  <td className="border p-1">{gst}</td>
                 </tr>
         
                 <tr>
-                  <td className="border p-3">INVOICE TOTAL :</td>
-                  <td className="border p-3">{total}</td>
+                  <td className="border p-1">INVOICE TOTAL :</td>
+                  <td className="border p-1">{total}</td>
                 </tr>
+                
                 <tr>
-                  <td className="border p-3">PAYMENT IN CASH:</td>
-                  <td className="border p-3">  
+                  <td className="border p-1">PAYMENT IN CASH:</td>
+                  <td className="border p-1">  
                     <input
                 type="text"
                 id="cash"
                 value={cashPay}
                 onChange={(e)=>setCashPay(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter payed cash"
               /></td>
                 </tr>
+
                 <tr>
-                  <td className="border p-3">PAYMENT IN CARD:</td>
-                  <td className="border p-3"><input
+                  <td className="border p-1">PAYMENT IN CARD:</td>
+                  <td className="border p-1"><input
                 type="text"
                 id="card"
                 value={cardPay}
                 onChange={(e)=>setCardPay(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter payed cash or enter 0"
               /></td>
                 </tr>
+                
                 <tr>
                   <td className="border p-3">PAYMENT IN UPI:</td>
-                  <td className="border p-3"><input
+                  <td className="border p-1"><input
                 type="text"
                 id="upi"
                 value={upiPay}
                 onChange={(e)=>setUPIPay(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter payed cash or enter 0"
               /></td>
                 </tr>
                 <tr>
-                  <td className="border p-3">BORROW:</td>
-                  <td className="border p-3"><input
+                  <td className="border p-1">BORROW:</td>
+                  <td className="border p-1"><input
                 type="text"
                 id="borrow"
                 value={borrow}
                 onChange={(e)=>setBorrow(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter payed cash or enter 0"
               /></td>
                 </tr>
