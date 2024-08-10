@@ -165,7 +165,12 @@ export const deleteProduct = async (req, res) => {
 // Assuming you have a model named Product
 export const viewProducts = async (req, res) => {
   try {
-    const products = await Product.find().limit(500).populate('category')
+    // Query to get products sorted by discount and createdAt
+    const products = await Product.find()
+      .sort({updatedAt: -1 }) 
+      .limit(100)
+      .populate('category');
+
     return res.status(200).send({ message: "Products retrieved successfully", status: true, data: products });
   } catch (error) {
     console.error(error);
