@@ -468,7 +468,7 @@ console.log(err.message)
   {dispatch(fetchCart());
   }
   else{
-    alert("somthing went wrong")
+    alert("somthing went wrong");
   }
  }
   const handleError = (err) => {
@@ -755,7 +755,7 @@ console.log(err.message)
           </div>
           <div>
             <label className=" mr-2 text-gray-700 font-medium">Ship To</label>
-            <input
+            <input 
               type="text"
               id="ShipTo"
               value={finalform.ShipTo}
