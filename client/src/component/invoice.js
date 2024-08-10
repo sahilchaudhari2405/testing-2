@@ -610,7 +610,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
               </div>
               <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                 <span>DISCOUNT</span>
-                <span>₹{(details.totalPrice - details.totalDiscountedPrice)}</span>
+                <span>₹{(details.totalPrice - details.totalPurchaseRate)?(details.totalPrice - details.totalPurchaseRate):0}</span>
               </div>
               <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                 <span>GST</span>

@@ -40,6 +40,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                 existingProduct.purchaseRate = parseFloat(productData.purchaseRate) || 0;
                 existingProduct.retailPrice = parseFloat(productData.saleRate) || 0;
                 existingProduct.GST = parseFloat(productData.gst) || 0;
+                existingProduct.updatedAt=new Date(),
                 await existingProduct.save();
                 orderItems.push({
                     productId: existingProduct._id,
@@ -51,7 +52,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                 });
             } else {
                 const newProduct = new Product({
-                    title: productData.title || null,
+                    title: productData.description || null,
                     description: productData.description || null,
                     price: parseFloat(productData.saleRate) || 0,
                     discountedPrice: parseFloat(productData.discountedPrice) || 0,
@@ -65,8 +66,8 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     reviews: productData.reviews || [],
                     numRatings: parseInt(productData.numRatings, 10) || 0,
                     category:category._id,
-                    createdAt: productData.createdAt || null,
-                    updatedAt: productData.updatedAt || null,
+                    createdAt:new Date(),
+                    updatedAt:new Date(),
                     BarCode: productData.barcode || null,
                     stockType: productData.stockType || null,
                     unit: productData.unit || null,
