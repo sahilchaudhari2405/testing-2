@@ -7,6 +7,7 @@ import {jwtDecode} from 'jwt-decode';
 import { saveAs } from 'file-saver';
 import { toast } from 'react-toastify';
 import { deleteOrder, fetchOrders } from '../Redux/Orders/orderSlice';
+import { logoutUser } from '../Redux/User/userSlices';
 
 const Accounts = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const Accounts = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    dispatch(logoutclient());
+    dispatch(logoutUser());
     localStorage.removeItem('token');
     toast.error("Logout Successfully!");
     navigate('/');
