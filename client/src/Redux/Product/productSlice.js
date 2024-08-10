@@ -28,6 +28,17 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_
   }
 });
 
+export const sortProducts = createAsyncThunk('products/sortProducts', async ({ barcode, name, category ,brand,weight,expiringDays,lowStock}) => {
+  try {
+    const response = await axiosInstance.post('/product/sortProducts',{ barcode, name, category ,brand,weight,expiringDays,lowStock});
+
+    // console.log(response)
+    return response.data.data;  // Return the sorted orders data
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to sort orders');
+  }
+});
+
 export const deleteProduct = createAsyncThunk('products/deleteProduct', async (productId, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.delete(`/product/delete/${productId}`);
@@ -88,6 +99,17 @@ const productSlice = createSlice({
         state.products = action.payload;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      .addCase(sortProducts.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(sortProducts.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.products = action.payload;
+      })
+      .addCase(sortProducts.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })

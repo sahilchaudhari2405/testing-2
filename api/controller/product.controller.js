@@ -178,6 +178,64 @@ export const viewProducts = async (req, res) => {
   }
 };
 
+
+// ========================filter products in inventory=====================================
+export const sortProducts = async (req, res) => {
+  try {
+    const {barcode, name, category ,brand,weight,expiringDays,lowStock} = req.body;
+    let query = {};
+  
+    // Add date range filter if fromDate and toDate are provided
+    if (barcode) {
+      query.BarCode =parseInt(barcode)
+    }
+  if(brand){
+    query.brand ={ $regex: brand, $options: 'i' }
+  }
+  if(weight){
+    query.weight =weight
+  }
+    // Add name filter if provided
+
+    if (name) {
+        query.title = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
+      }
+   
+
+
+    // Query to get products sorted by discount and createdAt
+    const products = await Product.find(query)
+      .limit(100)
+      .populate('category');
+    //  console.log(products)
+    // console.log("hallo")
+    let filteredProducts=[]
+    if(category){
+       filteredProducts = products.filter(product =>
+        product.category?.name.toLowerCase().startsWith(category.toLowerCase())
+      );
+    }else{
+      filteredProducts=products
+    }
+    
+
+    //console.log(filteredProducts)
+      let sortedProducts=[]
+      if(lowStock){
+        sortedProducts = filteredProducts.sort((a, b) => a.quantity - b.quantity);
+      }else{
+        sortedProducts = filteredProducts
+      }
+    return res.status(200).send({ message: "Products retrieved successfully", status: true, data: sortedProducts });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
+  }
+};
+
+
+
+
 export const createProduct = async (req, res) => {
   const { 
     title,
