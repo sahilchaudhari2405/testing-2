@@ -217,19 +217,19 @@ const Sale = () => {
 
       const mrp = parseFloat(newState.product?.price || 0);
       const quantity = parseInt(newState.quantity || 0);
-      const discountedPrice = parseFloat(newState.discountedPrice || 0);
+      const OneUnit = parseInt(newState.OneUnit);
       const gst = parseFloat(newState.GST || 0);
 
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
-      const totalValue = (discountedPrice * quantity);
+      const totalValue = (OneUnit * quantity)+gst;
       newState.finalPrice_with_GST = totalValue;
       const {product} = editItem;
-      let discount = mrp-discountedPrice;
+      let discount = mrp-OneUnit;
       if(mrp==0)
       {
-       discount=product.discountedPrice-discountedPrice;
+       discount=product.OneUnit-OneUnit;
       }
-   
+      newState.discountedPrice=OneUnit*quantity
       // console.log(discount);
       newState.discount = discount;
 
@@ -250,7 +250,7 @@ const Sale = () => {
     // Extract necessary fields from editItem
     const { product } = editItem;
     console.log(items);
-    const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
+    const { discountedPrice, quantity, GST, finalPrice_with_GST,OneUnit } = editItem;
     let { title: productTitle, price: productPrice,  } = product;
     const ProductApalaBajarPrice = product.discountedPrice;
     if(productPrice==0)
@@ -264,7 +264,8 @@ console.log(editItem);
       discountedPrice: parseFloat(discountedPrice),
       quantity: parseInt(quantity),
       price: parseFloat(productPrice),
-      discount: (parseFloat(productPrice) - parseFloat(discountedPrice))*parseFloat(quantity),
+      OneUnit: parseFloat(OneUnit),
+      discount: (parseFloat(productPrice) - parseFloat(OneUnit))*parseFloat(quantity),
       GST: parseFloat(GST),
       finalPrice_with_GST: parseFloat(finalPrice_with_GST)
     };
@@ -1013,8 +1014,9 @@ console.log(err.message)
                 <th className="p-1 border border-gray-600 text-left w-[60px]">
                   Net Qty
                 </th>
-                <th className="p-1 border border-gray-600 text-left">Apla Price</th>
+                <th className="p-1 border border-gray-600 text-left">Single Unit price</th>
                 <th className="p-1 border border-gray-600 text-left">Disc.</th>
+                <th className="p-1 border border-gray-600 text-left">Total Discount Price</th>
                 <th className="p-1 border border-gray-600 text-left">GST%</th>
                 <th className="p-1 border border-gray-600 text-left">
                   Total Value
@@ -1103,23 +1105,34 @@ console.log(err.message)
                     {editId === item._id ? (
                       <input
                         type="number"
-                        value={editItem.discountedPrice}
-                        onChange={(e) => handleInputChange(e, "discountedPrice")}
+                        value={editItem.OneUnit}
+                        onChange={(e) => handleInputChange(e, "OneUnit")}
                       />
                     ) : (
-                      item.discountedPrice
+                      item.OneUnit
                     )}
                   </td>
                   <td className="p-1 border border-gray-600">
                     {editId === item._id ? (
                       <input
                         type="number"
-                        value={editItem?.discount}
+                        value={editItem.product.discountedPrice-editItem.OneUnit}
                         readOnly
                       />
                     ) : (
                       (item.price - item.discountedPrice) < 0 ? 0 : item.price - item.discountedPrice
                        )}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editId === item._id ? (
+                      <input
+                        type="number"
+                        value={editItem.discountedPrice}
+                        onChange={(e) => handleInputChange(e, "discountedPrice")}
+                      />
+                    ) : (
+                      item.discountedPrice
+                    )}
                   </td>
                   <td className="p-1 border border-gray-600">
                     {editId === item._id ? (
@@ -1140,9 +1153,7 @@ console.log(err.message)
                     )}
                   </td>
                   <td className="p-1 border flex gap-2 justify-center text-sm border-gray-600 text-center">
-                      <button className="bg-amber-600 text-white px-2 py-2 rounded hover:bg-amber-700" onClick={() => handleViewProduct(item.product)}>
-                        View Product
-                      </button>
+
                       {isviewProductModalOpen && selectedProduct && (
                         // <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                         //   <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -1207,9 +1218,12 @@ console.log(err.message)
                       </>
                     ) : (
                       <>
-                      {item.quantity!=1 || item.type!='custom' && <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
+                      <button className="bg-amber-600 text-white px-2 py-2 rounded hover:bg-amber-700" onClick={() => handleViewProduct(item.product)}>
+                        View Product
+                      </button>
+                       <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600" onClick={() => handleEditClick(item)}>
                           Edit
-                        </button>}
+                        </button>
                         <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" onClick={() => removeItem(item._id)}>
                           Delete
                         </button>
