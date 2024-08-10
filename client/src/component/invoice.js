@@ -83,7 +83,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
                   <td className="border p-1 truncate">{e.product?.title}</td>
                   <td className="border p-1 text-center">{e.quantity}</td>
                   <td className="border p-1 text-center">{e.GST}</td>
-                  <td className="border p-1 text-center">{((e.price - e.discountedPrice) > 0 ? e.price - e.discountedPrice : 0)}</td>
+                  <td className="border p-1 text-center">{((e.price!=0)? e.price - e.discountedPrice : (e.product.discountedPrice-(e.discountedPrice/e.quantity))*e.quantity)}</td>
                   <td className="border p-1 text-center">{e.price}</td>
                   <td className="border p-1 text-center">{e.discountedPrice}</td>
                 </tr>
@@ -99,7 +99,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
               </div>
               <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                 <span>DISCOUNT</span>
-                <span>₹{(details.totalPrice - details.totalPurchaseRate)?(details.totalPrice - details.totalPurchaseRate):0}</span>
+                <span>₹{details.discount}</span>
               </div>
               <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                 <span>GST</span>
