@@ -591,7 +591,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
             <tbody>
               {details?.orderItems?.map((e, index) => (
                 <tr key={index}>
-                  <td className="border p-1 truncate">{e.product?.title}</td>
+                  <td className="border p-1 truncate">{console.log(e.product?.title)}</td>
                   <td className="border p-1 text-center">{e.quantity}</td>
                   <td className="border p-1 text-center">{e.GST}</td>
                   <td className="border p-1 text-center">{((e.price - e.discountedPrice) > 0 ? e.price - e.discountedPrice : 0)}</td>
@@ -665,7 +665,7 @@ const Invoice = ({ componentRef, details,setPrint}) => {
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
               <div>
                 <span className={sharedClasses.fontBold}>INVOICE NO: </span>
-                <Barcode value={details._id} width={0.8} height={70} />
+                <Barcode value={details._id} width={0.8} height={70}/>
               </div>
               <div>
                 <span className={sharedClasses.fontBold}>DATE: </span>
