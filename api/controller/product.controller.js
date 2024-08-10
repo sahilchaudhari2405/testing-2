@@ -184,7 +184,23 @@ export const sortProducts = async (req, res) => {
   try {
     const {barcode, name, category ,brand,weight,expiringDays,lowStock} = req.body;
     let query = {};
-  
+    const noOtherFilters = !barcode && !name && !category && !brand && !weight && !expiringDays;
+
+     console.log(noOtherFilters);
+     
+    if(lowStock && noOtherFilters)
+    {      let sortedProducts=[];
+      sortedProducts = await Product.find()
+      .sort({ quantity: 1 }) 
+      .limit(100) 
+      .populate('category');
+      return res.status(200).send({ 
+        message: "Only Low stock products retrieved successfully", 
+        status: true, 
+        data: sortedProducts, 
+      });
+    }
+    console.log("yes");
     // Add date range filter if fromDate and toDate are provided
     if (barcode) {
       query.BarCode =parseInt(barcode)
@@ -202,7 +218,7 @@ export const sortProducts = async (req, res) => {
       }
    
 
-
+console.log(query);
     // Query to get products sorted by discount and createdAt
     const products = await Product.find(query)
       .limit(100)
@@ -220,7 +236,8 @@ export const sortProducts = async (req, res) => {
     
 
     //console.log(filteredProducts)
-      let sortedProducts=[]
+      let sortedProducts=[];
+
       if(lowStock){
         sortedProducts = filteredProducts.sort((a, b) => a.quantity - b.quantity);
       }else{

@@ -1125,11 +1125,7 @@ console.log(err.message)
                   </td>
                   <td className="p-1 border border-gray-600">
                     {editId === item._id ? (
-                      <input
-                        type="number"
-                        value={editItem.discountedPrice}
-                        onChange={(e) => handleInputChange(e, "discountedPrice")}
-                      />
+                       <div>{editItem.discountedPrice}</div>
                     ) : (
                       item.discountedPrice
                     )}
