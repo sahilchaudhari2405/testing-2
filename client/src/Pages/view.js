@@ -34,29 +34,32 @@ const View = () => {
   const [details, setDetails] = useState(null);
   const printRef = useRef();
   const orders = useSelector((state) => state.orders.orders);
-  const purchaseOrders = useSelector(state =>state.orders.purchaseOrders);
+  const purchaseOrders = useSelector(state => state.orders.purchaseOrders);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [name, setName] = useState('');
-  const [print,setPrint] = useState(false);
-const [sort , setSort] = useState([])
+  const [print, setPrint] = useState(false);
+  const [sort, setSort] = useState([]);
+
   const handlePrint = (item) => {
     setDetails(item);
   };
-  
-  console.log(orders)
 
   useEffect(() => {
-    dispatch(fetchOrders());
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0];
+    setFromDate(today);
+    setToDate(tomorrow);
+
+    dispatch(sortOrders({ fromDate: today, toDate: tomorrow, name, selectedView }));
   }, [dispatch]);
 
-
-  
   useEffect(() => {
-   setSort(orders)
+    setSort(orders);
   }, [orders]);
+
   useEffect(() => {
     if (details && printRef.current) {
       printRef.current.handlePrint();
@@ -69,7 +72,6 @@ const [sort , setSort] = useState([])
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
     } else {
-      // Redirect to login if no token found
       navigate('/');
     }
   }, [navigate]);
@@ -91,8 +93,7 @@ const [sort , setSort] = useState([])
   };
 
   useEffect(() => {
-    console.log('Purchase Orders:', purchaseOrders);
-    setSort(purchaseOrders)
+    setSort(purchaseOrders);
   }, [purchaseOrders]);
 
   const handleDelete = (item) => {
@@ -105,7 +106,7 @@ const [sort , setSort] = useState([])
 
   const handleSort = (e) => {
     e.preventDefault();
-    dispatch(sortOrders({ fromDate, toDate, name ,selectedView}));
+    dispatch(sortOrders({ fromDate, toDate, name, selectedView }));
   };
 
   const exportToExcel = (data) => {
