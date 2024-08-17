@@ -729,9 +729,11 @@ console.log(err.message)
               <button
                 type="button"
                 onClick={handleReverseOrder}
-                className="w-full bg-green-500 text-white py-1 px-4 rounded font-medium hover:bg-blue-800 transition-colors"
+                className={`w-full text-white py-1 px-4 rounded font-medium transition-colors ${
+                  reverseOrder ? 'bg-orange-500 hover:bg-green-500' : 'bg-green-500 hover:bg-blue-800'
+                }`}
               >
-                Reverse
+               {reverseOrder ? 'Reset' : 'Reverse'}
               </button>
             </div>
             <div className=" mb-4 text-center"> 
@@ -962,50 +964,6 @@ console.log(err.message)
                 </th>
               </tr>
             </thead>
-            {/* //<tbody> */}
-            {/* // Add rows dynamically here */}
-            {/* { 
-            //  details&&details.map((item,i)=>(
-            //     <tr key={item?._id}>
-            //     <td className="py-1 px-3 border border-gray-600 text-left whitespace-nowrap">
-            //       {i+1}
-            //     </td>
-            //     <td className="py-1 px-3 border border-gray-600 text-left">
-            //     {item?.product?.title}
-            //     </td>
-            //     <td className="p-1 border border-gray-600"> {item?.product?.price}</td>
-            //     <td className="p-1 border border-gray-600">
-            //     <div className="flex flex-row items-center">
-            //             <input type="number" value={item.quantity} readOnly min="1" className="w-12 sm:w-12 text-center border m-1 sm:mb-0" />
-            //             <button className=" bg-blue-500 mt-1 px-2 py-0 rounded-sm text-lg" onClick={() => decreaseQuantity(item._id)}>-</button>
-              
-            //         </div>
-            //     </td>
-            //     <td className="p-1 border border-gray-600"> {item?.discountedPrice}</td>
-            //     <td className="p-1 border border-gray-600"> {(item?.price-item?.discountedPrice)<0?0:item?.price-item?.discountedPrice}</td>
-            //     <td className="p-1 border border-gray-600"> {item?.GST}</td>
-            //     <td className="p-1 border border-gray-600"> {item?.finalPrice_with_GST}</td>
-            //     <td className="p-1 border flex gap-2 justify-center text-sm border-gray-600 text-center">
-            //       <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 ">
-            //         Edit
-            //       </button>
-            //       <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 ">
-            //         Save
-            //       </button>
-            //       <button className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 " onClick={() => removeItem(item?._id)}>
-            //         Delete
-            //       </button>
-                  
-            //     </td>
-            //   </tr>
-
-
-      // console.log(item)
-             // ))
-              // }
-
-              // Repeat rows as needed
-            </tbody>    */}
             <tbody>
               { details && (reverseOrder ? [...details].reverse() : details).map((item, i)  => (
                 <tr key={item._id}>
