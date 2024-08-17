@@ -27,6 +27,7 @@ const Purchase = () => {
   const [invoiceData, setInvoice] = useState();
   const [isChecked, setIsChecked] = useState(false);
   const handlePrintRef = useRef();
+  const [language,SetLanguage] = useState("");
   const [message, setMessage] = useState(false);
   const [print,setPrint] = useState(false);
   useEffect(() => {
@@ -358,8 +359,15 @@ const Purchase = () => {
 
   const handlePrint = () => {
     setPrint(true)
+    SetLanguage("English")
     bill()
       };
+
+      const handleMarathiPrint = () => {
+        setPrint(true)
+        SetLanguage("Marathi")
+        bill()
+          };
   //======================barcode genration====================================
 
   const componentRef = useRef();
@@ -861,6 +869,11 @@ const Purchase = () => {
                    Save & Print
                   </span>
                 </button>
+                <button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handleMarathiPrint}>
+                  <span className='text-center'>
+                  Marathi invoice
+                  </span>
+                </button>
           </div>
         </div>
 
@@ -943,7 +956,7 @@ const Purchase = () => {
 
       {/* ---------------------invoice ganrator------------------------- */}
       <div className='hidden'>
-      <Invoice componentRef={componentRef} setPrint={setPrint} details={purchaseOrders} />
+      <Invoice componentRef={componentRef} setPrint={setPrint} details={purchaseOrders} language={language} />
       </div>
  <ReactToPrint
         trigger={() => <button style={{ display: 'none' }} />}

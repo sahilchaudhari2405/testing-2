@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { TbEyeEdit } from "react-icons/tb";
 import ReactToPrint from "react-to-print"
 import * as XLSX from 'xlsx';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { saveAs } from 'file-saver';
 import { logoutUser } from '../Redux/User/userSlices';
 import { toast } from 'react-toastify';
@@ -34,18 +34,25 @@ const View = () => {
   const [details, setDetails] = useState(null);
   const printRef = useRef();
   const orders = useSelector((state) => state.orders.orders);
-  const purchaseOrders = useSelector(state =>state.orders.purchaseOrders);
+  const purchaseOrders = useSelector(state => state.orders.purchaseOrders);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
   const [fromDate, setFromDate] = useState('');
+  const [language,SetLanguage] = useState("");
+
   const [toDate, setToDate] = useState('');
   const [name, setName] = useState('');
-  const [print,setPrint] = useState(false);
-const [sort , setSort] = useState([])
+  const [print, setPrint] = useState(false);
+  const [sort, setSort] = useState([])
   const handlePrint = (item) => {
+    SetLanguage("English")
     setDetails(item);
   };
-  
+  const handleMarathiPrint = (item) => {
+    SetLanguage("Marathi")
+
+    setDetails(item);
+  };
   console.log(orders)
 
   useEffect(() => {
@@ -53,9 +60,9 @@ const [sort , setSort] = useState([])
   }, [dispatch]);
 
 
-  
+
   useEffect(() => {
-   setSort(orders)
+    setSort(orders)
   }, [orders]);
   useEffect(() => {
     if (details && printRef.current) {
@@ -105,7 +112,7 @@ const [sort , setSort] = useState([])
 
   const handleSort = (e) => {
     e.preventDefault();
-    dispatch(sortOrders({ fromDate, toDate, name ,selectedView}));
+    dispatch(sortOrders({ fromDate, toDate, name, selectedView }));
   };
 
   const exportToExcel = (data) => {
@@ -156,17 +163,17 @@ const [sort , setSort] = useState([])
           <th className="border border-zinc-800 px-4 py-2">Action</th>
         </tr>
       </thead>
-      <tbody> 
-        {Array.isArray(data ) && data?.map((item, i) => (
+      <tbody>
+        {Array.isArray(data) && data?.map((item, i) => (
           <tr key={item._id} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
             <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.Name}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.mobileNumber}</td>
             <td className="border border-zinc-800 px-4 py-2">(Maharastra)</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.discount||0 }</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice ||item.totalPrice}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.discount || 0}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice || item.totalPrice}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.GST}</td>
-            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice ||item.totalPrice}</td>
+            <td className="border border-zinc-800 px-4 py-2">{item.totalDiscountedPrice || item.totalPrice}</td>
             <td className="border border-zinc-800 px-4 py-2 flex flex-col">
               <span>CASH: {item.paymentType?.cash}</span>
               <span>CARD: {item.paymentType?.Card}</span>
@@ -178,12 +185,21 @@ const [sort , setSort] = useState([])
             <td className="border border-zinc-800 px-4 py-2">{item.updatedAt?.substring(0, 10)}</td>
             <td className="border border-zinc-800 px-4 py-2">
               <div className='flex justify-around'>
-                <button className="text-blue-500" onClick={() => handlePrint(item)}>
-                  <span className='text-center'>
-                    <TbEyeEdit className="text-2xl" />
-                    Invoice
-                  </span>
-                </button>
+                <div className='flex justify-around space-x-4'>
+                  <button className="text-blue-500" onClick={() => handlePrint(item)}>
+                    <span className='text-center'>
+                      <TbEyeEdit className="text-2xl" />
+                      English
+                    </span>
+                  </button>
+                  <button className="text-blue-500" onClick={() => handleMarathiPrint(item)}>
+                    <span className='text-center'>
+                      <TbEyeEdit className="text-2xl" />
+                      Marathi
+                    </span>
+                  </button>
+                </div>
+
               </div>
             </td>
           </tr>
@@ -191,8 +207,8 @@ const [sort , setSort] = useState([])
       </tbody>
     </table>
   );
-       // {selectedView === 'Sales' && renderTable(orders)}
-        // {selectedView === 'Purchase' && renderTable(orders)}
+  // {selectedView === 'Sales' && renderTable(orders)}
+  // {selectedView === 'Purchase' && renderTable(orders)}
 
 
   return (
@@ -252,66 +268,66 @@ const [sort , setSort] = useState([])
             </div>
           </label>
           <form onSubmit={handleSort} className="flex items-center space-x-2 mb-4 bg-gray-100 p-3 mt-[-5px] rounded-md">
-          <div>
-            <label htmlFor="from" >
-              From
-            </label>
-            <input
-          id="from"
-          type="date"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-          className="bg-white border border-zinc-300 px-4 py-2 rounded"
-        />
-        
-           </div>
-          <div>
-            <label htmlFor="to" >
-              To
-            </label>
-        <input
-          id="to"
-          type="date"
-          value={toDate}
-          onChange={(e) => setToDate(e.target.value)}
-          className="bg-white border border-zinc-300 px-4 py-2 rounded"
-        />
-                  </div>
+            <div>
+              <label htmlFor="from" >
+                From
+              </label>
+              <input
+                id="from"
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="bg-white border border-zinc-300 px-4 py-2 rounded"
+              />
 
-                  <div>
-            <label htmlFor="from" >
-              Customer
-            </label>
-            <input
-          id="name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder='Customer Name'
-          className="bg-white border border-zinc-300 px-4 py-2 rounded w-fit"
-        />
-        
-           </div>
-          <button
-                type="submit"
-                className="w-full bg-blue-600 mt-6 text-white py-2 rounded font-medium hover:bg-green-800 transition-colors"
-             
-             >
-                Enter
-              </button>
+            </div>
+            <div>
+              <label htmlFor="to" >
+                To
+              </label>
+              <input
+                id="to"
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="bg-white border border-zinc-300 px-4 py-2 rounded"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="from" >
+                Customer
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder='Customer Name'
+                className="bg-white border border-zinc-300 px-4 py-2 rounded w-fit"
+              />
+
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 mt-6 text-white py-2 rounded font-medium hover:bg-green-800 transition-colors"
+
+            >
+              Enter
+            </button>
           </form>
         </div>
 
         {selectedView === 'Sales' && renderTable(sort)}
         {/* //importedData.length ? importedData : orders */}
-        {selectedView === 'Purchase' && renderTable(sort)}  
+        {selectedView === 'Purchase' && renderTable(sort)}
       </div>
 
-      
-      <Invoice 
-        componentRef={componentRef} 
-        details={details} 
 
+      <Invoice
+        componentRef={componentRef}
+        details={details}
+        language={language}
       />
 
 
