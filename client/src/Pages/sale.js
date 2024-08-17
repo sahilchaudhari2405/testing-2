@@ -729,7 +729,7 @@ console.log(err.message)
               <button
                 type="button"
                 onClick={handleReverseOrder}
-                className="w-full bg-blue-700 text-white py-1 px-4 rounded font-medium hover:bg-blue-800 transition-colors"
+                className="w-full bg-green-500 text-white py-1 px-4 rounded font-medium hover:bg-blue-800 transition-colors"
               >
                 Reverse
               </button>
@@ -1186,7 +1186,7 @@ console.log(err.message)
                    Save & Print
                   </span>
                 </button>
-                <button className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handleMarathiPrint}>
+                <button className="bg-orange-400 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handleMarathiPrint}>
                   <span className='text-center'>
                    Marathi invoice
                   </span>
