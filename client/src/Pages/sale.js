@@ -607,7 +607,7 @@ console.log(err.message)
         <h1 className="text-xl font-bold">Sale</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm">
-            Online Orders | Hi, <span className="font-bold">{fullName}</span>
+          Offline Orders | Hi, <span className="font-bold">{fullName}</span>
           </span>
           <button
             onClick={handleLogout}

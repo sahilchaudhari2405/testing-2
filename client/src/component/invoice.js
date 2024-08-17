@@ -124,7 +124,7 @@ const Invoice = ({ componentRef, details,setPrint,language}) => {
           <div>
             {/* <span className={sharedClasses.fontBold}>चलन: </span> */}
             <div>
-              <Barcode value={details._id} width={1.5} height={40} displayValue={false} />
+              <Barcode value={details._id} width={0.8} height={40} displayValue={false} />
             </div>
           </div>
           <p className="text-center font-bold">आपला बाजार भेट दिल्याबद्दल धन्यवाद!</p>
@@ -326,7 +326,7 @@ const Invoice = ({ componentRef, details,setPrint,language}) => {
           <div>
             {/* <span className={sharedClasses.fontBold}>INVOICE: </span> */}
             <div>
-              <Barcode value={details._id} width={1.5} height={40} displayValue={false} />
+              <Barcode value={details._id} width={0.8} height={40} displayValue={false} />
               </div>
           </div>
           <p className="text-center font-bold">THANK YOU FOR VISITING APALA BAJAR!</p>

@@ -103,7 +103,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalGST += item.GST * item.quantity;
             totalItem += 1; 
         }
-
+        const Amount = orderDetails.paymentType.cash + orderDetails.paymentType.Card+orderDetails.paymentType.UPI ;
         const newOrder = new OfflinePurchaseOrder({
             user: id,
             Name: orderDetails.name || 'Unknown',
@@ -120,7 +120,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalPurchaseRate,
             GST: totalGST,
             totalItem,
-            AmountPaid: orderDetailspaymentType.cash + orderDetailspaymentType.Card+orderDetailspaymentType.UPI || 0,
+            AmountPaid: parseInt(Amount,10)|| 0,
             orderDate: new Date(),
             createdAt: new Date(),
         });
