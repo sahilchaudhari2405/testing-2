@@ -237,7 +237,7 @@ const Sale = () => {
     });
     console.log("edittem after input change: ",editItem);
   };
-
+  
   
   // const handleSaveClick = (itemId) => {
   //   // Implement save functionality here
