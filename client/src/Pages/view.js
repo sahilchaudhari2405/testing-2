@@ -53,7 +53,7 @@ const View = () => {
 
     setDetails(item);
   };
-  console.log(orders)
+
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -68,6 +68,7 @@ const View = () => {
     if (details && printRef.current) {
       printRef.current.handlePrint();
     }
+    setDetails(null);
   }, [details]);
 
   useEffect(() => {
