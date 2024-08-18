@@ -33,11 +33,10 @@ const Accounts = () => {
   useEffect(() => {
     if (orders.length > 0) {
       orders.forEach(order => {
-        console.log("Client fecthed!!");
+        console.log("Client fetched!!");
       });
     }
   }, [orders]);
-
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -48,6 +47,20 @@ const Accounts = () => {
       navigate('/');
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const currentDate = new Date().toISOString().split('T')[0];
+    const nextDate = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+    setStartDate(currentDate);
+    setEndDate(nextDate);
+
+    const filteredOrders = orders.filter(order => {
+      const orderDate = new Date(order.orderDate).toISOString().split('T')[0];
+      return orderDate >= currentDate && orderDate <= nextDate;
+    });
+
+  }, [orders]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -184,7 +197,6 @@ const Accounts = () => {
       </table>
     </div>
   );
-
   return (
     <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
       {isPopupOpen && (

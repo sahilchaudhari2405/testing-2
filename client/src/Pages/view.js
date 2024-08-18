@@ -43,11 +43,13 @@ const View = () => {
   const [toDate, setToDate] = useState('');
   const [name, setName] = useState('');
   const [print, setPrint] = useState(false);
+
   const [sort, setSort] = useState([])
   const handlePrint = (item) => {
     SetLanguage("English")
     setDetails(item);
   };
+
   const handleMarathiPrint = (item) => {
     SetLanguage("Marathi")
 
@@ -55,15 +57,23 @@ const View = () => {
   };
 
 
+
   useEffect(() => {
-    dispatch(fetchOrders());
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0];
+    setFromDate(today);
+    setToDate(tomorrow);
+
+    dispatch(sortOrders({ fromDate: today, toDate: tomorrow, name, selectedView }));
   }, [dispatch]);
 
 
-
   useEffect(() => {
-    setSort(orders)
-  }, [orders]);
+    setSort(orders);
+
+
+
+
   useEffect(() => {
     if (details && printRef.current) {
       printRef.current.handlePrint();
@@ -77,7 +87,6 @@ const View = () => {
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
     } else {
-      // Redirect to login if no token found
       navigate('/');
     }
   }, [navigate]);
@@ -99,8 +108,7 @@ const View = () => {
   };
 
   useEffect(() => {
-    console.log('Purchase Orders:', purchaseOrders);
-    setSort(purchaseOrders)
+    setSort(purchaseOrders);
   }, [purchaseOrders]);
 
   const handleDelete = (item) => {
