@@ -6,7 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import { logoutUser } from '../Redux/User/userSlices';
 import { toast } from 'react-toastify';
 import Modal from '../component/Modal';
-import { fetchProducts } from "../Redux/Product/productSlice";
+import { fetchProducts,sortProducts } from "../Redux/Product/productSlice";
 import { fetchCategories } from "../Redux/Category/categoriesSlice";
 import CategorySuggestions from '../component/CategorySuggestions';
 import { importExcelData, exportExcelData } from '../component/Card'; 
@@ -113,22 +113,21 @@ const Inventory = () => {
 
   const handleFilter = (e) => {
     e.preventDefault();
-    let filteredProducts = products.filter((product) => {
-      return (
-        (formValues.barcode === '' || product.BarCode.toString() === formValues.barcode) &&
-        (formValues.description === '' || (product.description && product.description.toLowerCase().includes(formValues.description.toLowerCase()))) &&
-        (formValues.category === '' || (product.category && product.category.name && product.category.name.toLowerCase().includes(formValues.category.toLowerCase()))) &&
-        (formValues.brand === '' || (product.brand && product.brand.toLowerCase().includes(formValues.brand.toLowerCase()))) &&
-        (formValues.size === '' || (product.size && product.size === formValues.size)) &&
-        (formValues.expiringDays === '' || (product.expiringDays && product.ageing <= parseInt(formValues.expiringDays)))
-       );
-    });
+    // const handleSort = (e) => {
+    //   e.preventDefault();
+    //   dispatch(sortOrders({ fromDate, toDate, name ,selectedView}));
+    // };
+    const barcode=formValues.barcode;
+    const name = formValues.description;
+    const category = formValues.category;
+    const brand = formValues.brand;
+    const weight = formValues.size;
+    const expiringDays=formValues.expiringDays;
+    const lowStock=formValues.lowStock;
+    dispatch(sortProducts({ barcode, name, category ,brand,weight,expiringDays,lowStock}));
 
-    if (formValues.lowStock) {
-      filteredProducts = filteredProducts.sort((a, b) => a.quantity - b.quantity);
-    }
 
-    setProd(filteredProducts);
+ 
   };
 
   const handleClearFilters = () => {
@@ -141,7 +140,7 @@ const Inventory = () => {
       expiringDays: '',
       lowStock: false,
     });
-    setProd(products);
+    dispatch(fetchProducts());
   };
 
   const handleOpenModal = () => {
@@ -311,7 +310,13 @@ const Inventory = () => {
             key={items._id}
             items={items}
           />
-         ))} 
+         ))
+         
+         } 
+           {prod && prod.length===0?<div className='bg-white text-black text-2xl w-full h-[80vh] pt-[30vh] text-center'> Sorry No Product Found As Per Your Search Combination</div> :null}
+         
+      
+
         </div>
       </div>
       <Modal show={isModalOpen} onClose={handleCloseModal}>

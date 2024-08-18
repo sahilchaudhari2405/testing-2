@@ -4,7 +4,7 @@ import OfflinePurchaseOrder from "../model/purchaseOrder.js";
 
 export const generateOrderWithProductCheck = async (req, res) => {
     console.log(req.body);
-    
+     
     // Handle early response scenario
     if (!req.body || !req.body.products || !req.body.orderDetails) {
         return res.status(400).json({ message: "Invalid input", error: "Missing products or orderDetails" });
@@ -35,12 +35,13 @@ export const generateOrderWithProductCheck = async (req, res) => {
             let existingProduct = await Product.findOne({ BarCode: productData.barcode });
              
             if (existingProduct) {
-                // Update the existing product
-                existingProduct.quantity = (existingProduct.quantity || 0) + (parseInt(productData.qty, 10) || 0);
-                existingProduct.purchaseRate = parseFloat(productData.purchaseRate) || 0;
-                existingProduct.retailPrice = parseFloat(productData.saleRate) || 0;
-                existingProduct.GST = parseFloat(productData.gst) || 0;
+                existingProduct.quantity = existingProduct.quantity + (parseInt(productData.qty, 10) || 0);
+                existingProduct.purchaseRate = parseFloat(productData.purchaseRate,10) || 0;
+                existingProduct.retailPrice = parseInt(productData.saleRate, 10)|| 0;
+                existingProduct.GST = parseInt(productData.gst, 10) || 0;
+                existingProduct.updatedAt = new Date();
                 await existingProduct.save();
+                
                 orderItems.push({
                     productId: existingProduct._id,
                     quantity: productData.qty,
@@ -51,12 +52,12 @@ export const generateOrderWithProductCheck = async (req, res) => {
                 });
             } else {
                 const newProduct = new Product({
-                    title: productData.title || null,
+                    title: productData.description || null,
                     description: productData.description || null,
-                    price: parseFloat(productData.saleRate) || 0,
-                    discountedPrice: parseFloat(productData.discountedPrice) || 0,
-                    discountPercent: parseFloat(productData.discountPercent) || 0,
-                    weight: parseFloat(productData.weight) || 0,
+                    price: parseFloat(productData.MRP, 10) || 0,
+                    discountedPrice: parseInt(productData.saleRate, 10) || 0,
+                    discountPercent: parseFloat(productData.discountPercent, 10) || 0,
+                    weight: parseInt(productData.weight, 10) || 0,
                     quantity: parseInt(productData.qty, 10) || 0,
                     brand: productData.brand || null,
                     imageUrl: productData.imageUrl || 'https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png',
@@ -64,21 +65,21 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     ratings: productData.ratings || [],
                     reviews: productData.reviews || [],
                     numRatings: parseInt(productData.numRatings, 10) || 0,
-                    category:category._id,
-                    createdAt: productData.createdAt || null,
-                    updatedAt: productData.updatedAt || null,
+                    category: category._id,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
                     BarCode: productData.barcode || null,
                     stockType: productData.stockType || null,
                     unit: productData.unit || null,
-                    purchaseRate: parseFloat(productData.purchaseRate) || 0,
-                    profitPercentage: parseFloat(productData.profit) || 0,
+                    purchaseRate: parseFloat(productData.purchaseRate,10) || 0,
+                    profitPercentage: parseFloat(productData.profit,10) || 0,
                     HSN: productData.hsn || null,
-                    GST: parseFloat(productData.gst) || 0,
-                    retailPrice: parseFloat(productData.saleRate) || 0,
-                    totalAmount: parseFloat(productData.total) || 0,
-                    amountPaid: parseFloat(productData.amountpaid) || 0
+                    GST: parseInt(productData.gst, 10) || 0,
+                    retailPrice: parseInt(productData.saleRate, 10) || 0,
+                    totalAmount: parseInt(productData.total, 10) || 0,
+                    amountPaid: parseInt(productData.amountpaid, 10) || 0
                 });
-
+                
                 await newProduct.save();
                 orderItems.push({
                     productId: newProduct._id,
@@ -102,7 +103,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalGST += item.GST * item.quantity;
             totalItem += 1; 
         }
-
+        const Amount = orderDetails.paymentType.cash + orderDetails.paymentType.Card+orderDetails.paymentType.UPI ;
         const newOrder = new OfflinePurchaseOrder({
             user: id,
             Name: orderDetails.name || 'Unknown',
@@ -119,7 +120,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             totalPurchaseRate,
             GST: totalGST,
             totalItem,
-            AmountPaid: orderDetails.AmountPaid || 0,
+            AmountPaid: parseInt(Amount,10)|| 0,
             orderDate: new Date(),
             createdAt: new Date(),
         });

@@ -11,9 +11,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4000
-      - BASE_URL=http://apalabajar.shop  # Removed space around '='
+      - BASE_URL=http://apalabajar.shop
     networks:
       - app-network
+    restart: always
 
   client:
     build:
@@ -24,12 +25,8 @@ services:
       - "80:80"
     environment:
       - NODE_ENV=production
-<<<<<<< HEAD
-      - REACT_APP_BASE_URL=http://apalabajar.shop:4000/api
-=======
     depends_on:
       - api
->>>>>>> 31647d1e252157a7a38b09c83a917ec4037a575c
     networks:
       - app-network
 

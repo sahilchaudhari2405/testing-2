@@ -5,6 +5,7 @@ import slugify from 'slugify';
 // import { uploadImageOnCloudinary } from '../cloud/cloudinary.js';
 import fs from 'fs';
 import mongoose from 'mongoose';
+import categoryModel from '../model/category.model.js';
 // mongoose.set('debug', true);
 // Create product
 // export const createProduct = async (req, res) => {
@@ -71,7 +72,22 @@ export const viewProduct = async (req, res) => {
     return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
   }
 };
+export const SuggestProduct = async (req, res) => {
+  const { CategoriesId } = req.query;
+  try {
+     const parentCategory = await categoryModel.findById(CategoriesId);
+    const categories = await  categoryModel.find({ parentCategory: parentCategory.parentCategory});
 
+    const categoryIds = categories.map(category => category._id);
+
+    const products = await Product.find({ category: { $in: categoryIds } });
+
+    return products;
+  } catch (error) {
+    console.error('Error finding products by parent category:', error);
+    throw error;
+  }
+};
 // Update product
 // export const updateProduct = async (req, res) => {
 //   const { id } = req.params;
@@ -149,13 +165,93 @@ export const deleteProduct = async (req, res) => {
 // Assuming you have a model named Product
 export const viewProducts = async (req, res) => {
   try {
-    const products = await Product.find().limit(500).populate('category')
+    // Query to get products sorted by discount and createdAt
+    const products = await Product.find()
+      .sort({updatedAt: -1 }) 
+      .limit(100)
+      .populate('category');
+
     return res.status(200).send({ message: "Products retrieved successfully", status: true, data: products });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
   }
 };
+
+
+// ========================filter products in inventory=====================================
+export const sortProducts = async (req, res) => {
+  try {
+    const {barcode, name, category ,brand,weight,expiringDays,lowStock} = req.body;
+    let query = {};
+    const noOtherFilters = !barcode && !name && !category && !brand && !weight && !expiringDays;
+
+     console.log(noOtherFilters);
+     
+    if(lowStock && noOtherFilters)
+    {      let sortedProducts=[];
+      sortedProducts = await Product.find()
+      .sort({ quantity: 1 }) 
+      .limit(100) 
+      .populate('category');
+      return res.status(200).send({ 
+        message: "Only Low stock products retrieved successfully", 
+        status: true, 
+        data: sortedProducts, 
+      });
+    }
+    console.log("yes");
+    // Add date range filter if fromDate and toDate are provided
+    if (barcode) {
+      query.BarCode =parseInt(barcode)
+    }
+  if(brand){
+    query.brand ={ $regex: brand, $options: 'i' }
+  }
+  if(weight){
+    query.weight =weight
+  }
+    // Add name filter if provided
+
+    if (name) {
+        query.title = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
+      }
+   
+
+console.log(query);
+    // Query to get products sorted by discount and createdAt
+    const products = await Product.find(query)
+      .limit(100)
+      .populate('category');
+    //  console.log(products)
+    // console.log("hallo")
+    let filteredProducts=[]
+    if(category){
+       filteredProducts = products.filter(product =>
+        product.category?.name.toLowerCase().startsWith(category.toLowerCase())
+      );
+    }else{
+      filteredProducts=products
+    }
+    
+
+    //console.log(filteredProducts)
+      let sortedProducts=[];
+
+      if(lowStock){
+        sortedProducts = filteredProducts.sort((a, b) => a.quantity - b.quantity);
+      }else{
+        sortedProducts = filteredProducts
+      }
+    return res.status(200).send({ message: "Products retrieved successfully", status: true, data: sortedProducts });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
+  }
+};
+
+
+
 
 export const createProduct = async (req, res) => {
   const { 

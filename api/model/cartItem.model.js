@@ -21,6 +21,10 @@ const Offline_cartItemSchema = new mongoose.Schema({
     required: true,
     default: 1,
   },
+  OneUnit:{
+  type:Number,
+  required:true,
+  },
   price: {
     type: Number,
     required: true,
