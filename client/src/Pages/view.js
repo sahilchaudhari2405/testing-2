@@ -70,9 +70,8 @@ const View = () => {
 
   useEffect(() => {
     setSort(orders);
-
-
-
+  
+});
 
   useEffect(() => {
     if (details && printRef.current) {
