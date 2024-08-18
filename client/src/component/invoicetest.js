@@ -286,7 +286,7 @@ const InvoiceTest = () => {
 
   return (
     <div className="invoice__preview mt-20 bg-white p-5 w-fit  rounded-2xl border-4 border-blue-200">
-      <div  ref={componentRef} className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black">
+      <div  className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black">
           <div className="w-24 h-24 border flex items-center justify-center">
             <img src={logo} alt="Insert Logo Above" />
           </div>
