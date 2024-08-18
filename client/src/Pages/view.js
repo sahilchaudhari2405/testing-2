@@ -70,9 +70,8 @@ const View = () => {
 
   useEffect(() => {
     setSort(orders);
-
-
-
+  
+});
 
   useEffect(() => {
     if (details && printRef.current) {
@@ -195,13 +194,13 @@ const View = () => {
             <td className="border border-zinc-800 px-4 py-2">
               <div className='flex justify-around'>
                 <div className='flex justify-around space-x-4'>
-                  <button className="text-blue-500" onClick={() => handlePrint(item)}>
+                  <button className="text-green-500" onClick={() => handlePrint(item)}>
                     <span className='text-center'>
                       <TbEyeEdit className="text-2xl" />
                       English
                     </span>
                   </button>
-                  <button className="text-blue-500" onClick={() => handleMarathiPrint(item)}>
+                  <button className="text-orange-500" onClick={() => handleMarathiPrint(item)}>
                     <span className='text-center'>
                       <TbEyeEdit className="text-2xl" />
                       Marathi
