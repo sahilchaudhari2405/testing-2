@@ -871,7 +871,7 @@ const Purchase = () => {
                 </button>
                 <button className="bg-orange-400 text-white hover:bg-green-700 px-4 py-2 rounded-md" onClick={handleMarathiPrint}>
                   <span className='text-center'>
-                  Marathi invoice
+                  सेव्ह अँड प्रिंट
                   </span>
                 </button>
           </div>
