@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProduct } from "../Redux/Product/productSlice";
+import { fetchProduct, fetchProducts } from "../Redux/Product/productSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaBarcode } from "react-icons/fa"; // Import the barcode icon from react-icons
 import BarcodeReader from "react-barcode-reader";
@@ -54,11 +54,15 @@ const Sale = () => {
 
   const [searchInput, setSearchInput] = useState('');
   const [matchingOrders, setMatchingOrders] = useState([]);
+  const [matchingProducts, setMatchingProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showModaldescription, setShowModaldescription] = useState(false);
+  
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [matchingMobileNumbers, setMatchingMobileNumbers] = useState([]);
   const [reverseOrder, setReverseOrder] = useState(false);
-  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(false);
+  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(true);
+  const [allProducts, setAllproducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState({
     "_id": "66ab771af4df2f3e3c09ecb4",
     "title": "POSH COCOA POWDER",
@@ -147,6 +151,30 @@ const Sale = () => {
   //   }
   // };
 
+
+
+  const handleSearchandChange = (e) => {
+    const value = e.target.value;
+    setFormData({
+      ...formData,
+      [e.target.id]: value,
+    });
+    if (value) { 
+      const filteredProducts = allProducts.filter((product) =>
+        product.description?.toLowerCase().includes(value.toLowerCase())
+      );
+      console.log("filtered products are: ", filteredProducts);
+      setMatchingProducts(filteredProducts);
+      setShowModaldescription(true);
+
+
+    } else {
+      console.log("something wrong in value: ",value);
+      setShowModaldescription(false);
+    }
+
+  }
+
   const handlesearchChange = (e) => {
     const value = e.target.value;
     console.log("value is: ",value);
@@ -158,7 +186,7 @@ const Sale = () => {
     console.log("searchusers are: ",searchuser);
     if (value) {
       const filteredOrders = orders.filter((order) =>
-        order.Name?.toLowerCase().includes(value.toLowerCase())
+      order.Name?.toLowerCase().includes(value.toLowerCase())
       );
       console.log("filtered suers are: ", filteredOrders);
       setMatchingOrders(filteredOrders);
@@ -202,6 +230,27 @@ const Sale = () => {
     setShowMobileModal(false);
 
   };
+
+  const handleSelectProduct =(product) => {
+    console.log("handling ");
+
+    // setFormData({
+    //   barcode: product.BarCode,
+    //   brand: product.brand || "",
+    //   description: product.description || "",
+    //   category: product.category.name || "",
+    //   stockType: product.stockType || "",
+    //   unit: product.unit || "",
+    //   qty: product.quantity,
+    //   hsn: product.HSN,
+    //   gst: product.GST,
+    //   total: product.totalAmount,
+    // });
+    setProductDetails(product);
+    setShowModaldescription(false);
+    setShowMobileModal(false);
+
+  }
 
   const handleInputChange = (e, field) => {
     const { value } = e.target;
@@ -371,6 +420,30 @@ console.log(err.message)
     }
   };
 
+
+
+  const fetchAllProducts = async () => {
+    console.log(".............fetching All Products............")
+    try {
+      const response = await axiosInstance.get(`/product/view`);
+      console.log("All Products are: ",response)
+      const respdata = response.data.data
+      setAllproducts(respdata)
+      
+    } catch (err) {
+        console.log("All Products error are: ")
+        console.log(err.message)
+    }
+  };
+  useEffect(() => {
+    fetchAllProducts();
+
+  },[])
+
+  useEffect(() => {
+    console.log("allprodcut state : ", allProducts);
+  },[allProducts])
+
   useEffect(() => {
     // Get the current date in the required format (YYYY-MM-DD)
     const today = new Date();
@@ -391,6 +464,7 @@ console.log(err.message)
       dispatch(fetchProduct(data));
     }
   };
+
  const handleRemoveAllItem=async () =>
  {
   const response = await axiosInstance.delete(`/cart/removeAllItem`); 
@@ -585,6 +659,7 @@ console.log(err.message)
       dispatch(addToCart(id)).then(() => {
         dispatch(fetchCart());
       });
+      
     }
     setProductDetails({...productDetails,['qty']:" "});
 
@@ -798,10 +873,19 @@ console.log(err.message)
                 id="description"
                 onKeyDown={handleKeys}
                 value={formData.description}
-                onChange={handleChange}
-                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={handleSearchandChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter description"
               />
+              {showModaldescription && (
+              <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
+                {matchingProducts.map((product) => (
+                  <div key={product._id} onClick={() => handleSelectProduct(product)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+                    {product.title}
+                  </div>
+                ))}
+              </div>
+            )}
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
@@ -935,6 +1019,8 @@ console.log(err.message)
             </div>
           </div>
         </form>
+
+
         {/* Table */}
         <div className="overflow-x-auto">
         <div>
