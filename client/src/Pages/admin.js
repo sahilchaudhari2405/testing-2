@@ -241,7 +241,7 @@ const Admin = () => {
       if (!token) {
         throw new Error('No token found in localStorage');
       }
-      const response = await axiosInstance.get('/order/getAllOrderByCounter', {
+      const response = await axiosInstance.get('/order/getAllCounterSales', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const resData = response.data.data;
@@ -348,7 +348,7 @@ const Admin = () => {
       <div className="p-8 w-[95vw] mt-20">
         <h1 className="text-3xl font-bold mb-4">Counter Wise Dashboards</h1>
         <select className="my-5" value={selectedCounter} onChange={onCounterChange}>
-          {ourUsers.filter(user => user.role !== 'admin').map((user) => (
+          {ourUsers.map((user) => (
             <option key={user._id} value={user._id}>
               {user.counterNumber ? 'Counter Number: ' + user.counterNumber : ''} Name: {user.fullName}
             </option>

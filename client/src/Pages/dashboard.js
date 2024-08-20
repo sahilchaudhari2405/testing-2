@@ -378,32 +378,29 @@ const fetchOrders = async (token=null) => {
     if (!token) {
         throw new Error('No token found in localStorage');
     }
-    const response = await axiosInstance.get('/order/getAllOrderByCounter', {
-        headers: { Authorization: `Bearer ${token}` }
-    });
-      // setOrders(response.data.data);
+    const response = await axiosInstance.get('/admin/getTotalOfflineSale', );
+    console.log(response);
+
       const resData = response.data.data;
-      console.log("getAllOrderByCounter : ",resData);
-      console.log("userRole is: ",userRole);
+      setisAdmin(true);
+     setOrders(resData);
+      // if( userRole === "admin"){
+      //   setisAdmin(true);
+      //   resData.length > 0 ? setOrders(resData) : setOrders([]);
+      // }
+      // else {
+      //   console.log("inside of else of admin rol");
+      //   setisAdmin(false);
+      //   const matchingOrder = resData.find(order => order?.user?._id === userId);
+      //   if (matchingOrder) {
+      //     // setOrders(matchingOrder);
+      //     matchingOrder ? setOrders(matchingOrder) : setOrders({});
 
-
-      if( userRole === "admin"){
-        setisAdmin(true);
-        resData.length > 0 ? setOrders(resData) : setOrders([]);
-      }
-      else {
-        console.log("inside of else of admin rol");
-        setisAdmin(false);
-        const matchingOrder = resData.find(order => order?.user?._id === userId);
-        if (matchingOrder) {
-          // setOrders(matchingOrder);
-          matchingOrder ? setOrders(matchingOrder) : setOrders({});
-
-          console.log("matchingOrder is: ",matchingOrder);
-        } else {
-          console.log(`No order found for user ID: ${userId}`);
-        }
-      }
+      //     console.log("matchingOrder is: ",matchingOrder);
+      //   } else {
+      //     console.log(`No order found for user ID: ${userId}`);
+      //   }
+      // }
       
   } catch (error) {
       console.error('Error fetching orders:', error); 
