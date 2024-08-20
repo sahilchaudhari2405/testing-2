@@ -183,8 +183,8 @@ const Users = () => {
                                             className="block w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                         >   
                                             <option value=" ">Select Role</option>
-                                            <option value="Counter Boy">Counter Boy</option>
-                                            <option value="Admin">Admin</option>
+                                            <option value="user">Counter Boy</option>
+                                            <option value="admin">Admin</option>
                                         </select>
                                     </div>
                                 </div>
