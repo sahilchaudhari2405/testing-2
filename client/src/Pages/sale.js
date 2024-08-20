@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct, fetchProducts } from "../Redux/Product/productSlice";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaBarcode } from "react-icons/fa"; // Import the barcode icon from react-icons
+import { FaBarcode, FaSadCry } from "react-icons/fa"; // Import the barcode icon from react-icons
 import BarcodeReader from "react-barcode-reader";
 import ReactToPrint from "react-to-print";
 import logo from "../logo.png";
@@ -61,7 +61,7 @@ const Sale = () => {
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [matchingMobileNumbers, setMatchingMobileNumbers] = useState([]);
   const [reverseOrder, setReverseOrder] = useState(false);
-  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(true);
+  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(false);
   const [allProducts, setAllproducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState({
     "_id": "66ab771af4df2f3e3c09ecb4",
