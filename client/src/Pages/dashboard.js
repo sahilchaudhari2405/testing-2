@@ -379,11 +379,13 @@ const fetchOrders = async (token=null) => {
         throw new Error('No token found in localStorage');
     }
     const response = await axiosInstance.get('/admin/getTotalOfflineSale', );
-    console.log(response);
 
-      const resData = response.data.data;
-      setisAdmin(true);
-     setOrders(resData);
+    const resData = response.data.data;
+    setisAdmin(true);
+    setOrders(resData);
+    console.log("getTotalOfflineSale : ",resData);
+
+
       // if( userRole === "admin"){
       //   setisAdmin(true);
       //   resData.length > 0 ? setOrders(resData) : setOrders([]);

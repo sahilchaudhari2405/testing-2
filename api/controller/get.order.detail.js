@@ -192,4 +192,53 @@ const sortOrder = asyncHandler(async (req, res) => {
 
   });
 
-export {getAllBill,getCounterBill,getOneBill,sortOrder};
+const searchOfflineOrders = async (req, res) => {
+    const { alphabet, number } = req.body;
+  
+    try {
+      let matchCriteria = {};
+  
+      // Build the match criteria based on the provided alphabet
+      if (alphabet) {
+        matchCriteria.Name = { $regex: `^${alphabet}`, $options: 'i' }; // Match Name starting with the alphabet
+      }
+  
+      // Aggregate pipeline to match and group the records
+      const distinctOrders = await OfflineOrder.aggregate([
+        {
+          $addFields: {
+            mobileNumberStr: { $toString: "$mobileNumber" }, // Convert mobileNumber to string
+          },
+        },
+        {
+          $match: {
+            ...matchCriteria,
+            mobileNumberStr: number ? { $regex: `${number}` } : { $exists: true }, // Match mobileNumber containing the digit
+          },
+        },
+        {
+          $group: {
+            _id: "$mobileNumber", // Group by mobileNumber to ensure distinct entries
+            Name: { $first: "$Name" },
+            mobileNumber: { $first: "$mobileNumber" },
+            email: { $first: "$email" },
+          },
+        },
+      ]);
+  
+      return res.status(200).send({
+        message: "Distinct orders retrieved successfully",
+        status: true,
+        data: distinctOrders,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({
+        message: "Internal server error",
+        status: false,
+        error: error.message,
+      });
+    }
+  };
+
+export {getAllBill,getCounterBill,getOneBill,sortOrder,searchOfflineOrders};

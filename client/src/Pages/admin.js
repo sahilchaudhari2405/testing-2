@@ -254,6 +254,39 @@ const Admin = () => {
     }
   };
 
+  const fetchCounterSale = async (token) => {
+    try {
+      if (!token) {
+        throw new Error('No token found in localStorage');
+      }
+      const response = await axiosInstance.get(`/order/getCounterSale/${selectedCounter}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const resData = response.data.data;
+      console.log("getCounterSale : ", resData);
+      // setOrders(resData);
+      // setFilteredOrders(resData[0])
+
+    } catch (error) {
+      console.error('Error fetching orders:', error); 
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        fetchCounterSale(token);
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    } else {
+      console.error('No token found in localStorage');
+    }
+
+  }, [counterUser])
+
   const onCounterChange = (event) => {
     const selectedValue = event.target.value;
     setSelectedUserID(selectedValue);
@@ -263,7 +296,7 @@ const Admin = () => {
 
     const matchingOrders = orders.filter(order => order.user && order.user._id === selectedValue);
     setFilteredOrders(matchingOrders.length > 0 ? matchingOrders[0] : {});
-    console.log("for selecter counter user: ",selectedValue);
+    console.log("for selecter counter user: ",selectedUser);
     console.log("matchingOrders : ",matchingOrders);
   };
 
