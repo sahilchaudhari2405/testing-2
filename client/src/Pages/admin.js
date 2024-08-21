@@ -329,7 +329,7 @@ const Admin = () => {
         const latestSaleDate = new Date(daywise[daywise.length - 1].date);
         const today = new Date();
         
-        if (latestSaleDate.toDateString() === today.toDateString()) {
+        if (daywise[daywise.length - 1].date == today.getDate()) {
             setlatestDay('Today');
         } else {
           setlatestDay('Last Day');

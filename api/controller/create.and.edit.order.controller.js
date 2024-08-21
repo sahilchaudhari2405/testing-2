@@ -8,8 +8,6 @@ import Offline_CartItem from "../model/cartItem.model.js";
 import { handleOfflineCounterSales, updateSalesData } from "./add.counter.sales.info.js";
 import { handleAllTotalOfflineSales, TotalAllupdateSalesData } from "./add.total.sales.info.js";
 import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./add.offline.sales.info.js";
-
-
 // Function to place an order
 const placeOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
@@ -35,7 +33,7 @@ const placeOrder = asyncHandler(async (req, res) => {
                     purchaseRate: product.purchaseRate * cartItem.quantity,
                     GST: cartItem.GST,
                     type:cartItem.type,
-                    totalProfit:(cartItem.discountedPrice)-(product.purchaseRate*cartItem.quantity),
+                    totalProfit:Math.max(0,(cartItem.discountedPrice)-(product.purchaseRate*cartItem.quantity)),
                     finalPriceWithGST: cartItem.finalPrice_with_GST,
                     discountedPrice: cartItem.discountedPrice,
                     userId: id,
@@ -52,7 +50,7 @@ const placeOrder = asyncHandler(async (req, res) => {
                     price: cartItem.price,
                     purchaseRate: product.purchaseRate * cartItem.quantity,
                     GST: cartItem.GST,
-                    totalProfit:(product.discountedPrice-product.purchaseRate)*cartItem.quantity ,
+                    totalProfit:Math.max(0,(product.discountedPrice-product.purchaseRate)*cartItem.quantity ),
                     finalPriceWithGST: cartItem.finalPrice_with_GST,
                     discountedPrice: cartItem.discountedPrice,
                     userId: id,
@@ -129,7 +127,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
             cartItem.price -= product.price;
             cartItem.GST -= product.GST;
             cartItem.purchaseRate -= product.purchaseRate;
-            cartItem.totalProfit -= (product.discountedPrice - product.purchaseRate);
+            cartItem.totalProfit -= Math.max(0,(product.discountedPrice - product.purchaseRate));
             cartItem.finalPriceWithGST -= (product.discountedPrice + product.GST);
             cartItem.discountedPrice -= product.discountedPrice;
             cartItem.updatedAt = new Date();
@@ -151,7 +149,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
                     cart.totalPurchaseRate -= product.purchaseRate;
                     cart.GST -= product.GST;
                     cart.discount -= discount;
-                    cart.totalProfit -= (product.discountedPrice - product.purchaseRate);
+                    cart.totalProfit -= Math.max(0,product.discountedPrice - product.purchaseRate);
                     cart.finalPriceWithGST -= (product.discountedPrice + product.GST);
                     await cart.save();
                    await updateSalesData(oldOrder.user,oldOrder,cart);
@@ -273,7 +271,7 @@ const updateOrder = asyncHandler(async (req, res) => {
             price: item.price,
             purchaseRate: product.purchaseRate * item.quantity,
             GST: item.GST,
-            totalProfit: (product.discountedPrice - product.purchaseRate) * item.quantity,
+            totalProfit: Math.max(0,(product.discountedPrice - product.purchaseRate) * item.quantity),
             finalPriceWithGST: item.finalPriceWithGST,
             discountedPrice: item.discountedPrice,
             userId: order.user,
