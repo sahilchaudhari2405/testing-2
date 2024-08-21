@@ -53,6 +53,10 @@ const Sale = () => {
   const orders = useSelector((state) => state.orders.orders);
 
   const [searchInput, setSearchInput] = useState('');
+  const [Inputnameforsearch, setInputnameforsearch] = useState('');
+  const [Inputmobilenumberforsearch, setInputmobilenumberforsearch] = useState('');
+  const [Inputdescriptionforsearch, setInputdescriptionforsearch] = useState('');
+  
   const [matchingOrders, setMatchingOrders] = useState([]);
   const [matchingProducts, setMatchingProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -153,61 +157,102 @@ const Sale = () => {
 
 
 
-  const handleSearchandChange = (e) => {
-    const value = e.target.value;
-    setFormData({
-      ...formData,
-      [e.target.id]: value,
-    });
-    if (value) { 
-      const filteredProducts = allProducts.filter((product) =>
-        product.description?.toLowerCase().includes(value.toLowerCase())
-      );
-      console.log("filtered products are: ", filteredProducts);
-      setMatchingProducts(filteredProducts);
-      setShowModaldescription(true);
+  
 
-
-    } else {
-      console.log("something wrong in value: ",value);
-      setShowModaldescription(false);
-    }
-
-  }
-
-  const handlesearchChange = (e) => {
-    const value = e.target.value;
-    console.log("value is: ",value);
+  const searchOfflineOrders = async () => {
+    // const value = e.target.value;
+    // console.log("value is: ",value);
     setFinal({
       ...finalform,
-      [e.target.id]: value,
+      "name": Inputnameforsearch,
     });
     // setSearchInput(value);
-    console.log("searchusers are: ",searchuser);
-    if (value) {
-      const filteredOrders = orders.filter((order) =>
-      order.Name?.toLowerCase().includes(value.toLowerCase())
-      );
-      console.log("filtered suers are: ", filteredOrders);
-      setMatchingOrders(filteredOrders);
+
+    console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
+    if (Inputnameforsearch) {
+      const response = await axiosInstance.post('/order/searchOfflineOrders',{ alphabet : Inputnameforsearch})
+      const distinctOrders = response.data.data;
+      if ( distinctOrders == [] ){
+        setMatchingOrders([]);
+      }
+      console.log("distinctOrders users are: ", distinctOrders);
+      setMatchingOrders(distinctOrders);
       setShowModal(true);
     } else {
       setShowModal(false);
     }
   };
 
-  const handleMobileSearchChange = (e) => {
-    const value = e.target.value;
-    console.log("Mobile number is: ", value);
+  const searchOfflineOrdersForMobileNumber = async () => {
     setFinal({
       ...finalform,
-      [e.target.id]: value,
+      "mobileNumber": Inputmobilenumberforsearch,
     });
-    if (value) {
-      const filteredOrders = orders.filter((order) =>
-        String(order.mobileNumber).includes(value)
-      );
-      console.log("Filtered orders by mobile number: ", filteredOrders);
+    // setSearchInput(value);
+
+    console.log("searching Inputmobilenumberforsearch are: ",Inputmobilenumberforsearch);
+    if (Inputmobilenumberforsearch) {
+      const response = await axiosInstance.post('/order/searchOfflineOrders',{ number : Inputmobilenumberforsearch})
+      const distinctOrders = response.data.data;
+      if ( distinctOrders == [] ){
+        setMatchingOrders([]);
+      }
+      console.log("distinctOrders users are: ", distinctOrders);
+      setMatchingMobileNumbers(distinctOrders);
+      setShowMobileModal(true);
+      
+    } else {
+      setShowMobileModal(false);
+    }
+  };
+
+  useEffect(() => {
+    setMatchingProducts([]);
+    handleSearchandChange();
+    console.log("Inputdescriptionforsearch changed: ",Inputdescriptionforsearch)
+  },[Inputdescriptionforsearch])
+
+  useEffect(() => {
+    setMatchingMobileNumbers([]);
+    searchOfflineOrdersForMobileNumber();
+    console.log("Inputmobilenumberforsearch changed: ",Inputmobilenumberforsearch)
+  },[Inputmobilenumberforsearch])
+
+  useEffect(() => {
+    setMatchingOrders([]);
+    searchOfflineOrders();
+    console.log("Inputnameforsearch changed: ",Inputnameforsearch)
+  },[Inputnameforsearch])
+
+
+  const handleSearchandChange = async () => {
+    setFormData({
+      ...formData,
+      "description": Inputdescriptionforsearch,
+    });
+    if (Inputdescriptionforsearch) {
+      const response = await axiosInstance.post('/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
+      const filteredOrders = response.data.data;
+      console.log("Inputdescriptionforsearch filteredorders by mobile number: ", filteredOrders);
+      setMatchingProducts(filteredOrders);
+      setShowModaldescription(true);
+    } else {
+      setShowModaldescription(false);
+    }
+
+  }
+
+  const handleMobileSearchChange = async () => {
+    // const value = e.target.value;
+    // console.log("Mobile number is: ", value);
+    setFinal({
+      ...finalform,
+      "description": Inputdescriptionforsearch,
+    });
+    if (Inputdescriptionforsearch) {
+      const response = await axiosInstance.post('/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
+      const filteredOrders = response.data.data;
+      console.log("Inputdescriptionforsearch filteredorders by mobile number: ", filteredOrders);
       setMatchingMobileNumbers(filteredOrders);
       setShowMobileModal(true);
     } else {
@@ -420,8 +465,6 @@ console.log(err.message)
     }
   };
 
-
-
   const fetchAllProducts = async () => {
     console.log(".............fetching All Products............")
     try {
@@ -435,6 +478,7 @@ console.log(err.message)
         console.log(err.message)
     }
   };
+
   useEffect(() => {
     fetchAllProducts();
 
@@ -458,12 +502,12 @@ console.log(err.message)
   //  console.log(details);
 
   
-  const handleScan = (data) => {
-    // console.log(isChecked)
-    if (isChecked&&data) {
-      dispatch(fetchProduct(data));
-    }
-  };
+const handleScan = (data) => {
+  // console.log(isChecked)
+  if (isChecked&&data) {
+    dispatch(fetchProduct(data));
+  }
+};
 
  const handleRemoveAllItem=async () =>
  {
@@ -592,11 +636,11 @@ console.log(err.message)
     bill()
       };
 
-      const handleMarathiPrint = () => {
-        setPrint(true)
-        SetLanguage("Marathi")
-        bill()
-          };
+  const handleMarathiPrint = () => {
+    setPrint(true)
+    SetLanguage("Marathi")
+    bill()
+      };
     
   const handleChange = (e) => {
     setFormData({
@@ -716,16 +760,24 @@ console.log(err.message)
               value={finalform.name}
               placeholder="Enter name"
               onKeyDown={handleKeyDown}
-              onChange={handlesearchChange}
+              onChange={(e) => {setInputnameforsearch(e.target.value)}}
               className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {showModal && (
               <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
-                {matchingOrders.map((order) => (
+                { matchingOrders.length > 0 ? ( matchingOrders.map((order) => (
                   <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
                     {order.Name}
                   </div>
-                ))}
+                )) 
+              ) 
+            : 
+            (
+            <div key="noresultsfounds" className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+              No Search results founds.....
+            </div>
+          ) 
+            }
               </div>
             )}
           </div>
@@ -747,20 +799,28 @@ console.log(err.message)
               id="mobileNumber"
               required
               onKeyDown={handleKeys}
-              placeholder="Enter num"
+              placeholder="Enter mobile number.."
               maxLength={10}
               minLength={10}
               value={finalform.mobileNumber}
-              onChange={handleMobileSearchChange}
+              onChange={(e) => {setInputmobilenumberforsearch(e.target.value)}}
               className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {showMobileModal && (
               <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
-                {matchingMobileNumbers.map((order) => (
-                  <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid hover:bg-gray-200 cursor-pointer">
+                { matchingMobileNumbers.length > 0 ? ( matchingMobileNumbers.map((order) => (
+                  <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
                     {order.mobileNumber}
                   </div>
-                ))}
+                )) 
+              ) 
+            : 
+            (
+            <div key="noresultsfounds" className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+              No Search results founds.....
+            </div>
+          ) 
+            }
               </div>
             )}
           </div>
@@ -868,12 +928,13 @@ console.log(err.message)
               >
                 Description
               </label>
+              
               <input
                 type="text"
                 id="description"
                 onKeyDown={handleKeys}
                 value={formData.description}
-                onChange={handleSearchandChange}
+                onChange={(e) => {setInputdescriptionforsearch(e.target.value)}}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter description"
               />

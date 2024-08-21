@@ -250,6 +250,46 @@ console.log(query);
   }
 };
 
+export const sortProductsfordescription = async (req, res) => {
+  try {
+    const {description} = req.body;
+    let query = {};
+    const noOtherFilters = !description;
+
+     console.log(noOtherFilters);
+     
+    if(noOtherFilters){
+      let sortedProducts=[];
+      sortedProducts = await Product.find()
+      .sort({ quantity: 1 }) 
+      .limit(100) 
+      .populate('category');
+      return res.status(200).send({ 
+        message: "Only Low stock products retrieved successfully", 
+        status: true, 
+        data: sortedProducts, 
+      });
+    }
+    console.log("yes");
+
+    if (description) {
+      query.description = { $regex: description, $options: 'i' }; // 'i' for case-insensitive
+    }
+   
+
+    console.log(query);
+    // Query to get products sorted by discount and createdAt
+    const products = await Product.find(query)
+      .limit(100)
+      .populate('category');
+    
+    return res.status(200).send({ message: "Products retrieved successfully", status: true, data: products });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
+  }
+};
+
 
 
 
