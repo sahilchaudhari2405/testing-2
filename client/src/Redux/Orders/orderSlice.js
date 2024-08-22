@@ -5,9 +5,10 @@ import axiosInstance from '../../axiosConfig';
 // Async thunks for handling API requests
 export const fetchOrders = createAsyncThunk('orders/fetchOrders', async () => {
   try {
-    const response = await axiosInstance.get('/order/getCounterOrder');
-    console.log('order fetched!!')
-    return response.data.data;  // Return the data directly from axios response
+    const response = await axiosInstance.get('/admin/Client');
+    console.log('order fetched!!' ,response)
+    return response.data; 
+     // Return the data directly from axios response
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to fetch orders');
   }

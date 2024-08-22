@@ -107,7 +107,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
         const newOrder = new OfflinePurchaseOrder({
             user: id,
             Name: orderDetails.name || 'Unknown',
-            GSTNB: orderDetails.GSTNo || 'Not Provided',
+            GSTNB: orderDetails.GSTNo || 'Not Provided',  
             mobileNumber: orderDetails.mobileNumber || 'Not Provided',
             email: orderDetails.email || 'No',
             Address: `${orderDetails.address || 'No Address'} ${orderDetails.state || ''}`,

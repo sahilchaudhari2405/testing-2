@@ -147,7 +147,9 @@ async function importGSTData(productData, category) {
     GST: parseFloat(productData.TAX) || 0,
     retailPrice: parseFloat(productData['Net Sale']) || 0,
     totalAmount: parseFloat(productData['Net Sale']) || 0,
-    amountPaid: parseFloat(productData.amountpaid) || 0
+    amountPaid: parseFloat(productData.amountpaid) || 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
   return await product.save();
 }
@@ -179,7 +181,9 @@ async function NewimportGSTData(productData, category) {
     GST: parseFloat(productData.GST) || 0,
     retailPrice: parseFloat(productData.retailPrice) || 0,
     totalAmount: parseFloat(productData.totalAmount) || 0,
-    amountPaid: parseFloat(productData.amountpaid) || 0
+    amountPaid: parseFloat(productData.amountpaid) || 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
   return await product.save();
 }

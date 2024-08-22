@@ -26,13 +26,13 @@ const Sale = () => {
   const [details, setDetails] = useState([]);
   const [productDetails,setProductDetails] = useState()
   const dispatch = useDispatch();
-  //   let productDetails = useSelector((state) => state.products.productDetails);
+  //   let productDetails = useSelector((State) => State.products.productDetails);
   const [invoice,setInvoice] = useState()
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const handlePrintRef = useRef();
   const { orderId } = useParams();
-  let { items, status, fetchCartError } = useSelector((state) => state.cart);
+  let { items, status, fetchCartError } = useSelector((State) => State.cart);
   const [currentDate, setCurrentDate] = useState('');
   const [cardPay,setCardPay]=useState("");
   const [borrow,setBorrow]=useState("");
@@ -49,8 +49,8 @@ const Sale = () => {
   const [editId, setEditId] = useState(null);
   const [editItem, setEditItem] = useState({});
   const [searchuser, setSearchuser] = useState([]);
-  const users = useSelector((state) => state.user.users);
-  const orders = useSelector((state) => state.orders.orders);
+  const users = useSelector((State) => State.user.users);
+  const orders = useSelector((State) => State.orders.orders);
 
   const [searchInput, setSearchInput] = useState('');
   const [Inputnameforsearch, setInputnameforsearch] = useState('');
@@ -170,7 +170,7 @@ const Sale = () => {
 
     console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
     if (Inputnameforsearch) {
-      const response = await axiosInstance.post('/order/searchOfflineOrders',{ alphabet : Inputnameforsearch})
+      const response = await axiosInstance.get('/admin/SearchClient',{ alphabet : Inputnameforsearch})
       const distinctOrders = response.data.data;
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
@@ -186,13 +186,13 @@ const Sale = () => {
   const searchOfflineOrdersForMobileNumber = async () => {
     setFinal({
       ...finalform,
-      "mobileNumber": Inputmobilenumberforsearch,
+      "Mobile": Inputmobilenumberforsearch,
     });
     // setSearchInput(value);
 
     console.log("searching Inputmobilenumberforsearch are: ",Inputmobilenumberforsearch);
     if (Inputmobilenumberforsearch) {
-      const response = await axiosInstance.post('/order/searchOfflineOrders',{ number : Inputmobilenumberforsearch})
+      const response = await axiosInstance.get('/admin/SearchClient',{ number : Inputmobilenumberforsearch})
       const distinctOrders = response.data.data;
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
@@ -260,16 +260,16 @@ const Sale = () => {
     }
   };
 
-  const handleSelectOrder = (order) => {
+  const handleSelectOrder = (Client) => {
     console.log("handlie select form mobile number");
     setFinal({
       ...finalform,
-      name: order.Name,
-      Date: order.Date || currentDate,
-      mobileNumber: order.mobileNumber || '',
-      ShipTo: order.ShipTo || '',
-      address: order.address || 'Shrigonda',
-      state: order.state || 'Maharastra',
+      name: Client.Name,
+      Date: Client.Date || currentDate,
+      Mobile: Client.Mobile || '',
+      ShipTo: Client.ShipTo || '',
+      Address: Client.Address || 'Shrigonda',
+      State: Client.State || 'Maharastra',
     });
     setShowModal(false);
     setShowMobileModal(false);
@@ -485,7 +485,7 @@ console.log(err.message)
   },[])
 
   useEffect(() => {
-    console.log("allprodcut state : ", allProducts);
+    console.log("allprodcut State : ", allProducts);
   },[allProducts])
 
   useEffect(() => {
@@ -556,10 +556,10 @@ const handleScan = (data) => {
     type:"Sale",
     name:"",
     Date:currentDate,
-    mobileNumber:"",
+    Mobile:"",
     ShipTo:"",
-    address:"Shrigonda",
-    state:"Maharastra",
+    Address:"Shrigonda",
+    State:"Maharastra",
     GSTNo:"",
   });
 
@@ -571,7 +571,7 @@ const handleScan = (data) => {
     const Total = Math.round(total)
     console.log(amount == Total)        
   if(amount == Total){
-    if(items[0].length>0&&finalform.name&&finalform.mobileNumber&&finalform.address){
+    if(items[0].length>0&&finalform.name&&finalform.Mobile&&finalform.Address){
       try {
         const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
         console.log(createdOrder);
@@ -582,10 +582,10 @@ const handleScan = (data) => {
           type:"Sale",
           name:"",
           Date:currentDate,
-          mobileNumber:"",
+          Mobile:"",
           ShipTo:"",
-          address:"Shrigonda",
-          state:"Maharastra",
+          Address:"Shrigonda",
+          State:"Maharastra",
           GSTNo:"",
         })
         setFormData({
@@ -614,7 +614,7 @@ const handleScan = (data) => {
       setFinalTotal("")
       toast.success("Order created successfully!");
       } catch (err) {
-        toast.error(`Failed to create order: ${err.message}`);
+        toast.error(`Failed to create Client: ${err.message}`);
     
       }
     }else{
@@ -624,7 +624,7 @@ const handleScan = (data) => {
   }else if(amount>Total){
     setMessage(`Return ${amount-Total} rs `)
   }else{
-    setMessage(`Need ${Total-amount} rs to place order or add amount in borrow field `)
+    setMessage(`Need ${Total-amount} rs to place Client or add amount in borrow field `)
   }
 
   }
@@ -765,9 +765,9 @@ const handleScan = (data) => {
             />
             {showModal && (
               <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
-                { matchingOrders.length > 0 ? ( matchingOrders.map((order) => (
-                  <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
-                    {order.Name}
+                { matchingOrders.length > 0 ? ( matchingOrders.map((Client) => (
+                  <div key={Client._id} onClick={() => handleSelectOrder(Client)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+                    {Client.Name}
                   </div>
                 )) 
               ) 
@@ -796,21 +796,21 @@ const handleScan = (data) => {
             <label className=" mr-2 text-gray-700 font-medium">Mobile</label>
             <input
               type="text"
-              id="mobileNumber"
+              id="Mobile"
               required
               onKeyDown={handleKeys}
               placeholder="Enter mobile number.."
               maxLength={10}
               minLength={10}
-              value={finalform.mobileNumber}
+              value={finalform.Mobile}
               onChange={(e) => {setInputmobilenumberforsearch(e.target.value)}}
               className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {showMobileModal && (
               <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
-                { matchingMobileNumbers.length > 0 ? ( matchingMobileNumbers.map((order) => (
-                  <div key={order._id} onClick={() => handleSelectOrder(order)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
-                    {order.mobileNumber}
+                { matchingMobileNumbers.length > 0 ? ( matchingMobileNumbers.map((Client) => (
+                  <div key={Client._id} onClick={() => handleSelectOrder(Client)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+                    {Client.Mobile}
                   </div>
                 )) 
               ) 
@@ -839,8 +839,8 @@ const handleScan = (data) => {
             <label className=" mr-2 text-gray-700 font-medium">Address</label>
             <input
               type="text"
-              id="address"
-              value={finalform.address}
+              id="Address"
+              value={finalform.Address}
               onChange={handleFinal}
               onKeyDown={handleKeys}
               className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -848,8 +848,8 @@ const handleScan = (data) => {
           </div>
           <div>
             <label className=" mr-2 text-gray-700 font-medium">State</label>
-            <input id="state"
-              value={finalform.state}
+            <input id="State"
+              value={finalform.State}
              onChange={handleFinal} className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
             </input>
           </div>

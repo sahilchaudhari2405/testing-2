@@ -8,11 +8,13 @@ import { saveAs } from 'file-saver';
 import { toast } from 'react-toastify';
 import { deleteOrder, fetchOrders } from '../Redux/Orders/orderSlice';
 import { logoutUser } from '../Redux/User/userSlices';
+import axiosInstance from '../axiosConfig';
 
 const Accounts = () => {
   const navigate = useNavigate();
   const [selectedView, setSelectedView] = useState('clients');
   const [fullName, setFullName] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const [importedData, setImportedData] = useState([]);
   const [showImportModal, setShowImportModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -36,6 +38,7 @@ const Accounts = () => {
         console.log("Client fetched!!");
       });
     }
+    console.log(orders)
   }, [orders]);
 
   useEffect(() => {
@@ -61,6 +64,10 @@ const Accounts = () => {
     });
 
   }, [orders]);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -105,21 +112,46 @@ const Accounts = () => {
     saveAs(blob, 'Clients_Report.xlsx');
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+  const handleFileUpload = async () => {
+    if (!selectedFile) {
+      toast.error('Please select a file to upload.');
+      return;
+    }
+  
     const reader = new FileReader();
-    reader.onload = (event) => {
+  
+    reader.onload = async (event) => {
       const binaryStr = event.target.result;
       const workbook = XLSX.read(binaryStr, { type: 'binary' });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(sheet);
-      setImportedData(data);
+  
+      setImportedData(data); // Store imported data in state
       setShowImportModal(false);
+  
+      // Send the data to the backend
+      try {
+        const response = await axiosInstance.post('/admin/UserImport', {
+          users: data, // Sending only the data as payload
+        });
+  
+        if (!response.data.success) {
+          throw new Error('Failed to import users');
+        }
+  
+        toast.success('Import successful!');
+        dispatch(fetchOrders()); // Fetch the updated data
+      } catch (error) {
+        console.error('Error during import:', error);
+        toast.error('Error during import: ' + error.message);
+      }
     };
-    reader.readAsBinaryString(file);
+  
+    reader.readAsBinaryString(selectedFile); // Read the file as binary string
   };
-
+  
+  
   const filteredOrders = orders.filter(order => {
     const orderDate = new Date(order.orderDate);
     const orderCreatedAt = new Date(order.orderDate);
@@ -134,7 +166,6 @@ const Accounts = () => {
       (!endDate || orderDate <= end)
     );
   });
-
   const renderOrdersTable = (data) => (
     <div>
       <input
@@ -270,12 +301,24 @@ const Accounts = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h2 className="text-lg font-bold mb-4">Import clients</h2>
-              <input type="file" onChange={handleFileUpload} className="mb-4" />
-              <div className="flex justify-end">
-                <button onClick={() => setShowImportModal(false)} className="bg-red-500 text-white px-4 py-2 rounded-lg">
-                  Cancel
-                </button>
-              </div>
+              <input
+    type="file"
+    accept=".xlsx, .xls, .csv"
+    onChange={handleFileChange}
+    className="mb-4"
+/>
+<button
+    onClick={handleFileUpload}
+    className="bg-green-500 text-white py-2 px-4 rounded-lg"
+>
+    Send
+</button>
+<button
+    onClick={() => setShowImportModal(false)}
+    className="bg-red-500 text-white py-2 px-4 rounded-lg ml-2"
+>
+    Cancel
+</button>
             </div>
           </div>
         )}
