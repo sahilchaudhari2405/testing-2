@@ -233,7 +233,7 @@ const Sale = () => {
     if (Inputdescriptionforsearch) {
       const response = await axiosInstance.post('/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
       const filteredOrders = response.data.data;
-      console.log("Inputdescriptionforsearch filteredorders by mobile number: ", filteredOrders);
+      console.log("Inputdescriptionforsearch : ", filteredOrders);
       setMatchingProducts(filteredOrders);
       setShowModaldescription(true);
     } else {
@@ -935,13 +935,14 @@ const handleScan = (data) => {
                 onKeyDown={handleKeys}
                 value={formData.description}
                 onChange={(e) => {setInputdescriptionforsearch(e.target.value)}}
+                onBlur={() => setTimeout(() => setShowModaldescription(false), 200)}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter description"
               />
               {showModaldescription && (
               <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
                 {matchingProducts.map((product) => (
-                  <div key={product._id} onClick={() => handleSelectProduct(product)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+                  <div key={product._id} onClick={() => handleSelectProduct(product)} className="p-2 flex border border-solid  hover:bg-gray-200 cursor-pointer">
                     {product.title}
                   </div>
                 ))}
