@@ -109,119 +109,176 @@ const Dashboard = () => {
 
     return { daywise, weekwise, monthwise };
   };
-  const transformDataforAdmin = (data) => {
-    if (!data || data.length === 0) {
-      return { daywise: [], weekwise: [], monthwise: [] };
-    }
+//   const transformDataforAdmin = (data) => {
+//     if (!data || data.length === 0) {
+//       return { daywise: [], weekwise: [], monthwise: [] };
+//     }
   
-    if (!data || data.length === 0) {
-      return { daywise: [], weekwise: [], monthwise: [] };
-    }
+//     if (!data || data.length === 0) {
+//       return { daywise: [], weekwise: [], monthwise: [] };
+//     }
   
-    const daywise = [];
-    const weekwise = [];
-    const monthwise = [];
-  
-  
-    // Helper function to add data to the right container
-    const addToAggregation = (aggregation, key, value) => {
-      if (!aggregation[key]) {
-        aggregation[key] = { totalSales: 0, totalRevenue: 0 };
-      }
-      aggregation[key].totalSales += value.sales;
-      aggregation[key].totalRevenue += value.revenue;
-      if (!aggregation[key]) {
-        aggregation[key] = { totalSales: 0, totalRevenue: 0 };
-      }
-      aggregation[key].totalSales += value.sales;
-      aggregation[key].totalRevenue += value.revenue;
-    };
+//     const daywise = [];
+//     const weekwise = [];
+//     const monthwise = [];
   
   
-    // Aggregate daily sales
-    data.forEach(order => {
-      (order.dailySales || []).forEach(sale => {
-        const dayKey = `Day ${sale.date}`;
-        addToAggregation(daywise, dayKey, {
-          sales: sale.finalPriceWithGST,
-          revenue: sale.totalProfit
-        });
-      });
+//     // Helper function to add data to the right container
+//     const addToAggregation = (aggregation, key, value) => {
+//       if (!aggregation[key]) {
+//         aggregation[key] = { totalSales: 0, totalRevenue: 0 };
+//       }
+//       aggregation[key].totalSales += value.sales;
+//       aggregation[key].totalRevenue += value.revenue;
+//       if (!aggregation[key]) {
+//         aggregation[key] = { totalSales: 0, totalRevenue: 0 };
+//       }
+//       aggregation[key].totalSales += value.sales;
+//       aggregation[key].totalRevenue += value.revenue;
+//     };
   
-      // Aggregate weekly sales
-      (order.weekSales || []).forEach(sale => {
-        const weekKey = `Week ${sale.week}`;
-        addToAggregation(weekwise, weekKey, {
-          sales: sale.finalPriceWithGST,
-          revenue: sale.totalProfit
-        });
-      });
   
-      // Aggregate monthly sales
-      const monthKey = new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' });
-      monthwise.push({
-        name: monthKey,
-        sales: order.monthFinalPriceWithGST,
-        revenue: order.monthTotalProfit
+//     // Aggregate daily sales
+//     data.forEach(order => {
+//       (order.dailySales || []).forEach(sale => {
+//         const dayKey = `Day ${sale.date}`;
+//         addToAggregation(daywise, dayKey, {
+//           sales: sale.finalPriceWithGST,
+//           revenue: sale.totalProfit
+//         });
+//       });
+  
+//       // Aggregate weekly sales
+//       (order.weekSales || []).forEach(sale => {
+//         const weekKey = `Week ${sale.week}`;
+//         addToAggregation(weekwise, weekKey, {
+//           sales: sale.finalPriceWithGST,
+//           revenue: sale.totalProfit
+//         });
+//       });
+  
+//       // Aggregate monthly sales
+//       const monthKey = new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' });
+//       monthwise.push({
+//         name: monthKey,
+//         sales: order.monthFinalPriceWithGST,
+//         revenue: order.monthTotalProfit
+//       });
+//     });
+  
+  
+//     const daywiseArray = Object.entries(daywise).map(([name, { totalSales, totalRevenue }]) => ({
+//       name,
+//       sales: totalSales,
+//       revenue: totalRevenue
+//     }));
+  
+  
+//     const weekwiseArray = Object.entries(weekwise).map(([name, { totalSales, totalRevenue }]) => ({
+//       name,
+//       sales: totalSales,
+//       revenue: totalRevenue
+      
+//     }));
+  
+//     const uniqueMonthwise = monthwise.reduce((acc, cur) => {
+//       const existing = acc.find(item => item.name === cur.name);
+//       if (existing) {
+//         existing.sales += cur.sales;
+//         existing.revenue += cur.revenue;
+//       } else {
+//         acc.push(cur);
+//       }
+//       return acc;
+      
+//     }, []);
+//     if (daywiseArray.length > 0) {
+//       console.log("transformdataforadmin daywisearrauyeln > 0");
+
+//        const latestSale = daywiseArray[daywiseArray.length - 1].sales;
+//        setlastestSale(latestSale);
+//        const latestRevenue = daywiseArray[daywiseArray.length - 1].revenue;
+//        setlastestRevenue(latestRevenue);
+//        const latestSaleDate = new Date(daywiseArray[daywiseArray.length - 1].date);
+     
+//       console.log("transformdataforadmin daywisearrauyeln > 0 latestSale: ",latestSale);
+//       console.log("transformdataforadmin daywisearrauyeln > 0 latestRevenue: ",latestRevenue);
+//       console.log("transformdataforadmin daywisearrauyeln > 0 latestSaleDate: ",latestSaleDate);
+
+//        const today = new Date();
+//        // const latestSaleDate = new Date(daywise[daywise.length - 1].date);
+       
+//        if (latestSaleDate.toDateString() === today.toDateString()) {
+//            setlatestDay('Today');
+//        } else {
+//          setlatestDay('Last Day');
+
+//    }
+//  }
+//     return {
+//       daywise: daywiseArray,
+//       weekwise: weekwiseArray,
+//       monthwise: uniqueMonthwise,
+//     };
+//   };
+const transformDataforAdmin = (data) => {
+  if (!data || data.length === 0) {
+    return { daywise: [], weekwise: [], monthwise: [] };
+  }
+
+  const daywiseArray = [];
+  const weekwiseArray = [];
+  const monthwiseArray = [];
+
+  data.forEach(order => {
+    (order.dailySales || []).forEach(sale => {
+      daywiseArray.push({
+        name: `Day ${sale.date}`,
+        sales: sale.finalPriceWithGST,
+        revenue: sale.totalProfit,
+        date: sale.date
       });
     });
-  
-  
-    const daywiseArray = Object.entries(daywise).map(([name, { totalSales, totalRevenue }]) => ({
-      name,
-      sales: totalSales,
-      revenue: totalRevenue
-    }));
-  
-  
-    const weekwiseArray = Object.entries(weekwise).map(([name, { totalSales, totalRevenue }]) => ({
-      name,
-      sales: totalSales,
-      revenue: totalRevenue
-      
-    }));
-  
-    const uniqueMonthwise = monthwise.reduce((acc, cur) => {
-      const existing = acc.find(item => item.name === cur.name);
-      if (existing) {
-        existing.sales += cur.sales;
-        existing.revenue += cur.revenue;
-      } else {
-        acc.push(cur);
-      }
-      return acc;
-      
-    }, []);
-    if (daywiseArray.length > 0) {
-      console.log("transformdataforadmin daywisearrauyeln > 0");
 
-       const latestSale = daywiseArray[daywiseArray.length - 1].sales;
-       setlastestSale(latestSale);
-       const latestRevenue = daywiseArray[daywiseArray.length - 1].revenue;
-       setlastestRevenue(latestRevenue);
-       const latestSaleDate = new Date(daywiseArray[daywiseArray.length - 1].date);
-     
-      console.log("transformdataforadmin daywisearrauyeln > 0 latestSale: ",latestSale);
-      console.log("transformdataforadmin daywisearrauyeln > 0 latestRevenue: ",latestRevenue);
-      console.log("transformdataforadmin daywisearrauyeln > 0 latestSaleDate: ",latestSaleDate);
+    (order.weekSales || []).forEach(sale => {
+      weekwiseArray.push({
+        name: `Week ${sale.week}`,
+        sales: sale.finalPriceWithGST,
+        revenue: sale.totalProfit
+      });
+    });
 
-       const today = new Date();
-       // const latestSaleDate = new Date(daywise[daywise.length - 1].date);
-       
-       if (latestSaleDate.toDateString() === today.toDateString()) {
-           setlatestDay('Today');
-       } else {
-         setlatestDay('Last Day');
+    monthwiseArray.push({
+      name: new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' }),
+      sales: order.monthFinalPriceWithGST,
+      revenue: order.monthTotalProfit
+    });
+  });
 
-   }
- }
-    return {
-      daywise: daywiseArray,
-      weekwise: weekwiseArray,
-      monthwise: uniqueMonthwise,
-    };
+  // Determine the latest sale details
+  if (daywiseArray.length > 0) {
+    const latestDaywiseSale = daywiseArray[daywiseArray.length - 1];
+    setlastestSale(latestDaywiseSale.sales);
+    setlastestRevenue(latestDaywiseSale.revenue);
+    const latestSaleDate = new Date(latestDaywiseSale.date);
+    const today = new Date();
+    console.log("check",latestDaywiseSale.date);
+    console.log("check",today.getDate());
+    if (latestDaywiseSale.date == today.getDate()) {
+ console.log("yes")
+      setlatestDay('Today');
+    } else {
+      setlatestDay('Last Day');
+    }
+  }
+
+  return {
+    daywise: daywiseArray,
+    weekwise: weekwiseArray,
+    monthwise: monthwiseArray,
   };
-  
+};
+
 //   const transformDataforAdmin = (data) => {
 //     // Initialize containers for aggregation
 //     const daywise = [];

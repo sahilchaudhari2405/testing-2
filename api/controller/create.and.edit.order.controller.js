@@ -8,13 +8,13 @@ import Offline_CartItem from "../model/cartItem.model.js";
 import { handleOfflineCounterSales, updateSalesData } from "./add.counter.sales.info.js";
 import { handleAllTotalOfflineSales, TotalAllupdateSalesData } from "./add.total.sales.info.js";
 import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./add.offline.sales.info.js";
-
-
+import { createClient, reduceClient } from "./Client.controller.js";
 // Function to place an order
 const placeOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
     // const id=`669b9afa72e1e9138e2a64a3`;
     const { paymentType, BillUser } = req.body;
+
     const cart = await Offline_Cart.findOne({ userId: id }).populate('cartItems');
 
     if (!cart) {
@@ -35,7 +35,7 @@ const placeOrder = asyncHandler(async (req, res) => {
                     purchaseRate: product.purchaseRate * cartItem.quantity,
                     GST: cartItem.GST,
                     type:cartItem.type,
-                    totalProfit:(cartItem.discountedPrice)-(product.purchaseRate*cartItem.quantity),
+                    totalProfit:Math.max(0,(cartItem.discountedPrice)-(product.purchaseRate*cartItem.quantity)),
                     finalPriceWithGST: cartItem.finalPrice_with_GST,
                     discountedPrice: cartItem.discountedPrice,
                     userId: id,
@@ -52,7 +52,7 @@ const placeOrder = asyncHandler(async (req, res) => {
                     price: cartItem.price,
                     purchaseRate: product.purchaseRate * cartItem.quantity,
                     GST: cartItem.GST,
-                    totalProfit:(product.discountedPrice-product.purchaseRate)*cartItem.quantity ,
+                    totalProfit:Math.max(0,(product.discountedPrice-product.purchaseRate)*cartItem.quantity ),
                     finalPriceWithGST: cartItem.finalPrice_with_GST,
                     discountedPrice: cartItem.discountedPrice,
                     userId: id,
@@ -85,11 +85,26 @@ const placeOrder = asyncHandler(async (req, res) => {
             finalPriceWithGST: cart.final_price_With_GST,
             orderDate:new Date(),
         });
+        const clientReq = {
+            body: {
+                Type: 'Client',
+                Name: BillUser.name,
+                Email: BillUser.email || "",
+                Address: BillUser.Address,
+                State: BillUser.State,
+                Mobile: BillUser.Mobile, 
+                Purchase: cart.final_price_With_GST || 0,
+                Closing: paymentType.borrow || 0,
+            }
+        };
 
+    const r = await createClient(clientReq);
+     console.log(r);
         await order.save();
         await handleOfflineCounterSales(id, order);
         await handleTotalOfflineSales(order);
         await handleAllTotalOfflineSales(order);
+
         const results = await OfflineOrder.findById(order._id).populate({
             path:'orderItems',
             populate: {
@@ -123,36 +138,46 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
         }
 
         const product = await Product.findById(cartItem.product);
-            
+        const  oneUnit =  cartItem.discountedPrice/cartItem.quantity;
+        const oneUnitProfit = parseFloat(cartItem.totalProfit/cartItem.quantity);
         if (cartItem.quantity > 1) {
             cartItem.quantity -= 1;
             cartItem.price -= product.price;
             cartItem.GST -= product.GST;
             cartItem.purchaseRate -= product.purchaseRate;
-            cartItem.totalProfit -= (product.discountedPrice - product.purchaseRate);
-            cartItem.finalPriceWithGST -= (product.discountedPrice + product.GST);
-            cartItem.discountedPrice -= product.discountedPrice;
+            cartItem.totalProfit -= Math.max(0,(oneUnitProfit));
+            cartItem.finalPriceWithGST -= (oneUnit + product.GST);
+            cartItem.discountedPrice -= oneUnit;
             cartItem.updatedAt = new Date();
             product.quantity+=1;
             await product.save();
             await cartItem.save();
-             
+            
             const cart = await OfflineOrder.findById(orderId);
+           data = {
+                Type: 'Client',
+                Name: cart.Name,
+                Mobile: cart.mobileNumber,
+                Purchase: oneUnit,
+                Closing: (cart.paymentType.borrow>=oneUnit)?oneUnit:0,
+              }
+             const results =await reduceClient(data);
+             console.log(results);
             const oldOrder = JSON.parse(JSON.stringify(cart)); 
             if (cart) {
                 const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
                 if (cartItemExists) {
-                    const discount =await Math.max(product.price - product.discountedPrice, 0);
+                    const discount =await Math.max(product.price - oneUnit, 0);
                     cart.user=id,
                     cart.paymentType=paymentType,
                     cart.orderStatus='Update',
                     cart.totalPrice -= product.price;
-                    cart.totalDiscountedPrice -= product.discountedPrice;
+                    cart.totalDiscountedPrice -= oneUnit;
                     cart.totalPurchaseRate -= product.purchaseRate;
                     cart.GST -= product.GST;
                     cart.discount -= discount;
-                    cart.totalProfit -= (product.discountedPrice - product.purchaseRate);
-                    cart.finalPriceWithGST -= (product.discountedPrice + product.GST);
+                    cart.totalProfit -= Math.max(0,oneUnitProfit);
+                    cart.finalPriceWithGST -= (oneUnit+product.GST);
                     await cart.save();
                    await updateSalesData(oldOrder.user,oldOrder,cart);
                    await TotalAllupdateSalesData(oldOrder,cart);
@@ -189,6 +214,15 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
         const cart = await OfflineOrder.findById(orderId);
         const oldOrder = JSON.parse(JSON.stringify(cart));  
         const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
+        data = {
+            Type: 'Client',
+            Name: cart.Name,
+            Mobile: cart.mobileNumber,
+            Purchase: cartItem.finalPriceWithGST,
+            Closing: (cart.paymentType.borrow>=cartItem.finalPriceWithGST)?cartItem.finalPriceWithGST:0,
+          }
+         const results =await reduceClient(data);
+         console.log(results);
         if (cartItem.quantity > 0 && cartItemExists) {
             const discount =await Math.max(cartItem.price - cartItem.discountedPrice, 0);
             cart.user = id,
@@ -273,7 +307,7 @@ const updateOrder = asyncHandler(async (req, res) => {
             price: item.price,
             purchaseRate: product.purchaseRate * item.quantity,
             GST: item.GST,
-            totalProfit: (product.discountedPrice - product.purchaseRate) * item.quantity,
+            totalProfit: Math.max(0,(product.discountedPrice - product.purchaseRate) * item.quantity),
             finalPriceWithGST: item.finalPriceWithGST,
             discountedPrice: item.discountedPrice,
             userId: order.user,
@@ -349,7 +383,15 @@ const cancelledOrder = asyncHandler(async (req, res) => {
             totalProfit: 0,
             finalPriceWithGST: 0,
         };
-
+        data = {
+            Type: 'Client',
+            Name: cart.Name,
+            Mobile: cart.mobileNumber,
+            Purchase: cart.finalPriceWithGST,
+            Closing: cart.paymentType.borrow,
+          }
+         const results =await reduceClient(data)
+         console.log(results);
         cart.user = id;
         cart.orderStatus = 'Cancel';
         cart.totalPrice = cancelFields.totalPrice;
