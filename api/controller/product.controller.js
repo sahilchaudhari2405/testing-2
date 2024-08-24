@@ -273,7 +273,7 @@ export const sortProductsfordescription = async (req, res) => {
     console.log("yes");
 
     if (description) {
-      query.description = { $regex: description, $options: 'i' }; // 'i' for case-insensitive
+      query.description = { $regex: `^${description}`, $options: 'i' }; // 'i' for case-insensitive
     }
    
 
