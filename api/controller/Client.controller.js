@@ -120,17 +120,25 @@ const updateClient = async (req) => {
 
 const reduceClient = async (data) => {
   try {
-    let orderDate = new Date();
+    const orderDate = new Date();
     const currentMonth = orderDate.toISOString().slice(0, 7); // YYYY-MM
 
     // Find the client using the data provided
-    const updatedClient = await Client.findOne({ Type: data.Type, Name: data.Name, Mobile: data.Mobile });
+    const updatedClient = await Client.findOne({
+      Type: data.Type,
+      Name: data.Name,
+      Mobile: data.Mobile,
+    });
     if (!updatedClient) {
       throw new Error('Client not found');
     }
+    console.log(updatedClient);
 
-    // Get the latest closing balance record
-    let closingBalanceLast = await ClosingBalance.findById(updatedClient.ClosingBalance[updatedClient.ClosingBalance.length - 1]);
+    // Safely access the latest closing balance record
+    const closingBalanceLastId = updatedClient.ClosingBalance?.[updatedClient.ClosingBalance.length - 1];
+    let closingBalanceLast = closingBalanceLastId
+      ? await ClosingBalance.findById(closingBalanceLastId)
+      : null;
     if (!closingBalanceLast) {
       throw new Error('Closing balance record not found');
     }
@@ -142,8 +150,11 @@ const reduceClient = async (data) => {
       await closingBalanceLast.save();
     }
 
-    // Get the latest client purchase record
-    let clientPurchaseLast = await ClientPurchase.findById(updatedClient.ClientPurchase[updatedClient.ClientPurchase.length - 1]);
+    // Safely access the latest client purchase record
+    const clientPurchaseLastId = updatedClient.CompletePurchase?.[updatedClient.CompletePurchase.length - 1];
+    let clientPurchaseLast = clientPurchaseLastId
+      ? await ClientPurchase.findById(clientPurchaseLastId)
+      : null;
     if (!clientPurchaseLast) {
       throw new Error('Client purchase record not found');
     }
@@ -158,7 +169,7 @@ const reduceClient = async (data) => {
     // Update the client's overall records
     updatedClient.totalCompletePurchase = Math.max(0, updatedClient.totalCompletePurchase - data.Purchase);
     updatedClient.totalClosingBalance = Math.max(0, updatedClient.totalClosingBalance - data.Closing);
-    updatedClient.updatedAt = new Date();  
+    updatedClient.updatedAt = new Date();
 
     await updatedClient.save();
 
@@ -168,6 +179,7 @@ const reduceClient = async (data) => {
     throw new Error(error.message); // Throw the error to be handled by the calling function
   }
 };
+
 
 const getAllClients = async (req, res) => {
   try {

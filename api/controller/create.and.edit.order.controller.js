@@ -73,7 +73,7 @@ const placeOrder = asyncHandler(async (req, res) => {
             orderItems: orderItems,
             Name: BillUser.name,
             mobileNumber: BillUser.Mobile,
-            email: BillUser.email || "",
+            email: BillUser.email ,
             totalPrice: cart.totalPrice,
             totalDiscountedPrice: cart.totalDiscountedPrice,
             totalItem: cart.totalItem,
@@ -383,10 +383,10 @@ const cancelledOrder = asyncHandler(async (req, res) => {
             totalProfit: 0,
             finalPriceWithGST: 0,
         };
-        data = {
+      let  data = {
             Type: 'Client',
             Name: cart.Name,
-            Mobile: cart.mobileNumber,
+            Mobile: 9359228200,
             Purchase: cart.finalPriceWithGST,
             Closing: cart.paymentType.borrow,
           }
