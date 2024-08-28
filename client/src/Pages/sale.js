@@ -170,7 +170,7 @@ const Sale = () => {
 
     console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
     if (Inputnameforsearch) {
-      const response = await axiosInstance.get('/admin/SearchClient',{ alphabet : Inputnameforsearch})
+      const response = await axiosInstance.post('/admin/SearchClient',{ alphabet : Inputnameforsearch})
       const distinctOrders = response.data.data;
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
@@ -192,7 +192,7 @@ const Sale = () => {
 
     console.log("searching Inputmobilenumberforsearch are: ",Inputmobilenumberforsearch);
     if (Inputmobilenumberforsearch) {
-      const response = await axiosInstance.get('/admin/SearchClient',{ number : Inputmobilenumberforsearch})
+      const response = await axiosInstance.post('/admin/SearchClient',{ number : Inputmobilenumberforsearch})
       const distinctOrders = response.data.data;
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
@@ -706,6 +706,20 @@ const handleScan = (data) => {
       
     }
     setProductDetails({...productDetails,['qty']:" "});
+    // setFormData({
+    //   barcode: "",
+    //   brand: "",
+    //   description: "",
+    //   category: "",
+    //   stockType: "",
+    //   unit: "",
+    //   qty: "",
+    //   saleRate: "",
+    //   profit: "",
+    //   hsn: "",
+    //   gst: "",
+    //   total: "",
+    // });
 
   };
 
@@ -759,8 +773,10 @@ const handleScan = (data) => {
               required
               value={finalform.name}
               placeholder="Enter name"
+              autocomplete="off"
               onKeyDown={handleKeyDown}
               onChange={(e) => {setInputnameforsearch(e.target.value)}}
+              onBlur={() => setTimeout(() => setShowModal(false), 200)}
               className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {showModal && (
@@ -802,8 +818,10 @@ const handleScan = (data) => {
               placeholder="Enter mobile number.."
               maxLength={10}
               minLength={10}
+              autocomplete="off"
               value={finalform.Mobile}
               onChange={(e) => {setInputmobilenumberforsearch(e.target.value)}}
+              onBlur={() => setTimeout(() => setShowMobileModal(false), 200)}
               className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {showMobileModal && (
