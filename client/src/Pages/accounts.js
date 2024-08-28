@@ -50,20 +50,22 @@ const Accounts = () => {
       navigate('/');
     }
   }, [navigate]);
-
+  
   useEffect(() => {
     const currentDate = new Date().toISOString().split('T')[0];
     const nextDate = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-
+  
     setStartDate(currentDate);
     setEndDate(nextDate);
-
+  
     const filteredOrders = orders.filter(order => {
-      const orderDate = new Date(order.orderDate).toISOString().split('T')[0];
-      return orderDate >= currentDate && orderDate <= nextDate;
+      const orderDate = order.orderDate ? new Date(order.orderDate).toISOString().split('T')[0] : null;
+      return orderDate && orderDate >= currentDate && orderDate <= nextDate;
     });
-
+  
+    console.log(filteredOrders);
   }, [orders]);
+  
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
@@ -132,7 +134,7 @@ const Accounts = () => {
   
       // Send the data to the backend
       try {
-        const response = await axiosInstance.post('/admin/UserImport', {
+        const response = await axiosInstance.get('/admin/UserImport', {
           users: data, // Sending only the data as payload
         });
   
@@ -203,31 +205,37 @@ const Accounts = () => {
           </tr>
         </thead>
         <tbody>
-          {data?.map((order, i) => (
-            <tr key={order._id || i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
-              <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
-              <td className="border border-zinc-800 px-4 py-2">{order.Name}</td>
-              <td className="border border-zinc-800 px-4 py-2">{order.mobileNumber}</td>
-              <td className="border border-zinc-800 px-4 py-2">{order.email}</td>
-              <td className="border border-zinc-800 px-4 py-2">{order.orderStatus}</td>
-              <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleTimeString()}</td>
-              <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleDateString()}</td>
-              <td className="border border-zinc-800 px-4 py-2">
-                <div className='flex justify-around'>
-                  <button className="text-green-500 text-xl">
-                    <FaWhatsapp aria-hidden="true" onClick={() => openWhatsAppPopup(order)} />
-                  </button>
-                  <button className="text-red-500">
-                    <FaTrash aria-hidden="true" onClick={() => handleDelete(order)} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
+          {data?.map((order, i) => {
+            // Log each order to the console
+            console.log("Map ka andar ka data ",order);
+  
+            return (
+              <tr key={order._id || i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
+                <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order.Name}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order.mobileNumber}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order.email}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order.orderStatus}</td>
+                <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleTimeString()}</td>
+                <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleDateString()}</td>
+                <td className="border border-zinc-800 px-4 py-2">
+                  <div className='flex justify-around'>
+                    <button className="text-green-500 text-xl">
+                      <FaWhatsapp aria-hidden="true" onClick={() => openWhatsAppPopup(order)} />
+                    </button>
+                    <button className="text-red-500">
+                      <FaTrash aria-hidden="true" onClick={() => handleDelete(order)} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
   );
+  
   return (
     <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
       {isPopupOpen && (
