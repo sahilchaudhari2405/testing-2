@@ -154,7 +154,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
             await cartItem.save();
             
             const cart = await OfflineOrder.findById(orderId);
-           data = {
+        let   data = {
                 Type: 'Client',
                 Name: cart.Name,
                 Mobile: cart.mobileNumber,
@@ -214,7 +214,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
         const cart = await OfflineOrder.findById(orderId);
         const oldOrder = JSON.parse(JSON.stringify(cart));  
         const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
-        data = {
+       let data = {
             Type: 'Client',
             Name: cart.Name,
             Mobile: cart.mobileNumber,
@@ -411,6 +411,7 @@ const cancelledOrder = asyncHandler(async (req, res) => {
                 product.quantity += item.quantity;
                 await product.save();
             }
+            await OfflineOrderItem.findByIdAndDelete(item);
         }
 
         await updateSalesData(oldOrder.user, oldOrder, cancelFields);
