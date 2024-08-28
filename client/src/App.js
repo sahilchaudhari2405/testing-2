@@ -55,7 +55,7 @@ const App = () => {
             path="/admin/accounts"
             element={
               <ProtectedRoute requiredRole="admin">
-                <PageWithNavbar><Accounts /></PageWithNavbar>
+                <PageWithNavbar><Admin /></PageWithNavbar>
               </ProtectedRoute>
             }
           />
