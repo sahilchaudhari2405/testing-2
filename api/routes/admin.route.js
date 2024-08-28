@@ -19,5 +19,5 @@ admin.get('/getAllCounterSales', authenticateToken,getAllCounterSale );
 admin.get('/PurchaseOrderGet',authenticateToken,GetPurchaseOrder);
 admin.post('/UserImport',authenticateToken,importUser)
 admin.get('/Client',authenticateToken,getAllClients)
-admin.get('/SearchClient',searchClients)
+admin.post('/SearchClient',searchClients)
 export default admin;
