@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axiosInstance from '../axiosConfig';
 import { toast } from 'react-toastify';
 import BarcodeReader from 'react-barcode';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const EditOrder = () => {
+const Edit= () => {
+    const navigate = useNavigate();
+    const { orderId: orderIdFromURL } = useParams();
   const [formData, setFormData] = useState({
     Name: '',
     mobileNumber: '',
@@ -33,7 +36,14 @@ const EditOrder = () => {
   const [fetchedOrder, setfetchedOrder] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
 
-
+  useEffect(() => {
+    if (orderIdFromURL) {
+        setOrderId(orderIdFromURL); 
+        console.log("yes")
+      handleOrderIdChange({ target: { value: orderIdFromURL } });
+     fetchOrderData();
+    }
+  }, [orderIdFromURL]);
   const handleCheckboxChange = (event) => {
     const checked = event.target.checked;
     setIsChecked(checked);
@@ -168,7 +178,7 @@ const EditOrder = () => {
     }));
   };
 
-  const handleRemoveOrderItem = (e,orderId, itemId) => {
+  const handleRemoveOrderItem = async (e,orderId, itemId) => {
     e.preventDefault();
 
     const remove_payload = {
@@ -179,7 +189,7 @@ const EditOrder = () => {
     axiosInstance.put('/order/RemoveOneItem', remove_payload)
       .then(async response => {
         toast.success('Order item removed successfully!');
-        await fetchOrderData()
+        await  fetchOrderData();
       })
       .catch(err => {
         toast.error('Failed to remove item.');
@@ -197,9 +207,10 @@ const EditOrder = () => {
       .catch(err => {
         alert('Failed to update order.');
       });
+      navigator('/view');
   };
 
-  const cancelOrder =() => {
+  const cancelOrder =async () => {
     const cancelOrder_payload = {
       orderId : orderId
     }
@@ -207,7 +218,7 @@ const EditOrder = () => {
     axiosInstance.put('/order/cancelOrder', cancelOrder_payload)
       .then(async response => {
         toast.success('Order cancelled successfully!');
-        await fetchOrderData()
+        await  fetchOrderData();
       })
       .catch(err => {
         toast.error('Failed to cancel order');
@@ -234,10 +245,10 @@ const EditOrder = () => {
         totalProfit: '',
         finalPriceWithGST: '',
       });
-
+  
   }
 
-  const handleDecreaseQuantity = (e,iteamId) => {
+  const handleDecreaseQuantity = async (e,iteamId) => {
     //fefds decreaseQuantity
     e.preventDefault();
     const decreaseQuantity_payload = {
@@ -249,22 +260,24 @@ const EditOrder = () => {
     axiosInstance.put('/order/decreaseQuantity', decreaseQuantity_payload)
       .then(async response => {
         toast.success('Quantity decreased successfully!');
-        await fetchOrderData()
+        await  fetchOrderData();
       })
       .catch(err => {
         toast.error('Failed to decrease quantity');
       });
-      fetchOrderData();
+      
 
   }
 
 
   return (
     <div className="bg-gray-100 mt-20  mx-6 rounded-lg shadow-lg">
+        
       <div className="bg-blue-700 text-white p-4 rounded-t-lg">
         <h1 className="text-xl font-bold">Edit Order</h1>
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
+        
         <div className="mb-6">
           <BarcodeReader onError={handleError} onScan={handleScan} />
               
@@ -615,4 +628,4 @@ const EditOrder = () => {
   );
 };
 
-export default EditOrder;
+export default Edit;

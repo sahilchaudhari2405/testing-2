@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import logo from "../logo.png";
 import Barcode from 'react-barcode';
 import Invoice from "../component/invoice.js";
+
 const sharedClasses = {
   flex: 'flex ',
   justifyBetween: 'justify-between',
@@ -25,6 +26,7 @@ const sharedClasses = {
 
 const View = () => {
   const navigate = useNavigate();
+
   const [selectedView, setSelectedView] = useState('Sales');
   const [importedData, setImportedData] = useState([]);
   const [fullName, setFullName] = useState('');
