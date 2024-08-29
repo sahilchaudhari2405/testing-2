@@ -703,23 +703,10 @@ const handleScan = (data) => {
       dispatch(addToCart(id)).then(() => {
         dispatch(fetchCart());
       });
-      
     }
-    setProductDetails({...productDetails,['qty']:" "});
-    // setFormData({
-    //   barcode: "",
-    //   brand: "",
-    //   description: "",
-    //   category: "",
-    //   stockType: "",
-    //   unit: "",
-    //   qty: "",
-    //   saleRate: "",
-    //   profit: "",
-    //   hsn: "",
-    //   gst: "",
-    //   total: "",
-    // });
+    // setProductDetails({...productDetails,['qty']:" "});
+    setProductDetails();
+
 
   };
 
@@ -729,6 +716,22 @@ const handleScan = (data) => {
       if (e.target.value.trim()!="") {
       fetchProducts(e.target.value);
       }
+
+      setFormData({
+        barcode: "",
+        brand: "",
+        description: "",
+        category: "",
+        stockType: "",
+        unit: "",
+        qty: "",
+        saleRate: "",
+        profit: "",
+        hsn: "",
+        gst: "",
+        total: "",
+      })
+
     }
   };
   
@@ -1090,9 +1093,22 @@ const handleScan = (data) => {
             <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 mt-5">
               <button
                 type="submit"
+                onClick={() => setFormData({
+                  barcode: "",
+                  brand: "",
+                  description: "",
+                  category: "",
+                  stockType: "",
+                  unit: "",
+                  qty: "",
+                  saleRate: "",
+                  profit: "",
+                  hsn: "",
+                  gst: "",
+                  total: "",
+                })}
                 className="w-full bg-green-700 text-white py-1 rounded font-medium hover:bg-green-800 transition-colors"
               >
-          
 
                 Enter
               </button>
