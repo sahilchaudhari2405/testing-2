@@ -455,13 +455,16 @@ console.log(editItem);
     try {
       const response = await axiosInstance.get(`/product/view/${id}`); // Adjust the URL to your API endpoint
       // setProducts(response.data);
-      console.log(response)
+      console.log("barcode fetch product reponse ",response)
       dispatch(addToCart(id)).then(() => {
         dispatch(fetchCart());})
       setProductDetails({})
     } catch (err) {
-      // setError();
-console.log(err.message)
+      if (err.response && err.response.status === 404) {
+        toast.error("Product not found!"); 
+      } else {
+        console.log(err.message); 
+      }
     }
   };
 
@@ -706,14 +709,15 @@ const handleScan = (data) => {
     }
     // setProductDetails({...productDetails,['qty']:" "});
     setProductDetails();
-
-
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
+      console.log("inside handle key press == Enter")
 
       if (e.target.value.trim()!="") {
+      console.log("fetchroducts ")
+
       fetchProducts(e.target.value);
       }
 
