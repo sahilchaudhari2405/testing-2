@@ -194,6 +194,12 @@ const View = () => {
             <td className="border border-zinc-800 px-4 py-2">
               <div className='flex justify-around'>
                 <div className='flex justify-around space-x-4'>
+                <button className="text-blue-500"  onClick={() => navigate(`/edit/${item._id}`)}>
+                    <span className='text-center'>
+                      <TbEyeEdit className="text-2xl" />
+                      Edit
+                    </span>
+                  </button>
                   <button className="text-green-500" onClick={() => handlePrint(item)}>
                     <span className='text-center'>
                       <TbEyeEdit className="text-2xl" />
@@ -206,6 +212,7 @@ const View = () => {
                       Marathi
                     </span>
                   </button>
+
                 </div>
 
               </div>

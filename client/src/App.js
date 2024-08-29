@@ -25,6 +25,7 @@ import Users from './Pages/users.js';
 import { ToastContainer } from 'react-toastify';
 import ProtectedRoute from './component/ProtectedRoute';
 import InvoiceTest from './component/invoicetest.js';
+import Edit from './Pages/edit.js';
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
           <Route path="/inventory" element={<PageWithNavbar><Inventory /></PageWithNavbar>} />
           <Route path="/sales" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
           <Route path="/editOrder" element={<PageWithNavbar><EditOrder /></PageWithNavbar>} />
+          <Route path="/edit/:orderId" element={<PageWithNavbar><Edit /></PageWithNavbar>} />
           <Route path="/forbidden" element={<Forbidden />} />
           <Route path="/users" element={<PageWithNavbar><Users /></PageWithNavbar>} />
           <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
