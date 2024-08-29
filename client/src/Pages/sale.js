@@ -706,20 +706,20 @@ const handleScan = (data) => {
       
     }
     setProductDetails({...productDetails,['qty']:" "});
-    // setFormData({
-    //   barcode: "",
-    //   brand: "",
-    //   description: "",
-    //   category: "",
-    //   stockType: "",
-    //   unit: "",
-    //   qty: "",
-    //   saleRate: "",
-    //   profit: "",
-    //   hsn: "",
-    //   gst: "",
-    //   total: "",
-    // });
+    setFormData({
+      barcode: "",
+      brand: "",
+      description: "",
+      category: "",
+      stockType: "",
+      unit: "",
+      qty: "",
+      saleRate: "",
+      profit: "",
+      hsn: "",
+      gst: "",
+      total: "",
+    });
 
   };
 
