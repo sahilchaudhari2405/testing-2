@@ -133,9 +133,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
         if (!cartItem) {
             return res.status(404).json(new ApiResponse(404, 'Cart item not found', null));
         }
-        if (cartItem.type=='custom') {
-            return res.status(404).json(new ApiResponse(404, 'Cart item is custom', null));
-        }
+  
 
         const product = await Product.findById(cartItem.product);
         const  oneUnit =  cartItem.discountedPrice/cartItem.quantity;
