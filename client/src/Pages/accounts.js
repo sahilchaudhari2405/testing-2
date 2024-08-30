@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowDown, FaEdit, FaTrash, FaWhatsapp } from 'react-icons/fa';
+import { FaArrowDown, FaEdit, FaTrash,FaBalanceScale, FaWhatsapp } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
@@ -23,6 +23,7 @@ const Accounts = () => {
   const [message, setMessage] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
@@ -154,20 +155,32 @@ const Accounts = () => {
   };
   
   
-  const filteredOrders = orders.filter(order => {
-    const orderDate = new Date(order.orderDate);
-    const orderCreatedAt = new Date(order.orderDate);
+  const filteredOrders = orders.filter(orders => {
+    const updatedAt = new Date(orders.updatedAt);
+    const orderCreatedAt = new Date(orders.updatedAt);
     const start = new Date(startDate);
     const end = new Date(endDate);
 
     return (
-      Object.values(order).some(value =>
+      Object.values(orders).some(value =>
         value.toString().toLowerCase().includes(searchQuery.toLowerCase())
       ) &&
-      (!startDate || orderDate >= start) &&
-      (!endDate || orderDate <= end)
+      (!startDate || updatedAt >= start) &&
+      (!endDate || updatedAt <= end)
     );
   });
+  const fetchClosingBalanceData = async () => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const data = orders.flatMap(order => {
+      return order.ClosingBalance?.filter(balance => {
+        if (!balance.monthYear) return false;
+        const balanceDate = new Date(balance.monthYear);
+        return balanceDate >= start && balanceDate <= end;
+      });
+    });
+  };
   const renderOrdersTable = (data) => (
     <div>
       <input
@@ -198,7 +211,7 @@ const Accounts = () => {
             <th className="border border-zinc-800 px-4 py-2">Name</th>
             <th className="border border-zinc-800 px-4 py-2">Mobile Number</th>
             <th className="border border-zinc-800 px-4 py-2">Email</th>
-            <th className="border border-zinc-800 px-4 py-2">Status</th>
+            {/* <th className="border border-zinc-800 px-4 py-2">Status</th> */}
             <th className="border border-zinc-800 px-4 py-2">Time</th>
             <th className="border border-zinc-800 px-4 py-2">Date</th>
             <th className="border border-zinc-800 px-4 py-2">Action</th>
@@ -213,11 +226,11 @@ const Accounts = () => {
               <tr key={order._id || i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
                 <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
                 <td className="border border-zinc-800 px-4 py-2">{order.Name}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.mobileNumber}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.email}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.orderStatus}</td>
-                <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleTimeString()}</td>
-                <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleDateString()}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order.Mobile}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order.Email || 'N/A'}</td>
+                {/* <td className="border border-zinc-800 px-4 py-2">{order.orderStatus}</td> */}
+                <td className="border border-zinc-800 px-4 py-2">{new Date(order.updatedAt).toLocaleTimeString()}</td>
+                <td className="border border-zinc-800 px-4 py-2">{new Date(order.updatedAt).toLocaleDateString()}</td>
                 <td className="border border-zinc-800 px-4 py-2">
                   <div className='flex justify-around'>
                     <button className="text-green-500 text-xl">
@@ -225,6 +238,9 @@ const Accounts = () => {
                     </button>
                     <button className="text-red-500">
                       <FaTrash aria-hidden="true" onClick={() => handleDelete(order)} />
+                    </button>
+                    <button className="text-red-500">
+                      <FaBalanceScale aria-hidden="true" onClick={() => fetchClosingBalanceData(order)} />
                     </button>
                   </div>
                 </td>
@@ -302,6 +318,7 @@ const Accounts = () => {
             <button onClick={() => setShowImportModal(true)} className="bg-white text-black border-black border-[1px] px-4 py-2 rounded hover:text-red-600">
               Import clients
             </button>
+        
           </div>
         </div>
 
@@ -310,25 +327,25 @@ const Accounts = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h2 className="text-lg font-bold mb-4">Import clients</h2>
               <input
-    type="file"
-    accept=".xlsx, .xls, .csv"
-    onChange={handleFileChange}
-    className="mb-4"
-/>
-<button
-    onClick={handleFileUpload}
-    className="bg-green-500 text-white py-2 px-4 rounded-lg"
->
-    Send
-</button>
-<button
-    onClick={() => setShowImportModal(false)}
-    className="bg-red-500 text-white py-2 px-4 rounded-lg ml-2"
->
-    Cancel
-</button>
-            </div>
-          </div>
+                  type="file"
+                  accept=".xlsx, .xls, .csv"
+                  onChange={handleFileChange}
+                  className="mb-4"
+              />
+              <button
+                  onClick={handleFileUpload}
+                  className="bg-green-500 text-white py-2 px-4 rounded-lg"
+              >
+                  Send
+              </button>
+              <button
+                  onClick={() => setShowImportModal(false)}
+                  className="bg-red-500 text-white py-2 px-4 rounded-lg ml-2"
+              >
+                  Cancel
+              </button>
+                          </div>
+                        </div>
         )}
           {status === 'loading' ? (
           <div>Loading...</div>
@@ -344,3 +361,4 @@ const Accounts = () => {
 };
 
 export default Accounts;
+
