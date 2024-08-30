@@ -408,7 +408,7 @@ const EditOrder = () => {
                 required
               />
             </div>
-            <div>
+            {/* <div>
               <label className="block text-gray-700 font-medium">Total Purchase Rate</label>
               <input
                 type="number"
@@ -418,7 +418,7 @@ const EditOrder = () => {
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </div>
+            </div> */}
             <div>
               <label className="block text-gray-700 font-medium">GST</label>
               <input
@@ -462,7 +462,7 @@ const EditOrder = () => {
                 required
               />
             </div>
-            <div>
+            {/* <div>
               <label className="block text-gray-700 font-medium">Total Profit</label>
               <input
                 type="number"
@@ -472,7 +472,7 @@ const EditOrder = () => {
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </div>
+            </div> */}
             <div>
               <label className="block text-gray-700 font-medium">Final Price with GST</label>
               <input

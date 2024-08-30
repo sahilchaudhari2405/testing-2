@@ -203,12 +203,12 @@ const Edit= () => {
     axiosInstance.put(`/order/updateOrderbyID/${orderId}`, formData)
       .then(async response => {
         toast.success('Order updated successfully!');
-        await fetchOrderData()
+        await fetchOrderData();
+        navigate('/view')
       })
       .catch(err => {
         alert('Failed to update order.');
       });
-      navigator('/view');
   };
 
   const cancelOrder =async () => {
@@ -279,7 +279,7 @@ const Edit= () => {
       </div>
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
         
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <BarcodeReader onError={handleError} onScan={handleScan} />
               
           <label className="block text-gray-700 font-medium mb-2">Enter Order ID or Scan the Barcode</label>
@@ -315,7 +315,7 @@ const Edit= () => {
             </button>
           </div>
           {error && <p className="text-red-500 mt-2">{error}</p>}
-        </div>
+        </div> */}
         { fetchedOrder && (<form onSubmit={handleSubmit} className='bg-blue-100 rounded' >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-4 gap-4 mb-6">
             <div>
@@ -422,7 +422,7 @@ const Edit= () => {
                 required
               />
             </div>
-            <div>
+            {/* <div>
               <label className="block text-gray-700 font-medium">Total Purchase Rate</label>
               <input
                 type="number"
@@ -432,7 +432,7 @@ const Edit= () => {
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </div>
+            </div> */}
             <div>
               <label className="block text-gray-700 font-medium">GST</label>
               <input
@@ -476,7 +476,7 @@ const Edit= () => {
                 required
               />
             </div>
-            <div>
+            {/* <div>
               <label className="block text-gray-700 font-medium">Total Profit</label>
               <input
                 type="number"
@@ -486,7 +486,7 @@ const Edit= () => {
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </div>
+            </div> */}
             <div>
               <label className="block text-gray-700 font-medium">Final Price with GST</label>
               <input
