@@ -9,6 +9,7 @@ import { handleOfflineCounterSales, updateSalesData } from "./add.counter.sales.
 import { handleAllTotalOfflineSales, TotalAllupdateSalesData } from "./add.total.sales.info.js";
 import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./add.offline.sales.info.js";
 import { createClient, reduceClient } from "./Client.controller.js";
+import { Client } from "../model/Client.model.js";
 // Function to place an order
 const placeOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
@@ -282,7 +283,8 @@ const getOrderById = asyncHandler(async (req, res) => {
 // Function to update order
 const updateOrder = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { paymentType, BillUser, orderItems, ...rest } = req.body;
+    const UpdateUser = req.body;
+    console.log("Request body:", UpdateUser);
   
     try {
       const order = await OfflineOrder.findById(id);
@@ -291,56 +293,33 @@ const updateOrder = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'Order not found' });
       }
   
-      // Update order items if provided
-      if (orderItems && orderItems.length > 0) {
-        let purchaseRate = 0;
-        let totalProfit = 0;
-        const updatedOrderItems = [];
+      // Log the existing order before any updates
+      console.log("Existing Order:", order);
   
-        for (const item of orderItems) {
-          const product = await Product.findById(item.product);
-          const updatedOrderItem = {
-            product: item.product,
-            quantity: item.quantity,
-            price: item.price,
-            purchaseRate: product.purchaseRate * item.quantity,
-            GST: item.GST,
-            totalProfit: Math.max(0,(product.discountedPrice - product.purchaseRate) * item.quantity),
-            finalPriceWithGST: item.finalPriceWithGST,
-            discountedPrice: item.discountedPrice,
-            userId: order.user,
-          };
+      // Update the client information
+      const Type = 'Client';
+      const Name = order.Name;
+      const Mobile = order.mobileNumber;
+      const existingClient = await Client.findOne({ Type, Name, Mobile });
+      console.log("Existing Client:", existingClient);
   
-          if (item._id) {
-            await OfflineOrderItem.findByIdAndUpdate(item._id, updatedOrderItem);
-            updatedOrderItems.push(item._id);
-          } else {
-            const newOrderItem = new OfflineOrderItem(updatedOrderItem);
-            await newOrderItem.save();
-            updatedOrderItems.push(newOrderItem._id);
-          }
-  
-          purchaseRate += updatedOrderItem.purchaseRate;
-          totalProfit += updatedOrderItem.totalProfit;
-        }
-  
-        order.orderItems = updatedOrderItems;
-        order.totalPurchaseRate = purchaseRate;
-        order.totalProfit = totalProfit;
+      if (existingClient) {
+        existingClient.Name = UpdateUser.name || order.Name;
+        existingClient.Mobile = UpdateUser.mobileNumber || order.mobileNumber;
+        existingClient.Email = UpdateUser.email || order.email;
+        await existingClient.save();
+        console.log("Updated Client:", existingClient);
+      } else {
+        return res.status(404).json({ message: 'Client not found' });
       }
   
-      // Update the rest of the order fields
-      order.Name = BillUser?.name || order.Name;
-      order.mobileNumber = BillUser?.mobileNumber || order.mobileNumber;
-      order.email = BillUser?.email || order.email;
-      order.paymentType = paymentType || order.paymentType;
-      order.orderDate = rest.orderDate ? new Date(rest.orderDate) : order.orderDate;
+      // Update the order fields
+      order.Name = UpdateUser.name || order.Name;
+      order.mobileNumber = UpdateUser.mobileNumber || order.mobileNumber;
+      order.email = UpdateUser.email || order.email;
   
-      for (const key in rest) {
-        if (rest.hasOwnProperty(key)) {
-          order[key] = rest[key];
-        }
-      }
+      // Log the updated order before saving
+      console.log("Updated Order:", order);
   
       await order.save();
   
@@ -358,7 +337,98 @@ const updateOrder = asyncHandler(async (req, res) => {
       return res.status(500).json({ statusCode: 500, success: false, message: 'Error updating order', data: error.message });
     }
   });
+  
+// const updateOrder = asyncHandler(async (req, res) => {
+//     const { id } = req.params;
+//     const UpdateUser = req.body;
+//   console.log(req.body);
+//     try {
+//       const order = await OfflineOrder.findById(id);
+  
+//       if (!order) {
+//         return res.status(404).json({ message: 'Order not found' });
+//       }
+  
+//       // Update order items if provided
+//       // Uncomment and modify the following section if you want to update order items
+//       /*
+//       if (orderItems && orderItems.length > 0) {
+//         let purchaseRate = 0;
+//         let totalProfit = 0;
+//         const updatedOrderItems = [];
+  
+//         for (const item of orderItems) {
+//           const product = await Product.findById(item.product);
+//           const updatedOrderItem = {
+//             product: item.product,
+//             quantity: item.quantity,
+//             price: item.price,
+//             purchaseRate: product.purchaseRate * item.quantity,
+//             GST: item.GST,
+//             totalProfit: Math.max(0, (product.discountedPrice - product.purchaseRate) * item.quantity),
+//             finalPriceWithGST: item.finalPriceWithGST,
+//             discountedPrice: item.discountedPrice,
+//             userId: order.user,
+//           };
+  
+//           if (item._id) {
+//             await OfflineOrderItem.findByIdAndUpdate(item._id, updatedOrderItem);
+//             updatedOrderItems.push(item._id);
+//           } else {
+//             const newOrderItem = new OfflineOrderItem(updatedOrderItem);
+//             await newOrderItem.save();
+//             updatedOrderItems.push(newOrderItem._id);
+//           }
+  
+//           purchaseRate += updatedOrderItem.purchaseRate;
+//           totalProfit += updatedOrderItem.totalProfit;
+//         }
+  
+//         order.orderItems = updatedOrderItems;
+//         order.totalPurchaseRate = purchaseRate;
+//         order.totalProfit = totalProfit;
+//       }
+//       */
+  
+//    //   Update the rest of the order fields
+//       const Type = 'Client';
+//       const Name = order.Name;
+//       const Mobile = order.mobileNumber;
+//       const existingClient = await Client.findOne({ Type, Name, Mobile });
+//   console.log(existingClient)
+//       if (existingClient) {
+//         existingClient.Name =( UpdateUser.name)? UpdateUser.name : order.Name;
+//         existingClient.Mobile = (UpdateUser.mobileNumber)?UpdateUser.mobileNumber:order.mobileNumber;
+//         existingClient.Email =( UpdateUser.email )? UpdateUser.email : order.email;
+//         await existingClient.save();
+//         console.log(existingClient);
+//       } else {
+//         // Handle the case where no existing client is found
+//         return res.status(404).json({ message: 'Client not found' });
+//       }
+//   console.log(UpdateUser)
+//       order.Name = (UpdateUser.name)?UpdateUser.name: order.Name;
+//       order.mobileNumber = (UpdateUser.mobileNumber)?UpdateUser.mobileNumber:  order.mobileNumber;
+//       order.email =(UpdateUser.email)? UpdateUser.email : order.email;
+  
 
+//       await order.save();
+//   console.log(order)
+//       const results = await OfflineOrder.findById(order._id).populate({
+//         path: 'orderItems',
+//         populate: {
+//           path: 'product',
+//           model: 'products'
+//         }
+//       });
+  
+//       return res.status(200).json({ statusCode: 200, success: true, message: 'Order updated successfully', data: results });
+//     } catch (error) {
+//       console.error(error);
+//       return res.status(500).json({ statusCode: 500, success: false, message: 'Error updating order', data: error.message });
+//     }
+//   });
+  
 // to cancel an Order
 const cancelledOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
@@ -384,7 +454,7 @@ const cancelledOrder = asyncHandler(async (req, res) => {
       let  data = {
             Type: 'Client',
             Name: cart.Name,
-            Mobile: 9359228200,
+            Mobile: cart.mobileNumber,
             Purchase: cart.finalPriceWithGST,
             Closing: cart.paymentType.borrow,
           }

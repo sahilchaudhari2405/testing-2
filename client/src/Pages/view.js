@@ -62,7 +62,8 @@ const View = () => {
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0];
+    const tomorrow = new Date().toISOString().split('T')[0];
+    // const tomorrow = new Date(new Date().setDate(new Date().getDate())).toISOString().split('T')[0];
     setFromDate(today);
     setToDate(tomorrow);
 

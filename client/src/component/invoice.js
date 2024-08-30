@@ -90,10 +90,10 @@ const Invoice = ({ componentRef, details,setPrint,language}) => {
     
           <div className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}>
             <div className="w-full">
-              <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
+              {/* <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                 <span>उपयोगिता</span>
                 <span>₹{details.totalPrice}</span>
-              </div>
+              </div> */}
               <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                 <span>सवलत</span>
                 <span>₹{details.discount}</span>
@@ -292,10 +292,10 @@ const Invoice = ({ componentRef, details,setPrint,language}) => {
 
           <div className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}>
             <div className="w-full">
-              <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
+              {/* <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                 <span>SUBTOTAL</span>
                 <span>₹{details.totalPrice}</span>
-              </div>
+              </div> */}
               <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
                 <span>DISCOUNT</span>
                 <span>₹{details.discount}</span>

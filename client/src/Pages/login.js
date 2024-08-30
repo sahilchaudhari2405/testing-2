@@ -21,6 +21,15 @@ const Login = () => {
         // Decode the token
         const decodedToken = jwtDecode(token);
 
+        // Check if the token is expired
+        const currentTime = Date.now() / 1000; // Current time in seconds
+        if (decodedToken.exp < currentTime) {
+          // Token is expired
+          toast.error('Session expired. Please log in again.');
+          localStorage.removeItem('token'); // Remove expired token
+          return; // Do not navigate, keep the user on the login page
+        }
+
         // Extract role or any other user information
         const role = decodedToken.role;
 console.log(role)
@@ -44,6 +53,15 @@ console.log(role)
         try {
           // Decode the token
           const decodedToken = jwtDecode(token);
+
+          // Check if the token is expired
+          const currentTime = Date.now() / 1000; // Current time in seconds
+          if (decodedToken.exp < currentTime) {
+            // Token is expired
+            toast.error('Session expired. Please log in again.');
+            localStorage.removeItem('token'); // Remove expired token
+            return; // Do not navigate, keep the user on the login page
+          }
 
           // Extract role or any other user information
           const role = decodedToken.role;

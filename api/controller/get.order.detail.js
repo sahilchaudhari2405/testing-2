@@ -96,6 +96,12 @@ const sortOrder = asyncHandler(async (req, res) => {
         $lte: new Date(toDate),
       };
     }
+
+    if ((fromDate && toDate) && (fromDate === toDate))  {
+      query.updatedAt = {
+        $gte: new Date(fromDate),
+      };
+    }
   
     // Add name filter if provided
     if (name) {
