@@ -5,8 +5,8 @@ import BarcodeReader from 'react-barcode';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const Edit= () => {
-    const navigate = useNavigate();
-    const { orderId: orderIdFromURL } = useParams();
+  const navigate = useNavigate();
+  const { orderId: orderIdFromURL } = useParams();
   const [formData, setFormData] = useState({
     Name: '',
     mobileNumber: '',
@@ -41,9 +41,10 @@ const Edit= () => {
         setOrderId(orderIdFromURL); 
         console.log("yes")
       handleOrderIdChange({ target: { value: orderIdFromURL } });
-     fetchOrderData();
+      fetchOrderData();
     }
-  }, [orderIdFromURL]);
+  }, [orderId]);
+
   const handleCheckboxChange = (event) => {
     const checked = event.target.checked;
     setIsChecked(checked);
