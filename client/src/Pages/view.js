@@ -46,6 +46,9 @@ const View = () => {
   const [name, setName] = useState('');
   const [print, setPrint] = useState(false);
 
+  const [totalBills , setTotalBills] = useState();
+  const [totalSales, setTotalSales] = useState();
+  const [totalProfit , setTotalProfits] = useState();
   const [sort, setSort] = useState([])
   const handlePrint = (item) => {
     SetLanguage("English")
@@ -73,6 +76,7 @@ const View = () => {
 
   useEffect(() => {
     setSort(orders);
+    handleBills()
   
 });
 
@@ -93,6 +97,19 @@ const View = () => {
     }
   }, [navigate]);
 
+  const handleBills = () =>{
+    let Bills = 0;
+    let Sales = 0;
+    let Profits = 0;
+    for (let i=0 ; i < orders.length ; i++){
+      Sales += orders[i].totalDiscountedPrice ;
+      Profits += orders[i].totalProfit;
+      Bills ++;
+    }
+    setTotalBills(Bills)
+    setTotalSales(Sales.toFixed(2))
+    setTotalProfits(Profits.toFixed(2))
+  }
   const handleLogout = () => {
     dispatch(logoutUser());
     localStorage.removeItem('token');
@@ -254,6 +271,40 @@ const View = () => {
             Excel Report
           </button>
         </div>
+      
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-red-500 text-white p-6 rounded-lg">
+              <h2 className="text-xl">Total  Bills
+              </h2>
+              <h3 className="text-2xl font-bold">{totalBills} </h3>
+              {/* <p className="flex flex-row gap-2">
+                User Increased 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
+                </svg>
+              </p> */}
+            </div>
+            <div className="bg-purple-500 text-white p-6 rounded-lg">
+              <h2 className="text-xl">Total Sale </h2>
+              <h3 className="text-2xl font-bold">{totalSales} </h3>
+              {/* <p className="flex flex-row gap-2">
+                User Increased 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
+                </svg>
+              </p> */}
+            </div>
+            <div className="bg-green-500 text-white p-6 rounded-lg">
+              <h2 className="text-xl">Total Profit </h2>
+              <h3 className="text-2xl font-bold">{totalProfit} </h3>
+              {/* <p className="flex flex-row gap-2">
+                User Increased 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
+                </svg>
+              </p> */}
+            </div>
+</div>
+
+
 
         {showImportModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
