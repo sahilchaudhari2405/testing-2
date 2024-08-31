@@ -8,6 +8,11 @@ import bodyParser from 'body-parser';
 import cluster from 'cluster';
 import os from 'os';
 const totalCPUs = os.cpus().length;
+dotenv.config({
+  path: './env',
+});
+dotenv.config();
+connectDB();
 if(cluster.isPrimary)
 {
   console.log(`Primary ${process.pid} is running`);
@@ -22,9 +27,7 @@ if(cluster.isPrimary)
   });
 }
 else{
-dotenv.config({
-  path: './env',
-});
+
 
 const app = express();
 
@@ -52,7 +55,6 @@ app.use(cors({
   credentials: true, // Enable credentials
 }));
 
-dotenv.config();
 let orderDate = new Date().setDate()+1;
 app.use((req, res, next) => {
   res.setTimeout(5000); // Timeout in milliseconds (5000 ms = 5 seconds)
@@ -65,7 +67,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 // Connect to the database
-connectDB();
+
 
 // y
 app.use('/api', allRouter);
