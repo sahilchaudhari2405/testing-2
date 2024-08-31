@@ -76,14 +76,14 @@ const Dashboard = () => {
     const daywise = (data.dailySales || []).map((sale, index) => ({
       name: `Day ${index + 1}`,
       sales: sale.finalPriceWithGST,
-      revenue: sale.totalProfit,
+      revenue: sale.totalProfit.toFixed(2),
       date: sale.date
     }));
 
     const weekwise = ( data.weekSales || [] ).map((sale, index) => ({
       name: `Week ${index + 1}`,
       sales: sale.finalPriceWithGST,
-      revenue: sale.totalProfit
+      revenue: sale.totalProfit.toFixed(2)
     }));
 
     const monthwise = [
@@ -234,8 +234,8 @@ const transformDataforAdmin = (data) => {
     (order.dailySales || []).forEach(sale => {
       daywiseArray.push({
         name: `Day ${sale.date}`,
-        sales: sale.finalPriceWithGST,
-        revenue: sale.totalProfit,
+        sales: sale.finalPriceWithGST.toFixed(2),
+        revenue: sale.totalProfit.toFixed(2),
         date: sale.date
       });
     });
@@ -243,15 +243,15 @@ const transformDataforAdmin = (data) => {
     (order.weekSales || []).forEach(sale => {
       weekwiseArray.push({
         name: `Week ${sale.week}`,
-        sales: sale.finalPriceWithGST,
-        revenue: sale.totalProfit
+        sales: sale.finalPriceWithGST.toFixed(2),
+        revenue: sale.totalProfit.toFixed(2)
       });
     });
 
     monthwiseArray.push({
       name: new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' }),
-      sales: order.monthFinalPriceWithGST,
-      revenue: order.monthTotalProfit
+      sales: order.monthFinalPriceWithGST.toFixed(2),
+      revenue: order.monthTotalProfit.toFixed(2),
     });
   });
 

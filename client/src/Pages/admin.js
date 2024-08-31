@@ -305,14 +305,14 @@ const Admin = () => {
     const daywise = (data?.dailySales || []).map((sale, index) => ({
       name: `Day ${index + 1}`,
       sales: sale.finalPriceWithGST,
-      revenue: sale.totalProfit,
+      revenue: sale.totalProfit.toFixed(2),
       date: sale.date
     }));
 
     const weekwise = ( data?.weekSales || [] ).map((sale, index) => ({
       name: `Week ${index + 1}`,
       sales: sale.finalPriceWithGST,
-      revenue: sale.totalProfit
+      revenue: sale.totalProfit.toFixed(2)
     }));
 
     const monthwise = [
