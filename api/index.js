@@ -5,7 +5,23 @@ import dotenv from 'dotenv';
 import connectDB from './database/mongo.db.js';
 import allRouter from './Router/router.js';
 import bodyParser from 'body-parser';
+import cluster from 'cluster';
+import os from 'os';
+const totalCPUs = os.cpus().length;
+if(cluster.isPrimary)
+{
+  console.log(`Primary ${process.pid} is running`);
 
+  // Fork workers.
+  for (let i = 0; i < totalCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+}
+else{
 dotenv.config({
   path: './env',
 });
@@ -57,3 +73,4 @@ app.use('/api', allRouter);
 app.listen(4000, () => {
     console.log('listening on *:4000');
 });
+}
