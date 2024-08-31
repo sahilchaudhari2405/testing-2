@@ -80,6 +80,7 @@ export const fetchPurchaseOrders = createAsyncThunk('purchaseOrders/fetchPurchas
 // Initial state
 const initialState = {
   orders: [],
+  
   purchaseOrders: [],
   status: 'idle',
   error: null,

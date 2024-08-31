@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowDown, FaEdit, FaTrash, FaWhatsapp } from 'react-icons/fa';
+import { FaArrowDown, FaEdit, FaTrash,FaBalanceScale, FaCheckCircle,FaWhatsapp } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
@@ -23,6 +23,7 @@ const Accounts = () => {
   const [message, setMessage] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
@@ -154,20 +155,50 @@ const Accounts = () => {
   };
   
   
-  const filteredOrders = orders.filter(order => {
-    const orderDate = new Date(order.orderDate);
-    const orderCreatedAt = new Date(order.orderDate);
+  const filteredOrders = orders.filter(orders => {
+    const updatedAt = new Date(orders.updatedAt);
+    const orderCreatedAt = new Date(orders.updatedAt);
     const start = new Date(startDate);
     const end = new Date(endDate);
 
     return (
-      Object.values(order).some(value =>
+      Object.values(orders).some(value =>
         value.toString().toLowerCase().includes(searchQuery.toLowerCase())
       ) &&
-      (!startDate || orderDate >= start) &&
-      (!endDate || orderDate <= end)
+      (!startDate || updatedAt >= start) &&
+      (!endDate || updatedAt <= end)
     );
   });
+  // const fetchClosingBalanceData = async () => {
+  //   const start = new Date(startDate);
+  //   const end = new Date(endDate);
+
+  //   const data = orders.flatMap(order => {
+  //     return order.ClosingBalance?.filter(balance => {
+  //       if (!balance.monthYear) return false;
+  //       const balanceDate = new Date(balance.monthYear);
+  //       return balanceDate >= start && balanceDate <= end;
+  //     });
+  //   });
+  // };
+
+  const [closingBalanceData, setClosingBalanceData] = useState(null);
+  const [isClosingBalanceOpen, setIsClosingBalanceOpen] = useState(false);
+
+  const fetchClosingBalanceData = (order) => {
+    const balanceData = order.ClosingBalance || [];
+    setClosingBalanceData(balanceData);
+    setIsClosingBalanceOpen(true);
+  };
+
+   const [CompletePurchaseData, setCompletePurchaseData] = useState(null);
+  const [isCompletePurchaseOpen, setIsCompletePurchaseOpen] = useState(false);
+
+  const fetchCompletePurchaseData = (order) => {
+    const balanceData = order.CompletePurchase || [];
+    setCompletePurchaseData(balanceData);
+    setIsCompletePurchaseOpen(true);
+  };
   const renderOrdersTable = (data) => (
     <div>
       <input
@@ -198,7 +229,7 @@ const Accounts = () => {
             <th className="border border-zinc-800 px-4 py-2">Name</th>
             <th className="border border-zinc-800 px-4 py-2">Mobile Number</th>
             <th className="border border-zinc-800 px-4 py-2">Email</th>
-            <th className="border border-zinc-800 px-4 py-2">Status</th>
+            {/* <th className="border border-zinc-800 px-4 py-2">Status</th> */}
             <th className="border border-zinc-800 px-4 py-2">Time</th>
             <th className="border border-zinc-800 px-4 py-2">Date</th>
             <th className="border border-zinc-800 px-4 py-2">Action</th>
@@ -213,11 +244,11 @@ const Accounts = () => {
               <tr key={order._id || i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
                 <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
                 <td className="border border-zinc-800 px-4 py-2">{order.Name}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.mobileNumber}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.email}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.orderStatus}</td>
-                <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleTimeString()}</td>
-                <td className="border border-zinc-800 px-4 py-2">{new Date(order.orderDate).toLocaleDateString()}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order.Mobile}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order.Email || 'N/A'}</td>
+                {/* <td className="border border-zinc-800 px-4 py-2">{order.orderStatus}</td> */}
+                <td className="border border-zinc-800 px-4 py-2">{new Date(order.updatedAt).toLocaleTimeString()}</td>
+                <td className="border border-zinc-800 px-4 py-2">{new Date(order.updatedAt).toLocaleDateString()}</td>
                 <td className="border border-zinc-800 px-4 py-2">
                   <div className='flex justify-around'>
                     <button className="text-green-500 text-xl">
@@ -226,6 +257,18 @@ const Accounts = () => {
                     <button className="text-red-500">
                       <FaTrash aria-hidden="true" onClick={() => handleDelete(order)} />
                     </button>
+                    <button className="text-red-500">
+            <FaBalanceScale
+              aria-hidden="true"
+              onClick={() => fetchClosingBalanceData(order)}
+            />
+          </button>
+          <button className="text-red-500">
+            <FaCheckCircle
+              aria-hidden="true"
+              onClick={() => fetchCompletePurchaseData(order)}
+            />
+          </button>
                   </div>
                 </td>
               </tr>
@@ -233,6 +276,105 @@ const Accounts = () => {
           })}
         </tbody>
       </table>
+      {/* Conditionally render the closing balance data */}
+      {isClosingBalanceOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg relative">
+      <button
+        onClick={() => setIsClosingBalanceOpen(false)}
+        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+      <h3 className="text-lg font-bold mb-4">Closing Balance Data</h3>
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2">SrNo.</th>
+            <th className="border px-4 py-2">Date</th>
+            <th className="border px-4 py-2">Balance</th>
+            <th className="border px-4 py-2">Id</th>
+          </tr>
+        </thead>
+        <tbody>
+          {closingBalanceData.map((balance, i) => (
+            <tr key={balance._id}>
+              <td className="border px-4 py-2">{i + 1}</td>
+              <td className="border px-4 py-2">{balance.monthYear}</td>
+              <td className="border px-4 py-2">{balance.balance}</td>
+              <td className="border px-4 py-2">{balance._id}</td>
+            </tr>
+          ))}
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
+
+
+    {/* Conditionally render the Complete Purchase data */}
+      {isCompletePurchaseOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg relative">
+      <button
+        onClick={() => setIsCompletePurchaseOpen(false)}
+        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+      <h3 className="text-lg font-bold mb-4">Complete Purchase Data</h3>
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2">SrNo.</th>
+            <th className="border px-4 py-2">Date</th>
+            <th className="border px-4 py-2">Purchase</th>
+            <th className="border px-4 py-2">Id</th>
+          </tr>
+        </thead>
+        <tbody>
+          {CompletePurchaseData.map((balance, i) => (
+            <tr key={balance._id}>
+              <td className="border px-4 py-2">{i + 1}</td>
+              <td className="border px-4 py-2">{balance.monthYear}</td>
+              <td className="border px-4 py-2">{balance.Purchase}</td>
+              <td className="border px-4 py-2">{balance._id}</td>
+            </tr>
+          ))}
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}     
     </div>
   );
   
@@ -302,6 +444,7 @@ const Accounts = () => {
             <button onClick={() => setShowImportModal(true)} className="bg-white text-black border-black border-[1px] px-4 py-2 rounded hover:text-red-600">
               Import clients
             </button>
+        
           </div>
         </div>
 
@@ -310,25 +453,25 @@ const Accounts = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h2 className="text-lg font-bold mb-4">Import clients</h2>
               <input
-    type="file"
-    accept=".xlsx, .xls, .csv"
-    onChange={handleFileChange}
-    className="mb-4"
-/>
-<button
-    onClick={handleFileUpload}
-    className="bg-green-500 text-white py-2 px-4 rounded-lg"
->
-    Send
-</button>
-<button
-    onClick={() => setShowImportModal(false)}
-    className="bg-red-500 text-white py-2 px-4 rounded-lg ml-2"
->
-    Cancel
-</button>
-            </div>
-          </div>
+                  type="file"
+                  accept=".xlsx, .xls, .csv"
+                  onChange={handleFileChange}
+                  className="mb-4"
+              />
+              <button
+                  onClick={handleFileUpload}
+                  className="bg-green-500 text-white py-2 px-4 rounded-lg"
+              >
+                  Send
+              </button>
+              <button
+                  onClick={() => setShowImportModal(false)}
+                  className="bg-red-500 text-white py-2 px-4 rounded-lg ml-2"
+              >
+                  Cancel
+              </button>
+                          </div>
+                        </div>
         )}
           {status === 'loading' ? (
           <div>Loading...</div>
@@ -344,3 +487,4 @@ const Accounts = () => {
 };
 
 export default Accounts;
+
