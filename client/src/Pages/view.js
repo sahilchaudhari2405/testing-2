@@ -48,6 +48,10 @@ const View = () => {
 
   const [totalBills , setTotalBills] = useState();
   const [totalSales, setTotalSales] = useState();
+  const [totalBorrow , setTotalBorrow] = useState();
+  const [totalUPI , setTotalUPI] = useState();
+  const [totalCard , setTotalCard] = useState();
+  const [totalCash , setTotalCash] = useState();
   const [totalProfit , setTotalProfits] = useState();
   const [sort, setSort] = useState([])
   const handlePrint = (item) => {
@@ -101,14 +105,27 @@ const View = () => {
     let Bills = 0;
     let Sales = 0;
     let Profits = 0;
+    let borrow =0;
+    let cash=0;
+    let card =0;
+    let upi =0;
+
     for (let i=0 ; i < orders.length ; i++){
       Sales += orders[i].totalDiscountedPrice ;
       Profits += orders[i].totalProfit;
       Bills ++;
+      card+=orders[i].paymentType?.Card;
+      cash+=orders[i].paymentType?.cash;
+      borrow+=orders[i].paymentType?.borrow;
+      upi+=orders[i].paymentType?.UPI;
     }
     setTotalBills(Bills)
     setTotalSales(Sales.toFixed(2))
     setTotalProfits(Profits.toFixed(2))
+    setTotalBorrow(borrow.toFixed(2));
+    setTotalCard(card.toFixed(2));
+    setTotalCash(cash.toFixed(2));
+    setTotalUPI(upi.toFixed(2));
   }
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -302,6 +319,43 @@ const View = () => {
                 </svg>
               </p> */}
             </div>
+            <div className="bg-orange-400 text-white p-6 rounded-lg">
+              <h2 className="text-xl">Total Borrow </h2>
+              <h3 className="text-2xl font-bold">{totalBorrow} </h3>
+              {/* <p className="flex flex-row gap-2">
+                User Increased 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
+                </svg>
+              </p> */}
+            </div>
+            <div className="bg-red-400 text-white p-6 rounded-lg">
+              <h2 className="text-xl">Total Cash </h2>
+              <h3 className="text-2xl font-bold">{totalCash} </h3>
+              {/* <p className="flex flex-row gap-2">
+                User Increased 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
+                </svg>
+              </p> */}
+            </div>
+            <div className="bg-sky-400 text-white p-6 rounded-lg">
+              <h2 className="text-xl">Total Card </h2>
+              <h3 className="text-2xl font-bold">{totalCard} </h3>
+              {/* <p className="flex flex-row gap-2">
+                User Increased 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
+                </svg>
+              </p> */}
+            </div>
+            <div className="bg-pink-400 text-white p-6 rounded-lg">
+              <h2 className="text-xl">Total UPI </h2>
+              <h3 className="text-2xl font-bold">{totalUPI} </h3>
+              {/* <p className="flex flex-row gap-2">
+                User Increased 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
+                </svg>
+              </p> */}
+            </div>
+            
 </div>
 
 
