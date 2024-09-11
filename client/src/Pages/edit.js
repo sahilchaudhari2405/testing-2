@@ -7,6 +7,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 const Edit= () => {
   const navigate = useNavigate();
   const { orderId: orderIdFromURL } = useParams();
+  const [editId, setEditId] = useState(null);
+  const [editItem, setEditItem] = useState({});
   const [formData, setFormData] = useState({
     Name: '',
     mobileNumber: '',
@@ -44,12 +46,34 @@ const Edit= () => {
       fetchOrderData();
     }
   }, [orderId]);
+  const [editingItemId, setEditingItemId] = useState(null); // Track which item is being edited
+  const [editableOrderItems, setEditableOrderItems] = useState(formData.orderItems);
+
+  const handleEdit = (itemId) => {
+    setEditingItemId(itemId);
+  };
+
+  const handleSave = (itemId) => {
+    // Perform save logic here, such as calling an API to save the updated item
+    setEditingItemId(null); // Exit edit mode
+  };
+
+  const handleInputChange = (e, itemId, field) => {
+    const updatedItems = editableOrderItems.map((item) =>
+      item._id === itemId ? { ...item, [field]: e.target.value } : item
+    );
+    setEditableOrderItems(updatedItems);
+  };
 
   const handleCheckboxChange = (event) => {
     const checked = event.target.checked;
     setIsChecked(checked);
   };
 
+  const handleEditClick = (item) => {
+    setEditId(item._id);
+    setEditItem({...item});
+  };
 
   const handleScan = (data) => {
     // console.log(isChecked)
@@ -161,7 +185,7 @@ const Edit= () => {
       paymentType: {
         ...prevData.paymentType,
         [name]: Number(value)
-      }
+      } 
     }));
     console.log("changed formdata: ",formData);
 
@@ -538,27 +562,38 @@ const Edit= () => {
             ))} */}
 
           </div>
-          <div className='p-4 bg-blue-300'>
-          <h1 className='text-xl font-bold  mb-4'>Order Items</h1>
-          { formData.orderItems.length > 0 ? (
-          formData.orderItems.map((item, index) => (
-            <div key={item._id} className="flex items-center justify-between p-4 bg-white  mb-2 max-w-fit border border-gray-300 rounded-lg shadow-sm">
-              <div className="flex-grow flex flex-row">
-                <p className="text-gray-700 font-medium text-lg">{item.product.title}</p>
-                <div className="flex items-center ml-4 mr-4 space-x-4">
-                  <p className="text-gray-500">Quantity: {item.quantity}</p>
-                  <p className="text-gray-500">Price: ${item.price}</p>
-                </div>
-              </div>
+          <div className="p-4 bg-blue-300">
+  <h1 className="text-xl font-bold mb-4">Order Items</h1>
+  {formData.orderItems.length > 0 ? (
+    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
+      <thead>
+        <tr>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Product Title</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Quantity</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Price</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        {formData.orderItems.map((item, index) => (
+          <tr key={item._id} className="border-t">
+            <td className="px-4 py-2 text-gray-700">{item.product.title}</td>
+            <td className="px-4 py-2 text-gray-500">{item.quantity}</td>
+            <td className="px-4 py-2 text-gray-500">${item.price}</td>
+            <td className="px-4 py-2">
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={(e) => handleDecreaseQuantity(e,item._id)}
+                  onClick={(e) => handleDecreaseQuantity(e, item._id)}
                   className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded"
                 >
                   Decrease Quantity
                 </button>
                 <button
-                  onClick={(e) => handleRemoveOrderItem(e,orderId, item._id)}
+                  onClick={(e) => handleRemoveOrderItem(e, orderId, item._id)}
                   className="text-red-500 hover:text-red-700"
                 >
                   <svg
@@ -577,12 +612,16 @@ const Edit= () => {
                   </svg>
                 </button>
               </div>
-            </div>
-          ))) :
-           ( <h1 className='text-lg font-semibold text-red-500 mb-4'>OrderItems are Empty</h1> ) 
-          }
-          </div> 
-          
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <h1 className="text-lg font-semibold text-red-500 mb-4">Order Items are Empty</h1>
+  )}
+</div>
+
           <div className="flex p-4 bg-blue-700 rounded-b-lg justify-end space-x-4">
             <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
               Save changes

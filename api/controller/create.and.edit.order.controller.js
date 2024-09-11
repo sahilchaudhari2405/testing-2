@@ -63,13 +63,12 @@ const placeOrder = asyncHandler(async (req, res) => {
                 purchaseRate += orderItem.purchaseRate;
                 totalProfit += orderItem.totalProfit;
             }
-
         }
            if(cart.discount<0)
            {
             cart.discount=0;
            }
-        const order = new OfflineOrder({
+        const order = await new OfflineOrder({
             user: id,
             orderItems: orderItems,
             Name: BillUser.name,
@@ -80,7 +79,7 @@ const placeOrder = asyncHandler(async (req, res) => {
             totalItem: cart.totalItem,
             discount: cart.discount,
             GST: cart.GST,
-            paymentType: paymentType,
+            paymentType: await paymentType,
             totalPurchaseRate: purchaseRate,
             totalProfit: totalProfit,
             finalPriceWithGST: cart.final_price_With_GST,

@@ -1165,7 +1165,7 @@ const handleScan = (data) => {
                       <input
                         type="number"
                         value={editId === item._id ? editItem.quantity : item.quantity}
-                        // readOnly={editId !== item._id}
+                        readOnly
                         min="1"
                         className="w-12 sm:w-12 text-center border m-1 sm:mb-0"
                         onChange={(e) => handleInputChange(e, "quantity")}
