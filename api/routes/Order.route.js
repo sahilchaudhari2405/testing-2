@@ -1,7 +1,7 @@
 import express from 'express';
 import { authenticateToken, checkAdmin } from '../middleware/verify.js';
 import { getAllBill, getCounterBill,getOneBill,sortOrder, searchOfflineOrders } from '../controller/get.order.detail.js';
-import { placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById,updateOrder, cancelledOrder } from '../controller/create.and.edit.order.controller.js';
+import { placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById,updateOrder, cancelledOrder, AddOrder, AddCustomOrder } from '../controller/create.and.edit.order.controller.js';
 import { getCounterSale,getAllCounterSale } from '../controller/get.counter.sales.js';
 
 const OrderRouter = express.Router();
@@ -14,6 +14,8 @@ OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
 OrderRouter.get('/getEditOrder', authenticateToken,getOneBill);
 OrderRouter.post('/sortOrder', authenticateToken,sortOrder);
 OrderRouter.post('/searchOfflineOrders',searchOfflineOrders);
+OrderRouter.post('/addProductOnEdit',authenticateToken,AddOrder);
+OrderRouter.post('/addCustomProductOnEdit',authenticateToken,AddCustomOrder);
 // OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
     
 OrderRouter.get('/getCounterOrderbyID/:id',getOrderById);

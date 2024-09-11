@@ -10,7 +10,264 @@ import { handleAllTotalOfflineSales, TotalAllupdateSalesData } from "./add.total
 import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./add.offline.sales.info.js";
 import { createClient, reduceClient } from "./Client.controller.js";
 import { Client } from "../model/Client.model.js";
+import CounterUser from "../model/user.model.js";
 // Function to place an order
+const AddCustomOrder = asyncHandler(async (req, res) => {
+    const { id } = req.user; // User ID
+    const { orderId, productCode, discountedPrice, quantity, price, discount, GST, finalPriceWithGST, OneUnit } = req.body; // Request Body with Custom Info
+
+    try {
+        // Fetch user from database
+        const user = await CounterUser.findById(id);
+        if (!user) {
+            return res.status(401).json(new ApiResponse(401, 'User not found', null));
+        }
+
+        // Find existing order by orderId
+        let order = await OfflineOrder.findById(orderId).populate('orderItems');
+        const oldOrder = JSON.parse(JSON.stringify(order)); // Save the old order state for reference
+
+        // If order doesn't exist, return error
+        if (!order) {
+            return res.status(404).json(new ApiResponse(404, 'Order not found', null));
+        }
+
+        // Find product by barcode
+        const product = await Product.findOne({ BarCode: productCode });
+        if (!product) {
+            return res.status(404).json(new ApiResponse(404, 'Product not found', null));
+        }
+
+        // Check if this product is already in the order
+        let orderItem = await OfflineOrderItem.findOne({ orderId: order._id, product: product._id });
+        const oldItem = JSON.parse(JSON.stringify(orderItem)); // Save the old item state for reference
+
+        if (orderItem) {
+            // First, remove the old item values from the order totals
+            let value=0;
+            if(product.price!=0 && product.price)
+            {
+               value=product.price-oldItem.OneUnit;
+            }
+            else{
+               value=product.discountedPrice-oldItem.OneUnit;
+            }
+            order.totalPrice -= oldItem.price;
+            order.totalDiscountedPrice -= oldItem.discountedPrice;
+            order.GST -= oldItem.GST;
+            order.discount-=value*oldItem.quantity;
+            order.finalPriceWithGST -= oldItem.finalPriceWithGST;
+            order.totalItem -= oldItem.quantity;
+            order.totalProfit -= Math.max(0, oldItem.discountedPrice - oldItem.purchaseRate);
+            order.totalPurchaseRate -= oldItem.purchaseRate;
+
+            // Reset the old item values
+            orderItem.quantity = 0;
+            orderItem.price = 0;
+            orderItem.discountedPrice = 0;
+            orderItem.GST = 0;
+            orderItem.OneUnit = 0;
+            orderItem.finalPriceWithGST = 0;
+            orderItem.updatedAt = new Date();
+            await orderItem.save();
+        }
+
+        // Restore the product's stock by adding back the old quantity
+        product.quantity += oldItem ? oldItem.quantity : 0;
+        await product.save();
+
+        // Update the product stock by reducing the new quantity
+        product.quantity -= quantity;
+        await product.save();
+
+        // Add new values to the order and order item
+        if (orderItem) {
+            orderItem.quantity = quantity;
+            orderItem.price = product.price * quantity;
+            orderItem.discountedPrice = discountedPrice;
+            orderItem.GST = GST * quantity;
+            orderItem.OneUnit = OneUnit;
+            orderItem.finalPriceWithGST = finalPriceWithGST;
+            orderItem.updatedAt = new Date();
+            await orderItem.save();
+        } else {
+            // Create a new order item if it doesn't exist
+            orderItem = new OfflineOrderItem({
+                userId: id,
+                product: product._id,
+                quantity: quantity,
+                price:  product.price * quantity,
+                discountedPrice: discountedPrice,
+                GST: GST * quantity,
+                OneUnit: OneUnit,
+                finalPriceWithGST: finalPriceWithGST,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+            await orderItem.save();
+            order.orderItems.push(orderItem._id); // Add the new item to the order
+        }
+
+        // Update order totals with new values
+        order.user=id;
+        order.totalPrice += orderItem.price;
+        order.totalDiscountedPrice += orderItem.discountedPrice;
+        order.GST += orderItem.GST;
+        order.finalPriceWithGST += orderItem.finalPriceWithGST;
+        order.totalItem += orderItem.quantity;
+        order.totalProfit += Math.max(0, (orderItem.discountedPrice - product.purchaseRate)*orderItem.quantity);
+        order.totalPurchaseRate += product.purchaseRateorderItem.quantity;
+        order.updatedAt = new Date();
+
+        // Save the updated order
+        await order.save();
+        await order.save();
+        const clientReq = {
+            body: {
+                Type: 'Client',
+                Name: order.Name,
+                Email: order.email || "",
+                Address: order.Address,
+                State: order.State,
+                Mobile: order.mobileNumber, 
+                Purchase: (OneUnit+ product.GST)*quantity    || 0,
+                Closing: paymentType.borrow || 0,
+            }
+        };
+        let  data = {
+            Type: 'Client',
+            Name: order.Name,
+            Mobile: order.mobileNumber,
+            Purchase: discountedPrice,
+            Closing: 0,
+          }
+         const results =await reduceClient(data)
+         console.log(results);
+    const r = await createClient(clientReq);
+     console.log(r);
+        await order.save();
+        await updateSalesData(oldOrder.user,oldOrder,order);
+        await TotalAllupdateSalesData(oldOrder,order);
+        await TotalOfflineupdateSalesData(oldOrder,order);
+
+        // Return the updated order with populated order items
+        const updatedOrder = await OfflineOrder.findById(order._id).populate({
+            path: 'orderItems',
+            populate: {
+                path: 'product',
+                model: 'products',
+            }
+        });
+
+        return res.status(200).json(new ApiResponse(200, 'Order updated successfully', updatedOrder));
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+const AddOrder = asyncHandler(async (req, res) => {
+    const { id } = req.user;
+    const { orderId, productCode } = req.body;
+
+    try {
+        // Find existing order by orderId
+        let order = await OfflineOrder.findById(orderId).populate('orderItems');
+        const oldOrder = JSON.parse(JSON.stringify(order));  
+        // If order doesn't exist, return error
+        if (!order) {
+            return res.status(404).json(new ApiResponse(404, 'Order not found', null));
+        }
+
+        // Find product by barcode
+        const product = await Product.findOne({ BarCode: productCode });
+        if (!product) {
+            return res.status(404).json(new ApiResponse(404, 'Product not found', null)); 
+        }
+
+        // Find if this product already exists in the order
+        let existingOrderItem = order.orderItems.find(item => item.product.toString() === product._id.toString());
+        
+        let purchaseRate = 0;
+        let totalProfit = 0;
+
+        if (existingOrderItem) {
+            // If product already exists in order, update the quantity and prices
+            existingOrderItem.quantity += 1;
+            existingOrderItem.price += product.price;
+            existingOrderItem.discountedPrice += product.discountedPrice;
+            existingOrderItem.GST += product.GST;
+            existingOrderItem.finalPriceWithGST += (product.discountedPrice + product.GST);
+            existingOrderItem.updatedAt = new Date();
+            await existingOrderItem.save();
+        } else {
+            // If product is not already in the order, create a new OfflineOrderItem
+            const newOrderItem = new OfflineOrderItem({
+                product: product._id,
+                quantity: 1,
+                price: product.price,
+                purchaseRate: product.purchaseRate,
+                GST: product.GST,
+                finalPriceWithGST: product.discountedPrice + product.GST,
+                discountedPrice: product.discountedPrice,
+                userId: id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+            await newOrderItem.save();
+            order.orderItems.push(newOrderItem._id); // Add new order item to the order
+            purchaseRate += newOrderItem.purchaseRate;
+            totalProfit += Math.max(0, newOrderItem.discountedPrice - newOrderItem.purchaseRate);
+        }
+
+        // Update order totals
+        order.totalPrice += product.price;
+        order.totalDiscountedPrice += product.discountedPrice;
+        order.totalItem += 1;
+        order.GST += product.GST;
+        order.finalPriceWithGST += (product.discountedPrice + product.GST);
+        order.totalPurchaseRate += product.purchaseRate;
+        order.totalProfit += totalProfit;
+        order.updatedAt = new Date();
+
+        // Save updated order
+        await order.save();
+        const clientReq = {
+            body: {
+                Type: 'Client',
+                Name: order.Name,
+                Email: order.email || "",
+                Address: order.Address,
+                State: order.State,
+                Mobile: order.mobileNumber, 
+                Purchase: (product.discountedPrice + product.GST) || 0,
+                Closing: paymentType.borrow || 0,
+            }
+        };
+
+    const r = await createClient(clientReq);
+     console.log(r);
+        await order.save();
+        await updateSalesData(oldOrder.user,oldOrder,order);
+        await TotalAllupdateSalesData(oldOrder,order);
+        await TotalOfflineupdateSalesData(oldOrder,order);
+
+        const results = await OfflineOrder.findById(order._id).populate({
+            path:'orderItems',
+            populate: {
+                path: 'product',
+                model: 'products'
+            }
+        });
+        return res.status(200).json(new ApiResponse(200, 'Product added to order successfully', order));
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json(new ApiResponse(500, 'Error adding product to order', error.message));
+    }
+});
+
 const placeOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
     // const id=`669b9afa72e1e9138e2a64a3`;
@@ -494,4 +751,4 @@ const cancelledOrder = asyncHandler(async (req, res) => {
 
 
 // Export functions
-export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById,updateOrder,cancelledOrder };
+export {placeOrder, removeItemQuantityOrder, RemoveOneItemOnOrder,getOrderById,updateOrder,cancelledOrder,AddOrder,AddCustomOrder };
