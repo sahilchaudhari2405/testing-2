@@ -576,7 +576,7 @@ const handleScan = (data) => {
   if(amount == Total){
     if(items[0].length>0&&finalform.name&&finalform.Mobile&&finalform.Address){
       try {
-        const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
+        const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,Card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
         console.log(createdOrder);
       
         setInvoice(createdOrder.data)
@@ -1165,7 +1165,6 @@ const handleScan = (data) => {
                       <input
                         type="number"
                         value={editId === item._id ? editItem.quantity : item.quantity}
-                        readOnly
                         min="1"
                         className="w-12 sm:w-12 text-center border m-1 sm:mb-0"
                         onChange={(e) => handleInputChange(e, "quantity")}

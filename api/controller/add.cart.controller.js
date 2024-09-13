@@ -60,8 +60,6 @@ const addToCart = asyncHandler(async (req, res) => {
        }
         let cart = await Offline_Cart.findOne({ userId: id });
         if (!cart) {
-
-           
             cart = await Offline_Cart.create({
                 userId: id,
                 cartItems: [cartItem._id],
