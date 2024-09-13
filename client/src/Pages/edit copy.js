@@ -3,41 +3,56 @@ import axiosInstance from '../axiosConfig';
 import { toast } from 'react-toastify';
 import BarcodeReader from 'react-barcode';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCart, removeFromCart, clearCart, updateCartQuantity, addToCart } from '../Redux/Cart/cartSlice';
+
 
 const Edit= () => {
   const navigate = useNavigate();
-  const { orderId: orderIdFromURL } = useParams();
-  const [editOrderItemId, setEditOrderItemId] = useState(null);
-  const [editOrderItem, setEditOrderItem] = useState({});
-  const [editingItem, setEditingItem] = useState(null);
-  const [editItem, setEditItem] = useState(
-  {
-    // product: {
-    //     title: "",
-    //     price: 0,
-    //     discountedPrice: 0,
-    //     discountPercent: 0,
-    //     quantity: 0,
-    //     purchaseRate: 12.5,
-    //     profitPercentage: 0,
-    //     HSN: null,
-    //     GST: 0,
-    //     retailPrice: 15,
-    //     totalAmount: 15,
-    //     amountPaid: 0,
-    //     __v: 0
-    // },
-    quantity: 0,
-    purchaseRate: 0,
-    price: 0,
-    GST: 0,
-    totalProfit: 0,
-    discountedPrice: 0,
-    finalPriceWithGST: 0,
-});
+  const dispatch = useDispatch();
 
-  const [editedItemData, setEditedItemData] = useState({});
+  const { orderId: orderIdFromURL } = useParams();
+  const [editId, setEditId] = useState(null);
+  const [editItem, setEditItem] = useState({});
+  const [editOrderItem, setEditOrderItem] = useState({});
+  const [editOrderItemId, setEditOrderItemId] = useState(null);
+  let { items, status, fetchCartError } = useSelector((State) => State.cart);
+  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(false);
+  const [reverseOrder, setReverseOrder] = useState(false);
+
+  const [selectedProduct, setSelectedProduct] = useState({
+    "_id": "66ab771af4df2f3e3c09ecb4",
+    "title": "POSH COCOA POWDER",
+    "description": "POSH COCOA POWDER",
+    "price": 65,
+    "discountedPrice": 64,
+    "discountPercent": 0,
+    "weight": 0,
+    "quantity": -155,
+    "brand": "Brand Name",
+    "imageUrl": "https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png",
+    "slug": "POSH COCOA POWDER",
+    "ratings": [],
+    "reviews": [],
+    "numRatings": 0,
+    "category": "66ab771af4df2f3e3c09ecb1",
+    "createdAt": null,
+    "updatedAt": null,
+    "BarCode": "8906017232378",
+    "stockType": "Stock Type",
+    "unit": "PCS",
+    "purchaseRate": 50,
+    "profitPercentage": 0,
+    "HSN": "HSN Code",
+    "GST": 0,
+    "retailPrice": 64,
+    "totalAmount": 64,
+    "amountPaid": 0,
+    "__v": 0
+  });
+
+
+
   const [formData, setFormData] = useState({
     Name: '',
     mobileNumber: '',
@@ -75,6 +90,11 @@ const Edit= () => {
       fetchOrderData();
     }
   }, [orderId]);
+
+
+
+
+
   const [editingItemId, setEditingItemId] = useState(null); // Track which item is being edited
   const [editableOrderItems, setEditableOrderItems] = useState(formData.orderItems);
 
@@ -82,50 +102,22 @@ const Edit= () => {
     setEditingItemId(itemId);
   };
 
-  const handleSave = async (itemId) => {
-
-    try {
-      console.log("editedItemData:", editedItemData);
-      const payload = {
-        orderId: orderId,
-        productCode: editedItemData.product.BarCode,
-        discountedPrice: editedItemData.discountedPrice,
-        quantity: editedItemData.quantity,
-        // price: editedItemData.unitPrice,
-        // discount: editedItemData.discount,
-        GST: editedItemData.GST,
-        finalPriceWithGST: editedItemData.finalPriceWithGST,
-        OneUnit: parseFloat(editedItemData.finalPriceWithGST) / parseFloat(editedItemData.quantity)
-      };
-  
-      const response = await axiosInstance.post('/order/addCustomProductOnEdit', payload);
-  
-      console.log("Response from server:", response.data);
-
-      setEditingItemId(null); 
-  
-    } catch (error) {
-      console.error("Error saving item:", error);
-    }
-
-
-
-
-    console.log("editedItemData:", editedItemData);
-    setEditingItemId(null);
+  const handleSave = (itemId) => {
+    // Perform save logic here, such as calling an API to save the updated item
+    setEditingItemId(null); // Exit edit mode
   };
 
-  // const handleInputChange = (e, itemId, field) => {
-  //   const updatedItems = editableOrderItems.map((item) =>
-  //     item._id === itemId ? { ...item, [field]: e.target.value } : item
-  //   );
-  //   setEditableOrderItems(updatedItems);
-  // };
+  const handleInputChange = (e, itemId, field) => {
+    const updatedItems = editableOrderItems.map((item) =>
+      item._id === itemId ? { ...item, [field]: e.target.value } : item
+    );
+    setEditableOrderItems(updatedItems);
+  };
 
-  const handleInputChange = (e, field) => {
+  const handleOrderItemInputChange = (e, field) => {
     const { value } = e.target;
 
-    setEditedItemData(prevState => {
+    setEditOrderItem(prevState => {
       const newState = { ...prevState };
       if (field.includes('.')) {
         const [outerKey, innerKey] = field.split('.');
@@ -136,22 +128,19 @@ const Edit= () => {
 
       const mrp = parseFloat(newState.product?.price || 0);
       const quantity = parseInt(newState.quantity || 0);
-      // const OneUnit = parseInt(newState?.OneUnit);
+      const OneUnit = parseInt(newState.OneUnit);
       const gst = parseFloat(newState.GST || 0);
 
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
-      // const totalValue = (OneUnit * quantity)+gst;
-      const totalValue = (mrp * quantity)+gst;
+      const totalValue = (OneUnit * quantity)+gst;
       newState.finalPrice_with_GST = totalValue;
-      // const {product} = editItem;
-      const {product} = editedItemData;
-      // let discount = mrp-OneUnit;
-      let discount = mrp-mrp;
+      const {product} = editItem;
+      let discount = mrp-OneUnit;
       if(mrp==0)
       {
-       discount=product.price-mrp;
+       discount=product.OneUnit-OneUnit;
       }
-      newState.discountedPrice=mrp*quantity
+      newState.discountedPrice=OneUnit*quantity
       // console.log(discount);
       newState.discount = discount;
 
@@ -160,24 +149,89 @@ const Edit= () => {
     console.log("edittem after input change: ",editItem);
   };
 
+  const decreaseQuantity = (id) => {
+    const item = items[0].find(item => item._id === id);
+    if (item.quantity > 1) {
+      dispatch(updateCartQuantity({ productId: id, quantity: item.quantity - 1 })).then(() => {
+        dispatch(fetchCart());
+      });
+    }
+  };
+
+  const closeModal = () => {
+    setIsViewProductModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleSaveClick = async (e,itemId) => {
+    e.preventDefault();
+    // Extract necessary fields from editItem
+    const { product } = editOrderItem;
+    console.log(items);
+    const { discountedPrice, quantity, GST, finalPrice_with_GST,OneUnit } = editOrderItem;
+    let { title: productTitle, price: productPrice,  } = product;
+    const ProductApalaBajarPrice = product.discountedPrice;
+    if(productPrice==0)
+    {
+      productPrice=ProductApalaBajarPrice;
+    }
+    console.log(editOrderItem);
+    // Construct the payload for the API request
+    const payload = {
+      productCode: product.BarCode, 
+      discountedPrice: parseFloat(discountedPrice),
+      quantity: parseInt(quantity),
+      price: parseFloat(productPrice),
+      OneUnit: parseFloat(OneUnit),
+      discount: (parseFloat(productPrice) - parseFloat(OneUnit))*parseFloat(quantity),
+      GST: parseFloat(GST),
+      finalPrice_with_GST: parseFloat(finalPrice_with_GST)
+    };
+  
+    try {
+      const response = await axiosInstance.put('cart/adjustment', payload);
+  
+      // if (!response.ok) {
+      //   throw new Error('Network response was not ok' + response.statusText);
+      // }
+      const resData = response.data;
+      console.log("Save changes for item:", resData);
+  
+      setEditOrderItemId(null);
+      setEditOrderItem({});
+      dispatch(fetchCart());
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
+  };
+
+  const handleCancelClick = () => {
+    setEditOrderItemId(null);
+    setEditOrderItem({});
+  };
+
+  const handleViewProduct = (product) => {
+    setSelectedProduct(product);
+    setIsViewProductModalOpen(true);
+  };
+
+  const removeItem = (id) => {
+    dispatch(removeFromCart(id)).then(() => {
+      dispatch(fetchCart());
+    });
+  };
+
   const handleCheckboxChange = (event) => {
     const checked = event.target.checked;
     setIsChecked(checked);
   };
 
-  const handleEditClick = (e, item) => {
+  const handleEditClick = (e,item) => {
     e.preventDefault();
-    setEditingItem(item._id);
-    setEditedItemData(item);
-  };
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setEditedItemData({
-  //     ...editedItemData,
-  //     [name]: value,
-  //   });
-  // };
+    setEditOrderItemId(item._id);
+    setEditOrderItem({...item});
+  };
 
   const handleScan = (data) => {
     // console.log(isChecked)
@@ -666,171 +720,254 @@ const Edit= () => {
             ))} */}
 
           </div>
-          <div className="p-4 bg-blue-300">
+          {/* <div className="p-4 bg-blue-300">
   <h1 className="text-xl font-bold mb-4">Order Items</h1>
   {formData.orderItems.length > 0 ? (
-      <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
-        <thead>
-          <tr className="bg-gray-300 text-gray-600">
-            <th className="p-1 border border-gray-600 text-left">#</th>
-            <th className="p-1 border border-gray-600 text-left">Product Title</th>
-            {/* <th className="p-1 border border-gray-600 text-left">Description</th> */}
-            <th className="p-1 border border-gray-600 text-left">MRP</th>
-            <th className="p-1 border border-gray-600 text-left w-[60px]">Net Qty</th>
-            <th className="p-1 border border-gray-600 text-left">Single Unit Price</th>
-            <th className="p-1 border border-gray-600 text-left">Disc.</th>
-            <th className="p-1 border border-gray-600 text-left">Total Discount Price</th>
-            <th className="p-1 border border-gray-600 text-left">GST%</th>
-            <th className="p-1 border border-gray-600 text-left">Total Value</th>
-            <th className="p-1 border border-gray-600 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {formData.orderItems.map((item, index) => (
-            <tr key={item._id} className="border-t">
-              <td className="px-4 py-2 text-gray-700">{index + 1}</td>
-              <td className="px-4 py-2 text-gray-700">
-                {item.product.title}
-              </td>
-              
-              <td className="px-4 py-2 text-gray-500">
-                {editingItem === item._id ? (
-                  <input
-                    type="number"
-                    name="mrp"
-                    value={editedItemData.price}
-                    onChange={(e) => handleInputChange(e,'price')}
-                  />
-                ) : (
-                  `${item.price}`
-                )}
-              </td>
-              <td className="px-4 py-2 text-gray-500">
-                {editingItem === item._id ? (
-                  <input
-                    type="number"
-                    name="quantity"
-                    value={editedItemData.quantity}
-                    onChange={(e) => handleInputChange(e,'quantity')}
-                  />
-                ) : (
-                  item.quantity
-                )}
-              </td>
-              <td className="px-4 py-2 text-gray-500">
-                  { parseFloat(item.finalPriceWithGST) / parseFloat(item.quantity)} 
-              </td>
-              <td className="px-4 py-2 text-gray-500">
-                {editingItem === item._id ? (
-                  <input
-                    type="number"
-                    name="discount"
-                    value={editedItemData.product.discountedPrice - (parseFloat(editedItemData.finalPriceWithGST) / parseFloat(editedItemData.quantity))} //editItem.product.discountedPrice-editItem.OneUnit
-                    onChange={(e) => handleInputChange(e,'discount')}
-                  />
-                ) : (
-                  (item.price - item.discountedPrice) < 0 ? 0 : item.price - item.discountedPrice
-                )}
-              </td>
-              <td className="px-4 py-2 text-gray-500">
-                {editingItem === item._id ? (
-                  <input
-                    type="number"
-                    name="totalDiscountPrice"
-                    value={editedItemData.discountedPrice}
-                    onChange={(e) => handleInputChange(e,'discountedPrice')}
-                  />
-                ) : (
-                  `${item.product.discountedPrice}`
-                )}
-              </td>
-              <td className="px-4 py-2 text-gray-500">
-                {editingItem === item._id ? (
-                  <input
-                    type="number"
-                    name="gst"
-                    value={editedItemData.GST}
-                    onChange={(e) => handleInputChange(e,'GST')}
-                  />
-                ) : (
-                  `${item.GST}%`
-                )}
-              </td>
-              <td className="px-4 py-2 text-gray-500">
-                {editingItem === item._id ? (
-                  <input
-                    type="number"
-                    name="totalValue"
-                    value={editedItemData.finalPriceWithGST}
-                    onChange={(e) => handleInputChange(e,'finalPriceWithGST')}
-                  />
-                ) : (
-                  `${item.finalPriceWithGST}`
-                )}
-              </td>
-              <td className="px-4 py-2">
-                <div className="flex items-center space-x-2">
-                  {editingItem === item._id ? (
-                    <>
-                      <button
-                        onClick={handleSave}
-                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditingItem(null)}
-                        className="bg-gray-300 text-gray-700 px-2 py-1 rounded hover:bg-gray-400"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={(e) => handleDecreaseQuantity(e, item._id)}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded"
-                      >
-                        Decrease Quantity
-                      </button>
-                      <button
-                        onClick={(e) => handleRemoveOrderItem(e, orderId, item._id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
-                        onClick={(e) => handleEditClick(e, item)}
-                      >
-                        Edit
-                      </button>
-                    </>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    ) : (
-      <h1 className="text-lg font-semibold text-red-500 mb-4">Order Items are Empty</h1>
-    )}
+    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
+      <thead>
+        <tr>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Product Title</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Quantity</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Price</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
+          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
 
-</div>
+        </tr>
+      </thead>
+      <tbody>
+        {formData.orderItems.map((item, index) => (
+          <tr key={item._id} className="border-t">
+            <td className="px-4 py-2 text-gray-700">{item.product.title}</td>
+            <td className="px-4 py-2 text-gray-500">{item.quantity}</td>
+            <td className="px-4 py-2 text-gray-500">${item.price}</td>
+            <td className="px-4 py-2">
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={(e) => handleDecreaseQuantity(e, item._id)}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded"
+                >
+                  Decrease Quantity
+                </button>
+                <button
+                  onClick={(e) => handleRemoveOrderItem(e, orderId, item._id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <h1 className="text-lg font-semibold text-red-500 mb-4">Order Items are Empty</h1>
+  )}
+</div> */}
+          <div className="overflow-x-auto p-4">
+        <div>
+            <span className="text-muted-foreground">ORDER ITEMS</span>
+            <span className="text-primary px-3">{items[1]&&items[1].totalItem}</span>
+          </div>
+          <table className="w-full mb-2 border-collapse bg-white rounded-lg shadow-md overflow-hidden">
+            <thead>
+              <tr className="bg-gray-300 text-gray-600">
+                <th className="p-1 border border-gray-600 text-left">#</th>
+                <th className="p-1 border border-gray-600 text-left">
+                  Description
+                </th>
+                <th className="p-1 border border-gray-600 text-left">MRP</th>
+                <th className="p-1 border border-gray-600 text-left w-[60px]">
+                  Net Qty
+                </th>
+                <th className="p-1 border border-gray-600 text-left">Single Unit price</th>
+                <th className="p-1 border border-gray-600 text-left">Disc.</th>
+                <th className="p-1 border border-gray-600 text-left">Total Discount Price</th>
+                <th className="p-1 border border-gray-600 text-left">GST%</th>
+                <th className="p-1 border border-gray-600 text-left">
+                  Total Value
+                </th>
+                <th className="p-1 border border-gray-600 text-left">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              { formData.orderItems && (reverseOrder ? [...formData.orderItems].reverse() : formData.orderItems).map((item, i)  => (
+                <tr key={item._id}>
+                  <td className="py-1 px-3 border border-gray-600 text-left whitespace-nowrap">{i + 1}</td>
+                  <td className="py-1 px-3 border border-gray-600 text-left">
+                      {item.product?.title}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                      {item.product?.price}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    <div className="flex flex-row items-center">
+                      <input
+                        type="number"
+                        value={editOrderItemId === item._id ? editOrderItem.quantity : item.quantity}
+                        readOnly
+                        min="1"
+                        className="w-12 sm:w-12 text-center border m-1 sm:mb-0"
+                        onChange={(e) => handleOrderItemInputChange(e, "quantity")}
+                      />
+                     
+                      {editOrderItemId !== item._id &&  
+                      <button
+                        className=" bg-blue-500 mt-1 px-2 py-0 rounded-sm text-lg"
+                        onClick={() => decreaseQuantity(item._id)}
+                      >
+                        -
+                      </button>
+                        }
+                    </div>
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editOrderItemId === item._id ? (
+                      <input
+                        type="number"
+                        value={editOrderItem.OneUnit}
+                        onChange={(e) => handleOrderItemInputChange(e, "OneUnit")}
+                      />
+                    ) : (
+                      item.OneUnit
+                    )}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editOrderItemId === item._id ? (
+                      <input
+                        type="number"
+                        value={editOrderItem.product.discountedPrice-editOrderItem.OneUnit}
+                        readOnly
+                      />
+                    ) : (
+                      (item.price - item.discountedPrice) < 0 ? 0 : item.price - item.discountedPrice
+                       )}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editOrderItemId === item._id ? (
+                       <div>{editOrderItem.discountedPrice}</div>
+                    ) : (
+                      item.discountedPrice
+                    )}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editOrderItemId === item._id ? (
+                      <input
+                        type="number"
+                        value={editOrderItem.GST}
+                        onChange={(e) => handleOrderItemInputChange(e, "GST")}
+                      />
+                    ) : (
+                      item.GST
+                    )}
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editOrderItemId === item._id ? (
+                      <div>{editOrderItem.finalPrice_with_GST}</div>
+                    ) : (
+                      item.finalPrice_with_GST
+                    )}
+                  </td>
+                  <td className="p-1 border flex gap-2 justify-center text-sm border-gray-600 text-center">
+
+                      {isviewProductModalOpen && selectedProduct && (
+                        // <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        //   <div className="bg-white p-6 rounded-lg shadow-lg">
+                        //     <h2 className="text-2xl font-bold mb-4">{selectedProduct.name}</h2>
+                        //     <p className="text-gray-700 mb-4">{selectedProduct.description}</p>
+                        //     <button
+                        //       className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                        //       onClick={closeModal}
+                        //     >
+                        //       Close
+                        //     </button>
+                        //   </div>
+                        // </div>
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                          <div className="bg-white p-2 rounded-lg shadow-lg w-full max-w-3xl mx-4">
+                            <div className="flex justify-between items-start">
+                              <h2 className="text-2xl font-bold mb-4">{selectedProduct.title}</h2>
+                              <button
+                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                onClick={closeModal}
+                              >
+                                Close
+                              </button>
+                            </div>
+                            <div className="flex flex-col md:flex-row">
+                              <img
+                                src={selectedProduct.imageUrl}
+                                alt={selectedProduct.title}
+                                className="w-full md:w-1/2 rounded-lg  md:mb-0 md:mr-4"
+                              />
+                              <div className="flex flex-col items-start w-full justify-start">
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Description:</strong></div> <div>{selectedProduct.description}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Price:</strong> </div> <div> ${selectedProduct.price}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Discounted Price:</strong> </div> <div>${selectedProduct.discountedPrice}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Discount Percent:</strong></div> <div> {selectedProduct.discountPercent}%</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Weight:</strong></div> <div> {selectedProduct.weight} kg</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Quantity:</strong></div> <div> {selectedProduct.quantity}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Brand:</strong></div> <div> {selectedProduct.brand || 'N/A'}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Category:</strong></div> <div> {selectedProduct.category}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Bar Code:</strong></div> <div> {selectedProduct.BarCode}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Stock Type:</strong></div> <div> {selectedProduct.stockType || 'N/A'}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Unit:</strong></div> <div> {selectedProduct.unit}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Purchase Rate:</strong></div> <div> ${selectedProduct.purchaseRate}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>HSN:</strong></div> <div> {selectedProduct.HSN || 'N/A'}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>GST:</strong></div> <div> {selectedProduct.GST}%</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Retail Price:</strong></div> <div> ${selectedProduct.retailPrice}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Total Amount:</strong></div> <div> ${selectedProduct.totalAmount}</div></div>
+                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Amount Paid:</strong></div> <div> ${selectedProduct.amountPaid}</div></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    {editOrderItemId === item._id ? (
+                      <>
+                        <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600" onClick={(e) => handleSaveClick(e,item._id)}>
+                          Save
+                        </button>
+                        <button className="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600" onClick={handleCancelClick}>
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                      <button className="bg-amber-600 text-white px-2 py-2 rounded hover:bg-amber-700" onClick={() => handleViewProduct(item.product)}>
+                        View Product
+                      </button>
+                       <button className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600" onClick={(e) => handleEditClick(e,item)}>
+                          Edit
+                        </button>
+                        <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" onClick={() => removeItem(item._id)}>
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
           <div className="flex p-4 bg-blue-700 rounded-b-lg justify-end space-x-4">
             <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
