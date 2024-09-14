@@ -318,11 +318,7 @@ const Sale = () => {
       const totalValue = (OneUnit * quantity)+gst;
       newState.finalPrice_with_GST = totalValue;
       const {product} = editItem;
-      let discount = mrp-OneUnit;
-      if(mrp==0)
-      {
-       discount=product.OneUnit-OneUnit;
-      }
+      const discount = mrp>OneUnit? mrp-OneUnit:newState.product.discountedPrice-OneUnit;
       newState.discountedPrice=OneUnit*quantity
       // console.log(discount);
       newState.discount = discount;
@@ -346,11 +342,7 @@ const Sale = () => {
     console.log(items);
     const { discountedPrice, quantity, GST, finalPrice_with_GST,OneUnit } = editItem;
     let { title: productTitle, price: productPrice,  } = product;
-    const ProductApalaBajarPrice = product.discountedPrice;
-    if(productPrice==0)
-    {
-      productPrice=ProductApalaBajarPrice;
-    }
+    const Discount = (product.price>OneUnit? product.price-OneUnit:product.discountedPrice-OneUnit)*quantity
 console.log(editItem);
     // Construct the payload for the API request
     const payload = {
@@ -359,7 +351,7 @@ console.log(editItem);
       quantity: parseInt(quantity),
       price: parseFloat(productPrice),
       OneUnit: parseFloat(OneUnit),
-      discount: (parseFloat(productPrice) - parseFloat(OneUnit))*parseFloat(quantity),
+      discount: parseFloat(Discount),
       GST: parseFloat(GST),
       finalPrice_with_GST: parseFloat(finalPrice_with_GST)
     };
@@ -1139,6 +1131,7 @@ const handleScan = (data) => {
                   Net Qty
                 </th>
                 <th className="p-1 border border-gray-600 text-left">Single Unit price</th>
+                <th className="p-1 border border-gray-600 text-left">Single Disc.</th>
                 <th className="p-1 border border-gray-600 text-left">Disc.</th>
                 <th className="p-1 border border-gray-600 text-left">Total Discount Price</th>
                 <th className="p-1 border border-gray-600 text-left">GST%</th>
@@ -1195,12 +1188,23 @@ const handleScan = (data) => {
                     {editId === item._id ? (
                       <input
                         type="number"
-                        value={editItem.product.discountedPrice-editItem.OneUnit}
+                        value={editItem.product.price>editItem.OneUnit? editItem.product.price-editItem.OneUnit:editItem.product.discountedPrice-editItem.OneUnit}
                         readOnly
                       />
-                    ) : (
-                      (item.price - item.discountedPrice) < 0 ? 0 : item.price - item.discountedPrice
-                       )}
+                    ) : 
+                      (item.product.price>item.OneUnit? item.product.price-item.OneUnit:item.product.discountedPrice-item.OneUnit
+                      ) }
+                  </td>
+                  <td className="p-1 border border-gray-600">
+                    {editId === item._id ? (
+                      <input
+                        type="number"
+                        value={(editItem.product.price>editItem.OneUnit? editItem.product.price-editItem.OneUnit:editItem.product.discountedPrice-editItem.OneUnit)*editItem.quantity}
+                        readOnly
+                      />
+                    ) : 
+                      ((item.product.price>item.OneUnit? item.product.price-item.OneUnit:item.product.discountedPrice-item.OneUnit)*item.quantity)
+                      }
                   </td>
                   <td className="p-1 border border-gray-600">
                     {editId === item._id ? (
