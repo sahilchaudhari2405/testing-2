@@ -149,7 +149,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             orderItem.discountedPrice = discountedPrice;
             orderItem.GST = GST * quantity;
             orderItem.purchaseRate=product.purchaseRate*quantity;
-            orderItem.totalProfit=discountedPrice-(product.purchaseRate*quantity);
+            orderItem.totalProfit=(OneUnit-product.purchaseRate)*quantity;
             orderItem.finalPriceWithGST = finalPriceWithGST;
             orderItem.updatedAt = new Date();
             await orderItem.save();
@@ -163,7 +163,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
                 OneUnit :OneUnit,
                 purchaseRate:product.purchaseRate*quantity,
                 discountedPrice: discountedPrice,
-                totalProfit:discountedPrice-(product.purchaseRate*quantity),
+                totalProfit:(OneUnit-product.purchaseRate)*quantity,
                 GST: GST * quantity,
                 finalPriceWithGST: finalPriceWithGST,
                 createdAt: new Date(),
@@ -176,15 +176,15 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
         // Update order totals with new values
         order.user = id;
         order.totalPrice += orderItem.price;
-        order.totalDiscountedPrice += orderItem.discountedPrice;
+        order.totalDiscountedPrice += discountedPrice;
         order.GST += orderItem.GST;
         order.discount+=discount,
-        order.finalPriceWithGST += orderItem.finalPriceWithGST;
-        order.paymentType.cash += orderItem.finalPriceWithGST;
+        order.finalPriceWithGST += finalPriceWithGST;
+        order.paymentType.cash += finalPriceWithGST;
         order.totalProfit += orderItem.totalProfit;
         order.totalPurchaseRate += orderItem.purchaseRate;
         order.updatedAt = new Date();
-
+  
         // Save the updated order
         await order.save();
         let Type = 'Client'

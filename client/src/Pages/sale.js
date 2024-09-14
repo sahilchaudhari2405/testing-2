@@ -311,7 +311,7 @@ const Sale = () => {
 
       const mrp = parseFloat(newState.product?.price || 0);
       const quantity = parseInt(newState.quantity || 0);
-      const OneUnit = parseInt(newState.OneUnit);
+      const OneUnit = (newState.product?.purchaseRate<parseInt(newState.OneUnit))? parseInt(newState.OneUnit):parseInt(newState.product?.purchaseRate+1);
       const gst = parseFloat(newState.GST || 0);
 
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
@@ -322,7 +322,7 @@ const Sale = () => {
       newState.discountedPrice=OneUnit*quantity
       // console.log(discount);
       newState.discount = discount;
-
+      newState.OneUnit = OneUnit;
       return newState;
     });
     console.log("edittem after input change: ",editItem);

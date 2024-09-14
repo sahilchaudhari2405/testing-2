@@ -75,7 +75,7 @@ const Edit = () => {
   const [formData, setFormData] = useState({
     Name: '',
     mobileNumber: '',
-    email: 'No',
+    email: '',
     orderDate: '',
     paymentType: {
       cash: 0,
@@ -167,16 +167,17 @@ const Edit = () => {
 
     try {
       console.log("editedItemData:", editedItemData);
+      const Discount = (editedItemData.product.price>editedItemData.OneUnit? editedItemData.product.price-editedItemData.OneUnit:editedItemData.product.discountedPrice-editedItemData.OneUnit)*editedItemData.quantity
       const payload = {
         orderId: orderId,
         productCode: editedItemData.product.BarCode,
         discountedPrice: editedItemData.discountedPrice,
         quantity: editedItemData.quantity,
         price: editedItemData.price,
-        discount: parseInt(parseFloat(editedItemData.price) - parseFloat(editedItemData.discountedPrice)),
+        discount: Discount,
         GST: editedItemData.GST,
         finalPriceWithGST: editedItemData.finalPriceWithGST,
-        OneUnit: parseFloat(editedItemData.finalPriceWithGST) / parseFloat(editedItemData.quantity)
+        OneUnit: editedItemData.OneUnit
       };
 
       const response = await axiosInstance.post('/order/addCustomProductOnEdit', payload);
@@ -254,9 +255,9 @@ const Edit = () => {
 
       const mrp = parseFloat(newState.product?.price || 0);
       const quantity = parseInt(newState.quantity || 0);
-      const OneUnit = parseInt(newState.OneUnit);
+      const OneUnit = (newState.product?.purchaseRate<parseInt(newState.OneUnit))? parseInt(newState.OneUnit):parseInt(newState.product?.purchaseRate+1);
       const gst = parseFloat(newState.GST || 0);
-
+      
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
       const totalValue = (OneUnit * quantity) + gst;
       newState.finalPrice_with_GST = totalValue;
@@ -265,7 +266,8 @@ const Edit = () => {
       newState.discountedPrice = OneUnit * quantity
       // console.log(discount);
       newState.discount = discount;
-
+      newState.finalPriceWithGST=(OneUnit * quantity)+gst;
+      newState.OneUnit = OneUnit;
       return newState;
     });
     console.log("edittem after input change: ", editItem);
@@ -361,7 +363,7 @@ const Edit = () => {
       setFormData({
         Name: '',
         mobileNumber: '',
-        email: 'No',
+        email: '',
         orderDate: '',
         orderItems: [],
         paymentType: {
@@ -469,7 +471,7 @@ const Edit = () => {
     setFormData({
       Name: '',
       mobileNumber: '',
-      email: 'No',
+      email: '',
       orderDate: '',
       orderItems: [],
       paymentType: {
