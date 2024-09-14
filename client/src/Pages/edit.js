@@ -1355,7 +1355,7 @@ const handleReturn = ()=>{
           </div>
 
           <div className="flex p-4 bg-blue-700 rounded-b-lg justify-end space-x-4">
-            <button type="submit" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors" onClick={handleReturn}>
+            <button type="submit" className="bg-red-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors" onClick={handleReturn}>
               Return
             </button>
             <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors" onClick={handleMarathiPrint}>
