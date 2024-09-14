@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axiosInstance from '../axiosConfig';
 import { toast } from 'react-toastify';
 import BarcodeReader from 'react-barcode';
@@ -6,6 +6,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { fetchCart, addToCart } from '../Redux/Cart/cartSlice';
+import Invoice from '../component/invoice';
+import ReactToPrint from 'react-to-print';
+import { FaSave, FaTrash } from 'react-icons/fa';
 
 const Edit = () => {
   const navigate = useNavigate();
@@ -14,6 +17,72 @@ const Edit = () => {
   const [editOrderItemId, setEditOrderItemId] = useState(null);
   const [editOrderItem, setEditOrderItem] = useState({});
   const [editingItem, setEditingItem] = useState(null);
+  const [totalBills, setTotalBills] = useState();
+  const [totalPrice, setPayprice] = useState();
+  const [popupVisible, setPopupVisible] = useState(false);
+  const printRef = useRef();
+  const [language, SetLanguage] = useState("");
+  const [details, setDetails] = useState(null);
+  const componentRef = useRef();
+
+  const [remainingAmount, setRemainingAmount] = useState(null);
+
+  const [payment, setPayment] = useState({
+    cash: 0,
+    card: 0,
+    upi: 0,
+    borrow: 0,
+  });
+  // Function to handle input changes for payment and borrow
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+    setPayment((prevPayment) => ({
+      ...prevPayment,
+      [name]: parseFloat(value) || 0, // Ensure value is numeric or 0
+    }));
+  };
+  const handleCancel = () => {
+    setPayment({
+      cash: 0,
+      card: 0,
+      upi: 0,
+      borrow: 0,
+    });
+    setError('');
+    setRemainingAmount(0); // Reset remaining amount
+    setPopupVisible(false);
+    setPayprice(0); // Close the popup
+  };
+  const openPopupForPay = () => {
+    setPopupVisible(true);
+    setPayprice(editedItemData.finalPriceWithGST);
+    setRemainingAmount(editedItemData.finalPriceWithGST);
+  }
+  // Effect to update remaining amount whenever payment fields change
+  useEffect(() => {
+    const totalPaid =
+      parseFloat(payment.cash) +
+      parseFloat(payment.card) +
+      parseFloat(payment.upi) +
+      parseFloat(payment.borrow);
+
+    const remaining = totalPrice - totalPaid;
+    setRemainingAmount(remaining);
+  }, [payment]); // Triggered whenever payment state changes
+
+  // Function to handle form submission and validate payments
+  const handleSavePayment = () => {
+    console.log('Payment successful:', payment);
+    if (remainingAmount === 0) {
+      console.log('Payment successful:', payment);
+      handleSave()
+      setError('');
+     // Close the popup after saving
+    } else {
+      setError(`You still need to pay ₹${remainingAmount}.`);
+    }
+  };
+
 
   const [editItem, setEditItem] = useState(
     {
@@ -40,7 +109,15 @@ const Edit = () => {
       discountedPrice: 0,
       finalPriceWithGST: 0,
     });
-    const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(false);
+    const formatDateForInput = (dateString) => {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+  const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({
     "_id": "66ab771af4df2f3e3c09ecb4",
     "title": "POSH COCOA POWDER",
@@ -72,6 +149,7 @@ const Edit = () => {
     "__v": 0
   });
   const [editedItemData, setEditedItemData] = useState({});
+  const [invoiceData, setinvoice] = useState({});
   const [formData, setFormData] = useState({
     Name: '',
     mobileNumber: '',
@@ -167,7 +245,7 @@ const Edit = () => {
 
     try {
       console.log("editedItemData:", editedItemData);
-      const Discount = (editedItemData.product.price>editedItemData.OneUnit? editedItemData.product.price-editedItemData.OneUnit:editedItemData.product.discountedPrice-editedItemData.OneUnit)*editedItemData.quantity
+      const Discount = (editedItemData.product?.price > editedItemData.OneUnit ? editedItemData.product?.price - editedItemData.OneUnit : editedItemData.product.discountedPrice - editedItemData.OneUnit) * editedItemData.quantity
       const payload = {
         orderId: orderId,
         productCode: editedItemData.product.BarCode,
@@ -177,70 +255,37 @@ const Edit = () => {
         discount: Discount,
         GST: editedItemData.GST,
         finalPriceWithGST: editedItemData.finalPriceWithGST,
-        OneUnit: editedItemData.OneUnit
+        OneUnit: editedItemData.OneUnit,
+        payment,
       };
 
-      const response = await axiosInstance.post('/order/addCustomProductOnEdit', payload);
+      const response = await axiosInstance.post('/order/addCustomProductOnEdit', payload)
+        .then(async response => {
+          toast.success('Order updated successfully!');
+          console.log("yes")
+          handleSetData(response.data.data);
+          setPopupVisible(false); 
+          setEditingItem(null);
+        })
+        .catch(err => {
+          alert('Failed to update order.');
+        });;
 
-      console.log("Response from server:", response.data);
-
+      console.log("Response from server:", response);
       setEditingItemId(null);
-
     } catch (error) {
       console.error("Error saving item:", error);
     }
-
-
-
-
     console.log("editedItemData:", editedItemData);
     setEditingItemId(null);
+
   };
-
-  // const handleInputChange = (e, itemId, field) => {
-  //   const updatedItems = editableOrderItems.map((item) =>
-  //     item._id === itemId ? { ...item, [field]: e.target.value } : item
-  //   );
-  //   setEditableOrderItems(updatedItems);
-  // };
-
-  // const handleInputChange = (e, field) => {
-  //   const { value } = e.target;
-
-  //   setEditedItemData(prevState => {
-  //     const newState = { ...prevState };
-  //     if (field.includes('.')) {
-  //       const [outerKey, innerKey] = field.split('.');
-  //       newState[outerKey] = { ...newState[outerKey], [innerKey]: value };
-  //     } else {
-  //       newState[field] = value;
-  //     }
-
-  //     const mrp = parseFloat(newState.product?.price || 0);
-  //     const quantity = parseInt(newState.quantity || 0);
-  //     // const OneUnit = parseInt(newState?.OneUnit);
-  //     const gst = parseFloat(newState.GST || 0);
-
-  //     // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
-  //     // const totalValue = (OneUnit * quantity)+gst;
-  //     const totalValue = (mrp * quantity)+gst;
-  //     newState.finalPrice_with_GST = totalValue;
-  //     // const {product} = editItem;
-  //     const {product} = editedItemData;
-  //     // let discount = mrp-OneUnit;
-  //     let discount = mrp-mrp;
-  //     if(mrp==0)
-  //     {
-  //      discount=product.price-mrp;
-  //     }
-  //     newState.discountedPrice=mrp*quantity
-  //     // console.log(discount);
-  //     newState.discount = discount;
-
-  //     return newState;
-  //   });
-  //   console.log("edittem after input change: ",editItem);
-  // };
+  useEffect(() => {
+    if (details && printRef.current) {
+      printRef.current.handlePrint();
+    }
+    setDetails(null);
+  }, [details]);
   const handleInputChange = (e, field) => {
     const { value } = e.target;
 
@@ -255,9 +300,9 @@ const Edit = () => {
 
       const mrp = parseFloat(newState.product?.price || 0);
       const quantity = parseInt(newState.quantity || 0);
-      const OneUnit = (newState.product?.purchaseRate<parseInt(newState.OneUnit))? parseInt(newState.OneUnit):parseInt(newState.product?.purchaseRate+1);
+      const OneUnit = (newState.product?.purchaseRate < parseInt(newState.OneUnit)) ? parseInt(newState.OneUnit) : parseInt(newState.product?.purchaseRate + 1);
       const gst = parseFloat(newState.GST || 0);
-      
+
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
       const totalValue = (OneUnit * quantity) + gst;
       newState.finalPrice_with_GST = totalValue;
@@ -266,7 +311,7 @@ const Edit = () => {
       newState.discountedPrice = OneUnit * quantity
       // console.log(discount);
       newState.discount = discount;
-      newState.finalPriceWithGST=(OneUnit * quantity)+gst;
+      newState.finalPriceWithGST = (OneUnit * quantity) + gst;
       newState.OneUnit = OneUnit;
       return newState;
     });
@@ -295,6 +340,7 @@ const Edit = () => {
   const handleScan = (data) => {
     // console.log(isChecked)
     if (isChecked && data) {
+      console.log("yes")
       setOrderId(data);
       fetchOrderData();
     }
@@ -310,7 +356,16 @@ const Edit = () => {
     // dispatch(fetchProduct("5345435334"));
   };
 
+  const handlePrint = () => {
+    SetLanguage("English")
+    setDetails(invoiceData);
+  };
 
+  const handleMarathiPrint = () => {
+    SetLanguage("Marathi")
+
+    setDetails(invoiceData);
+  };
   const handleOrderIdChange = (e) => {
     setOrderId(e.target.value);
   };
@@ -329,34 +384,7 @@ const Edit = () => {
     try {
       const response = await axiosInstance.get(`/order/getCounterOrderbyID/${orderId}`);
       console.log("editorderresponse: ", response.data);
-      setFormData(response.data);
-      const orderData = response.data.data;
-      const formattedOrderDate = orderData.orderDate.split('T')[0];
-      const displayOrderDate = formatDateToDisplay(formattedOrderDate);
-
-      setFormData({
-        Name: orderData.Name,
-        mobileNumber: orderData.mobileNumber,
-        email: orderData.email,
-        orderDate: formattedOrderDate,
-        orderItems: orderData.orderItems,
-        paymentType: orderData.paymentType,
-        billImageURL: orderData.billImageURL || '', // Add this if available in the response
-        totalPrice: orderData.totalPrice,
-        totalDiscountedPrice: orderData.totalDiscountedPrice,
-        totalPurchaseRate: orderData.totalPurchaseRate,
-        GST: orderData.GST,
-        discount: orderData.discount,
-        orderStatus: orderData.orderStatus,
-        totalItem: orderData.totalItem,
-        totalProfit: orderData.totalProfit,
-        finalPriceWithGST: orderData.finalPriceWithGST,
-      });
-      console.log("setFormData: ", formData);
-      setpaymenttype(orderData.paymentType);
-      setfetchedOrder(true);
-
-
+      handleSetData(response.data.data);
       setError('');
     } catch (err) {
       setError('Failed to fetch order data. Please check the Order ID.');
@@ -383,9 +411,19 @@ const Edit = () => {
         finalPriceWithGST: '',
       });
     }
+  };
+  
+  const handleSetData = (orderData) => {
+    console.log("setFormData: ", orderData);
+    setinvoice(orderData);
+    setFormData(orderData);
+    const formattedOrderDate = orderData.orderDate.split('T')[0];
+    const displayOrderDate = formatDateToDisplay(formattedOrderDate);
+    setpaymenttype(orderData.paymentType);
+    setfetchedOrder(true);
     setLoading(false);
   };
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
@@ -395,18 +433,18 @@ const Edit = () => {
     console.log("changed formdata: ", formData);
   };
 
-  const handlePaymentChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      paymentType: {
-        ...prevData.paymentType,
-        [name]: Number(value)
-      }
-    }));
-    console.log("changed formdata: ", formData);
+  // const handlePaymentChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData(prevData => ({
+  //     ...prevData,
+  //     paymentType: {
+  //       ...prevData.paymentType,
+  //       [name]: Number(value)
+  //     }
+  //   }));
+  //   console.log("changed formdata: ", formData);
 
-  };
+  // };
   const handleOrderItemChange = (index, e) => {
     const { name, value } = e.target;
     const updatedOrderItems = [...formData.orderItems];
@@ -434,7 +472,8 @@ const Edit = () => {
     axiosInstance.put('/order/RemoveOneItem', remove_payload)
       .then(async response => {
         toast.success('Order item removed successfully!');
-        await fetchOrderData();
+        console.log("yes")
+       await fetchOrderData();
       })
       .catch(err => {
         toast.error('Failed to remove item.');
@@ -447,8 +486,9 @@ const Edit = () => {
     axiosInstance.put(`/order/updateOrderbyID/${orderId}`, formData)
       .then(async response => {
         toast.success('Order updated successfully!');
-        await fetchOrderData();
-        navigate('/view')
+        console.log("yes")
+        handleSetData(response.data.data);
+        // navigate('/view')
       })
       .catch(err => {
         alert('Failed to update order.');
@@ -460,10 +500,11 @@ const Edit = () => {
       orderId: orderId
     }
 
-    axiosInstance.put('/order/cancelOrder', cancelOrder_payload)
+  axiosInstance.put('/order/cancelOrder', cancelOrder_payload)
       .then(async response => {
         toast.success('Order cancelled successfully!');
-        await fetchOrderData();
+        console.log("yes")
+      await fetchOrderData();
       })
       .catch(err => {
         toast.error('Failed to cancel order');
@@ -505,7 +546,8 @@ const Edit = () => {
     axiosInstance.put('/order/decreaseQuantity', decreaseQuantity_payload)
       .then(async response => {
         toast.success('Quantity decreased successfully!');
-        await fetchOrderData();
+        console.log("yes")
+        handleSetData(response.data.data);
       })
       .catch(err => {
         toast.error('Failed to decrease quantity');
@@ -583,7 +625,9 @@ const Edit = () => {
     }
 
   };
-
+const handleReturn = ()=>{
+  navigate('/view')
+}
   const handleSelectProduct = (product) => {
     console.log("handling ");
     setaddprocudtoneditformData({
@@ -618,7 +662,6 @@ const Edit = () => {
     } else {
       setShowModaldescription(false);
     }
-
   }
   const handleAddProductSubmit = async (e) => {
     e.preventDefault();
@@ -631,15 +674,25 @@ const Edit = () => {
         productCode: id
       }
       const response = await axiosInstance.post('/order/addProductOnEdit', payload)
+     await fetchOrderData();
       console.log("resposne: ", response);
     }
     // setProductDetails({...productDetails,['qty']:" "});
     setProductDetails();
-    fetchOrderData();
-
+    
+    console.log("yes")
   };
 
-
+  const saveAndClosePopup = () => {
+    // Perform any validation or save logic here
+    if (!formData.paymentType.cash && !formData.paymentType.card && !formData.paymentType.upi) {
+      setError('Please fill in at least one payment type');
+    } else {
+      // Save logic
+      console.log('Saving data:', formData);
+      setPopupVisible(false); // Close the popup
+    }
+  };
   return (
     <div className="bg-gray-100 mt-20  mx-6 rounded-lg shadow-lg">
 
@@ -711,7 +764,6 @@ const Edit = () => {
             <div>
               <label className="block text-gray-700 font-medium">Email</label>
               <input
-                type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -723,7 +775,7 @@ const Edit = () => {
               <input
                 type="date"
                 name="orderDate"
-                value={formData.orderDate}
+                value={formatDateForInput(formData.orderDate)}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
@@ -1179,7 +1231,7 @@ const Edit = () => {
                         {item.product?.title}
                       </td>
                       <td className="p-1 border border-gray-600">
-                        {item.product?.price}
+                        {item.product.price}
                       </td>
                       <td className="p-1 border border-gray-600">
                         <div className="flex flex-row items-center">
@@ -1217,7 +1269,7 @@ const Edit = () => {
                         {editingItem === item._id ? (
                           <input
                             type="number"
-                            value={editedItemData.product.price > editedItemData.OneUnit ? editedItemData.product.price - editedItemData.OneUnit : editedItemData.product.discountedPrice - editedItemData.OneUnit}
+                            value={editedItemData.product?.price > editedItemData.OneUnit ? editedItemData.product.price - editedItemData.OneUnit : editedItemData.product.discountedPrice - editedItemData.OneUnit}
                             readOnly
                           />
                         ) :
@@ -1261,63 +1313,11 @@ const Edit = () => {
                         )}
                       </td>
                       <td className="px-4 py-2 border border-gray-600">
-                      {isviewProductModalOpen && selectedProduct && (
-                        // <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                        //   <div className="bg-white p-6 rounded-lg shadow-lg">
-                        //     <h2 className="text-2xl font-bold mb-4">{selectedProduct.name}</h2>
-                        //     <p className="text-gray-700 mb-4">{selectedProduct.description}</p>
-                        //     <button
-                        //       className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                        //       onClick={closeModal}
-                        //     >
-                        //       Close
-                        //     </button>
-                        //   </div>
-                        // </div>
-                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                          <div className="bg-white p-2 rounded-lg shadow-lg w-full max-w-3xl mx-4">
-                            <div className="flex justify-between items-start">
-                              <h2 className="text-2xl font-bold mb-4">{selectedProduct.title}</h2>
-                              <button
-                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                                onClick={closeModal}
-                              >
-                                Close
-                              </button>
-                            </div>
-                            <div className="flex flex-col md:flex-row">
-                              <img
-                                src={selectedProduct.imageUrl}
-                                alt={selectedProduct.title}
-                                className="w-full md:w-1/2 rounded-lg  md:mb-0 md:mr-4"
-                              />
-                              <div className="flex flex-col items-start w-full justify-start">
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Description:</strong></div> <div>{selectedProduct.description}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Price:</strong> </div> <div> ${selectedProduct.price}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Discounted Price:</strong> </div> <div>${selectedProduct.discountedPrice}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Discount Percent:</strong></div> <div> {selectedProduct.discountPercent}%</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Weight:</strong></div> <div> {selectedProduct.weight} kg</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Quantity:</strong></div> <div> {selectedProduct.quantity}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Brand:</strong></div> <div> {selectedProduct.brand || 'N/A'}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Bar Code:</strong></div> <div> {selectedProduct.BarCode}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Stock Type:</strong></div> <div> {selectedProduct.stockType || 'N/A'}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Unit:</strong></div> <div> {selectedProduct.unit}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Purchase Rate:</strong></div> <div> ${selectedProduct.purchaseRate}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>HSN:</strong></div> <div> {selectedProduct.HSN || 'N/A'}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>GST:</strong></div> <div> {selectedProduct.GST}%</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Retail Price:</strong></div> <div> ${selectedProduct.retailPrice}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Total Amount:</strong></div> <div> ${selectedProduct.totalAmount}</div></div>
-                                <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Amount Paid:</strong></div> <div> ${selectedProduct.amountPaid}</div></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
                         <div className="flex items-center space-x-2">
                           {editingItem === item._id ? (
                             <>
                               <button
-                                onClick={handleSave}
+                                onClick={openPopupForPay}
                                 className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"                      >
                                 Save
                               </button>
@@ -1352,10 +1352,19 @@ const Edit = () => {
             ) : (
               <h1 className="text-lg font-semibold text-red-500 mb-4">Order Items are Empty</h1>
             )}
-
           </div>
 
           <div className="flex p-4 bg-blue-700 rounded-b-lg justify-end space-x-4">
+            <button type="submit" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors" onClick={handleReturn}>
+              Return
+            </button>
+            <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors" onClick={handleMarathiPrint}>
+              सेव्ह अँड प्रिंट
+            </button>
+            <button type="submit" className="bg-sky-500 text-white px-4 py-2 rounded-lg hover:bg-sky-600 transition-colors" onClick={handlePrint}>
+              English bill
+
+            </button>
             <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
               Save changes
             </button>
@@ -1368,7 +1377,7 @@ const Edit = () => {
               setFormData({
                 Name: '',
                 mobileNumber: '',
-                email: 'No',
+                email: '',
                 orderDate: '',
                 orderItems: [],
                 paymentType: {
@@ -1396,8 +1405,165 @@ const Edit = () => {
         </form>)
         }
 
+        <Invoice
+          componentRef={componentRef}
+          details={details}
+          language={language}
+        />
+
+
+        <ReactToPrint
+          trigger={() => <button style={{ display: 'none' }} />}
+          content={() => componentRef.current}
+          ref={printRef}
+        />
+
       </div>
+      {isviewProductModalOpen && selectedProduct && (
+                          // <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                          //   <div className="bg-white p-6 rounded-lg shadow-lg">
+                          //     <h2 className="text-2xl font-bold mb-4">{selectedProduct.name}</h2>
+                          //     <p className="text-gray-700 mb-4">{selectedProduct.description}</p>
+                          //     <button
+                          //       className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                          //       onClick={closeModal}
+                          //     >
+                          //       Close
+                          //     </button>
+                          //   </div>
+                          // </div>
+                          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                            <div className="bg-white p-2 rounded-lg shadow-lg w-full max-w-3xl mx-4">
+                              <div className="flex justify-between items-start">
+                                <h2 className="text-2xl font-bold mb-4">{selectedProduct.title}</h2>
+                                <button
+                                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                  onClick={closeModal}
+                                >
+                                  Close
+                                </button>
+                              </div>
+                              <div className="flex flex-col md:flex-row">
+                                <img
+                                  src={selectedProduct.imageUrl}
+                                  alt={selectedProduct.title}
+                                  className="w-full md:w-1/2 rounded-lg  md:mb-0 md:mr-4"
+                                />
+                                <div className="flex flex-col items-start w-full justify-start">
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Description:</strong></div> <div>{selectedProduct.description}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Price:</strong> </div> <div> ${selectedProduct.price}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Discounted Price:</strong> </div> <div>${selectedProduct.discountedPrice}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Discount Percent:</strong></div> <div> {selectedProduct.discountPercent}%</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Weight:</strong></div> <div> {selectedProduct.weight} kg</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Quantity:</strong></div> <div> {selectedProduct.quantity}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Brand:</strong></div> <div> {selectedProduct.brand || 'N/A'}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Bar Code:</strong></div> <div> {selectedProduct.BarCode}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Stock Type:</strong></div> <div> {selectedProduct.stockType || 'N/A'}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Unit:</strong></div> <div> {selectedProduct.unit}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Purchase Rate:</strong></div> <div> ${selectedProduct.purchaseRate}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>HSN:</strong></div> <div> {selectedProduct.HSN || 'N/A'}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>GST:</strong></div> <div> {selectedProduct.GST}%</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Retail Price:</strong></div> <div> ${selectedProduct.retailPrice}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Total Amount:</strong></div> <div> ${selectedProduct.totalAmount}</div></div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex "><div><strong>Amount Paid:</strong></div> <div> ${selectedProduct.amountPaid}</div></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+      {popupVisible && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Total Amount: ₹{totalPrice}
+            </h3>
+
+            <div className="space-y-4">
+              <span className="text-gray-600">Borrow Amount</span>
+              <input
+                type="number"
+                name="borrow"
+                value={payment.borrow || ''}
+                onChange={handlePaymentChange}
+                placeholder=""
+                className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{
+                  appearance: 'textfield',
+                  MozAppearance: 'textfield',
+                  WebkitAppearance: 'none'
+                }}
+              />
+              <span className="text-gray-600">cash Amount</span>
+              <input
+                type="number"
+                name="cash"
+                value={payment.cash || ''}
+                onChange={handlePaymentChange}
+                placeholder=""
+                className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{
+                  appearance: 'textfield',
+                  MozAppearance: 'textfield',
+                  WebkitAppearance: 'none'
+                }}
+              />
+              <span className="text-gray-600">card Amount</span>
+              <input
+                type="number"
+                name="card"
+                value={payment.card || ''}
+                onChange={handlePaymentChange}
+                placeholder=""
+                className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{
+                  appearance: 'textfield',
+                  MozAppearance: 'textfield',
+                  WebkitAppearance: 'none'
+                }}
+              />
+              <span className="text-gray-600">UPI Amount</span>
+              <input
+                type="number"
+                name="upi"
+                value={payment.upi || ''}
+                onChange={handlePaymentChange}
+                placeholder=""
+                className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{
+                  appearance: 'textfield',
+                  MozAppearance: 'textfield',
+                  WebkitAppearance: 'none'
+                }}
+              />
+
+            </div>
+
+            {/* Remaining amount */}
+            <h4 className={`mt-4 ${remainingAmount === 0 ? 'text-green-500' : 'text-red-500'}`}>
+        {remainingAmount === 0 ? 'You are ready to submit' : `Remaining Amount to Pay: ₹${remainingAmount}`}
+      </h4>
+            <div className="flex justify-end space-x-4 mt-4">
+              <button
+                onClick={() => handleSavePayment()}
+                className="bg-green-400 text-white p-2 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out flex items-center"
+              >
+                <FaSave className="mr-2" />
+                Save Changes
+              </button>
+              <button
+                onClick={handleCancel}
+                className="bg-gray-300 text-gray-800 p-2 rounded-lg hover:bg-gray-400 transition duration-150 ease-in-out flex items-center"
+              >
+                <FaTrash className="mr-2" />
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 

@@ -15,8 +15,8 @@ import { Client } from "../model/Client.model.js";
 // Function to place an order
 const AddCustomOrder = asyncHandler(async (req, res) => {
     const { id } = req.user; // User ID
-    const { orderId, productCode, discountedPrice, quantity, price, discount, GST, finalPriceWithGST, OneUnit } = req.body; // Request Body with Custom Info
-
+    const { orderId, productCode, discountedPrice, quantity, price, discount, GST, finalPriceWithGST, OneUnit,payment } = req.body; // Request Body with Custom Info
+     console.log(payment);
     try {
         // Fetch user from database
         const user = await CounterUser.findById(id);
@@ -56,7 +56,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             order.totalPrice -= oldItem.price;
             order.totalDiscountedPrice -= oldItem.discountedPrice;
             order.GST -= oldItem.GST;
-            order.discount -= value*oldItem.quantity;
+            order.discount -= (value*oldItem.quantity);
             order.finalPriceWithGST -= oldItem.finalPriceWithGST;
             order.totalProfit -= oldItem.totalProfit;
             order.totalPurchaseRate -= oldItem.purchaseRate;
@@ -180,7 +180,10 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
         order.GST += orderItem.GST;
         order.discount+=discount,
         order.finalPriceWithGST += finalPriceWithGST;
-        order.paymentType.cash += finalPriceWithGST;
+        order.paymentType.cash += payment.cash;
+        order.paymentType.Card+=payment.card;
+        order.paymentType.UPI+=payment.upi,
+        order.paymentType.borrow+=payment.borrow,
         order.totalProfit += orderItem.totalProfit;
         order.totalPurchaseRate += orderItem.purchaseRate;
         order.updatedAt = new Date();
@@ -291,13 +294,20 @@ const AddOrder = asyncHandler(async (req, res) => {
             purchaseRate += newOrderItem.purchaseRate;
             totalProfit += newOrderItem.totalProfit; // Accumulate totalProfit
         }
-
-
+       let value=0;
+        if(product.price!=0 && product.price)
+            {
+               value=product.price-oneUnit;
+            }
+            else{
+               value=product.discountedPrice-oneUnit;
+            }
         // Update order totals
         order.totalPrice += product.price;
         order.totalDiscountedPrice += oneUnit;
         order.totalItem += 1;
         order.GST += product.GST;
+        order.discount+=value;
         order.paymentType.cash += (oneUnit + product.GST);
         order.finalPriceWithGST += (oneUnit + product.GST);
         order.totalPurchaseRate += product.purchaseRate;
@@ -500,7 +510,16 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
             if (cart) {
                 const cartItemExists = cart.orderItems.some(item => item.toString() === cartItem._id.toString());
                 if (cartItemExists) {
-                    const discount = await Math.max(product.price - oneUnit, 0);
+                    if (cartItem.quantity > 0 && cartItemExists) {
+                        let value=0;
+                        if(product.price!=0 && product.price)
+                        {
+                           value=product.price-cartItem.OneUnit;
+                        }
+                        else{
+                           value=product.discountedPrice-cartItem.OneUnit;
+                        }
+                        const discount =value;
                     cart.user = id,
                         cart.orderStatus = 'Update',
                         cart.totalPrice -= product.price;
@@ -557,7 +576,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
                             cart.paymentType.cash = 0; // Cash is exhausted
                         }
                     }
-        
+                }
         
                     // At this point, remainingAmount should be 0, or you can handle if any uncovered amount remains.
 
@@ -566,12 +585,13 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
                     await TotalAllupdateSalesData(oldOrder, cart);
                     await TotalOfflineupdateSalesData(oldOrder, cart);
                 }
-            }
+        
 
             return res.status(200).json(new ApiResponse(200, 'Cart item quantity decreased successfully', cartItem, cart));
         } else {
             return res.status(400).json(new ApiResponse(400, 'Minimum quantity reached for this item', null));
         }
+    }
     } catch (error) {
         console.error(error);
         return res.status(500).json(new ApiResponse(500, 'Error decreasing cart item quantity', error.message));
@@ -607,7 +627,15 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
         const results = await reduceClient(data);
         console.log(results);
         if (cartItem.quantity > 0 && cartItemExists) {
-            const discount = await Math.max(cartItem.price - cartItem.discountedPrice, 0);
+            let value=0;
+            if(product.price!=0 && product.price)
+            {
+               value=product.price-cartItem.OneUnit;
+            }
+            else{
+               value=product.discountedPrice-cartItem.OneUnit;
+            }
+            const discount =value*cartItem.quantity;
             cart.user = id,
                 cart.orderItems.pull(cartItem._id);
             cart.orderStatus = 'Update',
@@ -616,7 +644,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
             cart.totalPurchaseRate -= cartItem.purchaseRate;
             cart.GST -= cartItem.GST;
             cart.totalItem -= 1,
-                cart.discount -= discount;
+            cart.discount -= discount;
             cart.totalProfit -= cartItem.totalProfit;
             cart.finalPriceWithGST -= cartItem.finalPriceWithGST;
             let remainingAmount = cartItem.finalPriceWithGST; // Start with the item's price
