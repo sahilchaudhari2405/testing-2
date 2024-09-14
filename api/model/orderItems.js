@@ -32,6 +32,10 @@ const offlineOrderItemSchema = new Schema({
         type: Number,
         required: true,
     },
+    OneUnit:{
+        type:Number,
+        required:true,
+        },
     discountedPrice: {
         type: Number,
         required: true,

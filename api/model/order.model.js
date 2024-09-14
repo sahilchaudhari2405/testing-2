@@ -40,7 +40,7 @@ const offlineOrderSchema = new Schema({
             default: 0,
         },
         borrow:{
-            type:Number ,
+            type:Number,
             default:0
         }
     },
