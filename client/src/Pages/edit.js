@@ -3,12 +3,44 @@ import axiosInstance from '../axiosConfig';
 import { toast } from 'react-toastify';
 import BarcodeReader from 'react-barcode';
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { fetchCart, addToCart } from '../Redux/Cart/cartSlice';
 
 const Edit= () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { orderId: orderIdFromURL } = useParams();
-  const [editId, setEditId] = useState(null);
-  const [editItem, setEditItem] = useState({});
+  const [editOrderItemId, setEditOrderItemId] = useState(null);
+  const [editOrderItem, setEditOrderItem] = useState({});
+  const [editingItem, setEditingItem] = useState(null);
+  const [editItem, setEditItem] = useState(
+  {
+    // product: {
+    //     title: "",
+    //     price: 0,
+    //     discountedPrice: 0,
+    //     discountPercent: 0,
+    //     quantity: 0,
+    //     purchaseRate: 12.5,
+    //     profitPercentage: 0,
+    //     HSN: null,
+    //     GST: 0,
+    //     retailPrice: 15,
+    //     totalAmount: 15,
+    //     amountPaid: 0,
+    //     __v: 0
+    // },
+    quantity: 0,
+    purchaseRate: 0,
+    price: 0,
+    GST: 0,
+    totalProfit: 0,
+    discountedPrice: 0,
+    finalPriceWithGST: 0,
+});
+
+  const [editedItemData, setEditedItemData] = useState({});
   const [formData, setFormData] = useState({
     Name: '',
     mobileNumber: '',
@@ -31,12 +63,59 @@ const Edit= () => {
     totalProfit: '',
     finalPriceWithGST: '',
   });
+
+  // State variables for form fields
+  const [addprocudtoneditformData, setaddprocudtoneditformData] = useState({
+    barcode: "",
+    brand: "",
+    description: "",
+    category: "",
+    stockType: "",
+    unit: "",
+    qty: "",
+    saleRate: "",
+    profit: "",
+    hsn: "",
+    gst: "",
+    total: "",
+  });
   const [orderId, setOrderId] = useState('');
   const [paymenttype, setpaymenttype] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fetchedOrder, setfetchedOrder] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [Inputdescriptionforsearch, setInputdescriptionforsearch] = useState('');
+  const [showModaldescription, setShowModaldescription] = useState(false);
+  const [matchingProducts, setMatchingProducts] = useState([]);
+  const [productDetails,setProductDetails] = useState()
+  const [showMobileModal, setShowMobileModal] = useState(false);
+
+
+  useEffect(() => {
+    setMatchingProducts([]);
+    handleSearchandChange();
+    console.log("Inputdescriptionforsearch changed: ",Inputdescriptionforsearch)
+  },[Inputdescriptionforsearch])
+
+  useEffect(() => {
+    if (productDetails) {
+      setaddprocudtoneditformData({
+        barcode: productDetails.BarCode || "",
+        brand: productDetails.brand || "",
+        description: productDetails.title || "",
+        category: productDetails.category?.name|| "",
+        stockType: productDetails.stockType || "",
+        unit: productDetails.unit || "",
+        qty: "",
+        saleRate: productDetails.discountedPrice || "",
+        profit: productDetails.profit || "",
+        hsn: productDetails.HSN,
+        gst: productDetails.GST || "",
+      });
+    }
+  }, [productDetails]);
+
 
   useEffect(() => {
     if (orderIdFromURL) {
@@ -53,16 +132,82 @@ const Edit= () => {
     setEditingItemId(itemId);
   };
 
-  const handleSave = (itemId) => {
-    // Perform save logic here, such as calling an API to save the updated item
-    setEditingItemId(null); // Exit edit mode
+  const handleSave = async (itemId) => {
+
+    try {
+      console.log("editedItemData:", editedItemData);
+      const payload = {
+        orderId: orderId,
+        productCode: editedItemData.product.BarCode,
+        discountedPrice: editedItemData.discountedPrice,
+        quantity: editedItemData.quantity,
+        price: editedItemData.price,
+        discount: parseInt( parseFloat(editedItemData.price) - parseFloat(editedItemData.discountedPrice) ) ,
+        GST: editedItemData.GST,
+        finalPriceWithGST: editedItemData.finalPriceWithGST,
+        OneUnit: parseFloat(editedItemData.finalPriceWithGST) / parseFloat(editedItemData.quantity)
+      };
+  
+      const response = await axiosInstance.post('/order/addCustomProductOnEdit', payload);
+  
+      console.log("Response from server:", response.data);
+
+      setEditingItemId(null); 
+  
+    } catch (error) {
+      console.error("Error saving item:", error);
+    }
+
+
+
+
+    console.log("editedItemData:", editedItemData);
+    setEditingItemId(null);
   };
 
-  const handleInputChange = (e, itemId, field) => {
-    const updatedItems = editableOrderItems.map((item) =>
-      item._id === itemId ? { ...item, [field]: e.target.value } : item
-    );
-    setEditableOrderItems(updatedItems);
+  // const handleInputChange = (e, itemId, field) => {
+  //   const updatedItems = editableOrderItems.map((item) =>
+  //     item._id === itemId ? { ...item, [field]: e.target.value } : item
+  //   );
+  //   setEditableOrderItems(updatedItems);
+  // };
+
+  const handleInputChange = (e, field) => {
+    const { value } = e.target;
+
+    setEditedItemData(prevState => {
+      const newState = { ...prevState };
+      if (field.includes('.')) {
+        const [outerKey, innerKey] = field.split('.');
+        newState[outerKey] = { ...newState[outerKey], [innerKey]: value };
+      } else {
+        newState[field] = value;
+      }
+
+      const mrp = parseFloat(newState.product?.price || 0);
+      const quantity = parseInt(newState.quantity || 0);
+      // const OneUnit = parseInt(newState?.OneUnit);
+      const gst = parseFloat(newState.GST || 0);
+
+      // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
+      // const totalValue = (OneUnit * quantity)+gst;
+      const totalValue = (mrp * quantity)+gst;
+      newState.finalPrice_with_GST = totalValue;
+      // const {product} = editItem;
+      const {product} = editedItemData;
+      // let discount = mrp-OneUnit;
+      let discount = mrp-mrp;
+      if(mrp==0)
+      {
+       discount=product.price-mrp;
+      }
+      newState.discountedPrice=mrp*quantity
+      // console.log(discount);
+      newState.discount = discount;
+
+      return newState;
+    });
+    console.log("edittem after input change: ",editItem);
   };
 
   const handleCheckboxChange = (event) => {
@@ -70,10 +215,19 @@ const Edit= () => {
     setIsChecked(checked);
   };
 
-  const handleEditClick = (item) => {
-    setEditId(item._id);
-    setEditItem({...item});
+  const handleEditClick = (e, item) => {
+    e.preventDefault();
+    setEditingItem(item._id);
+    setEditedItemData(item);
   };
+
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setEditedItemData({
+  //     ...editedItemData,
+  //     [name]: value,
+  //   });
+  // };
 
   const handleScan = (data) => {
     // console.log(isChecked)
@@ -293,6 +447,119 @@ const Edit= () => {
       
 
   }
+
+  //fucntions to add new item to order
+  const fetchProducts = async (id) => {
+    console.log(id+"hallo")
+    try {
+      const response = await axiosInstance.get(`/product/view/${id}`); // Adjust the URL to your API endpoint
+      // setProducts(response.data);
+      console.log("barcode fetch product reponse ",response)
+      dispatch(addToCart(id)).then(() => {
+        dispatch(fetchCart());})
+      setProductDetails({})
+    } catch (err) {
+      if (err.response && err.response.status === 404) {
+        toast.error("Product not found!"); 
+      } else {
+        console.log(err.message); 
+      }
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      console.log("inside handle key press == Enter")
+
+      if (e.target.value.trim()!="") {
+      console.log("fetchroducts ")
+
+      fetchProducts(e.target.value);
+      }
+
+      setaddprocudtoneditformData({
+        barcode: "",
+        brand: "",
+        description: "",
+        category: "",
+        stockType: "",
+        unit: "",
+        qty: "",
+        saleRate: "",
+        profit: "",
+        hsn: "",
+        gst: "",
+        total: "",
+      })
+
+    }
+  };
+
+  const handleKeys = (e) => {
+    console.log(e.key)
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission on Enter
+      const form = e.target.form;
+      const index = Array.prototype.indexOf.call(form, e.target);
+      form.elements[index + 1].focus();
+    }
+
+  };
+
+  const handleSelectProduct =(product) => {
+    console.log("handling ");
+    setaddprocudtoneditformData({
+      barcode: product.BarCode,
+      brand: product.brand || "",
+      description: product.description || "",
+      category: product.category.name || "",
+      stockType: product.stockType || "",
+      unit: product.unit || "",
+      qty: product.quantity,
+      hsn: product.HSN,
+      gst: product.GST,
+      total: product.totalAmount,
+    });
+    setProductDetails(product);
+    setShowModaldescription(false);
+    setShowMobileModal(false);
+
+  }
+
+  const handleSearchandChange = async () => {
+    setaddprocudtoneditformData({
+      ...addprocudtoneditformData,
+      "description": Inputdescriptionforsearch,
+    });
+    if (Inputdescriptionforsearch) {
+      const response = await axiosInstance.post('/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
+      const filteredOrders = response.data.data;
+      console.log("Inputdescriptionforsearch : ", filteredOrders);
+      setMatchingProducts(filteredOrders);
+      setShowModaldescription(true);
+    } else {
+      setShowModaldescription(false);
+    }
+
+  }
+  const handleAddProductSubmit = async (e) => {
+    e.preventDefault();
+    console.log("productDetails: ",productDetails)
+    if(productDetails){
+      const id = productDetails.BarCode;
+      console.log(id);
+      const payload = {
+        orderId: orderId,
+        productCode : id
+      }
+      const response  = await axiosInstance.post('/order/addProductOnEdit',payload)
+      console.log("resposne: ",response);
+    }
+    // setProductDetails({...productDetails,['qty']:" "});
+    setProductDetails();
+    fetchOrderData();
+
+  };
 
 
   return (
@@ -562,64 +829,405 @@ const Edit= () => {
             ))} */}
 
           </div>
+          <form>
+          <div className="flex flex-nowrap bg-gray-200 px-3  text-center rounded-md space-x-2 mb-2">
+            {/* <div className="mb-2 flex justify-center items-center text-center">
+              <button
+                type="button"
+                onClick={handleReverseOrder}
+                className={`w-full text-white py-1 px-4 rounded font-medium transition-colors ${
+                  reverseOrder ? 'bg-orange-500 hover:bg-green-500' : 'bg-green-500 hover:bg-blue-800'
+                }`}
+              >
+               {reverseOrder ? 'Reset' : 'Reverse'}
+              </button>
+            </div> */}
+            <div className=" mb-4 text-center"> 
+              <label
+                htmlFor="scanner"
+                className="block text-sm font-medium"
+              >
+                Scanner
+              </label>
+              <input
+                type="checkbox"
+                id="scanner"
+                checked={isChecked}
+                onChange={handleCheckboxChange} 
+                className="border border-gray-300 rounded mt-4 "
+              />
+            </div>
+            
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="barcode"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Barcode
+              </label>
+              <input
+                type="text"
+                id="barcode"
+                value={addprocudtoneditformData.barcode}
+                onKeyDown={handleKeyPress}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter barcode"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 ">
+              <label
+                htmlFor="brand"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Brand
+              </label>
+              <input
+                type="text"
+                onKeyDown={handleKeys}
+                value={addprocudtoneditformData.brand}
+                onChange={handleChange}
+                id="brand"
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter brand"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="description"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Description
+              </label>
+              
+              <input
+                type="text"
+                id="description"
+                onKeyDown={handleKeys}
+                value={addprocudtoneditformData.description}
+                onChange={(e) => {setInputdescriptionforsearch(e.target.value)}}
+                onBlur={() => setTimeout(() => setShowModaldescription(false), 200)}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter description"
+              />
+              {showModaldescription && (
+              <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
+                {matchingProducts.map((product) => (
+                  <div key={product._id} onClick={() => handleSelectProduct(product)} className="p-2 flex border border-solid  hover:bg-gray-200 cursor-pointer">
+                    {product.title}
+                  </div>
+                ))}
+              </div>
+            )}
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="category"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Category
+              </label>
+              <input
+                type="text"
+                id="category"
+                value={addprocudtoneditformData.category}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter category"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="stock-type"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Stock Type
+              </label>
+              <input
+                type="text"
+                id="stockType"
+                value={addprocudtoneditformData.stockType}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter stock type"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="unit"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Unit
+              </label>
+              <input
+                type="text"
+                id="unit"
+                value={addprocudtoneditformData.unit}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter unit"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="qty"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Qty
+              </label>
+              <input
+                type="number"
+                id="qty"
+                value={addprocudtoneditformData.qty}
+                onKeyDown={handleKeys}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter quantity"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="sale-rate"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Sale Rate
+              </label>
+              <input
+                type="text"
+                id="sale-rate"
+                value={addprocudtoneditformData.saleRate}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter Sale rate"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="hsn"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                HSN
+              </label>
+              <input
+                type="text"
+                id="hsn"
+                value={addprocudtoneditformData.hsn}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter HSN"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="gst"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                GST%
+              </label>
+              <input
+                type="text"
+                id="gst"
+                value={addprocudtoneditformData.gst}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter GST percentage"
+              />
+            </div>
+     
+
+            <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 mt-5">
+              <button
+                onClick={(e) => { handleAddProductSubmit(e) ; setaddprocudtoneditformData({
+                  barcode: "",
+                  brand: "",
+                  description: "",
+                  category: "",
+                  stockType: "",
+                  unit: "",
+                  qty: "",
+                  saleRate: "",
+                  profit: "",
+                  hsn: "",
+                  gst: "",
+                  total: "",
+                }); } }
+                className="w-full bg-green-700 text-white py-1 rounded font-medium hover:bg-green-800 transition-colors"
+              >
+
+                Enter
+              </button>
+            </div>
+          </div>
+        </form>
           <div className="p-4 bg-blue-300">
   <h1 className="text-xl font-bold mb-4">Order Items</h1>
-  {formData.orderItems.length > 0 ? (
-    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
-      <thead>
-        <tr>
-          <th className="px-4 py-2 text-left font-medium text-gray-700">Product Title</th>
-          <th className="px-4 py-2 text-left font-medium text-gray-700">Quantity</th>
-          <th className="px-4 py-2 text-left font-medium text-gray-700">Price</th>
-          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
-          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
-          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
-          <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
-
-        </tr>
-      </thead>
-      <tbody>
-        {formData.orderItems.map((item, index) => (
-          <tr key={item._id} className="border-t">
-            <td className="px-4 py-2 text-gray-700">{item.product.title}</td>
-            <td className="px-4 py-2 text-gray-500">{item.quantity}</td>
-            <td className="px-4 py-2 text-gray-500">${item.price}</td>
-            <td className="px-4 py-2">
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={(e) => handleDecreaseQuantity(e, item._id)}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded"
-                >
-                  Decrease Quantity
-                </button>
-                <button
-                  onClick={(e) => handleRemoveOrderItem(e, orderId, item._id)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </td>
+  {formData.orderItems?.length > 0 ? (
+      <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
+        <thead>
+          <tr className="bg-gray-300 text-gray-600">
+            <th className="p-1 border border-gray-600 text-left">#</th>
+            <th className="p-1 border border-gray-600 text-left">Product Title</th>
+            {/* <th className="p-1 border border-gray-600 text-left">Description</th> */}
+            <th className="p-1 border border-gray-600 text-left">MRP</th>
+            <th className="p-1 border border-gray-600 text-left w-[60px]">Net Qty</th>
+            <th className="p-1 border border-gray-600 text-left">Single Unit Price</th>
+            <th className="p-1 border border-gray-600 text-left">Disc.</th>
+            <th className="p-1 border border-gray-600 text-left">Total Discount Price</th>
+            <th className="p-1 border border-gray-600 text-left">GST%</th>
+            <th className="p-1 border border-gray-600 text-left">Total Value</th>
+            <th className="p-1 border border-gray-600 text-left">Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  ) : (
-    <h1 className="text-lg font-semibold text-red-500 mb-4">Order Items are Empty</h1>
-  )}
+        </thead>
+        <tbody>
+          {formData.orderItems.map((item, index) => (
+            <tr key={item._id} className="border-t">
+              <td className="px-4 py-2 text-gray-700">{index + 1}</td>
+              <td className="px-4 py-2 text-gray-700">
+                {item.product.title}
+              </td>
+              
+              <td className="px-4 py-2 text-gray-500">
+                {editingItem === item._id ? (
+                  <input
+                    type="number"
+                    name="mrp"
+                    value={editedItemData.price}
+                    onChange={(e) => handleInputChange(e,'price')}
+                  />
+                ) : (
+                  `${item.price}`
+                )}
+              </td>
+              <td className="px-4 py-2 text-gray-500">
+                {editingItem === item._id ? (
+                  <input
+                    type="number"
+                    name="quantity"
+                    value={editedItemData.quantity}
+                    onChange={(e) => handleInputChange(e,'quantity')}
+                  />
+                ) : (
+                  item.quantity
+                )}
+              </td>
+              <td className="px-4 py-2 text-gray-500">
+                  { parseFloat(item.finalPriceWithGST) / parseFloat(item.quantity)} 
+              </td>
+              <td className="px-4 py-2 text-gray-500">
+                {editingItem === item._id ? (
+                  <input
+                    type="number"
+                    name="discount"
+                    value={editedItemData.product.discountedPrice - (parseFloat(editedItemData.finalPriceWithGST) / parseFloat(editedItemData.quantity))} //editItem.product.discountedPrice-editItem.OneUnit
+                    onChange={(e) => handleInputChange(e,'discount')}
+                  />
+                ) : (
+                  (item.price - item.discountedPrice) < 0 ? 0 : item.price - item.discountedPrice
+                )}
+              </td>
+              <td className="px-4 py-2 text-gray-500">
+                {editingItem === item._id ? (
+                  <input
+                    type="number"
+                    name="totalDiscountPrice"
+                    value={editedItemData.discountedPrice}
+                    onChange={(e) => handleInputChange(e,'discountedPrice')}
+                  />
+                ) : (
+                  `${item.product.discountedPrice}`
+                )}
+              </td>
+              <td className="px-4 py-2 text-gray-500">
+                {editingItem === item._id ? (
+                  <input
+                    type="number"
+                    name="gst"
+                    value={editedItemData.GST}
+                    onChange={(e) => handleInputChange(e,'GST')}
+                  />
+                ) : (
+                  `${item.GST}%`
+                )}
+              </td>
+              <td className="px-4 py-2 text-gray-500">
+                {editingItem === item._id ? (
+                  <input
+                    type="number"
+                    name="totalValue"
+                    value={editedItemData.finalPriceWithGST}
+                    onChange={(e) => handleInputChange(e,'finalPriceWithGST')}
+                  />
+                ) : (
+                  `${item.finalPriceWithGST}`
+                )}
+              </td>
+              <td className="px-4 py-2">
+                <div className="flex items-center space-x-2">
+                  {editingItem === item._id ? (
+                    <>
+                      <button
+                        onClick={handleSave}
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingItem(null)}
+                        className="bg-gray-300 text-gray-700 px-2 py-1 rounded hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={(e) => handleDecreaseQuantity(e, item._id)}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded"
+                      >
+                        Decrease Quantity
+                      </button>
+                      <button
+                        onClick={(e) => handleRemoveOrderItem(e, orderId, item._id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                        onClick={(e) => handleEditClick(e, item)}
+                      >
+                        Edit
+                      </button>
+                    </>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <h1 className="text-lg font-semibold text-red-500 mb-4">Order Items are Empty</h1>
+    )}
+
 </div>
 
           <div className="flex p-4 bg-blue-700 rounded-b-lg justify-end space-x-4">
