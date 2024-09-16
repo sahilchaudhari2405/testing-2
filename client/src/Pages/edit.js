@@ -9,6 +9,8 @@ import { fetchCart, addToCart } from '../Redux/Cart/cartSlice';
 import Invoice from '../component/invoice';
 import ReactToPrint from 'react-to-print';
 import { FaSave, FaTrash } from 'react-icons/fa';
+// import BarcodeReader from "react-barcode-reader";
+
 
 const Edit = () => {
   const navigate = useNavigate();
@@ -343,6 +345,43 @@ const Edit = () => {
       console.log("yes")
       setOrderId(data);
       fetchOrderData();
+    }
+  };
+
+  const fetchProduct = async (barcode) => {
+    try {
+      const response = await axiosInstance.get(`/view/${barcode}`);
+      return response.data; 
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      throw error; 
+    }
+  };
+
+  const handleScanproduct = (data) => {
+    // console.log(isChecked)
+    if (isChecked&&data) {
+      // dispatch(fetchProduct(data));
+      fetchProduct(data)
+      .then((product) => {
+        setProductDetails(product);
+        handleAddProductSubmit(); 
+        setaddprocudtoneditformData({
+          barcode: "",
+          brand: "",
+          description: "",
+          category: "",
+          stockType: "",
+          unit: "",
+          qty: "",
+          saleRate: "",
+          profit: "",
+          hsn: "",
+          gst: "",
+          total: "",
+        });
+        }
+      )
     }
   };
 
@@ -959,19 +998,23 @@ const handleReturn = ()=>{
             ))} */}
 
           </div>
+
           <form>
+
             <div className="flex flex-nowrap bg-gray-200 px-3  text-center rounded-md space-x-2 mb-2">
+              <BarcodeReader onError={handleError} onScan={handleScanproduct} />
+              
               {/* <div className="mb-2 flex justify-center items-center text-center">
-              <button
-                type="button"
-                onClick={handleReverseOrder}
-                className={`w-full text-white py-1 px-4 rounded font-medium transition-colors ${
-                  reverseOrder ? 'bg-orange-500 hover:bg-green-500' : 'bg-green-500 hover:bg-blue-800'
-                }`}
-              >
-               {reverseOrder ? 'Reset' : 'Reverse'}
-              </button>
-            </div> */}
+                <button
+                  type="button"
+                  onClick={handleReverseOrder}
+                  className={`w-full text-white py-1 px-4 rounded font-medium transition-colors ${
+                    reverseOrder ? 'bg-orange-500 hover:bg-green-500' : 'bg-green-500 hover:bg-blue-800'
+                  }`}
+                >
+                {reverseOrder ? 'Reset' : 'Reverse'}
+                </button>
+              </div> */}
               <div className=" mb-4 text-center">
                 <label
                   htmlFor="scanner"
