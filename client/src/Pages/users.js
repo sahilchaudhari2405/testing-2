@@ -10,6 +10,7 @@ const Users = () => {
     const [form, setForm] = useState({
         id: '',
         fullName: '',
+        username:'',
         email: '',
         password: '',
         mobile: '',
@@ -27,6 +28,7 @@ const Users = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
             if (form.id) {
                 // Update user
@@ -41,6 +43,7 @@ const Users = () => {
             setForm({
                 id: '',
                 fullName: '',
+                username:'',
                 email: '',
                 password: '',
                 mobile: '',
@@ -59,6 +62,7 @@ const Users = () => {
         setForm({ 
             id: user._id, 
             fullName: user.fullName, 
+            username:user.username,
             email: user.email, 
             password: '', // Do not prefill the password for security reasons
             mobile: user.mobile, 
@@ -84,6 +88,7 @@ const Users = () => {
                                         <UserIcon className="h-10 w-10 text-gray-500" />
                                         <div>
                                             <div className="font-semibold text-lg">{user.fullName}</div>
+                                            <div className="font-semibold text-lg">{user.username}</div>
                                             <div className="text-sm text-gray-500">{user.email}</div>
                                         </div>
                                         <div className='text-center'>
@@ -120,7 +125,18 @@ const Users = () => {
                                         />
                                     </div>
                                 </div>
-
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">User Name</label>
+                                    <div className="mt-1 relative rounded-md shadow-sm">
+                                        <input
+                                            type="text"
+                                            name="username"
+                                            value={form.username}
+                                            onChange={handleInputChange}
+                                            className="block w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        />
+                                    </div>
+                                </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Email</label>
                                     <div className="mt-1 relative rounded-md shadow-sm">

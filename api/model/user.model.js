@@ -2,7 +2,11 @@ import mongoose from 'mongoose';
 
 const CounterUserSchema = new mongoose.Schema(
     {
-        fullName: {
+        fullName: {   
+            type: String,
+            required: true,
+        },
+        username: {
             type: String,
             required: true,
         },

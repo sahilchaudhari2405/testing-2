@@ -1,6 +1,7 @@
 import Category from "../model/category.model.js";
 import Product from "../model/product.model.js";
 import OfflinePurchaseOrder from "../model/purchaseOrder.js";
+import { createClient } from "./Client.controller.js";
 
 export const generateOrderWithProductCheck = async (req, res) => {
     console.log(req.body);
@@ -124,7 +125,20 @@ export const generateOrderWithProductCheck = async (req, res) => {
             orderDate: new Date(),
             createdAt: new Date(),
         });
-
+        const clientReq = {
+            body: {
+                Type: 'Distributor',
+                Name: orderDetails.name,
+                Email: orderDetails.email || "",
+                Address: orderDetails.address,
+                State:  orderDetails.state,
+                Mobile:  orderDetails.mobileNumber,
+                Purchase:newOrder.AmountPaid+orderDetails.paymentType.borrow|| 0,
+                Closing: orderDetails.paymentType.borrow || 0,
+            }
+        };
+        const r = await createClient(clientReq);
+        console.log(r);
         await newOrder.save();
         const results = await OfflinePurchaseOrder.findById(newOrder._id).populate({
             path: 'orderItems.productId',

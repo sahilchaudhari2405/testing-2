@@ -18,6 +18,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
+  const [timeFrame, setTimeFrame] = useState('day');
   const [userId, setuserID] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -27,11 +28,14 @@ const Dashboard = () => {
   const [latestSale, setlastestSale] = useState('');
   const [latestRevenue, setlastestRevenue] = useState('');
   const [latestDay, setlatestDay] = useState('');
+  const [SalesYearandMonthWiseCustomers, SetSalesYearandMonthWiseCustomers] = useState(null);
+  const [RevenueYearandMonthWiseCustomers, SetRevenueYearandMonthWiseCustomers] = useState(null);
+  const [CustomersYearandMonthWiseCustomers, SetCustomersYearandMonthWiseCustomers] = useState(null);
   const [dateWiseCustomers, setdateWiseCustomers] = useState([]);
   const [weekWiseCustomers, setweekWiseCustomers] = useState('');
   const [monthWiseCustomers, setmonthWiseCustomers] = useState('');
   const [isAdmin, setisAdmin] = useState(false);
-
+  const [TotalView, setTotalView] = useState(false);
   useEffect(() => {
     if (isAdmin){
       console.log("isadmin");
@@ -109,118 +113,6 @@ const Dashboard = () => {
 
     return { daywise, weekwise, monthwise };
   };
-//   const transformDataforAdmin = (data) => {
-//     if (!data || data.length === 0) {
-//       return { daywise: [], weekwise: [], monthwise: [] };
-//     }
-  
-//     if (!data || data.length === 0) {
-//       return { daywise: [], weekwise: [], monthwise: [] };
-//     }
-  
-//     const daywise = [];
-//     const weekwise = [];
-//     const monthwise = [];
-  
-  
-//     // Helper function to add data to the right container
-//     const addToAggregation = (aggregation, key, value) => {
-//       if (!aggregation[key]) {
-//         aggregation[key] = { totalSales: 0, totalRevenue: 0 };
-//       }
-//       aggregation[key].totalSales += value.sales;
-//       aggregation[key].totalRevenue += value.revenue;
-//       if (!aggregation[key]) {
-//         aggregation[key] = { totalSales: 0, totalRevenue: 0 };
-//       }
-//       aggregation[key].totalSales += value.sales;
-//       aggregation[key].totalRevenue += value.revenue;
-//     };
-  
-  
-//     // Aggregate daily sales
-//     data.forEach(order => {
-//       (order.dailySales || []).forEach(sale => {
-//         const dayKey = `Day ${sale.date}`;
-//         addToAggregation(daywise, dayKey, {
-//           sales: sale.finalPriceWithGST,
-//           revenue: sale.totalProfit
-//         });
-//       });
-  
-//       // Aggregate weekly sales
-//       (order.weekSales || []).forEach(sale => {
-//         const weekKey = `Week ${sale.week}`;
-//         addToAggregation(weekwise, weekKey, {
-//           sales: sale.finalPriceWithGST,
-//           revenue: sale.totalProfit
-//         });
-//       });
-  
-//       // Aggregate monthly sales
-//       const monthKey = new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' });
-//       monthwise.push({
-//         name: monthKey,
-//         sales: order.monthFinalPriceWithGST,
-//         revenue: order.monthTotalProfit
-//       });
-//     });
-  
-  
-//     const daywiseArray = Object.entries(daywise).map(([name, { totalSales, totalRevenue }]) => ({
-//       name,
-//       sales: totalSales,
-//       revenue: totalRevenue
-//     }));
-  
-  
-//     const weekwiseArray = Object.entries(weekwise).map(([name, { totalSales, totalRevenue }]) => ({
-//       name,
-//       sales: totalSales,
-//       revenue: totalRevenue
-      
-//     }));
-  
-//     const uniqueMonthwise = monthwise.reduce((acc, cur) => {
-//       const existing = acc.find(item => item.name === cur.name);
-//       if (existing) {
-//         existing.sales += cur.sales;
-//         existing.revenue += cur.revenue;
-//       } else {
-//         acc.push(cur);
-//       }
-//       return acc;
-      
-//     }, []);
-//     if (daywiseArray.length > 0) {
-//       console.log("transformdataforadmin daywisearrauyeln > 0");
-
-//        const latestSale = daywiseArray[daywiseArray.length - 1].sales;
-//        setlastestSale(latestSale);
-//        const latestRevenue = daywiseArray[daywiseArray.length - 1].revenue;
-//        setlastestRevenue(latestRevenue);
-//        const latestSaleDate = new Date(daywiseArray[daywiseArray.length - 1].date);
-     
-//       console.log("transformdataforadmin daywisearrauyeln > 0 latestSale: ",latestSale);
-//       console.log("transformdataforadmin daywisearrauyeln > 0 latestRevenue: ",latestRevenue);
-//       console.log("transformdataforadmin daywisearrauyeln > 0 latestSaleDate: ",latestSaleDate);
-
-//        const today = new Date();
-//        // const latestSaleDate = new Date(daywise[daywise.length - 1].date);
-       
-//        if (latestSaleDate.toDateString() === today.toDateString()) {
-//            setlatestDay('Today');
-//        } else {
-//          setlatestDay('Last Day');
-
-//    }
-//  }
-//     return {
-//       daywise: daywiseArray,
-//       weekwise: weekwiseArray,
-//       monthwise: uniqueMonthwise,
-//     };
-//   };
 const transformDataforAdmin = (data) => {
   if (!data || data.length === 0) {
     return { daywise: [], weekwise: [], monthwise: [] };
@@ -278,110 +170,6 @@ const transformDataforAdmin = (data) => {
     monthwise: monthwiseArray,
   };
 };
-
-//   const transformDataforAdmin = (data) => {
-//     // Initialize containers for aggregation
-//     const daywise = [];
-//     const weekwise = [];
-//     const monthwise = [];
-
-//     // Helper function to add data to the right container
-//     const addToAggregation = (aggregation, key, value) => {
-//         if (!aggregation[key]) {
-//             aggregation[key] = { totalSales: 0, totalRevenue: 0 };
-//         }
-//         aggregation[key].totalSales += value.sales;
-//         aggregation[key].totalRevenue += value.revenue;
-//     };
-
-//     // Aggregate daily sales
-//     data.forEach(order => {
-//         (order.dailySales || []).forEach(sale => {
-//             const dayKey = `Day ${sale.date}`;
-//             addToAggregation(daywise, dayKey, {
-//                 sales: sale.totalPrice,
-//                 revenue: sale.finalPriceWithGST
-//             });
-//         });
-
-//         // Aggregate weekly sales
-//         (order.weekSales || []).forEach(sale => {
-//             const weekKey = `Week ${sale.week}`;
-//             addToAggregation(weekwise, weekKey, {
-//                 sales: sale.totalPrice,
-//                 revenue: sale.finalPriceWithGST
-//             });
-//         });
-
-//         // Aggregate monthly sales
-//         const monthKey = new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' });
-//         monthwise.push({
-//             name: monthKey,
-//             sales: order.monthTotalPrice,
-//             revenue: order.monthFinalPriceWithGST
-//         });
-//     });
-
-//     // Transform aggregated data into arrays for output
-//     const daywiseArray = Object.entries(daywise).map(([name, { totalSales, totalRevenue }]) => ({
-//         name,
-//         sales: totalSales,
-//         revenue: totalRevenue
-//     }));
-
-//     const weekwiseArray = Object.entries(weekwise).map(([name, { totalSales, totalRevenue }]) => ({
-//         name,
-//         sales: totalSales,
-//         revenue: totalRevenue
-//     }));
-
-//     // Remove duplicates from monthwise if there are multiple months
-//     const uniqueMonthwise = monthwise.reduce((acc, cur) => {
-//         const existing = acc.find(item => item.name === cur.name);
-//         if (existing) {
-//             existing.sales += cur.sales;
-//             existing.revenue += cur.revenue;
-//         } else {
-//             acc.push(cur);
-//         }
-//         return acc;
-//     }, []);
-
-//     // Determine latest sale and revenue
-//     // let latestSale = 0;
-//     // let latestRevenue = 0;
-//     // let latestDay = '';
-
-//     if (daywiseArray.length > 0) {
-//        console.log("transformdataforadmin daywisearrauyeln > 0");
-
-//         const latestSale = daywiseArray[daywiseArray.length - 1].sales;
-//         setlastestSale(latestSale);
-//         const latestRevenue = daywiseArray[daywiseArray.length - 1].revenue;
-//         setlastestRevenue(latestRevenue);
-//         const latestSaleDate = new Date(daywiseArray[daywiseArray.length - 1].date);
-      
-//        console.log("transformdataforadmin daywisearrauyeln > 0 latestSale: ",latestSale);
-//        console.log("transformdataforadmin daywisearrauyeln > 0 latestRevenue: ",latestRevenue);
-//        console.log("transformdataforadmin daywisearrauyeln > 0 latestSaleDate: ",latestSaleDate);
-
-//         const today = new Date();
-//         // const latestSaleDate = new Date(daywise[daywise.length - 1].date);
-        
-//         if (latestSaleDate.toDateString() === today.toDateString()) {
-//             setlatestDay('Today');
-//         } else {
-//           setlatestDay('Last Day');
-
-//     }
-
-//     return {
-//         daywise: daywiseArray,
-//         weekwise: weekwiseArray,
-//         monthwise: uniqueMonthwise,
-//     };
-//   }
-// };
 
 const calculateCustomersforAdmin = (ordersArray) => {
   const aggregatedData = {
@@ -441,25 +229,6 @@ const fetchOrders = async (token=null) => {
     setisAdmin(true);
     setOrders(resData);
     console.log("getTotalOfflineSale : ",resData);
-
-
-      // if( userRole === "admin"){
-      //   setisAdmin(true);
-      //   resData.length > 0 ? setOrders(resData) : setOrders([]);
-      // }
-      // else {
-      //   console.log("inside of else of admin rol");
-      //   setisAdmin(false);
-      //   const matchingOrder = resData.find(order => order?.user?._id === userId);
-      //   if (matchingOrder) {
-      //     // setOrders(matchingOrder);
-      //     matchingOrder ? setOrders(matchingOrder) : setOrders({});
-
-      //     console.log("matchingOrder is: ",matchingOrder);
-      //   } else {
-      //     console.log(`No order found for user ID: ${userId}`);
-      //   }
-      // }
       
   } catch (error) {
       console.error('Error fetching orders:', error); 
@@ -485,6 +254,7 @@ const calculateCustomers = (orders_data) => {
   return {dateWiseCustomers, weekWiseCustomers, monthWiseCustomers };
 };
 
+
   
 
   useEffect(() => {
@@ -501,6 +271,47 @@ const calculateCustomers = (orders_data) => {
         fetchOrders(token);
     }
   },[]);
+  const handleTimeFrameChange = (event) => {
+    const value = event.target.value;
+    setTimeFrame(value); // Update state when the selection changes
+  
+    // Conditional logic for TotalView
+    if (value === 'day') {
+      setTotalView(false);
+    } else if (value === 'year') {
+      setlatestDay('latest year');
+      let revenue = 0;
+      let sale = 0;
+      let Customers = 0;
+  
+      // Iterate over the `orders` array correctly
+      for (const data of orders) {
+        Customers += data.MonthsBill || 0;
+        revenue += data.monthTotalProfit || 0;
+        sale += data.monthFinalPriceWithGST || 0;
+      }
+  
+      // Update the state with calculated totals
+      SetCustomersYearandMonthWiseCustomers(Customers);
+      SetRevenueYearandMonthWiseCustomers(revenue);
+      SetSalesYearandMonthWiseCustomers(sale);
+      setTotalView(true);
+    } else if (value === 'month') {
+      setlatestDay('latest month');
+  
+      const latestOrder = orders[orders.length - 1];
+  
+      // Make sure there is an order available
+      if (latestOrder) {
+        SetCustomersYearandMonthWiseCustomers(latestOrder.MonthsBill || 0);
+        SetRevenueYearandMonthWiseCustomers(latestOrder.monthTotalProfit || 0);
+        SetSalesYearandMonthWiseCustomers(latestOrder.monthFinalPriceWithGST || 0);
+      }
+  
+      setTotalView(true);
+    }
+  };
+  
 
   useEffect(() => {
     console.log("the user role is: ",userRole);
@@ -545,14 +356,25 @@ const calculateCustomers = (orders_data) => {
 
       <div className="flex flex-col justify-center items-center">
         <div className="p-8 w-[95vw] mt-4">
-          <p className="mb-12 text-black text-xm font-semibold">
+        <p className="mb-12 text-black text-xm font-semibold">
             Welcome to <span className="font-bold text-4xl text-gray-600">Apala Bazaar</span>
           </p>
+        <div className='flex flex-row justify-between mx-5 my-5'>
+        <select className='bg-gray-300' value={timeFrame} onChange={handleTimeFrameChange}>
+        <option value="day">Day</option>
+        <option value="month">Month</option>
+        <option value="year">Year</option>
+      </select>
+      </div>
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-purple-500 text-white p-6 rounded-lg">
-              <h2 className="text-xl">Customers on the latest Day</h2>
-              <h3 className="text-2xl font-bold">{dateWiseCustomers?.length ? dateWiseCustomers[dateWiseCustomers?.length - 1].bills : 'N/A'}
-              </h3>
+            <h2 className="text-xl">Customers on the {latestDay}</h2>
+    <h3 className="text-2xl font-bold">
+      {(CustomersYearandMonthWiseCustomers || (dateWiseCustomers && dateWiseCustomers[dateWiseCustomers.length - 1]?.bills))
+        ? (TotalView ? CustomersYearandMonthWiseCustomers : dateWiseCustomers[dateWiseCustomers.length - 1]?.bills)
+        : 'NA'}
+    </h3>
               {/* <p className="flex flex-row gap-2">
                 Increased by 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
                   <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
@@ -561,7 +383,7 @@ const calculateCustomers = (orders_data) => {
             </div>
             <div className="bg-orange-500 text-white p-6 rounded-lg">
               <h2 className="text-xl">Sales {latestDay}</h2>
-              <h3 className="text-2xl font-bold">{latestSale}</h3>
+              <h3 className="text-2xl font-bold">{(latestSale || SalesYearandMonthWiseCustomers)? (TotalView)? SalesYearandMonthWiseCustomers?.toFixed(2):latestSale:'NA'}</h3>
               {/* <p className="flex flex-row gap-2">
                 Above Average by 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
                   <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
@@ -570,7 +392,7 @@ const calculateCustomers = (orders_data) => {
             </div>
             <div className="bg-blue-500 text-white p-6 rounded-lg">
               <h2 className="text-xl">Revenue {latestDay}</h2>
-              <h3 className="text-2xl font-bold">{latestRevenue}</h3>
+              <h3 className="text-2xl font-bold">{(latestSale || RevenueYearandMonthWiseCustomers)? (TotalView)? RevenueYearandMonthWiseCustomers?.toFixed(2):latestRevenue:'NA'}</h3>
               {/* <p className="flex flex-row gap-2">
                 More than 45% <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
                   <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />

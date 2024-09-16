@@ -339,24 +339,25 @@ const Admin = () => {
     return { daywise, weekwise, monthwise };
   };
 
-  const calculateCustomers = (orders_data) => {
+  const calculateCustomers = (orders_data = {}) => {
     const dateWiseCustomers = orders_data.dailySales?.map(entry => ({
       name: entry.date,
       bills: entry.DayBill
-    }));
+    })) || [];
   
     const weekWiseCustomers = orders_data.weekSales?.map(entry => ({
       name: entry.week,
       bills: entry.WeekBill
-    }));
+    })) || [];
   
-    const monthWiseCustomers = {
+    const monthWiseCustomers = orders_data.month && orders_data.MonthsBill ? {
       name: orders_data.month,
       bills: orders_data.MonthsBill
-    };
+    } : { name: null, bills: null };
   
-    return {dateWiseCustomers, weekWiseCustomers, monthWiseCustomers };
+    return { dateWiseCustomers, weekWiseCustomers, monthWiseCustomers };
   };
+  
 
   useEffect(() => {
       const { daywise, weekwise, monthwise } = transformData(filteredOrders);

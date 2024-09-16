@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 export async function signup(req, res) {
     try {
-        const { fullName, username, email, password, counterNumber, mobile } = req.body;
+        const { fullName, username, email, password, counterNumber, mobile,role } = req.body;
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -36,7 +36,7 @@ export async function signup(req, res) {
             password: hashedPassword,
             counterNumber,
             mobile,
-            role: 'user' // Default role
+            role, 
         });
 
         await newUser.save();
@@ -56,7 +56,7 @@ export async function signup(req, res) {
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await CounterUser.findOne({ email }) || await CounterUser.findOne({ fullName: email });
+        const user = await CounterUser.findOne({ email }) || await CounterUser.findOne({ username: email });
         
         if (!user) {
             return res.status(400).json({ error: "Invalid email or password" });
