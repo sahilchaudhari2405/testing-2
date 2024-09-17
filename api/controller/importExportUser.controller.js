@@ -9,7 +9,7 @@ console.log(req.body)
     let type = 'Client'
     for (const data of users) {
       const { Type, Name, Address, State, Mobile, 'Closing Balance': ClosingBalanceValue } = data;
-
+       
       // Check if the client already exists
       const existingUser = await Client.findOne({ Type, Name, Mobile });
       if (existingUser) {
@@ -17,10 +17,10 @@ console.log(req.body)
         continue;  // Skip to the next user
       }
 
-      if (!Mobile || !MobileDigite(Mobile)) {
-        console.log(`Client ${Name} mobile number not present present`);
+      if (!Type || !Name || !Address || !State || !Mobile || !ClosingBalanceValue || !MobileDigite(Mobile)) {
+        console.log(`Client ${Name || 'Unknown'} has missing or invalid data, skipping entry.`);
         continue;  // Skip to the next user
-      }  
+      }
       const orderDate = new Date();
       const currentMonth = orderDate.toISOString().slice(0, 7);
 
@@ -37,7 +37,7 @@ console.log(req.body)
 
       // Create the new Client instance
       const client = new Client({
-        Type:Type || type,
+        Type,
         Name,
         Address,
         State,
