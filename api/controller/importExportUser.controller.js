@@ -17,8 +17,11 @@ console.log(req.body)
         continue;  // Skip to the next user
       }
 
-      if (!Type || !Name || !Mobile || !MobileDigite(Mobile)) {
-        console.log(`Client ${Name || 'Unknown'} has missing or invalid data, skipping entry.`);
+      const isNumeric = (value) => /^\d+$/.test(value);
+
+      // Check if any required field is missing or invalid
+      if (!Type || !Name || !Mobile || !isNumeric(Mobile) || !MobileDigite(Mobile)) {
+        console.log(`Client ${Name || 'Unknown'} has missing, invalid, or non-numeric mobile data, skipping entry.`);
         continue;  // Skip to the next user
       }
       const orderDate = new Date();
