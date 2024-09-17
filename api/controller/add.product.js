@@ -127,7 +127,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
         });
         const clientReq = {
             body: {
-                Type: 'Distributor',
+                Type: 'Supplier',
                 Name: orderDetails.name,
                 Email: orderDetails.email || "",
                 Address: orderDetails.address,

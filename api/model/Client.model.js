@@ -28,7 +28,7 @@ const clientSchema = new mongoose.Schema({
   Type: {
     type: String,
     required: true,
-    enum: ['Client', 'Distributor'],
+    enum: ['Client', 'Supplier'],
   },
   Name: {
     type: String,
