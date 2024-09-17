@@ -17,7 +17,7 @@ console.log(req.body)
         continue;  // Skip to the next user
       }
 
-      if (!Type || !Name || !Address || !State || !Mobile || !ClosingBalanceValue || !MobileDigite(Mobile)) {
+      if (!Type || !Name || !Mobile || !MobileDigite(Mobile)) {
         console.log(`Client ${Name || 'Unknown'} has missing or invalid data, skipping entry.`);
         continue;  // Skip to the next user
       }

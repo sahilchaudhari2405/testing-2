@@ -50,12 +50,6 @@ const clientSchema = new mongoose.Schema({
   Mobile: {
     type: Number,
     required: true,
-    validate: {
-      validator: function (v) {
-        return /\d{10}/.test(v); // Validates a 10-digit mobile number
-      },
-      message: props => `${props.value} is not a valid mobile number!`
-    }
   },
   ClosingBalance: [{
     type:mongoose.Schema.Types.ObjectId,
