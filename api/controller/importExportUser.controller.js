@@ -4,7 +4,7 @@ function MobileDigite(v) {
 };
 export const importUser = async (req, res) => {
   const { users } = req.body;
-
+console.log(req.body)
   try {
     for (const data of users) {
       const { Type, Name, Address, State, Mobile, 'Closing Balance': ClosingBalanceValue } = data;
@@ -19,7 +19,7 @@ export const importUser = async (req, res) => {
       if (!Mobile || !MobileDigite(Mobile)) {
         console.log(`Client ${Name} mobile number not present present`);
         continue;  // Skip to the next user
-      }
+      }  
       const orderDate = new Date();
       const currentMonth = orderDate.toISOString().slice(0, 7);
 

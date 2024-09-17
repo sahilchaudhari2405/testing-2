@@ -17,7 +17,7 @@ admin.get('/getTotalOfflineSale', authenticateToken, getTotalOfflineSale);
 admin.get('/getAllOrderBill', authenticateToken,getAllBill );
 admin.get('/getAllCounterSales', authenticateToken,getAllCounterSale );
 admin.get('/PurchaseOrderGet',authenticateToken,GetPurchaseOrder);
-admin.get('/UserImport',authenticateToken,importUser)
+admin.post('/UserImport',authenticateToken,importUser)
 admin.get('/Client',authenticateToken,getAllClients)
 admin.post('/SearchClient',searchClients)
 export default admin;

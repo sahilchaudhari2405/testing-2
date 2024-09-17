@@ -129,13 +129,13 @@ const Accounts = () => {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(sheet);
-
+      console.log(data);
       setImportedData(data); // Store imported data in state
       setShowImportModal(false);
 
       // Send the data to the backend
       try {
-        const response = await axiosInstance.get('/admin/UserImport', {
+        const response = await axiosInstance.post('/admin/UserImport', {
           users: data, // Sending only the data as payload
         });
 
