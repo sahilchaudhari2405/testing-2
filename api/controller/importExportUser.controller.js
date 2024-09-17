@@ -1,22 +1,19 @@
 import { Client, ClientPurchase, ClosingBalance } from "../model/Client.model.js";
 function MobileDigite(v) {
   return /\d{10}/.test(v); // Validates a 10-digit mobile number
-};
+}
+
 export const importUser = async (req, res) => {
   const { users } = req.body;
-console.log(req.body)
+  console.log(req.body);
+
   try {
-    let type = 'Client'
+    let type = 'Client';
+
     for (const data of users) {
       const { Type, Name, Address, State, Mobile, 'Closing Balance': ClosingBalanceValue } = data;
-       
-      // Check if the client already exists
-      const existingUser = await Client.findOne({ Type, Name, Mobile });
-      if (existingUser) {
-        console.log(`Client ${Name} already present`);
-        continue;  // Skip to the next user
-      }
 
+      // Ensure the mobile number is valid and numeric
       const isNumeric = (value) => /^\d+$/.test(value);
 
       // Check if any required field is missing or invalid
@@ -24,6 +21,14 @@ console.log(req.body)
         console.log(`Client ${Name || 'Unknown'} has missing, invalid, or non-numeric mobile data, skipping entry.`);
         continue;  // Skip to the next user
       }
+
+      // Check if the client already exists
+      const existingUser = await Client.findOne({ Type, Name, Mobile });
+      if (existingUser) {
+        console.log(`Client ${Name} already present`);
+        continue;  // Skip to the next user
+      }
+
       const orderDate = new Date();
       const currentMonth = orderDate.toISOString().slice(0, 7);
 
@@ -52,7 +57,7 @@ console.log(req.body)
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-type = client.Type;
+
       // Save the client to the database
       await client.save();
       console.log(`Client ${Name} created successfully`);
