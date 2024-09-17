@@ -6,6 +6,7 @@ export const importUser = async (req, res) => {
   const { users } = req.body;
 console.log(req.body)
   try {
+    let type = 'Client'
     for (const data of users) {
       const { Type, Name, Address, State, Mobile, 'Closing Balance': ClosingBalanceValue } = data;
 
@@ -36,7 +37,7 @@ console.log(req.body)
 
       // Create the new Client instance
       const client = new Client({
-        Type,
+        Type:Type || type,
         Name,
         Address,
         State,
@@ -48,7 +49,7 @@ console.log(req.body)
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-
+type = client.Type;
       // Save the client to the database
       await client.save();
       console.log(`Client ${Name} created successfully`);
