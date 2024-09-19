@@ -43,6 +43,10 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
         const orderItem = order.orderItems.find(item => item.product.toString() === product._id.toString());
         const oldItem = JSON.parse(JSON.stringify(orderItem)); // Save the old item state for reference
 
+
+        // Update the product stock by reducing the new quantity
+
+
         if (orderItem) {
             // First, remove the old item values from the order totals
             let value=0;
@@ -53,6 +57,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             else{
                value=product.discountedPrice-oldItem.OneUnit;
             }
+            
             order.totalPrice -= oldItem.price;
             order.totalDiscountedPrice -= oldItem.discountedPrice;
             order.GST -= oldItem.GST;
@@ -60,7 +65,8 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             order.finalPriceWithGST -= oldItem.finalPriceWithGST;
             order.totalProfit -= oldItem.totalProfit;
             order.totalPurchaseRate -= oldItem.purchaseRate;
-         
+            product.quantity+=oldItem.quantity;
+            await product.save();
             let remainingAmount = oldItem.finalPriceWithGST; // Start with the item's price
             let data = {
                 Type: 'Client',
@@ -69,8 +75,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
                 Purchase: oldItem.finalPriceWithGST,
                 Closing: (order.paymentType.borrow >= oldItem.finalPriceWithGST) ? oldItem.finalPriceWithGST : 0,
             }
-            const results = await reduceClient(data);
-
+           const results = await reduceClient(data);
             // Check and deduct from borrow first
 
             // First, check and deduct from Borrow
@@ -90,8 +95,8 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
                     order.paymentType.Card -= remainingAmount;
                     remainingAmount = 0; // All amount is covered by Card
                 } else {
-                    remainingAmount -= cart.paymentType.Card; // Deduct whatever is available in Card
-                    cart.paymentType.Card = 0; // Card is exhausted
+                    remainingAmount -= order.paymentType.Card; // Deduct whatever is available in Card
+                    order.paymentType.Card = 0; // Card is exhausted
                 }
             }
 
@@ -108,7 +113,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
 
             // Cash Payment
             if (remainingAmount > 0 && order.paymentType.cash > 0) {
-                if (order.paymentType.cash >= remainingAmount) {
+                if (order.paymentType.cash >= remainingAmount) { 
                     order.paymentType.cash -= remainingAmount;
                     remainingAmount = 0; // All amount is covered by Cash
                 } else {
@@ -131,15 +136,9 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             orderItem.type='custom',
             orderItem.updatedAt = new Date();
             await orderItem.save();
+
         }
 
-        // Restore the product's stock by adding back the old quantity
-        product.quantity += oldItem ? oldItem.quantity : 0;
-        await product.save();
-
-        // Update the product stock by reducing the new quantity
-        product.quantity -= quantity;
-        await product.save();
 
         // Add new values to the order and order item
         if (orderItem) {
@@ -149,7 +148,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             orderItem.discountedPrice = discountedPrice;
             orderItem.GST = GST * quantity;
             orderItem.purchaseRate=product.purchaseRate*quantity;
-            orderItem.totalProfit=(OneUnit-product.purchaseRate)*quantity;
+            orderItem.totalProfit=(product.purchaseRate>1)? (OneUnit-product.purchaseRate)*quantity:(discountedPrice*0.10);
             orderItem.finalPriceWithGST = finalPriceWithGST;
             orderItem.updatedAt = new Date();
             await orderItem.save();
@@ -163,7 +162,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
                 OneUnit :OneUnit,
                 purchaseRate:product.purchaseRate*quantity,
                 discountedPrice: discountedPrice,
-                totalProfit:(OneUnit-product.purchaseRate)*quantity,
+                totalProfit:(product.purchaseRate)>1? (OneUnit-product.purchaseRate)*quantity:(discountedPrice*0.10),
                 GST: GST * quantity,
                 finalPriceWithGST: finalPriceWithGST,
                 createdAt: new Date(),
@@ -187,7 +186,8 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
         order.totalProfit += orderItem.totalProfit;
         order.totalPurchaseRate += orderItem.purchaseRate;
         order.updatedAt = new Date();
-  
+        product.quantity -= quantity;
+        await product.save();
         // Save the updated order
         await order.save();
         let Type = 'Client'
@@ -256,9 +256,12 @@ const AddOrder = asyncHandler(async (req, res) => {
         let purchaseRate = 0;
         let totalProfit = 0;
        let oneUnit=0; 
+       
         if (existingOrderItem) {
             oneUnit = existingOrderItem.discountedPrice/ existingOrderItem.quantity;
             // If product already exists in order, update the quantity and prices
+            const d= existingOrderItem.discountedPrice + oneUnit;
+            const q =  existingOrderItem.quantity+1;
             existingOrderItem.quantity += 1;
             existingOrderItem.price += product.price;
             existingOrderItem.discountedPrice += oneUnit;
@@ -268,7 +271,7 @@ const AddOrder = asyncHandler(async (req, res) => {
             existingOrderItem.updatedAt = new Date();
              
             // Recalculate totalProfit for existing items
-            existingOrderItem.totalProfit = Math.max(0, existingOrderItem.discountedPrice - existingOrderItem.purchaseRate);
+            existingOrderItem.totalProfit =(product.purchaseRate)>1? (oneUnit-product.purchaseRate)*q:((d)*0.10);
 
             await existingOrderItem.save();
         } else {
@@ -284,7 +287,7 @@ const AddOrder = asyncHandler(async (req, res) => {
                 finalPriceWithGST: product.discountedPrice + product.GST,
                 discountedPrice: product.discountedPrice,
                 userId: id,
-                totalProfit: Math.max(0, product.discountedPrice - product.purchaseRate), // Ensure totalProfit is set
+                totalProfit:(product.purchaseRate)>1? (oneUnit-product.purchaseRate):(product.discountedPrice*0.10), // Ensure totalProfit is set
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
@@ -302,6 +305,7 @@ const AddOrder = asyncHandler(async (req, res) => {
             else{
                value=product.discountedPrice-oneUnit;
             }
+            
         // Update order totals
         order.totalPrice += product.price;
         order.totalDiscountedPrice += oneUnit;
@@ -311,9 +315,8 @@ const AddOrder = asyncHandler(async (req, res) => {
         order.paymentType.cash += (oneUnit + product.GST);
         order.finalPriceWithGST += (oneUnit + product.GST);
         order.totalPurchaseRate += product.purchaseRate;
-        order.totalProfit += (oneUnit- product.purchaseRate);
+        order.totalProfit += (product.purchaseRate)>1? (oneUnit-product.purchaseRate):(oneUnit*0.10);
         order.updatedAt = new Date();
-
         // Save updated order
         await order.save();
         let Type = 'Client'
@@ -332,7 +335,8 @@ const AddOrder = asyncHandler(async (req, res) => {
                 Closing: 0,
             }
         };
-
+        product.quantity-=1;
+        await product.save();
         const r = await createClient(clientReq);
         console.log(r);
         await order.save();
@@ -381,7 +385,9 @@ console.log(paymentType);
                     GST: cartItem.GST,
                     type: cartItem.type,
                     OneUnit:cartItem.OneUnit,
-                    totalProfit: Math.max(0, (cartItem.discountedPrice) - (product.purchaseRate * cartItem.quantity)),
+                    totalProfit : (product.purchaseRate > 1) 
+                    ? (cartItem.discountedPrice - (product.purchaseRate * cartItem.quantity)) 
+                    : (cartItem.discountedPrice * 0.10),
                     finalPriceWithGST: cartItem.finalPrice_with_GST,
                     discountedPrice: cartItem.discountedPrice,
                     userId: id,
@@ -399,7 +405,9 @@ console.log(paymentType);
                     purchaseRate: product.purchaseRate * cartItem.quantity,
                     GST: cartItem.GST,
                     OneUnit:cartItem.OneUnit,
-                    totalProfit: Math.max(0, (product.discountedPrice - product.purchaseRate) * cartItem.quantity),
+                    totalProfit:(product.purchaseRate > 1) 
+                    ? (cartItem.discountedPrice - (product.purchaseRate * cartItem.quantity)) 
+                    : (cartItem.discountedPrice * 0.10),
                     finalPriceWithGST: cartItem.finalPrice_with_GST,
                     discountedPrice: cartItem.discountedPrice,
                     userId: id,
@@ -900,7 +908,7 @@ const cancelledOrder = asyncHandler(async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        const oldOrder = cart.toObject(); // Creating a plain object copy of the cart
+        const oldOrder = JSON.parse(JSON.stringify(cart)); // Creating a plain object copy of the cart
         const cancelFields = {
             totalPrice: 0,
             totalDiscountedPrice: 0,
@@ -930,7 +938,10 @@ const cancelledOrder = asyncHandler(async (req, res) => {
         cart.totalPurchaseRate = cancelFields.totalPurchaseRate;
         cart.totalProfit = cancelFields.totalProfit;
         cart.finalPriceWithGST = cancelFields.finalPriceWithGST;
-
+        cart.paymentType.Card = 0;
+        cart.paymentType.cash=0;
+        cart.paymentType.UPI=0;
+        cart.paymentType.borrow=0;
         await cart.save();
 
         for (const item of cart.orderItems) {

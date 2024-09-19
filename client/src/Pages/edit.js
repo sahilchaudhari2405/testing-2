@@ -586,7 +586,7 @@ const Edit = () => {
       .then(async response => {
         toast.success('Quantity decreased successfully!');
         console.log("yes")
-        handleSetData(response.data.data);
+        await fetchOrderData();
       })
       .catch(err => {
         toast.error('Failed to decrease quantity');
