@@ -350,8 +350,11 @@ const Edit = () => {
 
   const fetchProduct = async (barcode) => {
     try {
-      const response = await axiosInstance.get(`/view/${barcode}`);
-      return response.data; 
+      console.log("inside fetchprodcut barcode: ",barcode)
+      const response = await axiosInstance.get(`/product/view/${barcode}`);
+      console.log("inside fetchprodcut response: ",response.data)
+
+      return response.data.data; 
     } catch (error) {
       console.error("Error fetching product:", error);
       throw error; 
@@ -360,12 +363,15 @@ const Edit = () => {
 
   const handleScanproduct = (data) => {
     // console.log(isChecked)
+    console.log("after scanning data barcode: ",data)
     if (isChecked&&data) {
       // dispatch(fetchProduct(data));
+      console.log("after scanning data barcode: ",data)
+
       fetchProduct(data)
       .then((product) => {
         setProductDetails(product);
-        handleAddProductSubmit(); 
+        
         setaddprocudtoneditformData({
           barcode: "",
           brand: "",
@@ -383,6 +389,7 @@ const Edit = () => {
         }
       )
     }
+    
   };
 
   const handleError = (err) => {
@@ -470,6 +477,15 @@ const Edit = () => {
       [name]: value
     }));
     console.log("changed formdata: ", formData);
+  };
+
+  const handleChangeAddProductonEdit = (e) => {
+    const { id, value } = e.target;
+    setaddprocudtoneditformData(prevData => ({
+      ...prevData,
+      [id]: value
+    }));
+    console.log("changed addprocudtoneditformData: ", addprocudtoneditformData);
   };
 
   // const handlePaymentChange = (e) => {
@@ -626,14 +642,32 @@ const Edit = () => {
     }
   };
 
+  const [handlekeyPress, setHandleKeyPress] = useState(false);
+
+  useEffect(() => {
+    if(handlekeyPress){
+      handleAddProductSubmit();
+    }
+    setHandleKeyPress(false);
+
+  },[productDetails])
+
   const handleKeyPress = (e) => {
+    setHandleKeyPress(true);
     if (e.key === "Enter") {
       console.log("inside handle key press == Enter")
 
       if (e.target.value.trim() != "") {
         console.log("fetchroducts ")
-
-        fetchProducts(e.target.value);
+        const barcode = addprocudtoneditformData.barcode;
+        console.log(" key pressed bardcode: ",barcode)
+        fetchProduct(barcode)
+        .then((product) => {
+          console.log("prodcut after fetching inside handle key press: ",product)
+          setProductDetails(product);
+          
+          }
+        )
       }
 
       setaddprocudtoneditformData({
@@ -702,8 +736,8 @@ const handleReturn = ()=>{
       setShowModaldescription(false);
     }
   }
-  const handleAddProductSubmit = async (e) => {
-    e.preventDefault();
+  const handleAddProductSubmit = async (e=null) => {
+    if (e){ e.preventDefault();}
     console.log("productDetails: ", productDetails)
     if (productDetails) {
       const id = productDetails.BarCode;
@@ -718,7 +752,20 @@ const handleReturn = ()=>{
     }
     // setProductDetails({...productDetails,['qty']:" "});
     setProductDetails();
-    
+    setaddprocudtoneditformData({
+      barcode: "",
+      brand: "",
+      description: "",
+      category: "",
+      stockType: "",
+      unit: "",
+      qty: "",
+      saleRate: "",
+      profit: "",
+      hsn: "",
+      gst: "",
+      total: "",
+    })
     console.log("yes")
   };
 
@@ -1043,7 +1090,7 @@ const handleReturn = ()=>{
                   id="barcode"
                   value={addprocudtoneditformData.barcode}
                   onKeyDown={handleKeyPress}
-                  onChange={handleChange}
+                  onChange={handleChangeAddProductonEdit}
                   className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter barcode"
                 />
@@ -1059,7 +1106,7 @@ const handleReturn = ()=>{
                   type="text"
                   onKeyDown={handleKeys}
                   value={addprocudtoneditformData.brand}
-                  onChange={handleChange}
+                  onChange={handleChangeAddProductonEdit}
                   id="brand"
                   className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter brand"
@@ -1105,7 +1152,7 @@ const handleReturn = ()=>{
                   id="category"
                   value={addprocudtoneditformData.category}
                   onKeyDown={handleKeys}
-                  onChange={handleChange}
+                  onChange={handleChangeAddProductonEdit}
                   className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter category"
                 />
@@ -1122,7 +1169,7 @@ const handleReturn = ()=>{
                   id="stockType"
                   value={addprocudtoneditformData.stockType}
                   onKeyDown={handleKeys}
-                  onChange={handleChange}
+                  onChange={handleChangeAddProductonEdit}
                   className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter stock type"
                 />
@@ -1139,7 +1186,7 @@ const handleReturn = ()=>{
                   id="unit"
                   value={addprocudtoneditformData.unit}
                   onKeyDown={handleKeys}
-                  onChange={handleChange}
+                  onChange={handleChangeAddProductonEdit}
                   className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter unit"
                 />
@@ -1172,7 +1219,7 @@ const handleReturn = ()=>{
                   id="sale-rate"
                   value={addprocudtoneditformData.saleRate}
                   onKeyDown={handleKeys}
-                  onChange={handleChange}
+                  onChange={handleChangeAddProductonEdit}
                   className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter Sale rate"
                 />
@@ -1189,7 +1236,7 @@ const handleReturn = ()=>{
                   id="hsn"
                   value={addprocudtoneditformData.hsn}
                   onKeyDown={handleKeys}
-                  onChange={handleChange}
+                  onChange={handleChangeAddProductonEdit}
                   className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter HSN"
                 />
@@ -1206,7 +1253,7 @@ const handleReturn = ()=>{
                   id="gst"
                   value={addprocudtoneditformData.gst}
                   onKeyDown={handleKeys}
-                  onChange={handleChange}
+                  onChange={handleChangeAddProductonEdit}
                   className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter GST percentage"
                 />
