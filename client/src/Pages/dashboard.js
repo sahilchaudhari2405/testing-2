@@ -277,6 +277,7 @@ const calculateCustomers = (orders_data) => {
   
     // Conditional logic for TotalView
     if (value === 'day') {
+      setlatestDay('latest day');
       setTotalView(false);
     } else if (value === 'year') {
       setlatestDay('latest year');
