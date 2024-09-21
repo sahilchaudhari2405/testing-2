@@ -285,7 +285,7 @@ const calculateCustomers = (orders_data) => {
       let sale = 0;
       let Customers = 0;
   
-      // Iterate over the `orders` array correctly
+      // Iterate over the `orders` array correctly 
       for (const data of orders) {
         Customers += data.MonthsBill || 0;
         revenue += data.monthTotalProfit || 0;
