@@ -247,7 +247,9 @@ const Edit = () => {
 
     try {
       console.log("editedItemData:", editedItemData);
-      const Discount = (editedItemData.product?.price > editedItemData.OneUnit ? editedItemData.product?.price - editedItemData.OneUnit : editedItemData.product.discountedPrice - editedItemData.OneUnit) * editedItemData.quantity
+      const oneUnit = editedItemData.discountedPrice / editedItemData.quantity;
+      console.log(oneUnit)
+      const Discount = (editedItemData.product?.price > oneUnit ? editedItemData.product?.price - oneUnit : editedItemData.product.discountedPrice - oneUnit) * editedItemData.quantity
       const payload = {
         orderId: orderId,
         productCode: editedItemData.product.BarCode,
@@ -257,7 +259,7 @@ const Edit = () => {
         discount: Discount,
         GST: editedItemData.GST,
         finalPriceWithGST: editedItemData.finalPriceWithGST,
-        OneUnit: editedItemData.OneUnit,
+        OneUnit: oneUnit,
         payment,
       };
 
@@ -314,7 +316,7 @@ const Edit = () => {
       // console.log(discount);
       newState.discount = discount;
       newState.finalPriceWithGST = (OneUnit * quantity) + gst;
-      newState.OneUnit = OneUnit;
+
       return newState;
     });
     console.log("edittem after input change: ", editItem);

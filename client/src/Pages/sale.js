@@ -320,9 +320,8 @@ const Sale = () => {
       const {product} = editItem;
       const discount = mrp>OneUnit? mrp-OneUnit:newState.product.discountedPrice-OneUnit;
       newState.discountedPrice=OneUnit*quantity
-      // console.log(discount);
+      console.log(discount);
       newState.discount = discount;
-      newState.OneUnit = OneUnit;
       return newState;
     });
     console.log("edittem after input change: ",editItem);
@@ -340,9 +339,12 @@ const Sale = () => {
     // Extract necessary fields from editItem
     const { product } = editItem;
     console.log(items);
-    const { discountedPrice, quantity, GST, finalPrice_with_GST,OneUnit } = editItem;
-    let { title: productTitle, price: productPrice,  } = product;
-    const Discount = (product.price>OneUnit? product.price-OneUnit:product.discountedPrice-OneUnit)*quantity
+
+    const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
+    let { title: productTitle, price: productPrice,  } = product; 
+     const Oneunit = discountedPrice/quantity;
+
+    const Discount = (product.price>Oneunit? product.price-Oneunit:product.discountedPrice-Oneunit)*quantity
 console.log(editItem);
     // Construct the payload for the API request
     const payload = {
@@ -350,7 +352,7 @@ console.log(editItem);
       discountedPrice: parseFloat(discountedPrice),
       quantity: parseInt(quantity),
       price: parseFloat(productPrice),
-      OneUnit: parseFloat(OneUnit),
+      OneUnit: parseFloat(Oneunit),
       discount: parseFloat(Discount),
       GST: parseFloat(GST),
       finalPrice_with_GST: parseFloat(finalPrice_with_GST)
