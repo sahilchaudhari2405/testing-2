@@ -85,28 +85,32 @@ const Modal = ({ show, onClose, product }) => {
     e.preventDefault();
 
     if (product) {
-      console.log(form)
-      dispatch(updateProduct({ id: product.items._id, productData:form })).then((response) => {
-     
-        if (response.error) {
-          toast.error('Failed to update product');
-        } else {
-          toast.success('Product updated successfully');
-          onClose();
+        const productId = product._id || (product.items && product.items._id);
+        if (!productId) {
+            toast.error("Product ID not found!");
+            return;
         }
-      });
+
+        dispatch(updateProduct({ id: productId, productData: form })).then((response) => {
+            if (response.error) {
+                toast.error('Failed to update product');
+            } else {
+                toast.success('Product updated successfully');
+                onClose();
+            }
+        });
     } else {
-      dispatch(createProduct(form)).then((response) => {
-        console.log(response)
-        if (response.error) {
-          toast.error('Failed to create product');
-        } else {
-          toast.success('Product created successfully');
-          onClose();
-        }
-      });
+        dispatch(createProduct(form)).then((response) => {
+            if (response.error) {
+                toast.error('Failed to create product');
+            } else {
+                toast.success('Product created successfully');
+                onClose();
+            }
+        });
     }
-  };
+};
+
 
   return (
     <>
@@ -125,33 +129,25 @@ const Modal = ({ show, onClose, product }) => {
            <form onSubmit={handleSubmit}>
              <div className="bg-white p-6 rounded-lg shadow-md">
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                 <div className="mb-6">
+               
+             <div>
+ 
+
+</div>
+
+
+                {/* Category Code here */}
+                 
+               
+             </div>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+               <div className="mb-6">
                     <label htmlFor="title" className="block text-sm font-medium text-zinc-700 mb-3">Product Name <span className="text-destructive">*</span></label>
                     <input type="text" id="title" name="title" value={form.title} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter product name" required/>
                  </div>
-                 <div>
-                   <label htmlFor="category" className="block text-sm font-medium text-zinc-700 mb-3">Category <span className="text-destructive">*</span></label>
-                   <select id="category" name="category" value={form.category} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" required>
-                     <option value="">Choose category</option>
-                     {/* <option key='general' value='general'>General</option>
-                     <option key='sport' value='sport'>60d72b2f9b1d8b001f8e4f2c</option> */}
-                     
-                     {categories.map((category) => (
-                       <option key={category._id} value={category._id}>{category.name}</option>
-                     ))}
-                   </select>
-                 </div>
-                 <div>
-                   <label htmlFor="brand" className="block text-sm font-medium text-zinc-700 mb-3">Brand <span className="text-destructive">*</span></label>
-                   <input type="text" id="brand" name="brand" value={form.brand} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter brand" required/>
-                 </div>
-             </div>
-       
-
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                <div className="mb-4">
                  <label htmlFor="price" className="block text-sm font-medium text-zinc-700 mb-3">Price <span className="text-destructive">*</span></label>
-                 <input type="number" id="price" name="price" value={form.price} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter price" required/>
+                 <input type="number" id="price" name="price" value={form.price} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter price" />
                </div>
                <div className="mb-4">
                  <label htmlFor="discountedPrice" className="block text-sm font-medium text-zinc-700 mb-3">Discounted Price</label>
@@ -163,51 +159,51 @@ const Modal = ({ show, onClose, product }) => {
                </div>
                <div className="mb-4">
                  <label htmlFor="quantity" className="block text-sm font-medium text-zinc-700 mb-3">Quantity</label>
-                 <input type="number" id="quantity" name="quantity" value={form.quantity} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter quantity" />
+                 <input type="number" id="quantity" name="quantity" onChange={handleChange} value={form.quantity} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter quantity" />
                </div>
                <div className="mb-4">
                  <label htmlFor="weight" className="block text-sm font-medium text-zinc-700 mb-3">Weight</label>
                  <input type="number" id="weight" name="weight" value={form.weight} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter quantity" />
                </div>
-               <div className="mb-4">
+               {/* <div className="mb-4">
                  <label htmlFor="BarCode" className="block text-sm font-medium text-zinc-700 mb-3">Bar Code</label>
                  <input type="number" id="BarCode" name="BarCode" value={form.BarCode} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter BarCode" required/>
-               </div>
-               <div className="mb-4">
+               </div> */}
+               {/* <div className="mb-4">
                  <label htmlFor="stockType" className="block text-sm font-medium text-zinc-700 mb-3">Stock Type</label>
                  <input type="text" id="stockType" name="stockType" value={form.stockType} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Stock Type" required/>
-               </div>
+               </div> */}
                <div className="mb-4">
                  <label htmlFor="unit" className="block text-sm font-medium text-zinc-700 mb-3">Unit</label>
-                 <input type="text" id="unit" name="unit" value={form.unit} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Unit" required/>
+                 <input type="text" id="unit" name="unit" value={form.unit} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Unit" />
                </div>
                <div className="mb-4">
                  <label htmlFor="purchaseRate" className="block text-sm font-medium text-zinc-700 mb-3">Purchase Rate</label>
-                 <input type="number" id="purchaseRate" name="purchaseRate" value={form.purchaseRate} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Purchase Rate" required/>
+                 <input type="number" id="purchaseRate" name="purchaseRate" value={form.purchaseRate} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Purchase Rate" />
                </div>
                <div className="mb-4">
                  <label htmlFor="profitPercentage" className="block text-sm font-medium text-zinc-700 mb-3">Profit Percentage</label>
-                 <input type="number" id="profitPercentage" name="profitPercentage" value={form.profitPercentage} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Profit Percentage" required/>
+                 <input type="number" id="profitPercentage" name="profitPercentage" value={form.profitPercentage} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Profit Percentage" />
                </div>
                <div className="mb-4">
                  <label htmlFor="HSN" className="block text-sm font-medium text-zinc-700 mb-3">HSN</label>
-                 <input type="number" id="HSN" name="HSN" value={form.HSN} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter HSN" required/>
+                 <input type="number" id="HSN" name="HSN" value={form.HSN} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter HSN" />
                </div>
                <div className="mb-4">
                  <label htmlFor="GST" className="block text-sm font-medium text-zinc-700 mb-3">GST</label>
-                 <input type="number" id="GST" name="GST" value={form.GST} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter GST" required/>
+                 <input type="number" id="GST" name="GST" value={form.GST} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter GST" />
                </div>
                <div className="mb-4">
                  <label htmlFor="retailPrice" className="block text-sm font-medium text-zinc-700 mb-3">Retail Price</label>
-                 <input type="number" id="retailPrice" name="retailPrice" value={form.retailPrice} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Retail Price" required/>
+                 <input type="number" id="retailPrice" name="retailPrice" value={form.retailPrice} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Retail Price" />
                </div>
                <div className="mb-4">
                  <label htmlFor="totalAmount" className="block text-sm font-medium text-zinc-700 mb-3">Total Amount</label>
-                 <input type="number" id="totalAmount" name="totalAmount" value={form.totalAmount} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Total Amount" required/>
+                 <input type="number" id="totalAmount" name="totalAmount" value={form.totalAmount} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Total Amount" />
                </div>
                <div className="mb-4">
                  <label htmlFor="amountPaid" className="block text-sm font-medium text-zinc-700 mb-3">Amount Paid</label>
-                 <input type="number" id="amountPaid" name="amountPaid" value={form.amountPaid} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Amount Paid" required/>
+                 <input type="number" id="amountPaid" name="amountPaid" value={form.amountPaid} onChange={handleChange} className="mt-1 block w-full p-2 border border-input rounded-md" placeholder="Enter Amount Paid" />
                </div>
                <div className="mb-4">
                  <label htmlFor="slug" className="block text-sm font-medium text-zinc-700 mb-3">Slug <span className="text-destructive">*</span></label>
@@ -257,3 +253,7 @@ const Modal = ({ show, onClose, product }) => {
 };
 
 export default Modal;
+
+
+
+
