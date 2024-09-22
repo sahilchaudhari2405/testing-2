@@ -66,7 +66,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     ratings: productData.ratings || [],
                     reviews: productData.reviews || [],
                     numRatings: parseInt(productData.numRatings, 10) || 0,
-                    category: category._id,
+                    category: category._id ,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     BarCode: productData.barcode || null,
@@ -76,8 +76,8 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     profitPercentage: parseFloat(productData.profit,10) || 0,
                     HSN: productData.hsn || null,
                     GST: parseInt(productData.gst, 10) || 0,
-                    retailPrice: parseInt(productData.saleRate, 10) || 0,
-                    totalAmount: parseInt(productData.total, 10) || 0,
+                    retailPrice: parseInt(productData.saleRate, 10) || 0 ,
+                    totalAmount: parseInt(productData.total, 10) || parseInt(productData.saleRate, 10) ,
                     amountPaid: parseInt(productData.amountpaid, 10) || 0
                 });
                 
