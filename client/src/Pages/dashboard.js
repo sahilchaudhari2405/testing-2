@@ -126,7 +126,7 @@ const transformDataforAdmin = (data) => {
     (order.dailySales || []).forEach(sale => {
       daywiseArray.push({
         name: `Day ${sale.date}`,
-        sales: sale.finalPriceWithGST.toFixed(2),
+        sales: sale.finalPriceWithGST,
         revenue: sale.totalProfit.toFixed(2),
         date: sale.date
       });
@@ -135,14 +135,14 @@ const transformDataforAdmin = (data) => {
     (order.weekSales || []).forEach(sale => {
       weekwiseArray.push({
         name: `Week ${sale.week}`,
-        sales: sale.finalPriceWithGST.toFixed(2),
-        revenue: sale.totalProfit.toFixed(2)
+        sales: sale.finalPriceWithGST,
+        revenue: sale.totalProfit.toFixed(2),
       });
     });
 
     monthwiseArray.push({
       name: new Date(order.month).toLocaleString('default', { month: 'short', year: 'numeric' }),
-      sales: order.monthFinalPriceWithGST.toFixed(2),
+      sales: order.monthFinalPriceWithGST,
       revenue: order.monthTotalProfit.toFixed(2),
     });
   });
@@ -277,6 +277,7 @@ const calculateCustomers = (orders_data) => {
   
     // Conditional logic for TotalView
     if (value === 'day') {
+      setlatestDay('latest day');
       setTotalView(false);
     } else if (value === 'year') {
       setlatestDay('latest year');
@@ -284,7 +285,7 @@ const calculateCustomers = (orders_data) => {
       let sale = 0;
       let Customers = 0;
   
-      // Iterate over the `orders` array correctly
+      // Iterate over the `orders` array correctly 
       for (const data of orders) {
         Customers += data.MonthsBill || 0;
         revenue += data.monthTotalProfit || 0;

@@ -75,8 +75,9 @@ export const importProducts = async (req, res) => {
 
       if (barcode && barcode !=0) {
         const existingProduct = await Product.findOne({ BarCode: barcode });
-
+         
         if (existingProduct) {
+          productData.BarCode? await updateProductData(productData,existingProduct): await updateProductDataGSTPad(productData,existingProduct);
           skippedProducts.push(productData);
           continue;
         }
@@ -119,7 +120,38 @@ export const importProducts = async (req, res) => {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };
+async function updateProductDataGSTPad(productData, existingProduct) {
+  if (existingProduct) {
+    // Update fields for the existing product
+    existingProduct.retailPrice = parseFloat(productData['Net Sale']) || 0;
+    existingProduct.totalAmount = parseFloat(productData['Net Sale']) || 0;
+    existingProduct.amountPaid = parseFloat(productData.amountpaid) || 0;
+    existingProduct.quantity = parseInt(productData['Qty.'], 10) || 0;
+    existingProduct.price = parseFloat(productData.MRP) || 0;
+    existingProduct.discountedPrice = parseFloat(productData['Net Sale']) || 0;
+    existingProduct.purchaseRate = parseFloat(productData['Purchase Rate']) || 0;
+    existingProduct.profitPercentage = parseFloat(productData.profit) || 0;
+    existingProduct.discountPercent = parseFloat(productData.discountPercent) || 0;
 
+    // Save the updated product to the database
+    await existingProduct.save();
+  }
+}
+async function updateProductData(productData, existingProduct) {
+  if (existingProduct) {
+    // Update fields for the existing product
+    existingProduct.retailPrice = parseFloat(productData.retailPrice) || 0;
+    existingProduct.totalAmount = parseFloat(productData.totalAmount) || 0;
+    existingProduct.amountPaid = parseFloat(productData.amountpaid) || 0;
+    existingProduct.quantity = parseInt(productData.quantity, 10) || 0;
+    existingProduct.price = parseFloat(productData.price) || 0;
+    existingProduct.discountedPrice = parseFloat(productData.discountedPrice) || 0;
+    existingProduct.purchaseRate = parseFloat(productData.purchaseRate) || 0;
+    existingProduct.profitPercentage = parseFloat(productData.profitPercentage) || 0;
+    existingProduct.discountPercent = parseFloat(productData.discountPercent) || 0;
+    await existingProduct.save();
+  }
+}
 async function importGSTData(productData, category) {
   const product = new Product({
     title: productData.Name || null,

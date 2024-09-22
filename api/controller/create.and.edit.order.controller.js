@@ -11,6 +11,7 @@ import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./add.offl
 import { createClient, reduceClient } from "./Client.controller.js";
 import CounterUser from "../model/user.model.js";
 import { Client } from "../model/Client.model.js";
+import mongoose from "mongoose";
 
 // Function to place an order
 const AddCustomOrder = asyncHandler(async (req, res) => {
@@ -361,83 +362,78 @@ const AddOrder = asyncHandler(async (req, res) => {
 
 const placeOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
-    // const id=`669b9afa72e1e9138e2a64a3`;
     const { paymentType, BillUser } = req.body;
-console.log(paymentType);
-    const cart = await Offline_Cart.findOne({ userId: id }).populate('cartItems');
 
-    if (!cart) {
-        return res.status(404).json(new ApiResponse(404, 'Cart not found', null));
-    }
+    // Start session for transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
+        // Fetch cart with populated cart items
+        const cart = await Offline_Cart.findOne({ userId: id }).populate('cartItems');
+        if (!cart) {
+            await session.abortTransaction();
+            return res.status(404).json(new ApiResponse(404, 'Cart not found', null));
+        }
+
+        // Fetch all products in one query
+        const productIds = cart.cartItems.map(cartItem => cartItem.product);
+        const products = await Product.find({ _id: { $in: productIds } });
+
+        // Create orderItems in bulk
         let purchaseRate = 0;
         let totalProfit = 0;
-        const orderItems = [];
-        for (const cartItem of cart.cartItems) {
-            const product = await Product.findById(cartItem.product);
-            if (cartItem.type == 'custom') {
-                const orderItem = new OfflineOrderItem({
-                    product: cartItem.product,
-                    quantity: cartItem.quantity,
-                    price: cartItem.price,
-                    purchaseRate: product.purchaseRate * cartItem.quantity,
-                    GST: cartItem.GST,
-                    type: cartItem.type,
-                    OneUnit:cartItem.OneUnit,
-                    totalProfit : (product.purchaseRate > 1) 
-                    ? (cartItem.discountedPrice - (product.purchaseRate * cartItem.quantity)) 
-                    : (cartItem.discountedPrice * 0.10),
-                    finalPriceWithGST: cartItem.finalPrice_with_GST,
-                    discountedPrice: cartItem.discountedPrice,
-                    userId: id,
-                });
-                await orderItem.save();
-                orderItems.push(orderItem._id);
-                purchaseRate += orderItem.purchaseRate;
-                totalProfit += orderItem.totalProfit;
-            }
-            else {
-                const orderItem = new OfflineOrderItem({
-                    product: cartItem.product,
-                    quantity: cartItem.quantity,
-                    price: cartItem.price,
-                    purchaseRate: product.purchaseRate * cartItem.quantity,
-                    GST: cartItem.GST,
-                    OneUnit:cartItem.OneUnit,
-                    totalProfit:(product.purchaseRate > 1) 
-                    ? (cartItem.discountedPrice - (product.purchaseRate * cartItem.quantity)) 
-                    : (cartItem.discountedPrice * 0.10),
-                    finalPriceWithGST: cartItem.finalPrice_with_GST,
-                    discountedPrice: cartItem.discountedPrice,
-                    userId: id,
-                });
-                await orderItem.save();
-                orderItems.push(orderItem._id);
-                purchaseRate += orderItem.purchaseRate;
-                totalProfit += orderItem.totalProfit;
-            }
-        }
-        if (cart.discount < 0) {
-            cart.discount = 0;
-        }
-        const order = await new OfflineOrder({
+        const orderItemsData = cart.cartItems.map(cartItem => {
+            const product = products.find(prod => prod._id.equals(cartItem.product));
+            const TotalProfit = (product.purchaseRate > 1)
+                ? (cartItem.discountedPrice - (product.purchaseRate * cartItem.quantity))
+                : (cartItem.discountedPrice * 0.10);
+
+            purchaseRate += product.purchaseRate * cartItem.quantity;
+            totalProfit += TotalProfit;
+
+            return {
+                product: cartItem.product,
+                quantity: cartItem.quantity,
+                price: cartItem.price,
+                purchaseRate: product.purchaseRate * cartItem.quantity,
+                GST: cartItem.GST,
+                OneUnit: cartItem.OneUnit,
+                totalProfit:TotalProfit,
+                finalPriceWithGST: cartItem.finalPrice_with_GST,
+                discountedPrice: cartItem.discountedPrice,
+                userId: id,
+            };
+        });
+
+        const orderItems = await OfflineOrderItem.insertMany(orderItemsData, { session });
+        const orderItemIds = orderItems.map(item => item._id);
+
+        // Calculate cart discount if negative
+        const discount = cart.discount < 0 ? 0 : cart.discount;
+
+        // Create order
+        const order = new OfflineOrder({
             user: id,
-            orderItems: orderItems,
+            orderItems: orderItemIds,
             Name: BillUser.name,
             mobileNumber: BillUser.Mobile,
             email: BillUser.email,
             totalPrice: cart.totalPrice,
             totalDiscountedPrice: cart.totalDiscountedPrice,
             totalItem: cart.totalItem,
-            discount: cart.discount,
+            discount,
             GST: cart.GST,
-            paymentType: await paymentType,
+            paymentType: paymentType,
             totalPurchaseRate: purchaseRate,
             totalProfit: totalProfit,
             finalPriceWithGST: cart.final_price_With_GST,
             orderDate: new Date(),
         });
+
+        await order.save({ session });
+
+        // Create client request
         const clientReq = {
             body: {
                 Type: 'Client',
@@ -451,13 +447,24 @@ console.log(paymentType);
             }
         };
 
-        const r = await createClient(clientReq);
-        console.log(r);
-        await order.save();
-        await handleOfflineCounterSales(id, order);
-        await handleTotalOfflineSales(order);
-        await handleAllTotalOfflineSales(order);
+        // Execute in parallel: client creation and cart deletion
+        const clientPromise = createClient(clientReq);
+        const cartDeletePromise = Offline_CartItem.deleteMany({ _id: { $in: cart.cartItems.map(item => item._id) } }, { session });
+        const cartDelete = Offline_Cart.findByIdAndDelete(cart._id, { session });
 
+        await Promise.all([clientPromise, cartDeletePromise, cartDelete]);
+
+        // Handle sales updates in parallel
+        await Promise.all([
+            handleOfflineCounterSales(id, order),
+            handleTotalOfflineSales(order),
+            handleAllTotalOfflineSales(order)
+        ]);
+
+        // Commit the transaction
+        await session.commitTransaction();
+
+        // Fetch and return the created order
         const results = await OfflineOrder.findById(order._id).populate({
             path: 'orderItems',
             populate: {
@@ -466,15 +473,16 @@ console.log(paymentType);
             }
         });
 
-        await Offline_CartItem.deleteMany({ _id: { $in: cart.cartItems.map(item => item._id) } });
-        await Offline_Cart.findByIdAndDelete(cart._id);
-
         return res.status(200).json(new ApiResponse(200, 'Order placed successfully', results));
     } catch (error) {
+        await session.abortTransaction();
         console.error(error);
         return res.status(500).json(new ApiResponse(500, 'Error placing order', error.message));
+    } finally {
+        session.endSession();
     }
 });
+
 // Function to remove item quantity from cart
 const removeItemQuantityOrder = asyncHandler(async (req, res) => {
     const { id } = req.user;
