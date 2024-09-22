@@ -77,7 +77,7 @@ const Purchase = () => {
 
     console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
     if (Inputnameforsearch) {
-      const response = await axiosInstance.post('/admin/SearchClient',{ alphabet : Inputnameforsearch})
+      const response = await axiosInstance.post('/admin/SearchClientDistributer',{ alphabet : Inputnameforsearch})
       const distinctOrders = response.data.data;
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
@@ -100,8 +100,9 @@ const Purchase = () => {
       category: product.category.name || "",
       stockType: product.stockType || "",
       unit: product.unit || "",
-      // qty: product.quantity,
-      qty: 1,
+      qty:product.quantity,
+      saleRate:product.discountedPrice,
+      purchaseRate:product.purchaseRate,
       hsn: product.HSN,
       gst: product.GST,
       total: product.totalAmount,
@@ -278,7 +279,7 @@ const Purchase = () => {
         saleRate: productDetails.discountedPrice || "",
         purchaseRate: productDetails.purchaseRate || "",
         profit:
-          productDetails.discountedPrice - productDetails.purchaseRate || "",
+        (productDetails.purchaseRate >0)?  productDetails.discountedPrice - productDetails.purchaseRate: 0,
         hsn: productDetails.HSN || "",
         gst: productDetails.GST || "",
         amountpaid: "",
@@ -314,8 +315,7 @@ const Purchase = () => {
       qty: productDetails.BarCode ? 1 : "",
       saleRate: productDetails.discountedPrice || "",
       purchaseRate: productDetails.purchaseRate || "",
-      profit:
-      productDetails.discountedPrice - productDetails.purchaseRate || "",
+      profit:(productDetails.purchaseRate >0)?  productDetails.discountedPrice - productDetails.purchaseRate: 0,
       hsn: productDetails.HSN || "",
       gst: productDetails.GST || "",
       amountpaid: "",

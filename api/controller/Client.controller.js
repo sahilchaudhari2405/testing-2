@@ -199,7 +199,7 @@ const searchClients = async (req, res) => {
   const { alphabet, number } = req.body; // Get the alphabet (name prefix) and mobile number from the request body
 
   try {
-    let matchCriteria = {};
+    let matchCriteria = { Type: 'Client'};
 
     // Build the match criteria based on the provided alphabet (Name prefix)
     if (alphabet) {
@@ -245,6 +245,55 @@ const searchClients = async (req, res) => {
     });
   }
 };
+const searchClientsDistributer = async (req, res) => {
+  const { alphabet, number } = req.body; // Get the alphabet (name prefix) and mobile number from the request body
 
-export { updateClient, createClient ,reduceClient, getAllClients,searchClients};
+  try {
+    let matchCriteria = { Type: 'Supplier'};
+
+    // Build the match criteria based on the provided alphabet (Name prefix)
+    if (alphabet) {
+      matchCriteria.Name = { $regex: `^${alphabet}`, $options: 'i' }; // Match Name exactly starting with the alphabet
+    }
+
+    // Aggregate pipeline to match and group the records
+    const distinctClients = await Client.aggregate([
+      {
+        $addFields: {
+          mobileNumberStr: { $toString: "$Mobile" }, // Convert Mobile to string
+        },
+      },
+      {
+        $match: {
+          ...matchCriteria,
+          mobileNumberStr: number ? { $regex: `^${number}` } : { $exists: true }, // Match Mobile containing the digit
+        },
+      },
+      {
+        $group: {
+          _id: "$Mobile", // Group by Mobile to ensure distinct entries
+          Name: { $first: "$Name" },
+          Mobile: { $first: "$Mobile" },
+          Email: { $first: "$Email" },
+          Address: { $first: "$Address" },
+          State: { $first: "$State" },
+        },
+      },
+    ]);
+
+    return res.status(200).send({
+      message: "Distinct clients retrieved successfully",
+      status: true,
+      data: distinctClients,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      message: "Internal server error",
+      status: false,
+      error: error.message,
+    });
+  }
+};
+export { updateClient, createClient ,reduceClient, getAllClients,searchClients,searchClientsDistributer};
  
