@@ -15,6 +15,7 @@ import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
 import Admin from './Pages/admin';
 import Accounts from './Pages/accounts.js';
+import Clients from './Pages/Client.js';
 // import Reports from './pages/Reports';
 // import Msg from './pages/Msg';
 // import Import from './pages/Import';
@@ -94,6 +95,7 @@ const App = () => {
             }
           />
            <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
+           <Route path="/admin/client" element={<PageWithNavbar><Clients /></PageWithNavbar>} />
           {/*<Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
           <Route path="/reports" element={<PageWithNavbar><Reports /></PageWithNavbar>} />
           <Route path="/msg" element={<PageWithNavbar><Msg /></PageWithNavbar>} />

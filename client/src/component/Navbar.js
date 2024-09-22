@@ -30,6 +30,7 @@ const Navbar = () => {
           <NavItem icon={<FaShoppingCart className="text-orange-400" />} label="Sales" to="/sales" />
           <NavItem icon={<FaEye className="text-teal-400" />} label="View" to="/view" />
            <NavItem icon={<FaUser className="text-purple-400" />} label="Accounts" to="/admin/accounts" />
+           <NavItem icon={<FaUser className="text-purple-400" />} label="Client" to="/admin/client" />
           {/*<NavItem icon={<FaFileAlt className="text-pink-400" />} label="Reports" to="/reports" />
           <NavItem icon={<FaEnvelope className="text-blue-400" />} label="Msg" to="/msg" />
           <NavItem icon={<FaExchangeAlt className="text-indigo-400" />} label="Import" to="/import" />

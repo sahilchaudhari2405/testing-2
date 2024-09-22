@@ -182,15 +182,13 @@ const reduceClient = async (data) => {
 
 
 const getAllClients = async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // Get the page number from query, default to 1
-  const limit = parseInt(req.query.limit) || 30; // Get the limit from query, default to 20
-  const skip = (page - 1) * limit; // Calculate how many products to skip
+ // Get the page number from query, default to 1
+  const limit =500; // Get the limit from query, default to 20 // Calculate how many products to skip
   try {
     const clients = await Client.find().sort({updatedAt: -1 }) 
-    .skip(skip)
-    .limit(limit)
-    .populate('ClosingBalance')
-    .populate('CompletePurchase');
+      .limit(limit)
+      .populate('ClosingBalance')
+      .populate('CompletePurchase');
 
     // Respond with the retrieved clients
     res.status(200).json(clients);
@@ -253,6 +251,7 @@ const searchClients = async (req, res) => {
 const searchClientsDistributer = async (req, res) => {
   const { alphabet, number } = req.body; // Get the alphabet (name prefix) and mobile number from the request body
 
+
   try {
     let matchCriteria = { Type: 'Supplier'};
 
@@ -300,5 +299,30 @@ const searchClientsDistributer = async (req, res) => {
     });
   }
 };
-export { updateClient, createClient ,reduceClient, getAllClients,searchClients,searchClientsDistributer};
+
+
+
+
+const getAllCustomer = async (req, res) => {
+
+  console.log("page:",req.query)
+  const page = parseInt(req.query.page) || 1; // Get the page number from query, default to 1
+  const limit = parseInt(req.query.limit) ||20; // Get the limit from query, default to 20
+  const skip = (page - 1) * limit; // Calculate how many products to skip
+  try {
+    const clients = await Client.find().sort({updatedAt: -1 }) 
+      .skip(skip)
+      .limit(limit)
+      .populate('ClosingBalance')
+      .populate('CompletePurchase');
+    // Respond with the retrieved clients
+    res.status(200).json(clients);
+  } catch (error) {
+    console.error('Failed to retrieve clients:', error);
+    res.status(500).json({ message: 'Failed to retrieve clients', error: error.message });
+  }
+};
+
+
+export { updateClient, createClient ,reduceClient, getAllClients,searchClients,searchClientsDistributer,getAllCustomer};
  
