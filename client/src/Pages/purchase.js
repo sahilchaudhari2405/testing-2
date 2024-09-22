@@ -100,7 +100,7 @@ const Purchase = () => {
       category: product.category.name || "",
       stockType: product.stockType || "",
       unit: product.unit || "",
-      qty:product.quantity,
+      qty:1,
       saleRate:product.discountedPrice,
       purchaseRate:product.purchaseRate,
       hsn: product.HSN,
