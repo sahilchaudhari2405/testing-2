@@ -8,7 +8,7 @@ import { getTotalOfflineSale } from '../controller/get.total.offline.sales.js';
 import { getTotalSale } from '../controller/get.total.sales.js';
 import { GetPurchaseOrder } from '../controller/add.product.js';       
 import {  importUser } from '../controller/importExportUser.controller.js';
-import { getAllClients, getAllCustomer,searchClients } from '../controller/Client.controller.js';
+import { getAllClients, searchClients, searchClientsDistributer, getAllCustomer, } from '../controller/Client.controller.js';
 
 
 const admin = express.Router();
@@ -21,4 +21,5 @@ admin.post('/UserImport',authenticateToken,importUser);
 admin.get('/Client',authenticateToken,getAllClients);
 admin.get('/Customer',authenticateToken,getAllCustomer);
 admin.post('/SearchClient',searchClients)
+admin.post('/SearchClientDistributer',searchClientsDistributer)
 export default admin;

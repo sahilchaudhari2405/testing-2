@@ -131,103 +131,101 @@ const Invoice = ({ componentRef, details,setPrint,language}) => {
         </div>
       </div>
     ) : (
-      details && (
-        <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200 hidden">
-          <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
-            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-              <div>
-                {/* <h1 className="text-2xl font-bold mb-4">चलन</h1> */}
-                <h1 className="text-2xl font-bold mt-2">आपला बाजार</h1>
-                <p>आपला बाजार</p>
-                <p>श्रीगोंदा, अहमदनगर</p>
-                <p>अहमदनगर, महाराष्ट्र, 444002</p>
-                <p>फोन: 9849589588</p>
-                <p>ईमेल: aaplabajar1777@gmail.com</p>
-              </div>
-              <div className="w-24 h-24 border flex items-center justify-center">
-                <img src={logo} alt="कंपनी लोगो" />
-              </div>
+  details && (
+    <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200 hidden">
+      <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
+        <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
+          <div>
+            {/* <h1 className="text-2xl font-bold mb-4">INVOICE</h1> */}
+            <h1 className="text-2xl font-bold mt-2">आपला बाजार</h1>
+            <p>आपला बाजार</p>
+            <p>श्रीगोंदा, अहमदनगर</p>
+            <p>अहमदनगर, महाराष्ट्र, ४४४००२</p>
+            <p>फोन: ९८४९५८९५८८</p>
+            <p>ईमेल: aaplabajar1777@gmail.com</p>
+          </div>
+          <div className="w-24 h-24 border flex items-center justify-center">
+            <img src={logo} alt="कंपनीचा लोगो" />
+          </div>
+        </div>
+        <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
+          <div>
+            <span className={sharedClasses.fontBold}>चलन क्र.: </span>
+            <Barcode displayValue={false} value={details._id} width={0.8} height={70} />
+          </div>
+          <div>
+            <span className={sharedClasses.fontBold}>तारीख: </span>
+            <span>{currentDate}</span>
+          </div>
+        </div>
+        <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
+          <div className="w-1/2 pr-2">
+            <h2 className={sharedClasses.fontBold}>बिल:</h2>
+            <p>{details.Name?.toUpperCase()}</p>
+            <p>{details.Address?.toUpperCase()}</p>
+            <p>फोन: {details.mobileNumber}</p>
+            <p>ईमेल: {details.email}</p>
+          </div>
+        </div>
+   
+        <table className="w-full border-collapse border mb-2 text-xs">
+         <thead>
+           <tr className="bg-gray-800 text-white">
+             <th className="border p-1">वर्णन</th>
+             <th className="border p-1">संख्या</th>
+             <th className="border p-1">युनिट किंमत</th>
+             <th className="border p-1">जीएसटी</th>
+             <th className="border p-1">एकूण किंमत</th>
+           </tr>
+         </thead>
+         <tbody>
+           {details.orderItems?.map((e, index) => (
+            <tr key={index}>
+              <td className="border p-1 truncate">{e.productId?.title}</td>
+              <td className="border p-1 text-center">{e.quantity}</td>
+              <td className="border p-1 text-center">{(e.purchaseRate/e.quantity).toFixed(2) }</td>
+              <td className="border p-1 text-center">{e.GST}</td>
+              <td className="border p-1 text-center">{e.purchaseRate * e.quantity}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+        <div className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}>
+          <div className="w-full">
+            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
+              <span>उपएकूण</span>
+              <span>₹{details.totalPurchaseRate}</span>
             </div>
-            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
-              <div>
-                <span className={sharedClasses.fontBold}>चलन क्रमांक: </span>
-                <Barcode displayValue={false} value={details._id} width={0.8} height={70} />
-              </div>
-              <div>
-                <span className={sharedClasses.fontBold}>दिनांक: </span>
-                <span>{currentDate}</span>
-              </div>
+          
+            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
+              <span>जीएसटी</span>
+              <span>₹{details.GST}</span>
             </div>
-            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
-              <div className="w-1/2 pr-2">
-                <h2 className={sharedClasses.fontBold}>चलन प्राप्तकर्ता:</h2>
-                <p>{details.Name?.toUpperCase()}</p>
-                <p>{details.Address?.toUpperCase()}</p>
-                <p>फोन: {details.mobileNumber}</p>
-                <p>ईमेल: {details.email}</p>
-              </div>
-            </div>
-            <table className="w-full border-collapse border mb-2 text-xs">
-              <thead>
-                <tr className="bg-gray-800 text-white">
-                  <th className="border p-1">वर्णन</th>
-                  <th className="border p-1">प्रमाण</th>
-                  <th className="border p-1">युनिट किंमत</th>
-                  <th className="border p-1">किंमत</th>
-                </tr>
-              </thead>
-              <tbody>
-                {details?.orderItems?.map((e, index) => (
-                  <tr key={index}>
-                    <td className="border p-1 truncate">{e.product?.title}</td>
-                    <td className="border p-1 text-center">{e.quantity}</td>
-                    <td className="border p-1 text-center">{e.price}</td>
-                    <td className="border p-1 text-center">{e.price * e.quantity}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-    
-            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
-              <div>
-                <span className={sharedClasses.fontBold}>उपयोगिता </span>
-              </div>
-              <div>
-                <span>₹{details.totalPrice}</span>
-              </div>
-            </div>
-            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
-              <div>
-                <span className={sharedClasses.fontBold}>सवलत </span>
-              </div>
-              <div>
-                <span>₹{details.discount}</span>
-              </div>
-            </div>
-            <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
-              <div>
-                <span className={sharedClasses.fontBold}>कर </span>
-              </div>
-              <div>
-                <span>₹{details.GST}</span>
+            <div className='flex flex-col items-center'>
+              <span className='font-semibold'>पेमेंट</span>
+              <div className='flex flex-col w-full'>
+                <div className='flex justify-between'><span>रोख:</span><span> ₹{details.paymentType?.cash}</span></div>
+                <div className='flex justify-between'><span>कार्ड:</span><span>₹{details.paymentType?.Card}</span></div>
+                <div className='flex justify-between'><span>यूपीआय:</span><span>₹{details.paymentType?.UPI}</span></div>
+                <div className='flex justify-between'><span>उधारी:</span><span>₹{details.paymentType?.borrow}</span></div>
               </div>
             </div>
             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
-              <div>
-                <span>प्रदान रक्कम </span>
-              </div>
-              <div>
-                <span>₹{details.finalPriceWithGST}</span>
-              </div>
-            </div>
-            <div className="mb-4">
-              <h2 className={sharedClasses.fontBold}>अटी व शर्ती:</h2>
-              <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div>
+              <span>भरणा रक्कम</span>
+              <span>₹{details.AmountPaid }</span>
             </div>
           </div>
         </div>
-      )
-    )):(details?.type === "customer" ? (
+        <div className="mb-4">
+          <h2 className={sharedClasses.fontBold}>अटी व शर्ती:</h2>
+          <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div>
+        </div>
+        <p className="text-center font-bold">आपल्या व्यवसायासाठी धन्यवाद!</p>
+      </div>
+    </div>
+  )
+)
+):(details?.type === "customer" ? (
    
 
       <div className="invoice__preview mt-20 bg-white p-5  w-32 rounded-2xl border-4 border-blue-200">
