@@ -164,11 +164,15 @@ export const deleteProduct = async (req, res) => {
 // View all products
 // Assuming you have a model named Product
 export const viewProducts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Get the page number from query, default to 1
+  const limit = parseInt(req.query.limit) || 30; // Get the limit from query, default to 20
+  const skip = (page - 1) * limit; // Calculate how many products to skip
   try {
-    // Query to get products sorted by discount and createdAt
+    // Query to get products sorted by updatedAt, with pagination
     const products = await Product.find()
-      .sort({updatedAt: -1 }) 
-      .limit(100)
+      .sort({ updatedAt: -1 }) 
+      .skip(skip)
+      .limit(limit)
       .populate('category');
 
     return res.status(200).send({ message: "Products retrieved successfully", status: true, data: products });
