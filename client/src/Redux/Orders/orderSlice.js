@@ -3,16 +3,30 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../axiosConfig';
 
 // Async thunks for handling API requests
-export const fetchOrders = createAsyncThunk('orders/fetchOrders',async ({ page}) => {
+export const fetchOrders = createAsyncThunk('orders/fetchOrders', async () => {
   try {
-    const response = await axiosInstance.get(`/admin/Client?page=${page}`);
-    console.log('Orders fetched!!', response);
-    return response.data; // Return the fetched data
+    const response = await axiosInstance.get('/admin/Client');
+    console.log('order fetched!!' ,response)
+    return response.data; 
+     // Return the data directly from axios response
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to fetch orders');
   }
-}
-);
+});
+
+export const fetchClientOrders = createAsyncThunk('orders/fetchClientOrders', async ({page}) => {
+  console.log("hallo ji")
+  const next=page
+  console.log(page)
+  try {
+    const response = await axiosInstance.get(`/admin/Customer?page=${next}`);
+    console.log('order fetched!!' ,response)
+    return response.data; 
+     // Return the data directly from axios response
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch orders');
+  }
+});
 
 export const sortOrders = createAsyncThunk('orders/sortOrders', async ({ fromDate, toDate,name,selectedView}) => {
   const type = selectedView;
@@ -101,6 +115,17 @@ const ordersSlice = createSlice({
         state.orders = action.payload;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(fetchClientOrders.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchClientOrders.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.orders = action.payload;
+      })
+      .addCase(fetchClientOrders.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       })
