@@ -30,6 +30,114 @@ const Purchase = () => {
   const [language,SetLanguage] = useState("");
   const [message, setMessage] = useState(false);
   const [print,setPrint] = useState(false);
+
+  const [Inputnameforsearch, setInputnameforsearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [matchingOrders, setMatchingOrders] = useState([]);
+
+  const [Inputdescriptionforsearch, setInputdescriptionforsearch] = useState('');
+  const [showModaldescription, setShowModaldescription] = useState(false);
+  const [matchingProducts, setMatchingProducts] = useState([]);
+
+
+
+
+  // ============================functions to search name and description===============================
+
+  const handleSelectOrder = (Client) => {
+    console.log("handlie select form mobile number");
+    setFinal({
+      ...finalform,
+      name: Client.Name,
+      date: Client.Date || currentDate,
+      mobileNumber: Client.Mobile || '',
+      ShipTo: Client.ShipTo || '',
+      address: Client.Address || 'Shrigonda',
+      state: Client.State || 'Maharastra',
+    });
+    setShowModal(false);
+    // setShowMobileModal(false);
+
+  };
+
+  useEffect(() => {
+    setMatchingOrders([]);
+    searchOfflineOrders();
+    console.log("Inputnameforsearch changed: ",Inputnameforsearch)
+  },[Inputnameforsearch])
+
+  const searchOfflineOrders = async () => {
+    // const value = e.target.value;
+    // console.log("value is: ",value);
+    setFinal({
+      ...finalform,
+      "name": Inputnameforsearch,
+    });
+    // setSearchInput(value);
+
+    console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
+    if (Inputnameforsearch) {
+      const response = await axiosInstance.post('/admin/SearchClient',{ alphabet : Inputnameforsearch})
+      const distinctOrders = response.data.data;
+      if ( distinctOrders == [] ){
+        setMatchingOrders([]);
+      }
+      console.log("distinctOrders users are: ", distinctOrders);
+      setMatchingOrders(distinctOrders);
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+  };
+
+  const handleSelectProduct =(product) => {
+    console.log("handling ");
+
+    setFormData({
+      barcode: product.BarCode,
+      brand: product.brand || "",
+      description: product.description || "",
+      category: product.category.name || "",
+      stockType: product.stockType || "",
+      unit: product.unit || "",
+      // qty: product.quantity,
+      qty: 1,
+      hsn: product.HSN,
+      gst: product.GST,
+      total: product.totalAmount,
+    });
+    // setProductDetails(product);
+    setShowModaldescription(false);
+    // setShowMobileModal(false);
+
+  }
+
+  useEffect(() => {
+    setMatchingProducts([]);
+    handleSearchandChange();
+    console.log("Inputdescriptionforsearch changed: ",Inputdescriptionforsearch)
+  },[Inputdescriptionforsearch])
+
+  const handleSearchandChange = async () => {
+    setFormData({
+      ...formData,
+      "description": Inputdescriptionforsearch,
+    });
+    if (Inputdescriptionforsearch) {
+      const response = await axiosInstance.post('/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
+      const filteredOrders = response.data.data;
+      console.log("Inputdescriptionforsearch : ", filteredOrders);
+      setMatchingProducts(filteredOrders);
+      setShowModaldescription(true);
+    } else {
+      setShowModaldescription(false);
+    }
+
+  }
+
+
+
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -403,12 +511,38 @@ const Purchase = () => {
               <input
                 type="text"
                 id="name"
+                autocomplete="off"
                 require
                 value={finalform.name}
                 onKeyDown={handleKeys}
-                onChange={handleFinal}
+                // onChange={handleFinal}
+                onChange={(e) => {
+                  setFinal({
+                  ...finalform,
+                  [e.target.id]: e.target.value,
+                });
+                setInputnameforsearch(e.target.value)
+                }}
+                onBlur={() => setTimeout(() => setShowModal(false), 200)}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              {showModal && (
+                <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
+                  { matchingOrders.length > 0 ? ( matchingOrders.map((Client) => (
+                    <div key={Client._id} onClick={() => handleSelectOrder(Client)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+                      {Client.Name}
+                    </div>
+                  )) 
+                ) 
+              : 
+              (
+              <div key="noresultsfounds" className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
+                No Search results founds.....
+              </div>
+            ) 
+              }
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-gray-700 font-medium">Invoice</label>
@@ -571,10 +705,21 @@ const Purchase = () => {
                 onKeyDown={handleKeys}
                 required
                 value={formData.description}
-                onChange={handleChange}
+                // onChange={handleChange}
+                onChange={(e) => {handleChange(e); setInputdescriptionforsearch(e.target.value)}}
+                onBlur={() => setTimeout(() => setShowModaldescription(false), 200)}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter description"
               />
+              {showModaldescription && (
+                <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
+                  {matchingProducts.map((product) => (
+                    <div key={product._id} onClick={() => handleSelectProduct(product)} className="p-2 flex border border-solid  hover:bg-gray-200 cursor-pointer">
+                      {product.title}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
