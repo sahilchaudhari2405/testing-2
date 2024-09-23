@@ -1054,7 +1054,7 @@ import * as XLSX from 'xlsx';
 import { jwtDecode } from 'jwt-decode';
 import { saveAs } from 'file-saver';
 import { toast } from 'react-toastify';
-import { deleteOrder, fetchClientOrders } from '../Redux/Orders/orderSlice';
+import { deleteOrder} from '../Redux/Orders/orderSlice';
 import { logoutUser } from '../Redux/User/userSlices';
 import axiosInstance from '../axiosConfig';
 
@@ -1094,6 +1094,48 @@ const Clients = () => {
  
 //   }, [orders]);
 
+
+
+
+const fetchCustomer = async (page) => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(`/admin/Customer?page=${page}&limit=5`);
+      setClients((prev) => [...prev, ...response.data]); // Append new products
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  }; 
+
+
+  const handleScroll = () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
+      setPage((prev) => prev + 1); // Load the next page
+    }
+  };
+  useEffect(() => {
+    fetchCustomer(page);
+  }, [page]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [loading]);
+
+
+
+
+
+
+
+
+
+
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -1109,7 +1151,7 @@ const Clients = () => {
   useEffect(() => {
     const handleScroll = () => {
       // Check if user is near the bottom of the page
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 500 && !loading && hasMore) {
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 0 && !loading && hasMore) {
         setPage((prevPage) => prevPage + 1);  // Increase the page number to load more clients
       console.log(page)
     }
@@ -1128,26 +1170,26 @@ const Clients = () => {
 
 
 
-  useEffect(() => {
-    const fetchClients = async () => {
-      setLoading(true);
-      try {
+  // useEffect(() => {
+  //   const fetchClients = async () => {
+  //     setLoading(true);
+  //     try {
 
 
-        const response = await dispatch(fetchClientOrders(page)).unwrap();
-        if (response.length === 0) {
-          setHasMore(false);  // No more clients to load
-        } else {
-          setClients((prevClients) => [...prevClients, ...response]);  // Append new clients
-        }
-      } catch (error) {
-        console.error('Error fetching clients:', error);
-      }
-      setLoading(false);
-    };
+  //       const response = await dispatch(fetchfetchCustomer(page)).unwrap();
+  //       if (response.length === 0) {
+  //         setHasMore(false);  // No more clients to load
+  //       } else {
+  //         setClients((prevClients) => [...prevClients, ...response]);  // Append new clients
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching clients:', error);
+  //     }
+  //     setLoading(false);
+  //   };
   
-    fetchClients();
-  }, [page, dispatch]);
+  //   fetchClients();
+  // }, [page, dispatch]);
 
 
 
@@ -1184,7 +1226,7 @@ const Clients = () => {
   const handleDelete = async (order) => {
     try {
       await dispatch(deleteOrder(order._id)).unwrap();
-      dispatch(fetchClientOrders({page}));
+   fetchCustomer(page);
       toast.success('Client deleted successfully!');
     } catch (error) {
       console.error('Failed to delete client:', error);
@@ -1235,7 +1277,7 @@ const Clients = () => {
         }
 
         toast.success('Import successful!');
-        dispatch(fetchClientOrders(page)); // Fetch the updated data
+       fetchCustomer(page); // Fetch the updated data
       } catch (error) {
         console.error('Error during import:', error);
         toast.error('Error during import: ' + error.message);
@@ -1254,7 +1296,7 @@ const alphabet = searchQuery
     try {
         const response = await axiosInstance.post(`/admin/SearchClient`,{alphabet,number});
         console.log(response)
-        setClients(response.data.data);
+        setClients(response.data);
       } catch (error) {
         console.error('Error sort clients:', error);
       }
@@ -1283,7 +1325,7 @@ const alphabet = searchQuery
 
   const renderOrdersTable = (data) => (
     <div>
-      <table className="w-full mb-6 border-collapse bg-white rounded-lg shadow-md overflow-hidden">
+      <table className="w-full mb-6 border-collapse bg-white rounded-lg shadow-md ">
         <thead className="bg-gray-600 text-white">
           <tr>
             <th className="border border-zinc-800 px-4 py-2">SrNo.</th>
@@ -1299,12 +1341,16 @@ const alphabet = searchQuery
           </tr>
         </thead>
         <tbody>
+
+          {
+            console.log(data)
+          }
           {data?.map((order, i) => {
             // Log each order to the console
             // console.log("Map ka andar ka data ", order);
 
             return (
-              <tr key={order._id || i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
+              <tr key={order._id +i|| i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
                 <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
                 <td className="border border-zinc-800 px-1 py-2">{order.Name}</td>
                 <td className="border border-zinc-800 px-4 py-2">{order.Mobile}</td>
