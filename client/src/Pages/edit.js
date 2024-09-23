@@ -530,7 +530,7 @@ const Edit = () => {
       .then(async response => {
         toast.success('Order item removed successfully!');
         console.log("yes")
-       await fetchOrderData();
+        fetchOrderData();
       })
       .catch(err => {
         toast.error('Failed to remove item.');
@@ -604,7 +604,7 @@ const Edit = () => {
       .then(async response => {
         toast.success('Quantity decreased successfully!');
         console.log("yes")
-        await fetchOrderData
+         fetchOrderData()
       })
       .catch(err => {
         toast.error('Failed to decrease quantity');
