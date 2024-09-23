@@ -324,5 +324,39 @@ const getAllCustomer = async (req, res) => {
 };
 
 
-export { updateClient, createClient ,reduceClient, getAllClients,searchClients,searchClientsDistributer,getAllCustomer};
+
+const searchCustomer = async (req, res) => {
+  const { alphabet, number } = req.body;
+
+  // Initialize an empty query object
+  let query = {};
+
+  // Add conditions to the query object if fields are provided
+  if (alphabet) {
+    query.Name = { $regex: `^${alphabet}`, $options: 'i' }; // Case-insensitive regex for names starting with alphabet
+  }
+
+  if (number) {
+    query.Mobile = number; // Exact match for mobile number
+  }
+
+  try {
+    // Find clients based on the constructed query
+    const clients = await Client.find(query)
+      .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
+      .populate('ClosingBalance')
+      .populate('CompletePurchase');
+
+    // Respond with the retrieved clients
+    res.status(200).json(clients);
+  } catch (error) {
+    console.error('Failed to retrieve clients:', error);
+    res.status(500).json({ message: 'Failed to retrieve clients', error: error.message });
+  }
+};
+
+
+
+
+export { updateClient, createClient ,reduceClient, getAllClients,searchCustomer,searchClientsDistributer,getAllCustomer};
  
