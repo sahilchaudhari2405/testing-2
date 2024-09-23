@@ -358,5 +358,5 @@ const searchCustomer = async (req, res) => {
 
 
 
-export { updateClient, createClient ,reduceClient, getAllClients,searchCustomer,searchClientsDistributer,getAllCustomer};
+export { updateClient, createClient ,reduceClient, getAllClients,searchCustomer,searchClientsDistributer,getAllCustomer,searchClients};
  
