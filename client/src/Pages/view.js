@@ -209,7 +209,13 @@ const View = () => {
         </tr>
       </thead>
       <tbody>
-        {Array.isArray(data) && data?.map((item, i) => (
+        {!Array.isArray(data) || data.length === 0 ? (
+          <tr>
+            <td colSpan="13" className="text-center py-4">
+              <div className="loader">Loading... or Select another Date Range</div>
+            </td>
+          </tr>
+          ) : (data?.map((item, i) => (
           <tr key={item._id} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
             <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
             <td className="border border-zinc-800 px-4 py-2">{item.Name}</td>
@@ -255,6 +261,7 @@ const View = () => {
               </div>
             </td>
           </tr>
+        )
         ))}
       </tbody>
     </table>
