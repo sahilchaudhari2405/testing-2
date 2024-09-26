@@ -209,6 +209,8 @@ const Admin = () => {
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
+        console.log("exp time: ",decodedToken.exp )  // output 1727360441
+
         fetchUsers(token);
         fetchOrders(token);
       } catch (error) {
