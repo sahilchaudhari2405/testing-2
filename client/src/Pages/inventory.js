@@ -473,6 +473,7 @@ const Inventory = () => {
 
   const handleFilter = (e) => {
     e.preventDefault();
+    
     const { barcode, description, category, brand, size, expiringDays, lowStock } = formValues;
     dispatch(sortProducts({ barcode, description, category, brand, size, expiringDays, lowStock }));
   };

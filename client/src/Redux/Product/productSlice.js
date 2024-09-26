@@ -32,7 +32,7 @@ export const sortProducts = createAsyncThunk('products/sortProducts', async ({ b
   try {
     const response = await axiosInstance.post('/product/sortProducts',{ barcode, name, category ,brand,weight,expiringDays,lowStock});
 
-    // console.log(response)
+    console.log(response)
     return response.data.data;  // Return the sorted orders data
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to sort orders');
