@@ -1100,7 +1100,7 @@ const Clients = () => {
 const fetchCustomer = async (page) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/admin/Customer?page=${page}&limit=5`);
+      const response = await axiosInstance.get(`/admin/Customer?page=${page}&limit=70`);
       setClients((prev) => [...prev, ...response.data]); // Append new products
     } catch (error) {
       console.error('Error fetching products:', error);

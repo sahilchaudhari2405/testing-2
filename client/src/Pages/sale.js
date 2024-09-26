@@ -170,7 +170,7 @@ const Sale = () => {
 
     console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
     if (Inputnameforsearch) {
-      const response = await axiosInstance.post('/admin/SearchClient',{ alphabet : Inputnameforsearch})
+      const response = await axiosInstance.post('/admin/SearchClientSale',{ alphabet : Inputnameforsearch})
       const distinctOrders = response.data.data;
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
@@ -192,8 +192,10 @@ const Sale = () => {
 
     console.log("searching Inputmobilenumberforsearch are: ",Inputmobilenumberforsearch);
     if (Inputmobilenumberforsearch) {
-      const response = await axiosInstance.post('/admin/SearchClient',{ number : Inputmobilenumberforsearch})
+      const response = await axiosInstance.post('/admin/SearchClientSale',{ number : Inputmobilenumberforsearch})
       const distinctOrders = response.data.data;
+
+      console.log(distinctOrders);
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
       }
@@ -782,7 +784,7 @@ const handleScan = (data) => {
             />
             {showModal && (
               <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
-                { matchingOrders.length > 0 ? ( matchingOrders.map((Client) => (
+                { matchingOrders?.length > 0 ? ( matchingOrders.map((Client) => (
                   <div key={Client._id} onClick={() => handleSelectOrder(Client)} className="p-2 border border-solid  hover:bg-gray-200 cursor-pointer">
                     {Client.Name}
                   </div>
