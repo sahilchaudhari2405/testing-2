@@ -26,6 +26,7 @@ const setTokens = (user, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
+        //  maxAge : 1000, // 7 hours in milliseconds
          maxAge : 7 * 60 * 60 * 1000, // 7 hours in milliseconds
         // 15 minutes
     });
