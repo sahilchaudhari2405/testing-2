@@ -228,7 +228,9 @@ export const getProducts = async (req, res) => {
 
     if (Object.keys(query).length > 0) {
       // If there are any filters, apply them
+
       products = await Product.find(query)
+      .sort({ quantity:(lowStock)? 1:-1 })
         .skip(skip)
         .limit(limit)
         .populate('category');
@@ -240,10 +242,7 @@ export const getProducts = async (req, res) => {
         );
       }
 
-      // Sort by low stock if the filter is applied
-      if (lowStock) {
-        products.sort((a, b) => a.quantity - b.quantity);
-      } 
+
     } else {
       // If no filters are provided, fetch the newest products
       products = await Product.find()
