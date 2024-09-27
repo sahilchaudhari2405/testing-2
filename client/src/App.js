@@ -54,7 +54,6 @@ const validateToken = () => {
 };
 
 const App = () => {
-  const navigate = useNavigate();
   const handleTokenExpiration = () => {
     const token = localStorage.getItem('token');
     if (token) {

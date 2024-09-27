@@ -1190,6 +1190,7 @@ const handleScan = (data) => {
                         type="number"
                         value={editId === item._id ? editItem.quantity : item.quantity}
                         min="1"
+                        readOnly
                         className="w-12 sm:w-12 text-center border m-1 sm:mb-0"
                         onChange={(e) => handleInputChange(e, "quantity")}
                       />
