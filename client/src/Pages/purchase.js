@@ -941,6 +941,9 @@ const Purchase = () => {
                   Purchase Rate
                 </th>
                 <th className="p-3 border border-gray-600 text-left">
+                 Total purchase Rate
+                </th>
+                <th className="p-3 border border-gray-600 text-left">
                   Profit%
                 </th>
                 <th className="p-3 border border-gray-600 text-left">HSN</th>
@@ -978,6 +981,9 @@ const Purchase = () => {
                     </td>
                     <td className="p-3 border border-gray-600">
                       {item.purchaseRate}
+                    </td>
+                    <td className="p-3 border border-gray-600">
+                      {item.purchaseRate*item.qty}
                     </td>
                     <td className="p-3 border border-gray-600">
                       {item.profit}
