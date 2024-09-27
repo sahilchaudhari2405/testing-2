@@ -28,7 +28,8 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_
   }
 });
 
-export const sortProducts = createAsyncThunk('products/sortProducts', async ({ barcode, name, category ,brand,weight,expiringDays,lowStock}) => {
+export const sortProducts = createAsyncThunk('products/sortProducts', async ({ barcode, description, category ,brand,weight,expiringDays,lowStock}) => {
+ const name=description
   try {
     const response = await axiosInstance.post('/product/sortProducts',{ barcode, name, category ,brand,weight,expiringDays,lowStock});
 
@@ -107,6 +108,7 @@ const productSlice = createSlice({
       })
       .addCase(sortProducts.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        console.log(action.payload)
         state.products = action.payload;
       })
       .addCase(sortProducts.rejected, (state, action) => {

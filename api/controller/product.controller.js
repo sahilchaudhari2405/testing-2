@@ -165,7 +165,7 @@ export const deleteProduct = async (req, res) => {
 // Assuming you have a model named Product
 export const viewProducts = async (req, res) => {
   const page = parseInt(req.query.page) || 1; // Get the page number from query, default to 1
-  const limit = parseInt(req.query.limit) ||5; // Get the limit from query, default to 20
+  const limit =50; // Get the limit from query, default to 20
   const skip = (page - 1) * limit; // Calculate how many products to skip
   try {
     // Query to get products sorted by updatedAt, with pagination
@@ -177,7 +177,7 @@ export const viewProducts = async (req, res) => {
 
     return res.status(200).send({ message: "Products retrieved successfully", status: true, data: products });
   } catch (error) {
-    console.error(error);
+    console.error(error);  
     return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
   }
 };
@@ -190,24 +190,24 @@ export const sortProducts = async (req, res) => {
     let query = {};
     const noOtherFilters = !barcode && !name && !category && !brand && !weight && !expiringDays;
 
-     console.log(noOtherFilters);
+    //  console.log(noOtherFilters);
      
-    if(lowStock && noOtherFilters)
-    {      let sortedProducts=[];
-      sortedProducts = await Product.find()
-      .sort({ quantity: 1 }) 
-      .limit(100) 
-      .populate('category');
-      return res.status(200).send({ 
-        message: "Only Low stock products retrieved successfully", 
-        status: true, 
-        data: sortedProducts, 
-      });
-    }
+    // if(lowStock && noOtherFilters)
+    // {      let sortedProducts=[];
+    //   sortedProducts = await Product.find()
+    //   .sort({ quantity: 1 }) 
+    //   .limit(100) 
+    //   .populate('category');
+    //   return res.status(200).send({ 
+    //     message: "Only Low stock products retrieved successfully", 
+    //     status: true, 
+    //     data: sortedProducts,  
+    //   });
+    // }
     console.log("yes");
     // Add date range filter if fromDate and toDate are provided
     if (barcode) {
-      query.BarCode =parseInt(barcode)
+      query.BarCode =barcode
     }
   if(brand){
     query.brand ={ $regex: brand, $options: 'i' }
@@ -221,8 +221,11 @@ export const sortProducts = async (req, res) => {
         query.title = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
       }
    
+      // if (category) {
+      //   query. = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
+      // }
 
-console.log(query);
+
     // Query to get products sorted by discount and createdAt
     const products = await Product.find(query)
       .limit(100)
@@ -231,6 +234,7 @@ console.log(query);
     // console.log("hallo")
     let filteredProducts=[]
     if(category){
+      console.log("getting categories",category);
        filteredProducts = products.filter(product =>
         product.category?.name.toLowerCase().startsWith(category.toLowerCase())
       );
@@ -239,7 +243,7 @@ console.log(query);
     }
     
 
-    //console.log(filteredProducts)
+    // console.log(filteredProducts)
       let sortedProducts=[];
 
       if(lowStock){
