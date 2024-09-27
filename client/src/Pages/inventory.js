@@ -135,7 +135,7 @@ console.log(formValues);
 };
 
 // Handle filter form submission and trigger product fetching with filters
-const handleFilter = (e) => {
+const handleFilter = async (e) => {
   e.preventDefault();
 Suggestions(true);
   if (!isChecked) {
@@ -151,9 +151,10 @@ Suggestions(true);
       expiringDays,
       lowStock,
     };
-setPage(1);
+    await setPage(1);
+    setProd([]);
     // Fetch products with the filters, starting from page 1
-    fetchProducts(); // Use page 1 when applying filters
+   await fetchProducts(); // Use page 1 when applying filters
   } else {
     alert("Turn off the X machine before filtering");
   }
@@ -257,6 +258,8 @@ setPage(1);
       expiringDays: '',
       lowStock: false,
     });
+
+    setPage(1);
     Suggestions(false);
     fetchProducts();
   };
