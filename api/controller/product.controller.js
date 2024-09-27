@@ -217,9 +217,10 @@ export const sortProducts = async (req, res) => {
   }
     // Add name filter if provided
 
-    if (name) {
-        query.title = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
+      if (name) {
+        query.title = { $regex: `^${name}`, $options: 'i' }; // 'i' for case-insensitive and '^' ensures it matches from the start
       }
+
    
       // if (category) {
       //   query. = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
