@@ -39,7 +39,32 @@ const Purchase = () => {
   const [showModaldescription, setShowModaldescription] = useState(false);
   const [matchingProducts, setMatchingProducts] = useState([]);
 
+  const handleTokenExpiration = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
 
+        if (decodedToken.exp < currentTime) {
+          handlenewLogout();  
+        }
+      } catch (error) {
+        console.error("Error decoding token", error);
+      }
+    }
+  };
+
+  const handlenewLogout = () => {
+    localStorage.removeItem('token');
+    axiosInstance.post('/auth/logout').catch((err) => console.error(err));
+    // window.location.href = '/login';
+    navigate('/login');
+  };
+
+  React.useEffect(() => {
+    handleTokenExpiration(); 
+  }, []);
 
 
   // ============================functions to search name and description===============================
@@ -916,6 +941,9 @@ const Purchase = () => {
                   Purchase Rate
                 </th>
                 <th className="p-3 border border-gray-600 text-left">
+                 Total purchase Rate
+                </th>
+                <th className="p-3 border border-gray-600 text-left">
                   Profit%
                 </th>
                 <th className="p-3 border border-gray-600 text-left">HSN</th>
@@ -953,6 +981,9 @@ const Purchase = () => {
                     </td>
                     <td className="p-3 border border-gray-600">
                       {item.purchaseRate}
+                    </td>
+                    <td className="p-3 border border-gray-600">
+                      {item.purchaseRate*item.qty}
                     </td>
                     <td className="p-3 border border-gray-600">
                       {item.profit}

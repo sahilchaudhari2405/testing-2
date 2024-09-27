@@ -20,6 +20,7 @@ const Login = () => {
       try {
         // Decode the token
         const decodedToken = jwtDecode(token);
+        console.log("exp time: ",decodedToken.exp )
 
         // Check if the token is expired
         const currentTime = Date.now() / 1000; // Current time in seconds
@@ -28,6 +29,7 @@ const Login = () => {
           toast.error('Session expired. Please log in again.');
           localStorage.removeItem('token'); // Remove expired token
           return; // Do not navigate, keep the user on the login page
+
         }
 
         // Extract role or any other user information

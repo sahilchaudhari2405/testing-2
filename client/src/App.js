@@ -28,7 +28,60 @@ import ProtectedRoute from './component/ProtectedRoute';
 import InvoiceTest from './component/invoicetest.js';
 import Edit from './Pages/edit.js';
 
+import {jwtDecode} from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from './axiosConfig.js';
+
+const validateToken = () => {
+  const token = localStorage.getItem('token');
+  
+  if (token) {
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+
+      if (decodedToken.exp < currentTime) {
+        return false;
+      }
+
+      return true; 
+    } catch (error) {
+      return false; 
+    }
+  }
+
+  return false; 
+};
+
 const App = () => {
+  const handleTokenExpiration = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+
+        if (decodedToken.exp < currentTime) {
+          handleLogout();  
+        }
+      } catch (error) {
+        console.error("Error decoding token", error);
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    axiosInstance.post('/auth/logout').catch((err) => console.error(err));
+    window.location.href = '/login';
+    // navigate('/login');
+  };
+
+  React.useEffect(() => {
+    handleTokenExpiration(); 
+  }, []);
+
+
   return (
     <Provider store={store}>
       <Router>

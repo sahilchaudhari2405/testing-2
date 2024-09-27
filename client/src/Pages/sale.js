@@ -98,6 +98,33 @@ const Sale = () => {
     "__v": 0
   });
 
+  const handleTokenExpiration = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+
+        if (decodedToken.exp < currentTime) {
+          handlenewLogout();  
+        }
+      } catch (error) {
+        console.error("Error decoding token", error);
+      }
+    }
+  };
+
+  const handlenewLogout = () => {
+    localStorage.removeItem('token');
+    axiosInstance.post('/auth/logout').catch((err) => console.error(err));
+    // window.location.href = '/login';
+    navigate('/login');
+  };
+
+  React.useEffect(() => {
+    handleTokenExpiration(); 
+  }, []);
+
   const handleViewProduct = (product) => {
     setSelectedProduct(product);
     setIsViewProductModalOpen(true);
@@ -1163,6 +1190,7 @@ const handleScan = (data) => {
                         type="number"
                         value={editId === item._id ? editItem.quantity : item.quantity}
                         min="1"
+                        readOnly
                         className="w-12 sm:w-12 text-center border m-1 sm:mb-0"
                         onChange={(e) => handleInputChange(e, "quantity")}
                       />

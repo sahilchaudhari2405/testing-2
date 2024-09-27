@@ -3,8 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers, updateUser,  signupUser } from '../Redux/User/userSlices';
 import { UserIcon, MailIcon, LockClosedIcon, PhoneIcon, DeviceMobileIcon, BriefcaseIcon } from '@heroicons/react/outline';
 import { toast } from 'react-toastify'; // Import toast
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import axiosInstance from '../axiosConfig';
 
 const Users = () => {
+    const navigate = useNavigate()
     const dispatch = useDispatch();
     const { users, status, error } = useSelector((state) => state.user);
     const [form, setForm] = useState({
@@ -17,6 +21,33 @@ const Users = () => {
         counterNumber: '',
         role: 'Select Role',
     });
+
+    const handleTokenExpiration = () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          try {
+            const decodedToken = jwtDecode(token);
+            const currentTime = Date.now() / 1000;
+    
+            if (decodedToken.exp < currentTime) {
+              handlenewLogout();  
+            }
+          } catch (error) {
+            console.error("Error decoding token", error);
+          }
+        }
+      };
+    
+      const handlenewLogout = () => {
+        localStorage.removeItem('token');
+        axiosInstance.post('/auth/logout').catch((err) => console.error(err));
+        // window.location.href = '/login';
+        navigate('/login');
+      };
+    
+      React.useEffect(() => {
+        handleTokenExpiration(); 
+      }, []);
 
     useEffect(() => {
         dispatch(fetchUsers());
