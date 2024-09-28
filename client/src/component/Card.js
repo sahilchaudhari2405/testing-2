@@ -295,7 +295,7 @@ const ProductCard = ({ items }) => {
         <Modal
           show={isModalVisible}
           onClose={() => setIsModalVisible(false)}
-          product={currentProduct}
+          product={items}
         />
       )}
 
