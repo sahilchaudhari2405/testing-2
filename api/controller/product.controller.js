@@ -182,6 +182,93 @@ export const viewProducts = async (req, res) => {
   }
 };
 
+export const getProducts = async (req, res) => {
+  const page = parseInt(req.body.page) || 1; // Get the page number from body, default to 1
+  const limit = 50; // Set limit, default to 50
+  const skip = (page - 1) * limit; // Calculate how many products to skip for pagination
+
+  try {
+    // Extract filter options from the request body
+    const { barcode, description, category, brand, weight, expiringDays, lowStock } = req.body;
+    let query = {};
+    console.log(req.body);
+    const noOtherFilters = !barcode && !description && !category && !brand && !weight && !expiringDays;
+
+    //  console.log(noOtherFilters);
+     
+    if(lowStock && noOtherFilters)
+    {      let sortedProducts=[];
+      sortedProducts = await Product.find()
+      .sort({ quantity: 1 }) 
+      .skip(skip)
+      .limit(limit)
+      .populate('category');
+      return res.status(200).send({ 
+        message: "Only Low stock products retrieved successfully", 
+        status: true, 
+        data: sortedProducts,  
+      });
+    }
+    // Apply filters if provided
+    if (barcode) {
+      query.BarCode = barcode;
+    }
+    if (brand) {
+      query.brand = { $regex: brand, $options: 'i' }; // Case-insensitive regex search
+    }
+    if (weight) {
+      query.weight = weight;
+    }
+    if (description) {
+      query.title = { $regex: new RegExp(`^${description}`), $options: 'i' }; // Search by description prefix
+    }
+
+    // Fetch products based on filters
+    let products;
+
+    if (Object.keys(query).length > 0) {
+      // If there are any filters, apply them
+
+      products = await Product.find(query)
+      .sort({ quantity:(lowStock)? 1:-1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('category');
+
+      // If category filter is provided, further filter by category name
+      if (category) {
+        products = products.filter(product =>
+          product.category?.name.toLowerCase().startsWith(category.toLowerCase())
+        );
+      }
+
+
+    } else {
+      // If no filters are provided, fetch the newest products
+      products = await Product.find()
+        .sort({ updatedAt: -1 }) // Get newest products first
+        .skip(skip)
+        .limit(limit)
+        .populate('category');
+    }
+
+    // Return the filtered and paginated products
+    return res.status(200).send({
+      message: "Products retrieved successfully",
+      status: true,
+      data: products
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      message: "Internal server error",
+      status: false,
+      error: error.message
+    });
+  }
+};
+
+
 
 // ========================filter products in inventory=====================================
 export const sortProducts = async (req, res) => {
@@ -217,9 +304,10 @@ export const sortProducts = async (req, res) => {
   }
     // Add name filter if provided
 
-    if (name) {
-        query.title = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
+      if (name) {
+        query.title = { $regex: `^${name}`, $options: 'i' }; // 'i' for case-insensitive and '^' ensures it matches from the start
       }
+
    
       // if (category) {
       //   query. = { $regex: name, $options: 'i' }; // 'i' for case-insensitive
