@@ -299,8 +299,16 @@ Suggestions(true);
     }
   };
 
-  const handleExport = () => {
-    exportExcelData(prod);
+  const handleExport = async () => {
+    try {
+      const response = await axiosInstance.get('/product/view');
+      const productsTOExport = response.data.data;
+      exportExcelData(productsTOExport);
+
+    } catch (error) {
+      console.log("error: ",error);
+    }
+
   };
 
 
