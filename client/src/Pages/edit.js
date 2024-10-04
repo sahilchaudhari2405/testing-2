@@ -572,7 +572,7 @@ const Edit = () => {
         toast.success('Order updated successfully!');
         console.log("yes")
         handleSetData(response.data.data);
-        // navigate('/view')
+        navigate('/view')
       })
       .catch(err => {
         alert('Failed to update order.');

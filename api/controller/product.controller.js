@@ -497,6 +497,7 @@ export const updateProduct = async (req, res) => {
   try {
     let imageUrl = '';
     if (req.file) {
+      console.log("yes request file")
       try {
         const result = await uploadImageOnCloudinary(req.file.path);
         imageUrl = result.secure_url;
@@ -506,6 +507,8 @@ export const updateProduct = async (req, res) => {
         return res.status(500).send({ message: "Internal server error", status: false, error: "Error uploading image to Cloudinary" });
       }
     } else {
+      console.log("no request file")
+
       const existingProduct = await Product.findById(id);
       if (!existingProduct) {
         return res.status(404).send({ message: "Product not found", status: false });

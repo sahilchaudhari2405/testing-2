@@ -1146,9 +1146,13 @@ const handleScan = (data) => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-        <div>
-            <span class="text-muted-foreground">ITEMS</span>
-            <span class="text-primary px-3">{items[1]&&items[1].totalItem}</span>
+        <div className="p-2 bg-yellow-300 font-semibold rounded mb-2">
+            <span class="text-muted-foreground">Total Items Quantity : </span>
+            <span class="text-primary px-3">
+            {items[1] && items[1].cartItems 
+              ? items[1].cartItems.reduce((total, item) => total + item.quantity, 0) 
+              : 0}
+            </span>
           </div>
           <table className="w-full mb-2 border-collapse bg-white rounded-lg shadow-md overflow-hidden">
             <thead>
@@ -1190,7 +1194,7 @@ const handleScan = (data) => {
                         type="number"
                         value={editId === item._id ? editItem.quantity : item.quantity}
                         min="1"
-                        readOnly
+            
                         className="w-12 sm:w-12 text-center border m-1 sm:mb-0"
                         onChange={(e) => handleInputChange(e, "quantity")}
                       />
