@@ -6,7 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import { logoutUser } from '../Redux/User/userSlices';
 import { toast } from 'react-toastify';
 import Modal from '../component/Modal';
-import { fetchProducts, sortProducts } from "../Redux/Product/productSlice";
+import { fetchProduct, fetchProducts, sortProducts } from "../Redux/Product/productSlice";
 import { fetchCategories } from "../Redux/Category/categoriesSlice";
 import CategorySuggestions from '../component/CategorySuggestions';
 import { importExcelData, exportExcelData } from '../component/Card'; 
@@ -165,15 +165,13 @@ Suggestions(true);
   }, [dispatch]);
 
   useEffect(()=>{
-    fetchProducts(page);
-  },[page])
+    fetchProducts();
+  },[])
   useEffect(() => {
-      setProd(products)
-
-
-    console.log("getting filter products",prod)
-  }, [ products]);
-
+    fetchProduct(1)
+    console.log("getting filter products",products)
+  }, [ prod]);
+  
   useEffect(() => {
     if (formValues.category) {
       const filtered = categories.filter((cat) =>
@@ -270,6 +268,7 @@ Suggestions(true);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    console.log("!");
   };
 
   const handleCategorySelect = (category) => {

@@ -76,12 +76,14 @@ const ProductCard = ({ items }) => {
     setIsPopupVisible(false);
   };
 
-  const handleEdit = () => {
-    setCurrentProduct(items);
+  const handleEditOpen = () => {
     setIsModalVisible(true);
-    setIsPopupVisible(false);
   };
+  const handleEditClose = () => {
 
+    setIsModalVisible(false);
+  
+  };
   const handleGenerateBarcode = () => {
     setIsQuantityPopupVisible(true);
     setIsPopupVisible(false);
@@ -309,7 +311,7 @@ const ProductCard = ({ items }) => {
             </button>
             <button
               className="block w-full text-left px-4 py-2 text-muted-foreground hover:bg-gray-100"
-              onClick={handleEdit}
+              onClick={handleEditOpen}
             >
               Edit
             </button>
@@ -324,13 +326,13 @@ const ProductCard = ({ items }) => {
         )}
       </div>
 
-      {isModalVisible && (
+
         <Modal
           show={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
+          onClose={handleEditClose}
           product={items}
         />
-      )}
+
 
       {isQuantityPopupVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
