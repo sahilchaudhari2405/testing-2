@@ -6,6 +6,10 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from "jspdf";
 import JsBarcode from 'jsbarcode';
 import { toast } from "react-toastify";
+import { BiSolidImageAdd } from "react-icons/bi";
+import ImageGenerator from "../Pages/ImageGenerator";
+
+
 
 // Existing styles
 const cardClasses = "bg-white p-4 rounded-lg flex items-center justify-between";
@@ -58,7 +62,7 @@ const ProductCard = ({ items }) => {
   const dispatch = useDispatch();
 
   const handlePopupToggle = () => {
-    setIsPopupVisible(!isPopupVisible);
+    setIsPopupVisible(true);
   };
 
   const handleClickOutside = (event) => {
@@ -210,10 +214,35 @@ const ProductCard = ({ items }) => {
     };
   }, []);
 
+  const [isImageGenModalVisible, setImageGenModal] = useState(false);
+
+  const handleEditClick = () => {
+    setImageGenModal(true); 
+  };
+
   return (
     <div className={cardClasses} id={items._id}>
       <div className="flex items-center space-x-4">
-        <img src={items.imageUrl} alt={items.title} className="rounded-lg w-24 h-25" />
+        {/* <img src={items.imageUrl} alt={items.title} className="rounded-lg w-24 h-25" /> */}
+        <div className="relative group">
+          {/* Image with hover effect */}
+          <img
+            src={items.imageUrl}
+            alt={items.title}
+            className="rounded-lg w-24 h-25 transition duration-300 ease-in-out group-hover:blur-md"
+          />
+
+          {/* Edit Icon shown on hover */}
+          <div
+            className="absolute inset-0 flex justify-center items-center opacity-0 group-hover:opacity-100 transition duration-300"
+            onClick={handleEditClick}
+          >
+            <button className="text-white bg-blue-500 p-2 rounded-full">
+              {/* ✏️ Edit */}
+              <BiSolidImageAdd />
+            </button>
+          </div>
+        </div>
         <div>
           <h2 className="text-lg font-semibold">
             {items.title}{" "}/
@@ -229,7 +258,11 @@ const ProductCard = ({ items }) => {
           </span>
           <p className="text-black">Quantity:{items.quantity}</p>
         </div>
+
+        
       </div>
+      {/* Edit Image Modal */}
+      {isImageGenModalVisible && <ImageGenerator setImageGenModal={setImageGenModal} item={items} />}
       <div
         className="flex space-x-8 relative"
         onMouseLeave={() => setIsPopupVisible(false)}

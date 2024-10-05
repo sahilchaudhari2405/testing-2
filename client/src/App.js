@@ -10,6 +10,7 @@ import Inventory from './Pages/inventory';
 // import Sales from './pages/Sales';
 import EditOrder from './Pages/editOrder.js';
 import View from './Pages/view.js';
+import ImageGenerator from './Pages/ImageGenerator.js';
 import Login from './Pages/login';
 import Sales from './Pages/sale';
 import Forbidden from './component/Forbidden';
@@ -148,6 +149,7 @@ const App = () => {
             }
           />
            <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
+           <Route path="/generateimage" element={<PageWithNavbar><ImageGenerator /></PageWithNavbar>} />
            <Route path="/admin/client" element={<PageWithNavbar><Clients /></PageWithNavbar>} />
           {/*<Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
           <Route path="/reports" element={<PageWithNavbar><Reports /></PageWithNavbar>} />
