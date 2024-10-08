@@ -50,7 +50,7 @@ export const exportExcelData = (data) => {
   XLSX.writeFile(workbook, 'inventory_data.xlsx');
 };
 
-const ProductCard = ({ items }) => {
+const ProductCard = ({ items,OnAction }) => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isQuantityPopupVisible, setIsQuantityPopupVisible] = useState(false);
@@ -206,7 +206,13 @@ const ProductCard = ({ items }) => {
     doc.save("barcodes.pdf");
   };
   
-
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+  };
+  const handleCloseSuccessModal = () => {
+    setIsModalVisible(false);
+    OnAction()
+  };
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -324,13 +330,13 @@ const ProductCard = ({ items }) => {
         )}
       </div>
 
-      {isModalVisible && (
+   
         <Modal
           show={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
+          onClose={ handleCloseModal}
+          onSuccess={handleCloseSuccessModal}
           product={items}
         />
-      )}
 
       {isQuantityPopupVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">

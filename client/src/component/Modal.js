@@ -6,8 +6,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // 
+import axiosInstance from '../axiosConfig';
 
-const Modal = ({ show, onClose, product }) => {
+const Modal = ({ show, onClose, product,onSuccess }) => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
   const [form, setForm] = useState({
@@ -90,7 +91,7 @@ const Modal = ({ show, onClose, product }) => {
     setForm((prevForm) => ({ ...prevForm, description: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (product) {
@@ -99,23 +100,24 @@ const Modal = ({ show, onClose, product }) => {
             toast.error("Product ID not found!");
             return;
         }
-        dispatch(updateProduct({ id: productId, productData: form })).then((response) => {
-            if (response.error) {
-                toast.error('Failed to update product');
-            } else {
-                toast.success('Product updated successfully');
-                onClose();
-            }
-        });
+        try {
+          const response = await axiosInstance.put(`/product/update/${productId}`, form);
+        console.log(   response.data.data)
+           toast.success('Product updated successfully');
+           onSuccess()
+        } catch (error) {
+          toast.error('Failed to update product');
+        }
+
     } else {
-        dispatch(createProduct(form)).then((response) => {
-            if (response.error) {
-                toast.error('Failed to create product');
-            } else {
-                toast.success('Product created successfully');
-                onClose();
-            }
-        });
+        try {
+          const response = await axiosInstance.post('/product/create', form);
+        console.log(   response.data.data)
+           toast.success('Product create successfully');
+           onSuccess()
+        } catch (error) {
+          toast.error('Failed to create product');
+        }
     }
 };
 

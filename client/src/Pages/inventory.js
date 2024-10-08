@@ -271,7 +271,20 @@ Suggestions(true);
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-
+  const handleCloseSuccessModal = async () => {
+    setIsModalOpen(false);
+    setPage(1);
+    console.log("yes")
+   await fetchProducts();
+  };
+  const handleCloseAddSuccessModal = async () => {
+    setIsModalOpen(false);
+    setProd([]);
+    setPage(1);
+    console.log("yes")
+   await fetchProducts();
+  };
+  
   const handleCategorySelect = (category) => {
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -282,7 +295,7 @@ Suggestions(true);
 
   const handleImport = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file) { 
       importExcelData(file, async (data) => {
         setProd(data);
         try {
@@ -514,13 +527,14 @@ const handleCheckboxChange = (event) => {
           <ProductCard
             key={items._id}
             items={items}
+            OnAction={handleCloseSuccessModal}
           />
          ))}
          {loading && <div>Loading more products...</div>}
          {prod.length === 0 && !loading ? <div className='bg-white text-black text-2xl w-full h-[80vh] pt-[30vh] text-center'> Sorry No Product Found As Per Your Search Combination</div> : null}
         </div>
       </div>
-      <Modal show={isModalOpen} onClose={handleCloseModal}>
+      <Modal show={isModalOpen} onClose={handleCloseModal} onSuccess={handleCloseAddSuccessModal} >
       </Modal>
     </div>
   );
