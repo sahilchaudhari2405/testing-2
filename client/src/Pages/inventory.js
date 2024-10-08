@@ -152,7 +152,7 @@ Suggestions(true);
       lowStock,
     };
     await setPage(1);
-    setProd([]);
+   await setProd([]);
     // Fetch products with the filters, starting from page 1
    await fetchProducts(); // Use page 1 when applying filters
   } else {
