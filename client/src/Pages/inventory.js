@@ -17,7 +17,6 @@ const Inventory = () => {
   const navigate = useNavigate();
   
   const [fullName, setFullName] = useState('');
-  const { products, status } = useSelector((state) => state.products);
   const { categories } = useSelector((state) => state.categories);
   const [prod, setProd] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -165,14 +164,8 @@ Suggestions(true);
   }, [dispatch]);
 
   useEffect(()=>{
-    fetchProducts(page);
+    fetchProducts();
   },[page])
-  useEffect(() => {
-      setProd(products)
-
-
-    console.log("getting filter products",prod)
-  }, [ products]);
 
   useEffect(() => {
     if (formValues.category) {
