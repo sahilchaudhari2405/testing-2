@@ -17,7 +17,6 @@ const Inventory = () => {
   const navigate = useNavigate();
   
   const [fullName, setFullName] = useState('');
-  const { products, status } = useSelector((state) => state.products);
   const { categories } = useSelector((state) => state.categories);
   const [prod, setProd] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -152,7 +151,7 @@ Suggestions(true);
       lowStock,
     };
     await setPage(1);
-    setProd([]);
+   await setProd([]);
     // Fetch products with the filters, starting from page 1
    await fetchProducts(); // Use page 1 when applying filters
   } else {
@@ -166,12 +165,8 @@ Suggestions(true);
 
   useEffect(()=>{
     fetchProducts();
-  },[])
-  useEffect(() => {
-    fetchProduct(1)
-    console.log("getting filter products",products)
-  }, [ prod]);
-  
+  },[page])
+
   useEffect(() => {
     if (formValues.category) {
       const filtered = categories.filter((cat) =>
@@ -268,9 +263,21 @@ Suggestions(true);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    console.log("!");
   };
-
+  const handleCloseSuccessModal = async () => {
+    setIsModalOpen(false);
+    setPage(1);
+    console.log("yes")
+   await fetchProducts();
+  };
+  const handleCloseAddSuccessModal = async () => {
+    setIsModalOpen(false);
+    setProd([]);
+    setPage(1);
+    console.log("yes")
+   await fetchProducts();
+  };
+  
   const handleCategorySelect = (category) => {
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -281,7 +288,7 @@ Suggestions(true);
 
   const handleImport = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file) { 
       importExcelData(file, async (data) => {
         setProd(data);
         try {
@@ -513,13 +520,14 @@ const handleCheckboxChange = (event) => {
           <ProductCard
             key={items._id}
             items={items}
+            OnAction={handleCloseSuccessModal}
           />
          ))}
          {loading && <div>Loading more products...</div>}
          {prod.length === 0 && !loading ? <div className='bg-white text-black text-2xl w-full h-[80vh] pt-[30vh] text-center'> Sorry No Product Found As Per Your Search Combination</div> : null}
         </div>
       </div>
-      <Modal show={isModalOpen} onClose={handleCloseModal}>
+      <Modal show={isModalOpen} onClose={handleCloseModal} onSuccess={handleCloseAddSuccessModal} >
       </Modal>
     </div>
   );

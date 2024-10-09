@@ -87,7 +87,7 @@ export const deleteCategory = async (req, res) => {
 // View all categories
 export const viewCategories = async (req, res) => {
     try {
-        const categories = await Category.find().populate('parentCategory');
+        const categories = await Category.find().limit(10).populate('parentCategory');
         return res.status(200).send({ message: "Categories retrieved successfully", status: true, data: categories });
     } catch (error) {
         console.error(error);
