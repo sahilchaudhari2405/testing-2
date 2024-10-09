@@ -6,7 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import { logoutUser } from '../Redux/User/userSlices';
 import { toast } from 'react-toastify';
 import Modal from '../component/Modal';
-import { fetchProducts, sortProducts } from "../Redux/Product/productSlice";
+import { fetchProduct, fetchProducts, sortProducts } from "../Redux/Product/productSlice";
 import { fetchCategories } from "../Redux/Category/categoriesSlice";
 import CategorySuggestions from '../component/CategorySuggestions';
 import { importExcelData, exportExcelData } from '../component/Card'; 

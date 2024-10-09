@@ -76,12 +76,14 @@ const ProductCard = ({ items,OnAction }) => {
     setIsPopupVisible(false);
   };
 
-  const handleEdit = () => {
-    setCurrentProduct(items);
+  const handleEditOpen = () => {
     setIsModalVisible(true);
-    setIsPopupVisible(false);
   };
+  const handleEditClose = () => {
 
+    setIsModalVisible(false);
+  
+  };
   const handleGenerateBarcode = () => {
     setIsQuantityPopupVisible(true);
     setIsPopupVisible(false);
@@ -315,7 +317,7 @@ const ProductCard = ({ items,OnAction }) => {
             </button>
             <button
               className="block w-full text-left px-4 py-2 text-muted-foreground hover:bg-gray-100"
-              onClick={handleEdit}
+              onClick={handleEditOpen}
             >
               Edit
             </button>

@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // 
 import axiosInstance from '../axiosConfig';
+import axiosInstance from '../axiosConfig';
 
 const Modal = ({ show, onClose, product,onSuccess }) => {
   const dispatch = useDispatch();
@@ -91,6 +92,7 @@ const Modal = ({ show, onClose, product,onSuccess }) => {
     setForm((prevForm) => ({ ...prevForm, description: value }));
   };
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -296,7 +298,4 @@ const Modal = ({ show, onClose, product,onSuccess }) => {
 };
 
 export default Modal;
-
-
-
 
