@@ -7,7 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // 
 import axiosInstance from '../axiosConfig';
-import axiosInstance from '../axiosConfig';
 
 const Modal = ({ show, onClose, product,onSuccess }) => {
   const dispatch = useDispatch();
