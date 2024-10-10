@@ -18,6 +18,7 @@ const Inventory = () => {
   
   const [fullName, setFullName] = useState('');
   const { categories } = useSelector((state) => state.categories);
+  const { products, status } = useSelector((state) => state.products);
   const [prod, setProd] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, Suggestions] = useState(false);
