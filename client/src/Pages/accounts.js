@@ -135,7 +135,7 @@ const Accounts = () => {
 
       // Send the data to the backend
       try {
-        const response = await axiosInstance.post('/admin/UserImport', {
+        const response = await axiosInstance.post('/users/admin/UserImport', {
           users: data, // Sending only the data as payload
         });
 

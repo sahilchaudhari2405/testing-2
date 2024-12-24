@@ -4,7 +4,7 @@ import axiosInstance from '../../axiosConfig';
 // Async thunks for handling API requests related to ClosingBalance
 export const fetchClosingBalance = createAsyncThunk('closingBalance/fetchClosingBalance', async () => {
   try {
-    const response = await axiosInstance.get('/admin/Client');
+    const response = await axiosInstance.get('/users/admin/Client');
     console.log('Closing Order fetch!!' ,response)
 
     return response.data;  // Return the data directly from axios response
@@ -15,7 +15,7 @@ export const fetchClosingBalance = createAsyncThunk('closingBalance/fetchClosing
 
 export const createClosingBalance = createAsyncThunk('closingBalance/createClosingBalance', async ({ monthYear, balance }) => {
   try {
-    const response = await axiosInstance.post('/admin/ClosingBalance', { monthYear, balance });
+    const response = await axiosInstance.post('/users/admin/ClosingBalance', { monthYear, balance });
     return response.data;  // Return the newly created closing balance data
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to create closing balance');

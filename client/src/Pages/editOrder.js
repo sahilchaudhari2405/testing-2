@@ -75,7 +75,7 @@ const EditOrder = () => {
     }
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/order/getCounterOrderbyID/${orderId}`);
+      const response = await axiosInstance.get(`/sales/order/getCounterOrderbyID/${orderId}`);
       console.log("editorderresponse: ",response.data);
       setFormData(response.data);
       const orderData = response.data.data;
@@ -176,7 +176,7 @@ const EditOrder = () => {
       orderId : orderId
     }
 
-    axiosInstance.put('/order/RemoveOneItem', remove_payload)
+    axiosInstance.put('/sales/order/RemoveOneItem', remove_payload)
       .then(async response => {
         toast.success('Order item removed successfully!');
         await fetchOrderData()
@@ -189,7 +189,7 @@ const EditOrder = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axiosInstance.put(`/order/updateOrderbyID/${orderId}`, formData)
+    axiosInstance.put(`/sales/order/updateOrderbyID/${orderId}`, formData)
       .then(async response => {
         toast.success('Order updated successfully!');
         await fetchOrderData()
@@ -204,7 +204,7 @@ const EditOrder = () => {
       orderId : orderId
     }
 
-    axiosInstance.put('/order/cancelOrder', cancelOrder_payload)
+    axiosInstance.put('/sales/order/cancelOrder', cancelOrder_payload)
       .then(async response => {
         toast.success('Order cancelled successfully!');
         await fetchOrderData()
@@ -246,7 +246,7 @@ const EditOrder = () => {
       paymentType : paymenttype
     }
 
-    axiosInstance.put('/order/decreaseQuantity', decreaseQuantity_payload)
+    axiosInstance.put('/sales/order/decreaseQuantity', decreaseQuantity_payload)
       .then(async response => {
         toast.success('Quantity decreased successfully!');
         await fetchOrderData()

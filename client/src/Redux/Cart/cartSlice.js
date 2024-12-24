@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get('/cart/getCart');
+    const response = await axiosInstance.get('/sales/cart/getCart');
     const items = [response.data.data.cartItems, response.data.data];
     // console.log(response)
     return items;
@@ -19,7 +19,7 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWi
 export const addToCart = createAsyncThunk('cart/addToCart', async (productCode, { rejectWithValue }) => {
 // console.log(productId)
   try {
-    const response = await axiosInstance.post('/cart/addCart', { productCode });
+    const response = await axiosInstance.post('/sales/cart/addCart', { productCode });
     if (response.data.success) {
       toast.success('Product added to cart');
     }
@@ -34,12 +34,12 @@ export const addToCart = createAsyncThunk('cart/addToCart', async (productCode, 
 });
 
 export const addQuantity = createAsyncThunk('cart/addQuantity', async (productId) => {
-  const response = await axiosInstance.post('/cart/addCart', { productId });
+  const response = await axiosInstance.post('/sales/cart/addCart', { productId });
   return response.data;
 });
 
 export const removeFromCart = createAsyncThunk('cart/removeFromCart', async (productId) => {
-  const response = await axiosInstance.delete(`/cart/removeOneCart?itemId=${productId}`);
+  const response = await axiosInstance.delete(`/sales/cart/removeOneCart?itemId=${productId}`);
   // console.log(response)
   return response.data;
 });
@@ -49,7 +49,7 @@ export const clearCart = createAsyncThunk('cart/clearCart', async () => {
 });
 
 export const updateCartQuantity = createAsyncThunk('cart/updateCartQuantity', async ({ productId }) => {
-  const response = await axiosInstance.delete(`/cart/removeItemQuantity?itemId=${productId}`);
+  const response = await axiosInstance.delete(`/sales/cart/removeItemQuantity?itemId=${productId}`);
   return response.data;
 });
 

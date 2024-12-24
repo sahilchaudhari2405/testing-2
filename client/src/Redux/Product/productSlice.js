@@ -3,7 +3,7 @@ import axiosInstance from '../../axiosConfig';
 
 export const createProduct = createAsyncThunk('products/createProduct', async (productData, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post('/product/create', productData);
+    const response = await axiosInstance.post('/products/product/create', productData);
     return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -12,7 +12,7 @@ export const createProduct = createAsyncThunk('products/createProduct', async (p
 
 export const importProducts = createAsyncThunk('products/importProducts', async (products, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post('/product/importProducts', { products });
+    const response = await axiosInstance.post('/products/product/importProducts', { products });
     return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -21,7 +21,7 @@ export const importProducts = createAsyncThunk('products/importProducts', async 
 
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get('/product/view');
+    const response = await axiosInstance.get('/products/product/view');
     return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -31,7 +31,7 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_
 export const sortProducts = createAsyncThunk('products/sortProducts', async ({ barcode, description, category ,brand,weight,expiringDays,lowStock}) => {
  const name=description
   try {
-    const response = await axiosInstance.post('/product/sortProducts',{ barcode, name, category ,brand,weight,expiringDays,lowStock});
+    const response = await axiosInstance.post('/products/product/sortProducts',{ barcode, name, category ,brand,weight,expiringDays,lowStock});
 
     console.log(response)
     return response.data.data;  // Return the sorted orders data
@@ -42,7 +42,7 @@ export const sortProducts = createAsyncThunk('products/sortProducts', async ({ b
 
 export const deleteProduct = createAsyncThunk('products/deleteProduct', async (productId, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.delete(`/product/delete/${productId}`);
+    const response = await axiosInstance.delete(`/products/product/delete/${productId}`);
     return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -51,7 +51,7 @@ export const deleteProduct = createAsyncThunk('products/deleteProduct', async (p
 
 export const updateProduct = createAsyncThunk('products/updateProduct', async ({ id, productData }, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.put(`/product/update/${id}`, productData);
+    const response = await axiosInstance.put(`/products/product/update/${id}`, productData);
     return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -62,7 +62,7 @@ export const fetchProduct = createAsyncThunk('products/fetchProduct', async (pro
  
  
   try {
-    const response = await axiosInstance.get(`/product/view/${prodCode}`);
+    const response = await axiosInstance.get(`/products/product/view/${prodCode}`);
    console.log(response.data)
     return response.data.data;
   } catch (error) {

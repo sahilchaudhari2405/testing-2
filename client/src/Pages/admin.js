@@ -226,7 +226,7 @@ const Admin = () => {
       if (!token) {
         throw new Error('No token found in localStorage');
       }
-      const response = await axiosInstance.get('/auth/users', {
+      const response = await axiosInstance.get('users/auth/users', {
         withCredentials: true
       });
       const resData = response.data;
@@ -243,7 +243,7 @@ const Admin = () => {
       if (!token) {
         throw new Error('No token found in localStorage');
       }
-      const response = await axiosInstance.get('/order/getAllCounterSales', {
+      const response = await axiosInstance.get('sales/order/getAllCounterSales', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const resData = response.data.data;
@@ -261,7 +261,7 @@ const Admin = () => {
       if (!token) {
         throw new Error('No token found in localStorage');
       }
-      const response = await axiosInstance.get(`/order/getCounterSale/${selectedCounter}`, {
+      const response = await axiosInstance.get(`sales/order/getCounterSale/${selectedCounter}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const resData = response.data.data;

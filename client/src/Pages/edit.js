@@ -221,7 +221,7 @@ const Edit = () => {
 
   const handlenewLogout = () => {
     localStorage.removeItem('token');
-    axiosInstance.post('/auth/logout').catch((err) => console.error(err));
+    axiosInstance.post('/users/auth/logout').catch((err) => console.error(err));
     // window.location.href = '/login';
     navigate('/login');
   };
@@ -290,7 +290,7 @@ const Edit = () => {
         payment,
       };
 
-      const response = await axiosInstance.post('/order/addCustomProductOnEdit', payload)
+      const response = await axiosInstance.post('/sales/order/addCustomProductOnEdit', payload)
         .then(async response => {
           toast.success('Order updated successfully!');
           console.log("yes")
@@ -380,7 +380,7 @@ const Edit = () => {
   const fetchProduct = async (barcode) => {
     try {
       console.log("inside fetchprodcut barcode: ",barcode)
-      const response = await axiosInstance.get(`/product/view/${barcode}`);
+      const response = await axiosInstance.get(`/products/product/view/${barcode}`);
       console.log("inside fetchprodcut response: ",response.data)
 
       return response.data.data; 
@@ -457,7 +457,7 @@ const Edit = () => {
     }
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/order/getCounterOrderbyID/${orderId}`);
+      const response = await axiosInstance.get(`/sales/order/getCounterOrderbyID/${orderId}`);
       console.log("editorderresponse: ", response.data);
       handleSetData(response.data.data);
       setError('');
@@ -553,7 +553,7 @@ const Edit = () => {
       orderId: orderId
     }
 
-    axiosInstance.put('/order/RemoveOneItem', remove_payload)
+    axiosInstance.put('/sales/order/RemoveOneItem', remove_payload)
       .then(async response => {
         toast.success('Order item removed successfully!');
         console.log("yes")
@@ -567,7 +567,7 @@ const Edit = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axiosInstance.put(`/order/updateOrderbyID/${orderId}`, formData)
+    axiosInstance.put(`/sales/order/updateOrderbyID/${orderId}`, formData)
       .then(async response => {
         toast.success('Order updated successfully!');
         console.log("yes")
@@ -584,7 +584,7 @@ const Edit = () => {
       orderId: orderId
     }
 
-  axiosInstance.put('/order/cancelOrder', cancelOrder_payload)
+  axiosInstance.put('/sales/order/cancelOrder', cancelOrder_payload)
       .then(async response => {
         toast.success('Order cancelled successfully!');
         console.log("yes")
@@ -627,7 +627,7 @@ const Edit = () => {
       paymentType: paymenttype
     }
 
-    axiosInstance.put('/order/decreaseQuantity', decreaseQuantity_payload)
+    axiosInstance.put('/sales/order/decreaseQuantity', decreaseQuantity_payload)
       .then(async response => {
         toast.success('Quantity decreased successfully!');
         console.log("yes")
@@ -655,7 +655,7 @@ const Edit = () => {
   const fetchProducts = async (id) => {
     console.log(id + "hallo")
     try {
-      const response = await axiosInstance.get(`/product/view/${id}`); // Adjust the URL to your API endpoint
+      const response = await axiosInstance.get(`/products/product/view/${id}`); // Adjust the URL to your API endpoint
       // setProducts(response.data);
       console.log("barcode fetch product reponse ", response)
       dispatch(addToCart(id)).then(() => {
@@ -756,7 +756,7 @@ const handleReturn = ()=>{
       "description": Inputdescriptionforsearch,
     });
     if (Inputdescriptionforsearch) {
-      const response = await axiosInstance.post('/product/sortProductsfordescription', { description: Inputdescriptionforsearch })
+      const response = await axiosInstance.post('/products/product/sortProductsfordescription', { description: Inputdescriptionforsearch })
       const filteredOrders = response.data.data;
       console.log("Inputdescriptionforsearch : ", filteredOrders);
       setMatchingProducts(filteredOrders);
@@ -775,7 +775,7 @@ const handleReturn = ()=>{
         orderId: orderId,
         productCode: id
       }
-      const response = await axiosInstance.post('/order/addProductOnEdit', payload)
+      const response = await axiosInstance.post('/products/order/addProductOnEdit', payload)
      await fetchOrderData();
       console.log("resposne: ", response);
     }

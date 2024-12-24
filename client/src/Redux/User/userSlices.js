@@ -12,7 +12,7 @@ const initialState = {
 
 export const loginUser = createAsyncThunk('user/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post(`/auth/login`, credentials);
+    const response = await axiosInstance.post(`/users/auth/login`, credentials);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data.error || error.message); // Ensure error message is passed
@@ -21,7 +21,7 @@ export const loginUser = createAsyncThunk('user/login', async (credentials, { re
 
 export const signupUser = createAsyncThunk('user/signup', async (newUser, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post(`/auth/signup`, newUser);
+    const response = await axiosInstance.post(`/users/auth/signup`, newUser);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data.message || error.message);
@@ -30,7 +30,7 @@ export const signupUser = createAsyncThunk('user/signup', async (newUser, { reje
 
 export const logoutUser = createAsyncThunk('user/logout', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post(`/auth/logout`);
+    const response = await axiosInstance.post(`/users/auth/logout`);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data.message || error.message);
@@ -39,7 +39,7 @@ export const logoutUser = createAsyncThunk('user/logout', async (_, { rejectWith
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get('/auth/users');
+    const response = await axiosInstance.get('/users/auth/users');
     return response.data;
   } catch (error) {
     console.error('Error fetching users:', error.message);
@@ -50,7 +50,7 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { rejec
 export const updateUser = createAsyncThunk('users/updateUser', async (userData, { rejectWithValue }) => {
   const { id, fullName, password, email, mobile, counterNumber } = userData;
   try {
-    const response = await axiosInstance.put(`/auth/users/update/${id}`, { fullName, password, email, mobile, counterNumber });
+    const response = await axiosInstance.put(`/users/auth/users/update/${id}`, { fullName, password, email, mobile, counterNumber });
     return response.data;
   } catch (error) {
     console.error('Error updating user:', error.message);
@@ -60,7 +60,7 @@ export const updateUser = createAsyncThunk('users/updateUser', async (userData, 
 
 export const deleteUser = createAsyncThunk('users/deleteUser', async (id, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.delete(`/auth/users/delete/${id}`);
+    const response = await axiosInstance.delete(`/users/auth/users/delete/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting user:', error.message);

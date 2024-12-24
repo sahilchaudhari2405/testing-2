@@ -60,7 +60,7 @@ const Inventory = () => {
 
   const handlenewLogout = () => {
     localStorage.removeItem('token');
-    axiosInstance.post('/auth/logout').catch((err) => console.error(err));
+    axiosInstance.post('/users/auth/logout').catch((err) => console.error(err));
     // window.location.href = '/login';
     navigate('/login');
   };
@@ -118,7 +118,7 @@ console.log(formValues);
     };
 
     // Make a POST request to fetch products with pagination and filters
-    const response = await axiosInstance.post('/product/view', requestBody);
+    const response = await axiosInstance.post('/products/product/view', requestBody);
 
     if (page === 1) {
       // If it's the first page, replace the product list
@@ -293,7 +293,7 @@ Suggestions(true);
       importExcelData(file, async (data) => {
         setProd(data);
         try {
-          const response = await axiosInstance.post('/product/importProducts', { products: data });
+          const response = await axiosInstance.post('/products/product/importProducts', { products: data });
           console.log('Data imported successfully:', response.data);
           dispatch((response.data.data));
           if (response.data.skipped.length > 0) {
@@ -308,7 +308,7 @@ Suggestions(true);
 
   const handleExport = async () => {
     try {
-      const response = await axiosInstance.get('/product/view');
+      const response = await axiosInstance.get('/products/product/view');
       const productsTOExport = response.data.data;
       exportExcelData(productsTOExport);
 

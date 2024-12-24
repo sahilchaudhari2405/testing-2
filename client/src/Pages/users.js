@@ -40,7 +40,7 @@ const Users = () => {
     
       const handlenewLogout = () => {
         localStorage.removeItem('token');
-        axiosInstance.post('/auth/logout').catch((err) => console.error(err));
+        axiosInstance.post('/users/auth/logout').catch((err) => console.error(err));
         // window.location.href = '/login';
         navigate('/login');
       };

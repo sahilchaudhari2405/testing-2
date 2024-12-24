@@ -32,6 +32,7 @@ import Edit from './Pages/edit.js';
 import {jwtDecode} from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from './axiosConfig.js';
+import OngoingSale from './Pages/ongoingSale.js';
 
 const validateToken = () => {
   const token = localStorage.getItem('token');
@@ -92,6 +93,7 @@ const App = () => {
           <Route path="/purchase" element={<PageWithNavbar><Purchase /></PageWithNavbar>} />
           <Route path="/inventory" element={<PageWithNavbar><Inventory /></PageWithNavbar>} />
           <Route path="/sales" element={<PageWithNavbar><Sales /></PageWithNavbar>} />
+          <Route path="/OngoingSales" element={<PageWithNavbar><OngoingSale /></PageWithNavbar>} />
           <Route path="/editOrder" element={<PageWithNavbar><EditOrder /></PageWithNavbar>} />
           <Route path="/edit/:orderId" element={<PageWithNavbar><Edit /></PageWithNavbar>} />
           <Route path="/forbidden" element={<Forbidden />} />

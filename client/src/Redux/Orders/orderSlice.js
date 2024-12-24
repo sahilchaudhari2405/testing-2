@@ -5,7 +5,7 @@ import axiosInstance from '../../axiosConfig';
 // Async thunks for handling API requests
 export const fetchOrders = createAsyncThunk('orders/fetchOrders', async () => {
   try {
-    const response = await axiosInstance.get('/admin/Client');
+    const response = await axiosInstance.get('/users/admin/Client');
     console.log('order fetched!!' ,response)
     return response.data; 
      // Return the data directly from axios response
@@ -19,7 +19,7 @@ export const fetchClientOrders = createAsyncThunk('orders/fetchClientOrders', as
   const next=page
   console.log(page)
   try {
-    const response = await axiosInstance.get(`/admin/Customer?page=${next}`);
+    const response = await axiosInstance.get(`/users/admin/Customer?page=${next}`);
     console.log('order fetched!!' ,response)
     return response.data; 
      // Return the data directly from axios response
@@ -31,7 +31,7 @@ export const fetchClientOrders = createAsyncThunk('orders/fetchClientOrders', as
 export const sortOrders = createAsyncThunk('orders/sortOrders', async ({ fromDate, toDate,name,selectedView}) => {
   const type = selectedView;
   try {
-    const response = await axiosInstance.post('/order/sortOrder', { fromDate, toDate,name,type });
+    const response = await axiosInstance.post('/sales/order/sortOrder', { fromDate, toDate,name,type });
     return response.data;  // Return the sorted orders data
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to sort orders');
@@ -42,7 +42,7 @@ export const createOrder = createAsyncThunk('orders/createOrder', async ({ payme
 
   // console.log(" hallo",paymentType, "fello",BillUser )
   try {
-    const response = await axiosInstance.post('/order/placeOrder', { paymentType, BillUser });
+    const response = await axiosInstance.post('/sales/order/placeOrder', { paymentType, BillUser });
     console.log(response.data)
     return response.data;  // Return the data directly from axios response
   } catch (error) {
@@ -52,7 +52,7 @@ export const createOrder = createAsyncThunk('orders/createOrder', async ({ payme
 
 export const updateOrder = createAsyncThunk('orders/updateOrder', async (order) => {
   try {
-    const response = await axiosInstance.put(`/order/${order.id}`, order);
+    const response = await axiosInstance.put(`/sales/order/${order.id}`, order);
     return response.data;  // Return the data directly from axios response
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to update order');
@@ -61,7 +61,7 @@ export const updateOrder = createAsyncThunk('orders/updateOrder', async (order) 
 
 export const deleteOrder = createAsyncThunk('orders/deleteOrder', async (orderId) => {
   try {
-    await axiosInstance.delete(`/order/${orderId}`);
+    await axiosInstance.delete(`/sales/order/${orderId}`);
     return orderId;  // Return the ID of the deleted order
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to delete order');
@@ -72,7 +72,7 @@ export const createPurchaseOrder = createAsyncThunk('purchaseOrders/createPurcha
   // console.log(products)
   // console.log(orderDetails)
   try {
-    const response = await axiosInstance.post('/product/purchaseOrder', {products, orderDetails });
+    const response = await axiosInstance.post('/products/product/purchaseOrder', {products, orderDetails });
      console.log(response);
     return response.data.order;  // Return the data directly from axios response
   } catch (error) {
@@ -83,7 +83,7 @@ export const createPurchaseOrder = createAsyncThunk('purchaseOrders/createPurcha
 
 export const fetchPurchaseOrders = createAsyncThunk('purchaseOrders/fetchPurchaseOrders', async () => {
   try {
-    const response = await axiosInstance.get('/admin/PurchaseOrderGet');
+    const response = await axiosInstance.get('/users/admin/PurchaseOrderGet');
     console.log(response.order)
     return response.data.order;  // Return the data directly from axios response
   } catch (error) {

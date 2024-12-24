@@ -197,7 +197,7 @@ const Sale = () => {
 
     console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
     if (Inputnameforsearch) {
-      const response = await axiosInstance.post('/admin/SearchClientSale',{ alphabet : Inputnameforsearch})
+      const response = await axiosInstance.post('/users/admin/SearchClientSale',{ alphabet : Inputnameforsearch})
       const distinctOrders = response.data.data;
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
@@ -219,7 +219,7 @@ const Sale = () => {
 
     console.log("searching Inputmobilenumberforsearch are: ",Inputmobilenumberforsearch);
     if (Inputmobilenumberforsearch) {
-      const response = await axiosInstance.post('/admin/SearchClientSale',{ number : Inputmobilenumberforsearch})
+      const response = await axiosInstance.post('/users/admin/SearchClientSale',{ number : Inputmobilenumberforsearch})
       const distinctOrders = response.data.data;
 
       console.log(distinctOrders);
@@ -260,7 +260,7 @@ const Sale = () => {
       "description": Inputdescriptionforsearch,
     });
     if (Inputdescriptionforsearch) {
-      const response = await axiosInstance.post('/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
+      const response = await axiosInstance.post('/products/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
       const filteredOrders = response.data.data;
       console.log("Inputdescriptionforsearch : ", filteredOrders);
       setMatchingProducts(filteredOrders);
@@ -279,7 +279,7 @@ const Sale = () => {
       "description": Inputdescriptionforsearch,
     });
     if (Inputdescriptionforsearch) {
-      const response = await axiosInstance.post('/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
+      const response = await axiosInstance.post('/products/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
       const filteredOrders = response.data.data;
       console.log("Inputdescriptionforsearch filteredorders by mobile number: ", filteredOrders);
       setMatchingMobileNumbers(filteredOrders);
@@ -388,7 +388,7 @@ console.log(editItem);
     };
   
     try {
-      const response = await axiosInstance.put('cart/adjustment', payload);
+      const response = await axiosInstance.put('/sales/cart/adjustment', payload);
   
       // if (!response.ok) {
       //   throw new Error('Network response was not ok' + response.statusText);
@@ -476,7 +476,7 @@ console.log(editItem);
   const fetchProducts = async (id) => {
     console.log(id+"hallo")
     try {
-      const response = await axiosInstance.get(`/product/view/${id}`); // Adjust the URL to your API endpoint
+      const response = await axiosInstance.get(`/products/product/view/${id}`); // Adjust the URL to your API endpoint
       // setProducts(response.data);
       console.log("barcode fetch product reponse ",response)
       dispatch(addToCart(id)).then(() => {
@@ -494,7 +494,7 @@ console.log(editItem);
   const fetchAllProducts = async () => {
     console.log(".............fetching All Products............")
     try {
-      const response = await axiosInstance.get(`/product/view`);
+      const response = await axiosInstance.get(`/products/product/view`);
       console.log("All Products are: ",response)
       const respdata = response.data.data
       setAllproducts(respdata)
@@ -537,7 +537,7 @@ const handleScan = (data) => {
 
  const handleRemoveAllItem=async () =>
  {
-  const response = await axiosInstance.delete(`/cart/removeAllItem`); 
+  const response = await axiosInstance.delete(`/sales/cart/removeAllItem`); 
   if(response.status==200)
   {dispatch(fetchCart());
   }

@@ -57,7 +57,7 @@ const Purchase = () => {
 
   const handlenewLogout = () => {
     localStorage.removeItem('token');
-    axiosInstance.post('/auth/logout').catch((err) => console.error(err));
+    axiosInstance.post('users/auth/logout').catch((err) => console.error(err));
     // window.location.href = '/login';
     navigate('/login');
   };
@@ -102,7 +102,7 @@ const Purchase = () => {
 
     console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
     if (Inputnameforsearch) {
-      const response = await axiosInstance.post('/admin/SearchClientDistributer',{ alphabet : Inputnameforsearch})
+      const response = await axiosInstance.post('users/admin/SearchClientDistributer',{ alphabet : Inputnameforsearch})
       const distinctOrders = response.data.data;
       if ( distinctOrders == [] ){
         setMatchingOrders([]);
@@ -150,7 +150,7 @@ const Purchase = () => {
       "description": Inputdescriptionforsearch,
     });
     if (Inputdescriptionforsearch) {
-      const response = await axiosInstance.post('/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
+      const response = await axiosInstance.post('products/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
       const filteredOrders = response.data.data;
       console.log("Inputdescriptionforsearch : ", filteredOrders);
       setMatchingProducts(filteredOrders);

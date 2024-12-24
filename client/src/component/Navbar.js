@@ -29,6 +29,8 @@ const Navbar = () => {
           <NavItem icon={<FaTachometerAlt className="text-yellow-400" />} label="Dashboard" to="/dashboard" />
           <NavItem icon={<FaTruck className="text-green-400" />} label="Purchase" to="/purchase" />
           <NavItem icon={<FaBox className="text-red-400" />} label="Inventory" to="/inventory" />
+          <NavItem icon={<FaUser className="text-purple-400" />} label="OnGoing sales" to="/OngoingSales" />
+
           <NavItem icon={<FaShoppingCart className="text-orange-400" />} label="Sales" to="/sales" />
           <NavItem icon={<FaEye className="text-teal-400" />} label="View" to="/view" />
            <NavItem icon={<FaUser className="text-purple-400" />} label="Accounts" to="/admin/accounts" />
