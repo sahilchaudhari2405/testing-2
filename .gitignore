@@ -1,0 +1,4 @@
+node_modules/
+client/src/Pages/admin.js
+api/node_modules/
+client/.env
