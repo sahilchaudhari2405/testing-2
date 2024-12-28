@@ -1,5 +1,5 @@
 import express from 'express';
-import cookieParser from 'cookie-parser';
+  import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './database/mongo.db.js';

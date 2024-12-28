@@ -1,8 +1,86 @@
 import { generateAccessToken, setTokens } from '../middleware/generateToken.js';
-import CounterUser from '../model/user.model.js';
+import { getTenantModel } from '../model/getTenantModel.js';
+import TenantUser from '../model/tenent.model.js';
+import CounterUserSchema from '../model/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import mongoose from "mongoose";
 
+export async function UserCreate(req, res) {
+    try {
+        const { fullName, username, email, password, counterNumber, mobile, role } = req.body;
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: "Invalid email format" });
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            return res.status(400).json({ error: "Password must be at least 6 characters long" });
+        }
+
+        // Check if tenant exists
+        let tenantUser = await TenantUser.findOne({ email }) || await TenantUser.findOne({ mobile });
+
+        if (!tenantUser) {
+            // If tenant doesn't exist, create a new tenant
+            const tenantId = new mongoose.Types.ObjectId().toString(); // Generate a new tenantId
+            tenantUser = new TenantUser({
+                email,
+                mobile,
+                tenantId:username+tenantId,
+            });
+            await tenantUser.save();
+        }
+        else {
+            // If tenant exists, return error
+            return res.status(400).json({ error: "User is already present, please use another account" });
+        }
+        const tenantId =tenantUser.tenantId;
+
+        // Dynamically get the tenant-specific CounterUser model using the correct schema
+        const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
+
+        // Check if user already exists
+        const existingUser = await CounterUser.findOne({ $or: [{ username }, { email }] });
+        if (existingUser) {
+            return res.status(400).json({ error: "Username or email is already taken" });
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Create the new user
+        const newUser = new CounterUser({
+            fullName,
+            username,
+            email,
+            tenantId,
+            password: hashedPassword,
+            counterNumber,
+            mobile,
+            role,
+        });
+
+        await newUser.save();
+
+        res.status(201).json({
+            message: "User created successfully",
+            user: {
+                _id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
+                mobile: newUser.mobile,
+            },
+        });
+    } catch (error) {
+        console.error("Error in signup controller:", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
 export async function signup(req, res) {
     try {
         const { fullName, username, email, password, counterNumber, mobile,role } = req.body;
@@ -33,6 +111,7 @@ export async function signup(req, res) {
             fullName,
             username,
             email,
+            tenantId:tenantId,
             password: hashedPassword,
             counterNumber,
             mobile,
@@ -56,7 +135,15 @@ export async function signup(req, res) {
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await CounterUser.findOne({ email }) || await CounterUser.findOne({ username: email });
+                // Step 1: Fetch tenantId from TenantUsers collection
+                const tenantUser = await TenantUser.findOne({ email }) || await TenantUser.findOne({mobile: email });
+                if (!tenantUser) {
+                    return res.status(400).json({ error: 'Invalid email or tenant not found' });
+                }
+                const tenantId = tenantUser.tenantId;
+                console.log(tenantUser);
+           const CounterUser=await getTenantModel(tenantId, 'CounterUser', CounterUserSchema);
+        const user = await CounterUser.findOne({ email }) || await CounterUser.findOne({mobile: email });
         
         if (!user) {
             return res.status(400).json({ error: "Invalid email or password" });
