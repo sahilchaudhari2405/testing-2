@@ -1,5 +1,5 @@
 import { generateAccessToken, setTokens } from '../middleware/generateToken.js';
-import { getTenantModel } from '../model/getTenantModel.js';
+import { getTenantModel } from '../database/getTenantModel.js';
 import TenantUser from '../model/tenent.model.js';
 import CounterUserSchema from '../model/user.model.js';
 import bcrypt from 'bcryptjs';
@@ -85,6 +85,23 @@ export async function signup(req, res) {
     try {
         const { fullName, username, email, password, counterNumber, mobile,role } = req.body;
 
+        let tenantUser = await TenantUser.findOne({ email }) || await TenantUser.findOne({ mobile });
+
+        if (!tenantUser) {
+            tenantUser = new TenantUser({
+                email,
+                mobile,
+                tenantId:req.user.tenantId,
+            });
+            await tenantUser.save();
+        }
+        else {
+            // If tenant exists, return error
+            return res.status(400).json({ error: "User is already present, please use another account" });
+        }
+        const tenantId =tenantUser.tenantId;
+      
+              const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ error: "Invalid email format" });
@@ -103,6 +120,7 @@ export async function signup(req, res) {
         if (password.length < 6) {
             return res.status(400).json({ error: "Password must be at least 6 characters long" });
         }
+  
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -141,8 +159,7 @@ export async function login(req, res) {
                     return res.status(400).json({ error: 'Invalid email or tenant not found' });
                 }
                 const tenantId = tenantUser.tenantId;
-                console.log(tenantUser);
-           const CounterUser=await getTenantModel(tenantId, 'CounterUser', CounterUserSchema);
+           const CounterUser= await getTenantModel(tenantId, 'CounterUser', CounterUserSchema);
         const user = await CounterUser.findOne({ email }) || await CounterUser.findOne({mobile: email });
         
         if (!user) {
@@ -206,6 +223,8 @@ export async function refresh(req, res) {
 
 export async function getUsers(req, res) {
     try {
+        const tenantId =req.user.tenantId
+        const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
         const users = await CounterUser.find().select('-password'); // Exclude password field from query results
 
         res.status(200).json(users);
@@ -221,6 +240,8 @@ export async function updateUser(req, res) {
     const { fullName, password, email, mobile, counterNumber } = req.body;
 
     try {
+        const tenantId =req.user.tenantId
+        const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
         // the existing user
         const existingUser = await CounterUser.findById(id);
         if (!existingUser) {
@@ -255,6 +276,8 @@ export async function deleteUser(req, res) {
     const { id } = req.params;
 
     try {
+        const tenantId =req.user.tenantId
+        const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
         const deletedUser = await CounterUser.findByIdAndDelete(id);
         if (!deletedUser) {
             return res.status(404).send({ message: "User not found", status: false });

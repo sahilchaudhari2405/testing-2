@@ -6,6 +6,7 @@ const generateAccessToken = (user) => {
         fullName: user.fullName,
         email: user.email,
         role: user.role,
+        tenantId:user.tenantId
     }, process.env.JWT_SECRET, { expiresIn: '7h' });
 };
 
@@ -15,6 +16,7 @@ const generateRefreshToken = (user) => {
         fullName: user.fullName,
         email: user.email,
         role: user.role,
+        tenantId:user.tenantId
     }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 

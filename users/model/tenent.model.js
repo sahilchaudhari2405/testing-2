@@ -13,7 +13,6 @@ const tenantUserSchema = new mongoose.Schema({
     tenantId: {
         type: String,
         required: true,
-        unique:true,  // Ensure tenantId is required
     },
     softwarePlan: {
         type: Boolean,  // Ensure the field is of type Boolean
