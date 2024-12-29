@@ -1,71 +1,80 @@
-import { Client, ClientPurchase, ClosingBalance } from "../model/Client.model.js";
+import { getTenantModel } from "../database/getTenantModel.js";
+import { ClientPurchaseSchema, clientSchema, ClosingBalanceSchema } from "../model/Client.model.js";
+
 function MobileDigite(v) {
   return /\d{10}/.test(v); // Validates a 10-digit mobile number
 }
 
 export const importUser = async (req, res) => {
   const { users } = req.body;
-  console.log(req.body);
+
+  const importResults = {
+    success: [],
+    skipped: [],
+    failed: [],
+  };
 
   try {
-    let type = 'Client';
+    const tenantId = req.user.tenantId;
+    const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
 
     for (const data of users) {
-      const { Type, Name, Address, State, Mobile, 'Closing Balance': ClosingBalanceValue } = data;
+      try {
+        const { Type, Name, Address, State, Mobile, 'Closing Balance': ClosingBalanceValue } = data;
 
-      // Ensure the mobile number is valid and numeric
-      const isNumeric = (value) => /^\d+$/.test(value);
+        // Validate input
+        if (!Type || !Name || !Mobile || !/^\d{10}$/.test(Mobile)) {
+          importResults.skipped.push({ data, reason: 'Missing or invalid fields' });
+          continue;
+        }
 
-      // Check if any required field is missing or invalid
-      if (!Type || !Name || !Mobile || !isNumeric(Mobile) || !MobileDigite(Mobile)) {
-        console.log(`Client ${Name || 'Unknown'} has missing, invalid, or non-numeric mobile data, skipping entry.`);
-        continue;  // Skip to the next user
+        // Check for existing client
+        const existingUser = await Client.findOne({ Type, Name, Mobile });
+        if (existingUser) {
+          importResults.skipped.push({ data, reason: 'Client already exists' });
+          continue;
+        }
+
+        const currentMonth = new Date().toISOString().slice(0, 7);
+
+        // Create ClosingBalance and ClientPurchase entries
+        const closingMonth = await ClosingBalance.create({
+          monthYear: currentMonth,
+          balance: ClosingBalanceValue || 0,
+        });
+
+        const purchaseMonth = await ClientPurchase.create({
+          monthYear: currentMonth,
+          Purchase: 0,
+        });
+
+        // Create new Client
+        const client = new Client({
+          Type,
+          Name,
+          Address,
+          State,
+          Mobile,
+          ClosingBalance: [closingMonth],
+          CompletePurchase: [purchaseMonth],
+          totalClosingBalance: ClosingBalanceValue || 0,
+          totalCompletePurchase: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        await client.save();
+        importResults.success.push({ data });
+      } catch (innerError) {
+        importResults.failed.push({ data, error: innerError.message });
       }
-
-      // Check if the client already exists
-      const existingUser = await Client.findOne({ Type, Name, Mobile });
-      if (existingUser) {
-        console.log(`Client ${Name} already present`);
-        continue;  // Skip to the next user
-      }
-
-      const orderDate = new Date();
-      const currentMonth = orderDate.toISOString().slice(0, 7);
-
-      // Create new ClosingBalance and ClientPurchase documents
-      const closingMonth = await ClosingBalance.create({
-        monthYear: currentMonth,
-        balance: ClosingBalanceValue || 0,
-      });
-
-      const purchaseMonth = await ClientPurchase.create({
-        monthYear: currentMonth,
-        Purchase: 0,
-      });
-
-      // Create the new Client instance
-      const client = new Client({
-        Type,
-        Name,
-        Address,
-        State,
-        Mobile,
-        ClosingBalance: [closingMonth],
-        CompletePurchase: [purchaseMonth],
-        totalClosingBalance: ClosingBalanceValue || 0,
-        totalCompletePurchase: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      // Save the client to the database
-      await client.save();
-      console.log(`Client ${Name} created successfully`);
     }
 
-    res.status(201).json({ message: 'Clients imported successfully' });
+    res.status(201).json({ message: 'Import process completed', results: importResults });
   } catch (error) {
-    console.error('Failed to create clients:', error);
-    res.status(500).json({ message: 'Failed to create clients', error: error.message });
+    console.error('Import process failed:', error);
+    res.status(500).json({ message: 'Failed to import users', error: error.message });
   }
 };

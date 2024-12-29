@@ -152,6 +152,6 @@ totalOfflineSalesSchema.pre('save', function (next) {
     next();
 });
 
-const TotalOfflineSales = mongoose.model("TotalOfflineSales", totalOfflineSalesSchema);
 
-export default TotalOfflineSales;
+
+export default totalOfflineSalesSchema;

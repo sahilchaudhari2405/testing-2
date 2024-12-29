@@ -103,6 +103,6 @@ offlineOrderSchema.pre('save', function (next) {
     next();
 });
 
-const OfflineOrder = mongoose.model("OfflineOrder", offlineOrderSchema);
 
-export default OfflineOrder;
+
+export default offlineOrderSchema;
