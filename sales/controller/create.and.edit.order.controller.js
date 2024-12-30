@@ -254,7 +254,7 @@ const AddOrder = asyncHandler(async (req, res) => {
         const Client = await getTenantModel(tenantId, "Client", clientSchema);
         const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
         const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
-
+        
         let order = await OfflineOrder.findById(orderId).populate('orderItems');
         const oldOrder = JSON.parse(JSON.stringify(order));
         // If order doesn't exist, return error

@@ -8,22 +8,26 @@ const Offline_cartSchema = new mongoose.Schema({
         required: true,
     },
 
-    cartItems: [{
+    cartId: {
         type:mongoose.Schema.Types.ObjectId,
-        ref: "OfflineCartItems",
+        ref: "Offline_CartItem",
 
         required: true,  
-    }],  
+    },  
     totalPrice: {
         type: Number,
         required: true,
         default:0
     },
-   
+    status:{
+        type: String,
+        enum : ['Ongoing','OneTime'],
+        default: 'OneTime'
+    },
     totalItem:{
         type: Number,
         required: true,
-        default:0 
+        default:0
     },
     totalDiscountedPrice:{
         type: Number,

@@ -11,7 +11,7 @@ import Offline_cartSchema from "../model/cart.model.js";
 const addToCart = asyncHandler(async (req, res) => {
     const { id } = req.user; 
     // const id=`669b9afa72e1e9138e2a64a3`;
-    const { productCode } = req.body; 
+    const { productCode,status } = req.body; 
     const tenantId =req.user.tenantId
     const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
     const Product = await getTenantModel(tenantId, "Product", productSchema);
@@ -72,6 +72,7 @@ const addToCart = asyncHandler(async (req, res) => {
                 totalPrice: cartItem.price,
                 totalItem: 1,
                 GST: cartItem.GST, 
+                status:status,
                 final_price_With_GST: cartItem.finalPrice_with_GST,
                 totalDiscountedPrice: cartItem.discountedPrice,
                 discount:value,

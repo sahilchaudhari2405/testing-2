@@ -1,6 +1,6 @@
-import { getTenantModel } from '../database/getTenantModel.js';
-import categorySchema from '../model/category.model.js';
-import productSchema from '../model/product.model.js';
+import { getTenantModel } from "../database/getTenantModel.js";
+import categorySchema from "../model/category.model.js";
+import productSchema from "../model/product.model.js";
 
 async function CreateCategory(name, level, slug, parentId, CategoryModel) {
   const category = new CategoryModel({ name, level, slug, parentId });
@@ -33,12 +33,11 @@ async function generateUniqueBarcode(ProductModel) {
 }
 
 // Utility function to parse product data fields
-function parseField(value, type = 'string') {
-  if (type === 'float') return parseFloat(value) || 0;
-  if (type === 'int') return parseInt(value, 10) || 0;
+function parseField(value, type = "string") {
+  if (type === "float") return parseFloat(value) || 0;
+  if (type === "int") return parseInt(value, 10) || 0;
   return value || null;
 }
-
 
 // Main importProducts function
 export const importProducts = async (req, res) => {
@@ -46,28 +45,36 @@ export const importProducts = async (req, res) => {
 
   try {
     const tenantId = req.user.tenantId;
-    const Product = await getTenantModel(tenantId, 'Product', productSchema);
-    const Category = await getTenantModel(tenantId, 'Category', categorySchema);
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Category = await getTenantModel(tenantId, "Category", categorySchema);
 
     const newProducts = [];
     const updateOperations = [];
     const newCategories = [];
     const categoryMap = new Map();
 
-    const parentCategory = await Category.findOne({ name: 'GENERAL' }) ||
-      await CreateCategory('GENERAL', 1, 'general', null, Category);
+    const parentCategory =
+      (await Category.findOne({ name: "GENERAL" })) ||
+      (await CreateCategory("GENERAL", 1, "general", null, Category));
 
     for (const productData of products) {
       delete productData._id;
 
-      const categoryName = productData.title?.trim().substring(0, 50) ||
+      const categoryName =
+        productData.title?.trim().substring(0, 50) ||
         productData.Name?.trim().substring(0, 50) ||
         generateRandomStringCategory();
 
       if (!categoryMap.has(categoryName)) {
         let category = await Category.findOne({ name: categoryName });
         if (!category) {
-          category = await CreateCategory(categoryName, 2, categoryName, parentCategory._id, Category);
+          category = await CreateCategory(
+            categoryName,
+            2,
+            categoryName,
+            parentCategory._id,
+            Category
+          );
           newCategories.push(category);
         }
         categoryMap.set(categoryName, category);
@@ -96,11 +103,25 @@ export const importProducts = async (req, res) => {
         const newProduct = buildNewProductData(productData, category);
         newProducts.push(newProduct);
       }
+      console.log("data", barcode)
     }
 
-    // Perform bulk insertions
+    // Before bulk insertion of new categories
     if (newCategories.length) {
-      await Category.insertMany(newCategories);
+      // Check for existing categories to avoid duplication
+      const existingCategories = await Category.find({
+        name: { $in: newCategories.map((cat) => cat.name) },
+      });
+
+      // Filter out categories already in the database
+      const existingNames = new Set(existingCategories.map((cat) => cat.name));
+      const uniqueCategories = newCategories.filter(
+        (cat) => !existingNames.has(cat.name)
+      );
+
+      if (uniqueCategories.length) {
+        await Category.insertMany(uniqueCategories);
+      }
     }
 
     if (newProducts.length) {
@@ -110,17 +131,17 @@ export const importProducts = async (req, res) => {
     if (updateOperations.length) {
       await Product.bulkWrite(updateOperations);
     }
-
+    console.log("insert data success");
     res.json({
-      message: 'Products imported successfully',
+      message: "Products imported successfully",
       status: true,
       imported: newProducts.length,
       updated: updateOperations.length,
       categoriesAdded: newCategories.length,
     });
   } catch (error) {
-    console.error('Error importing products:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    console.error("Error importing products:", error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
 function buildNewProductData(productData, category) {
@@ -128,31 +149,55 @@ function buildNewProductData(productData, category) {
 
   return {
     title: parseField(isGSTPad ? productData.Name : productData.title),
-    description: parseField(isGSTPad ? productData.Name : productData.description),
-    price: parseField(isGSTPad ? productData.MRP : productData.price, 'float'),
-    discountedPrice: parseField(isGSTPad ? productData['Net Sale'] : productData.discountedPrice, 'float'),
-    discountPercent: parseField(productData.discountPercent, 'float'),
-    weight: parseField(productData.weight, 'float'),
-    quantity: parseField(isGSTPad ? productData['Qty.'] : productData.quantity, 'int'),
+    description: parseField(
+      isGSTPad ? productData.Name : productData.description
+    ),
+    price: parseField(isGSTPad ? productData.MRP : productData.price, "float"),
+    discountedPrice: parseField(
+      isGSTPad ? productData["Net Sale"] : productData.discountedPrice,
+      "float"
+    ),
+    discountPercent: parseField(productData.discountPercent, "float"),
+    weight: parseField(productData.weight, "float"),
+    quantity: parseField(
+      isGSTPad ? productData["Qty."] : productData.quantity,
+      "int"
+    ),
     brand: parseField(productData.brand),
-    imageUrl: productData.imageUrl || 'https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png',
-    slug: parseField(isGSTPad ? productData.Name : productData.slug, 'string') || 'default-slug',
+    imageUrl:
+      productData.imageUrl ||
+      "https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png",
+    slug:
+      parseField(isGSTPad ? productData.Name : productData.slug, "string") ||
+      "default-slug",
     ratings: productData.ratings || [],
     reviews: productData.reviews || [],
-    numRatings: parseField(productData.numRatings, 'int'),
+    numRatings: parseField(productData.numRatings, "int"),
     category: category._id,
     createdAt: productData.createdAt || new Date(),
     updatedAt: productData.updatedAt || new Date(),
     BarCode: parseField(isGSTPad ? productData.Barcode : productData.BarCode),
     stockType: parseField(productData.stockType),
     unit: parseField(isGSTPad ? productData.Unit : productData.unit),
-    purchaseRate: parseField(isGSTPad ? productData['Purchase Rate'] : productData.purchaseRate, 'float'),
-    profitPercentage: parseField(isGSTPad ? productData.profit : productData.profitPercentage, 'float'),
+    purchaseRate: parseField(
+      isGSTPad ? productData["Purchase Rate"] : productData.purchaseRate,
+      "float"
+    ),
+    profitPercentage: parseField(
+      isGSTPad ? productData.profit : productData.profitPercentage,
+      "float"
+    ),
     HSN: parseField(isGSTPad ? productData.CESS : productData.HSN),
-    GST: parseField(isGSTPad ? productData.TAX : productData.GST, 'float'),
-    retailPrice: parseField(isGSTPad ? productData['Net Sale'] : productData.retailPrice, 'float'),
-    totalAmount: parseField(isGSTPad ? productData['Net Sale'] : productData.totalAmount, 'float'),
-    amountPaid: parseField(productData.amountpaid, 'float'),
+    GST: parseField(isGSTPad ? productData.TAX : productData.GST, "float"),
+    retailPrice: parseField(
+      isGSTPad ? productData["Net Sale"] : productData.retailPrice,
+      "float"
+    ),
+    totalAmount: parseField(
+      isGSTPad ? productData["Net Sale"] : productData.totalAmount,
+      "float"
+    ),
+    amountPaid: parseField(productData.amountpaid, "float"),
   };
 }
 
@@ -161,15 +206,33 @@ function buildUpdateData(productData) {
   const isGSTPad = !productData.BarCode; // Determine data format
 
   return {
-    retailPrice: parseField(isGSTPad ? productData['Net Sale'] : productData.retailPrice, 'float'),
-    totalAmount: parseField(isGSTPad ? productData['Net Sale'] : productData.totalAmount, 'float'),
-    amountPaid: parseField(productData.amountpaid, 'float'),
-    quantity: parseField(isGSTPad ? productData['Qty.'] : productData.quantity, 'int'),
-    price: parseField(isGSTPad ? productData.MRP : productData.price, 'float'),
-    discountedPrice: parseField(isGSTPad ? productData['Net Sale'] : productData.discountedPrice, 'float'),
-    purchaseRate: parseField(isGSTPad ? productData['Purchase Rate'] : productData.purchaseRate, 'float'),
-    profitPercentage: parseField(isGSTPad ? productData.profit : productData.profitPercentage, 'float'),
-    discountPercent: parseField(productData.discountPercent, 'float'),
+    retailPrice: parseField(
+      isGSTPad ? productData["Net Sale"] : productData.retailPrice,
+      "float"
+    ),
+    totalAmount: parseField(
+      isGSTPad ? productData["Net Sale"] : productData.totalAmount,
+      "float"
+    ),
+    amountPaid: parseField(productData.amountpaid, "float"),
+    quantity: parseField(
+      isGSTPad ? productData["Qty."] : productData.quantity,
+      "int"
+    ),
+    price: parseField(isGSTPad ? productData.MRP : productData.price, "float"),
+    discountedPrice: parseField(
+      isGSTPad ? productData["Net Sale"] : productData.discountedPrice,
+      "float"
+    ),
+    purchaseRate: parseField(
+      isGSTPad ? productData["Purchase Rate"] : productData.purchaseRate,
+      "float"
+    ),
+    profitPercentage: parseField(
+      isGSTPad ? productData.profit : productData.profitPercentage,
+      "float"
+    ),
+    discountPercent: parseField(productData.discountPercent, "float"),
   };
 }
 
@@ -179,7 +242,7 @@ function buildUpdateData(productData) {
 
 //   let randomString = 'B';
 
-//   // for (let i = 0; i < 3; i++) { 
+//   // for (let i = 0; i < 3; i++) {
 //   //   const randomIndex = Math.floor(Math.random() * characters.length);
 //   //   randomString += characters[randomIndex];
 //   // }
@@ -197,12 +260,12 @@ function buildUpdateData(productData) {
 
 //   let randomString = '';
 
-//   for (let i = 0; i < characters.length; i++) { 
+//   for (let i = 0; i < characters.length; i++) {
 //     const randomIndex = Math.floor(Math.random() * characters.length);
 //     randomString += characters[randomIndex];
 //   }
 
-//   // for (let i = 0; i < 5; i++) { 
+//   // for (let i = 0; i < 5; i++) {
 //   //   const randomIndex = Math.floor(Math.random() * numbers.length);
 //   //   randomString += numbers[randomIndex];
 //   // }
@@ -242,14 +305,14 @@ function buildUpdateData(productData) {
 //           category = await CreateCategory(categoriesName, 2, categoriesName, parentCategory._id,Category);
 //         }
 //       }
- 
+
 //       const barcode = productData.BarCode || productData.Barcode;
 //       console.log(productData.BarCode, 'new product');
 //       console.log(productData.Barcode, 'GST pad product');
 
 //       if (barcode && barcode !=0) {
 //         const existingProduct = await Product.findOne({ BarCode: barcode });
-         
+
 //         if (existingProduct) {
 //           productData.BarCode? await updateProductData(productData,existingProduct): await updateProductDataGSTPad(productData,existingProduct);
 //           skippedProducts.push(productData);
@@ -328,7 +391,6 @@ function buildUpdateData(productData) {
 // }
 // async function importGSTData(productData, category,Product) {
 
-
 //   const product = new Product({
 //     title: productData.Name || null,
 //     description: productData.Name || null,
@@ -364,7 +426,6 @@ function buildUpdateData(productData) {
 
 // async function NewimportGSTData(productData, category,Product) {
 
-
 //   const product = new Product({
 //     title: productData.title || null,
 //     description: productData.description || null,
@@ -399,7 +460,6 @@ function buildUpdateData(productData) {
 // }
 
 // async function CreateCategory(name, level, slug, parentCategory,Category) {
-
 
 //   const category = new Category({
 //     name:name || "no data",
