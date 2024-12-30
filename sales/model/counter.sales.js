@@ -158,6 +158,6 @@ offlineCounterSalesSchema.pre('save', function (next) {
     next();
 });
 
-const OfflineCounterSales = mongoose.model("OfflineCounterSales", offlineCounterSalesSchema);
 
-export default OfflineCounterSales;
+
+export default offlineCounterSalesSchema;

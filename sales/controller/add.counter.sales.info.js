@@ -1,4 +1,6 @@
-import OfflineCounterSales from "../model/counter.sales.js";
+import { getTenantModel } from "../database/getTenantModel.js";
+import offlineCounterSalesSchema from "../model/counter.sales.js";
+
 
 const isSameDay = (date1, date2) => {
     return date1.getFullYear() === date2.getFullYear() &&
@@ -15,11 +17,12 @@ const isSameMonth = (date1, date2) => {
            date1.getMonth() === date2.getMonth();
 };
 
-const handleOfflineCounterSales = async (userId, order) => {
+const handleOfflineCounterSales = async (userId, order,tenantId) => {
     // const dummyDate = new Date('2024-08-11T00:00:00Z');
     let orderDate = new Date();
     const currentMonth = orderDate.toISOString().slice(0, 7); // YYYY-MM
     const currentWeek = `${orderDate.getFullYear()}-W${Math.ceil((orderDate.getDate()) / 7)}`; // YYYY-WW
+    const OfflineCounterSales = await getTenantModel(tenantId, "OfflineCounterSales", offlineCounterSalesSchema);
 
     const dailySale = {
         totalPrice: order.totalPrice,
@@ -119,11 +122,11 @@ const handleOfflineCounterSales = async (userId, order) => {
     await offlineCounterSales.save();
 };
 
-const updateSalesData = async (userId, oldOrder, newOrder) => {
+const updateSalesData = async (userId, oldOrder, newOrder,tenantId) => {
     const orderDate = new Date(oldOrder.createdAt);
     const currentMonth = orderDate.toISOString().slice(0, 7);
     const currentWeek = `${orderDate.getFullYear()}-W${Math.ceil((orderDate.getDate()) / 7)}`; 
-
+    const OfflineCounterSales = await getTenantModel(tenantId, "OfflineCounterSales", offlineCounterSalesSchema);
     // Find the existing sales record for the user
     let salesRecord = await OfflineCounterSales.findOne({ month: currentMonth, user: userId });
     if (!salesRecord) {

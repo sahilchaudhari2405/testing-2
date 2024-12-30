@@ -1,17 +1,21 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import Offline_Cart from "../model/cart.model.js";
-import OfflineOrderItem from "../model/orderItems.js";
-import Product from "../model/product.model.js";
-import OfflineOrder from "../model/order.model.js";
-import Offline_CartItem from "../model/cartItem.model.js";
 import { handleOfflineCounterSales, updateSalesData } from "./add.counter.sales.info.js";
 import { handleAllTotalOfflineSales, TotalAllupdateSalesData } from "./add.total.sales.info.js";
 import { handleTotalOfflineSales, TotalOfflineupdateSalesData } from "./add.offline.sales.info.js";
 import { createClient, reduceClient } from "./Client.controller.js";
-import CounterUser from "../model/user.model.js";
-import { Client } from "../model/Client.model.js";
+
 import mongoose from "mongoose";
+
+import { getTenantModel } from "../database/getTenantModel.js";
+import { clientSchema } from "../../users/model/Client.model.js";
+import productSchema from "../model/product.model.js";
+import CounterUserSchema from "../model/user.model.js";
+import offlineOrderSchema from "../model/order.model.js";
+import offlineOrderItemSchema from "../model/orderItems.js";
+import Offline_cartSchema from "../model/cart.model.js";
+import Offline_cartItemSchema from "../model/cartItem.model.js";
+
 
 // Function to place an order
 const AddCustomOrder = asyncHandler(async (req, res) => {
@@ -20,6 +24,12 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
      console.log(payment);
     try {
         // Fetch user from database
+        const tenantId =req.user.tenantId
+        const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
+        const Product = await getTenantModel(tenantId, "Product", productSchema);
+        const Client = await getTenantModel(tenantId, "Client", clientSchema);
+        const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
+        const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
         const user = await CounterUser.findById(id);
         if (!user) {
             return res.status(401).json(new ApiResponse(401, 'User not found', null));
@@ -205,15 +215,16 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
                 Mobile: order.mobileNumber,
                 Purchase: (product.discountedPrice + product.GST) || 0,
                 Closing: 0,
+                tenantId:tenantId
             }
         };
 
         const r = await createClient(clientReq);
         console.log(r);
         await order.save();
-        await updateSalesData(oldOrder.user, oldOrder, order);
-        await TotalAllupdateSalesData(oldOrder, order);
-        await TotalOfflineupdateSalesData(oldOrder, order);
+        await updateSalesData(oldOrder.user, oldOrder, order,tenantId);
+        await TotalAllupdateSalesData(oldOrder, order,tenantId);
+        await TotalOfflineupdateSalesData(oldOrder, order,tenantId);
 
         // Return the updated order with populated order items
         const updatedOrder = await OfflineOrder.findById(order._id).populate({
@@ -238,6 +249,12 @@ const AddOrder = asyncHandler(async (req, res) => {
 
     try {
         // Find existing order by orderId
+        const tenantId =req.user.tenantId
+        const Product = await getTenantModel(tenantId, "Product", productSchema);
+        const Client = await getTenantModel(tenantId, "Client", clientSchema);
+        const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
+        const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
+
         let order = await OfflineOrder.findById(orderId).populate('orderItems');
         const oldOrder = JSON.parse(JSON.stringify(order));
         // If order doesn't exist, return error
@@ -334,6 +351,7 @@ const AddOrder = asyncHandler(async (req, res) => {
                 Mobile: order.mobileNumber,
                 Purchase: (product.discountedPrice + product.GST) || 0,
                 Closing: 0,
+                tenantId:tenantId
             }
         };
         product.quantity-=1;
@@ -341,9 +359,9 @@ const AddOrder = asyncHandler(async (req, res) => {
         const r = await createClient(clientReq);
         console.log(r);
         await order.save();
-        await updateSalesData(oldOrder.user, oldOrder, order);
-        await TotalAllupdateSalesData(oldOrder, order);
-        await TotalOfflineupdateSalesData(oldOrder, order);
+        await updateSalesData(oldOrder.user, oldOrder, order,tenantId);
+        await TotalAllupdateSalesData(oldOrder, order,tenantId);
+        await TotalOfflineupdateSalesData(oldOrder, order,tenantId);
 
         const results = await OfflineOrder.findById(order._id).populate({
             path: 'orderItems',
@@ -369,6 +387,12 @@ const placeOrder = asyncHandler(async (req, res) => {
     session.startTransaction();
 
     try {
+        const tenantId =req.user.tenantId
+        const Product = await getTenantModel(tenantId, "Product", productSchema);
+        const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
+        const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
+        const Offline_CartItem = await getTenantModel(tenantId, "Offline_CartItem", Offline_cartItemSchema);
+        const Offline_Cart = await getTenantModel(tenantId, "Offline_Cart", Offline_cartSchema);
         // Fetch cart with populated cart items
         const cart = await Offline_Cart.findOne({ userId: id }).populate('cartItems');
         if (!cart) {
@@ -444,6 +468,7 @@ const placeOrder = asyncHandler(async (req, res) => {
                 Mobile: BillUser.Mobile,
                 Purchase: cart.final_price_With_GST || 0,
                 Closing: paymentType.borrow || 0,
+                tenantId:tenantId
             }
         };
 
@@ -456,9 +481,9 @@ const placeOrder = asyncHandler(async (req, res) => {
 
         // Handle sales updates in parallel
         await Promise.all([
-            handleOfflineCounterSales(id, order),
-            handleTotalOfflineSales(order),
-            handleAllTotalOfflineSales(order)
+            handleOfflineCounterSales(id, order,tenantId),
+            handleTotalOfflineSales(order,tenantId),
+            handleAllTotalOfflineSales(order,tenantId)
         ]);
 
         // Commit the transaction
@@ -489,6 +514,12 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
     const { iteamId, orderId} = req.body;
     console.log(req.body)
     try {
+        const tenantId =req.user.tenantId
+
+        const Product = await getTenantModel(tenantId, "Product", productSchema);
+        const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
+        const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
+
         const cartItem = await OfflineOrderItem.findById(iteamId);
 
         if (!cartItem) {
@@ -519,6 +550,7 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
                 Mobile: cart.mobileNumber,
                 Purchase: oneUnit,
                 Closing: (cart.paymentType.borrow >= oneUnit) ? oneUnit : 0,
+                tenantId:tenantId
             }
             const results = await reduceClient(data);
             console.log(results);
@@ -597,9 +629,9 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
                     // At this point, remainingAmount should be 0, or you can handle if any uncovered amount remains.
 
                     await cart.save();
-                    await updateSalesData(oldOrder.user, oldOrder, cart);
-                    await TotalAllupdateSalesData(oldOrder, cart);
-                    await TotalOfflineupdateSalesData(oldOrder, cart);
+                    await updateSalesData(oldOrder.user, oldOrder, cart,tenantId);
+                    await TotalAllupdateSalesData(oldOrder, cart,tenantId);
+                    await TotalOfflineupdateSalesData(oldOrder, cart,tenantId);
                 }
         
 
@@ -620,6 +652,12 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
     const { itemId, orderId } = req.body;
 
     try {
+        const tenantId =req.user.tenantId
+        const Product = await getTenantModel(tenantId, "Product", productSchema);
+        const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
+        const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
+
+
         const cartItem = await OfflineOrderItem.findById(itemId);
 
         if (!cartItem) {
@@ -639,6 +677,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
             Mobile: cart.mobileNumber,
             Purchase: cartItem.finalPriceWithGST,
             Closing: (cart.paymentType.borrow >= cartItem.finalPriceWithGST) ? cartItem.finalPriceWithGST : 0,
+            tenantId:tenantId
         }
         const results = await reduceClient(data);
         console.log(results);
@@ -716,9 +755,9 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
             product.quantity += cartItem.quantity,
                 product.save();
             await OfflineOrderItem.findByIdAndDelete(itemId);
-            await updateSalesData(oldOrder.user, oldOrder, cart);
-            await TotalAllupdateSalesData(oldOrder, cart);
-            await TotalOfflineupdateSalesData(oldOrder, cart);
+            await updateSalesData(oldOrder.user, oldOrder, cart,tenantId);
+            await TotalAllupdateSalesData(oldOrder, cart,tenantId);
+            await TotalOfflineupdateSalesData(oldOrder, cart,tenantId);
         }
 
         return res.status(200).json(new ApiResponse(200, 'Cart item deleted successfully', cartItem, cart));
@@ -737,6 +776,11 @@ const getOrderById = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
     try {
+        const tenantId =req.user.tenantId
+
+        const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
+
+
         const order = await OfflineOrder.findById(id).populate({
             path: 'orderItems',
             populate: {
@@ -763,6 +807,11 @@ const updateOrder = asyncHandler(async (req, res) => {
     console.log("Request body:", UpdateUser);
 
     try {
+        const tenantId =req.user.tenantId
+
+        const Client = await getTenantModel(tenantId, "Client", clientSchema);
+        const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
+
         const order = await OfflineOrder.findById(id);
 
         if (!order) {
@@ -911,6 +960,14 @@ const cancelledOrder = asyncHandler(async (req, res) => {
     const { orderId } = req.body;
 
     try {
+        const tenantId =req.user.tenantId
+
+        const Product = await getTenantModel(tenantId, "Product", productSchema);
+
+        const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
+        const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
+       
+
         const cart = await OfflineOrder.findById(orderId);
         if (!cart) {
             return res.status(404).json({ success: false, message: 'Order not found' });
@@ -933,6 +990,7 @@ const cancelledOrder = asyncHandler(async (req, res) => {
             Mobile: cart.mobileNumber,
             Purchase: cart.finalPriceWithGST,
             Closing: cart.paymentType.borrow,
+            tenantId:tenantId
         }
         const results = await reduceClient(data)
         console.log(results);
@@ -961,9 +1019,9 @@ const cancelledOrder = asyncHandler(async (req, res) => {
             await OfflineOrderItem.findByIdAndDelete(item);
         }
 
-        await updateSalesData(oldOrder.user, oldOrder, cancelFields);
-        await TotalAllupdateSalesData(oldOrder, cancelFields);
-        await TotalOfflineupdateSalesData(oldOrder, cancelFields);
+        await updateSalesData(oldOrder.user, oldOrder, cancelFields,tenantId);
+        await TotalAllupdateSalesData(oldOrder, cancelFields,tenantId);
+        await TotalOfflineupdateSalesData(oldOrder, cancelFields,tenantId);
 
         return res.status(200).json(new ApiResponse(200, 'Order cancelled successfully', cart));
     } catch (error) {

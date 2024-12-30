@@ -2,16 +2,22 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
-import Product from "../model/product.model.js";
-import Offline_CartItem from "../model/cartItem.model.js";
-import Offline_Cart from "../model/cart.model.js";
-import counter from "../model/user.model.js";
+import CounterUserSchema from "../model/user.model.js";
+import { getTenantModel } from "../database/getTenantModel.js";
+import productSchema from "../model/product.model.js";
+import Offline_cartItemSchema from "../model/cartItem.model.js";
+import Offline_cartSchema from "../model/cart.model.js";
 
 const addToCart = asyncHandler(async (req, res) => {
     const { id } = req.user; 
     // const id=`669b9afa72e1e9138e2a64a3`;
     const { productCode } = req.body; 
-    const user = await counter.findById(id); 
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Offline_CartItem = await getTenantModel(tenantId, "Offline_CartItem", Offline_cartItemSchema);
+    const Offline_Cart = await getTenantModel(tenantId, "Offline_Cart", Offline_cartSchema);
+    const user = await CounterUser.findById(id); 
     if (!user) {
         return res.status(401).json(new ApiResponse(401, 'User not found', null)); 
     }
@@ -97,7 +103,12 @@ const updateToCart = asyncHandler(async (req, res) => {
     // const id=`669b9afa72e1e9138e2a64a3`;
     const { productCode,discountedPrice,quantity,price,discount,GST,finalPrice_with_GST,OneUnit} = req.body; 
     console.log(req.body);
-    const user = await counter.findById(id); 
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Offline_CartItem = await getTenantModel(tenantId, "Offline_CartItem", Offline_cartItemSchema);
+    const Offline_Cart = await getTenantModel(tenantId, "Offline_Cart", Offline_cartSchema);
+    const user = await CounterUser.findById(id); 
     if (!user) {
         return res.status(401).json(new ApiResponse(401, 'User not found', null)); 
     }
@@ -175,7 +186,10 @@ const updateToCart = asyncHandler(async (req, res) => {
 const getCartDetails = asyncHandler(async (req, res) => {
     const { id } = req.user;
     // const id=`669b9afa72e1e9138e2a64a3`;
+
+    const Offline_Cart = await getTenantModel(tenantId, "Offline_Cart", Offline_cartSchema);
       console.log(id);
+      
     if (!id) {
         return res.status(401).json(new ApiResponse(401, 'User ID not provided in cookies', null));
     }
@@ -209,8 +223,9 @@ const getCartDetails = asyncHandler(async (req, res) => {
 const getCartItemsById = asyncHandler(async (req, res) => {
     const { id } = req.user; 
     const { productQR } = req.query;
-
-    const user = await counter.findById(id);
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const user = await CounterUser.findById(id);
 
     if (!user) {
         return res.status(401).json(new ApiError(401, 'User not found'));
@@ -237,8 +252,12 @@ const removeOneCart = asyncHandler(async (req, res) => {
     const { id } = req.user; 
     // const id=`669b9afa72e1e9138e2a64a3`;
     const { itemId } = req.query;
-
-    const user = await counter.findById(id);
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Offline_CartItem = await getTenantModel(tenantId, "Offline_CartItem", Offline_cartItemSchema);
+    const Offline_Cart = await getTenantModel(tenantId, "Offline_Cart", Offline_cartSchema);
+    const user = await CounterUser.findById(id); 
 
     if (!user) {
         return res.status(401).json(new ApiError(401, 'User not found'));
@@ -297,7 +316,11 @@ const removeOneCart = asyncHandler(async (req, res) => {
 const removeAllCart = asyncHandler(async (req, res) => {
     const { id } = req.user; 
     // const id=`669b9afa72e1e9138e2a64a3`;
-    const user = await counter.findById(id);
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
+    const Offline_CartItem = await getTenantModel(tenantId, "Offline_CartItem", Offline_cartItemSchema);
+    const Offline_Cart = await getTenantModel(tenantId, "Offline_Cart", Offline_cartSchema);
+    const user = await CounterUser.findById(id); 
     if (!user) {
         return res.status(401).json(new ApiError(401, 'User not found'));
     }
@@ -326,8 +349,12 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
     // const id=`669b9afa72e1e9138e2a64a3`
     const { itemId } = req.query;
     console.log(itemId)
-
-    const user = await counter.findById(id);
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Offline_CartItem = await getTenantModel(tenantId, "Offline_CartItem", Offline_cartItemSchema);
+    const Offline_Cart = await getTenantModel(tenantId, "Offline_Cart", Offline_cartSchema);
+    const user = await CounterUser.findById(id); 
 
     if (!user) {
         return res.status(401).json(new ApiError(401, 'User not found'));

@@ -45,6 +45,6 @@ const Offline_cartSchema = new mongoose.Schema({
     }
 })
 
-const Offline_Cart = mongoose.model("OfflineCart", Offline_cartSchema);
 
-export default Offline_Cart;
+
+export default Offline_cartSchema;

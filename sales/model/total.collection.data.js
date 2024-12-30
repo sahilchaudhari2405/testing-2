@@ -152,6 +152,6 @@ totalCollectionSalesSchema.pre('save', function (next) {
     next();
 });
 
-const TotalCollectionSales = mongoose.model("TotalCollectionSales", totalCollectionSalesSchema);
 
-export default TotalCollectionSales;
+
+export default totalCollectionSalesSchema;
