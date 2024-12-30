@@ -4,10 +4,10 @@ import { createUser, viewUser, viewUsers, updateUser, deleteUser } from '../cont
 
 const route = express.Router();
 
-route.post('/createUser', createUser);
-route.get('/viewUser/:id', viewUser);
-route.get('/viewUsers', viewUsers);
-route.put('/updateUser/:id', updateUser);
-route.delete('/deleteUser/:id', deleteUser);
+route.post('/createUser',authenticateToken, createUser);
+route.get('/viewUser/:id',authenticateToken, viewUser);
+route.get('/viewUsers',authenticateToken, viewUsers);
+route.put('/updateUser/:id',authenticateToken, updateUser);
+route.delete('/deleteUser/:id',authenticateToken, deleteUser);
 
 export default route;

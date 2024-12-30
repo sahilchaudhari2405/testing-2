@@ -17,7 +17,7 @@ admin.get('/PurchaseOrderGet',authenticateToken,GetPurchaseOrder);
 admin.post('/UserImport',authenticateToken,importUser);
 admin.get('/Client',authenticateToken,getAllClients);
 admin.get('/Customer',authenticateToken,getAllCustomer);
-admin.post('/SearchClient',searchCustomer);
-admin.post('/SearchClientSale',searchClients);
-admin.post('/SearchClientDistributer',searchClientsDistributer)
+admin.post('/SearchClient',authenticateToken,searchCustomer);
+admin.post('/SearchClientSale',authenticateToken,searchClients);
+admin.post('/SearchClientDistributer',authenticateToken,searchClientsDistributer)
 export default admin;
