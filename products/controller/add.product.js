@@ -160,7 +160,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
 
         const results = await OfflinePurchaseOrder.findById(newOrder._id).populate({
             path: 'orderItems.productId',
-            model: 'products'
+            model: 'Product'
         });
 
         res.status(201).json({ message: "Order created successfully", order: results });

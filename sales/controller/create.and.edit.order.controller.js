@@ -15,6 +15,7 @@ import offlineOrderSchema from "../model/order.model.js";
 import offlineOrderItemSchema from "../model/orderItems.js";
 import Offline_cartSchema from "../model/cart.model.js";
 import Offline_cartItemSchema from "../model/cartItem.model.js";
+import AdvancePaySchema from "../model/advancePay.js";
 
 
 // Function to place an order
@@ -231,7 +232,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             path: 'orderItems',
             populate: {
                 path: 'product',
-                model: 'products',
+                model: 'Product',
             }
         });
 
@@ -367,7 +368,7 @@ const AddOrder = asyncHandler(async (req, res) => {
             path: 'orderItems',
             populate: {
                 path: 'product',
-                model: 'products'
+                model: 'Product'
             }
         });
         return res.status(200).json(new ApiResponse(200, 'Product added to order successfully', order));
@@ -379,12 +380,10 @@ const AddOrder = asyncHandler(async (req, res) => {
 });
 
 const placeOrder = asyncHandler(async (req, res) => {
-    const { id } = req.user;
-    const { paymentType, BillUser } = req.body;
-
+    let { id } = req.user;
+    const { paymentType, BillUser,PayId,uId,status } = req.body;
+    id= (uId===id && uId)? uId:id;
     // Start session for transaction
-    const session = await mongoose.startSession();
-    session.startTransaction();
 
     try {
         const tenantId =req.user.tenantId
@@ -394,9 +393,8 @@ const placeOrder = asyncHandler(async (req, res) => {
         const Offline_CartItem = await getTenantModel(tenantId, "Offline_CartItem", Offline_cartItemSchema);
         const Offline_Cart = await getTenantModel(tenantId, "Offline_Cart", Offline_cartSchema);
         // Fetch cart with populated cart items
-        const cart = await Offline_Cart.findOne({ userId: id }).populate('cartItems');
+        const cart = await Offline_Cart.findOne({userId: id ,PayId: PayId || undefined,status:status }).populate('cartItems');
         if (!cart) {
-            await session.abortTransaction();
             return res.status(404).json(new ApiResponse(404, 'Cart not found', null));
         }
 
@@ -430,7 +428,7 @@ const placeOrder = asyncHandler(async (req, res) => {
             };
         });
 
-        const orderItems = await OfflineOrderItem.insertMany(orderItemsData, { session });
+        const orderItems = await OfflineOrderItem.insertMany(orderItemsData);
         const orderItemIds = orderItems.map(item => item._id);
 
         // Calculate cart discount if negative
@@ -455,9 +453,19 @@ const placeOrder = asyncHandler(async (req, res) => {
             orderDate: new Date(),
         });
 
-        await order.save({ session });
-
+        await order.save();
+        if(PayId)
+        {
+            const AdvancePay = await getTenantModel(tenantId, "AdvancePay", AdvancePaySchema);
+            const updatedPayment = await AdvancePay.findByIdAndUpdate(
+                PayId,
+                { status: 'complete',cart:order._id },
+                { new: true }
+            );
+          console.log(updatedPayment);
+        }
         // Create client request
+        
         const clientReq = {
             body: {
                 Type: 'Client',
@@ -474,8 +482,8 @@ const placeOrder = asyncHandler(async (req, res) => {
 
         // Execute in parallel: client creation and cart deletion
         const clientPromise = createClient(clientReq);
-        const cartDeletePromise = Offline_CartItem.deleteMany({ _id: { $in: cart.cartItems.map(item => item._id) } }, { session });
-        const cartDelete = Offline_Cart.findByIdAndDelete(cart._id, { session });
+        const cartDeletePromise = Offline_CartItem.deleteMany({ _id: { $in: cart.cartItems.map(item => item._id) } });
+        const cartDelete = Offline_Cart.findByIdAndDelete(cart._id);
 
         await Promise.all([clientPromise, cartDeletePromise, cartDelete]);
 
@@ -487,25 +495,23 @@ const placeOrder = asyncHandler(async (req, res) => {
         ]);
 
         // Commit the transaction
-        await session.commitTransaction();
+
 
         // Fetch and return the created order
         const results = await OfflineOrder.findById(order._id).populate({
             path: 'orderItems',
             populate: {
                 path: 'product',
-                model: 'products'
+                model: 'Product'
             }
         });
 
         return res.status(200).json(new ApiResponse(200, 'Order placed successfully', results));
     } catch (error) {
-        await session.abortTransaction();
+
         console.error(error);
         return res.status(500).json(new ApiResponse(500, 'Error placing order', error.message));
-    } finally {
-        session.endSession();
-    }
+    } 
 });
 
 // Function to remove item quantity from cart
@@ -779,13 +785,14 @@ const getOrderById = asyncHandler(async (req, res) => {
         const tenantId =req.user.tenantId
 
         const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
-
+        const Product = await getTenantModel(tenantId, "Product", productSchema);
+        const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
 
         const order = await OfflineOrder.findById(id).populate({
             path: 'orderItems',
             populate: {
                 path: 'product',
-                model: 'products',
+                model: 'Product',
             },
         });
 
@@ -852,7 +859,7 @@ const updateOrder = asyncHandler(async (req, res) => {
             path: 'orderItems',
             populate: {
                 path: 'product',
-                model: 'products'
+                model: 'Product'
             }
         });
 

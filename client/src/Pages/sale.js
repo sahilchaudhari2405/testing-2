@@ -14,7 +14,6 @@ import {createOrder} from '../Redux/Orders/orderSlice';
 import Invoice from "../component/invoice.js";
 import axiosInstance from "../axiosConfig.js";
 import { fetchUsers } from '../Redux/User/userSlices';
-import { fetchOrders } from '../Redux/Orders/orderSlice';
 
 
 
@@ -146,14 +145,11 @@ const Sale = () => {
 
   useEffect(() => {
     dispatch(fetchUsers());
-    dispatch(fetchOrders());
   }, [dispatch]);
 
   useEffect(() => {
     console.log("users are: ",users);
-    console.log("orders are: ",orders);
-    setSearchuser(users);
-  }, [users,orders]);
+  }, [users]);
 
   const handleKeyDown = (e) => {
     console.log(e.key);
@@ -414,7 +410,8 @@ console.log(editItem);
 
 
   useEffect(() => {
-    // clearCart()
+    clearCart();
+    console.log("sagar");
     dispatch(fetchCart());
   }, [dispatch]);
 
@@ -423,18 +420,37 @@ console.log(editItem);
   }, [items]);
 
   useEffect(() => {
-    console.log(items);
-    setDetails(items[0]);
-    if(items[0]?.length>0){
-      setDiscount(items[1]&&items[1].discount)
-      setTotalPrice(items[1]&&items[1].totalPrice)
-      setGst(items[1]&&items[1].GST)
-      setFinalTotal(items[1]&&items[1].final_price_With_GST)
+    // Reset details at the beginning
+    setDetails([]);
+  
+    if (items.length === 2) {
+      // Handle case where both cart details and summary are present
+      const productsData = items[0];
+      if (Array.isArray(productsData) && productsData.length > 0) {
+        setDetails(productsData); // Update details if productsData is valid
+      }
+  
+      const summary = items[1];
+      if (summary) {
+        setDiscount(summary.discount || 0);
+        setTotalPrice(summary.totalPrice || 0);
+        setGst(summary.GST || 0);
+        setFinalTotal(summary.final_price_With_GST || 0);
+      }
+    } else if (items.length === 1) {
+      // Handle case where only summary data is present
+      const summary = items[0];
+      if (summary) {
+        setDiscount(summary.discount || 0);
+        setTotalPrice(summary.totalPrice || 0);
+        setGst(summary.GST || 0);
+        setFinalTotal(summary.final_price_With_GST || 0);
+      }
     }
-
-
- 
   }, [items]);
+  
+  
+  
 
 
   console.log(details);
@@ -534,17 +550,35 @@ const handleScan = (data) => {
     dispatch(fetchProduct(data));
   }
 };
+const handleRemoveAllItem = async () => {
+  try {
+    // Send the request to delete all items from the cart
+    const response = await axiosInstance.delete('/sales/cart/removeAllItem');
+    
+    // Dispatch action to fetch the updated cart after clearing it
+    dispatch(fetchCart());
 
- const handleRemoveAllItem=async () =>
- {
-  const response = await axiosInstance.delete(`/sales/cart/removeAllItem`); 
-  if(response.status==200)
-  {dispatch(fetchCart());
+    // Reset all related states to initial values
+    setMessage('');
+    setCardPay('');
+    setCashPay('');
+    setUPIPay('');
+    setBorrow('');
+    setDetails([]);
+    setDiscount('');
+    setTotalPrice('');
+    setGst('');
+    setFinalTotal('');
+    
+    // Optionally show a success message (like using toast)
+    // toast.success("All items removed from the cart!");
+
+  } catch (e) {
+    console.log("Error occurred while removing all items:", e);
+    // Optionally, show an error message
+    // toast.error("Failed to remove all items.");
   }
-  else{
-    alert("somthing went wrong");
-  }
- }
+};
   const handleError = (err) => {
 
     // console.log(isChecked)
@@ -599,7 +633,7 @@ const handleScan = (data) => {
   if(amount == Total){
     if(items[0].length>0&&finalform.name&&finalform.Mobile&&finalform.Address){
       try {
-        const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,Card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform })).unwrap()
+        const createdOrder=  await dispatch(createOrder({paymentType:{cash:cashPay,Card:cardPay,UPI:upiPay,borrow:borrow}, BillUser:finalform,status:"OneTime" })).unwrap()
         console.log(createdOrder);
       
         setInvoice(createdOrder.data)
@@ -635,6 +669,7 @@ const handleScan = (data) => {
       setUPIPay("");
       setBorrow("");
       setDiscount("")
+      setDetails();
       setTotalPrice("")
       setGst("")
       setFinalTotal("")
@@ -726,7 +761,8 @@ const handleScan = (data) => {
     if(productDetails){
       const id = productDetails.BarCode;
       console.log(id);
-      dispatch(addToCart(id)).then(() => {
+      const status ='OneTime';
+      dispatch(addToCart({ productCode: id, status })).then(() => {
         dispatch(fetchCart());
       });
     }

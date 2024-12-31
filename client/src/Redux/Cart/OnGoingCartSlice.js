@@ -2,11 +2,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../axiosConfig';
 import { toast } from 'react-toastify';
 
-export const fetchCart = createAsyncThunk('cart/fetchCart', async (status, { rejectWithValue }) => {
+export const fetchCart = createAsyncThunk('cart/fetchCart', async ({ PayId, uId }, { rejectWithValue }) => {
   try {
-    const response =await axiosInstance.get('/sales/cart/getCart');
+    console.log(PayId, uId);
+    const response = await axiosInstance.get('/sales/OnGoing/getCart', {
+      params: { PayId, uId }, // Use params to send data in the URL
+    });
     const items = [response.data.data.cartItems, response.data.data];
-    // console.log(response)
     return items;
   } catch (error) {
     if (error.response && error.response.status === 401) {
@@ -16,11 +18,12 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (status, { rej
   }
 });
 
-export const addToCart = createAsyncThunk('cart/addToCart', async ({productCode,status },{ rejectWithValue }) => {
+
+export const addToCart = createAsyncThunk('cart/addToCart', async ({productCode,status,PayId,uId },{ rejectWithValue }) => {
 // console.log(productId)
   try {
     console.log("yes")
-    const response = await axiosInstance.post('/sales/cart/addCart', { productCode,status});
+    const response = await axiosInstance.post('/sales/OnGoing/addCart', { productCode,status,PayId,uId});
     if (response.data.success) {
       toast.success('Product added to cart');
     }
@@ -35,26 +38,35 @@ export const addToCart = createAsyncThunk('cart/addToCart', async ({productCode,
 });
 
 export const addQuantity = createAsyncThunk('cart/addQuantity', async (productId) => {
-  const response = await axiosInstance.post('/sales/cart/addCart', { productId });
+  const response = await axiosInstance.post('/sales/OnGoing/addCart', { productId });
   return response.data;
 });
 
-export const removeFromCart = createAsyncThunk('cart/removeFromCart', async (productId) => {
-  const response = await axiosInstance.delete(`/sales/cart/removeOneCart?itemId=${productId}`);
+export const removeFromCart = createAsyncThunk('cart/removeFromCart', async ({itemId, PayId, uId }) => {
+  const response = await axiosInstance.delete(
+    '/sales/OnGoing/removeOneCart',
+    {
+      params: { itemId, PayId, uId }, // All parameters are included in the query string
+    }
+  );
   // console.log(response)
   return response.data;
 });
 
 export const clearCart = createAsyncThunk('cart/clearCart', async () => {
-  await axiosInstance.delete('/sales/cart/removeAllItem');
+  await axiosInstance.delete('/sales/OnGoing/removeAllItem');
 });
 
-export const updateCartQuantity = createAsyncThunk('cart/updateCartQuantity', async ({ productId }) => {
-  const response = await axiosInstance.delete(`/sales/cart/removeItemQuantity?itemId=${productId}`);
+export const updateCartQuantity = createAsyncThunk('cart/updateCartQuantity', async ({itemId, PayId, uId  }) => {
+  const response = await axiosInstance.delete('/sales/OnGoing/removeItemQuantity',
+    {
+      params: { itemId, PayId, uId },
+    }
+  );
   return response.data;
 });
 
-const cartSlice = createSlice({
+const OnGoingcartSlice = createSlice({
   name: 'cart',
   initialState: {
     items: [],
@@ -93,7 +105,6 @@ const cartSlice = createSlice({
       .addCase(addToCart.rejected, (state, action) => {
         state.addToCartStatus = 'failed';
         state.addToCartError = action.payload;
-        
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         const { data } = action.payload;
@@ -127,4 +138,4 @@ const cartSlice = createSlice({
   },
 });
 
-export default cartSlice.reducer;
+export default OnGoingcartSlice.reducer;

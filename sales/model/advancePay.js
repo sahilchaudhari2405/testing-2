@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
+
 
 const AdvancePaySchema = new mongoose.Schema({
     clientId: {
@@ -10,6 +11,7 @@ const AdvancePaySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Offline_Cart",
         required: true,
+        unique: true
     }],
     status: {
         type: String,

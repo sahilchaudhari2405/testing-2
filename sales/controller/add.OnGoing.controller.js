@@ -9,11 +9,13 @@ import Offline_cartSchema from "../model/cart.model.js";
 import AdvancePaySchema from "../model/advancePay.js";
 
 const addToCart = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`;
-  const { productCode, status } = req.body;
+  const { productCode, status,PayId,uId } = req.body;
+  id= (uId===id && uId)? uId:id;
   const tenantId = req.user.tenantId;
   console.log("data",productCode)
+  console.log("payid", req.body);
   const CounterUser = await getTenantModel(
     tenantId,
     "CounterUser",
@@ -44,12 +46,12 @@ const addToCart = asyncHandler(async (req, res) => {
     }
 
     let cartItem = await Offline_CartItem.findOne({
-      status:'OneTime',
-      userId: id,
+      PayId: PayId || undefined,
+      status:'OnGoing',
+      userId: id ,
       product: product._id,
     });
     console.log(cartItem);
-
     if (cartItem) {
       cartItem.quantity += 1;
       cartItem.price += product.price;
@@ -64,9 +66,10 @@ const addToCart = asyncHandler(async (req, res) => {
         price: product.price,
         discountedPrice: product.discountedPrice,
         userId: id,
+        status: "OnGoing",
+        PayId: PayId || undefined,
         OneUnit: product.discountedPrice,
         GST: product.GST,
-        status:'OneTime',
         finalPrice_with_GST: product.discountedPrice + product.GST,
         product: product._id,
         createdAt: new Date(),
@@ -81,16 +84,16 @@ const addToCart = asyncHandler(async (req, res) => {
     } else {
       value = product.discountedPrice - cartItem.OneUnit;
     }
-    let cart = await Offline_Cart.findOne({ userId: id,status:'OneTime' });
+    let cart = await Offline_Cart.findOne({ userId: id ,PayId: PayId || undefined,status: "OnGoing"});
     if (!cart) {
       cart = await Offline_Cart.create({
         userId: id,
         cartItems: [cartItem._id],
-        status:'OneTime',
         totalPrice: cartItem.price,
+        PayId: PayId || undefined,
         totalItem: 1,
+        status: "OnGoing",
         GST: cartItem.GST,
-        status: status,
         final_price_With_GST: cartItem.finalPrice_with_GST,
         totalDiscountedPrice: cartItem.discountedPrice,
         discount: value,
@@ -123,7 +126,7 @@ const addToCart = asyncHandler(async (req, res) => {
 });
 
 const updateToCart = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`;
   const {
     productCode,
@@ -134,7 +137,10 @@ const updateToCart = asyncHandler(async (req, res) => {
     GST,
     finalPrice_with_GST,
     OneUnit,
+    uId,
+    PayId
   } = req.body;
+  id= (uId===id && uId)? uId:id;
   console.log(req.body);
   const tenantId = req.user.tenantId;
   const CounterUser = await getTenantModel(
@@ -167,9 +173,10 @@ const updateToCart = asyncHandler(async (req, res) => {
     }
 
     let cartItem = await Offline_CartItem.findOne({
+      PayId: PayId || undefined,
+      status:'OnGoing',
       userId: id,
       product: product._id,
-      status:'OneTime',
     });
     const oldItem = JSON.parse(JSON.stringify(cartItem));
     if (cartItem) {
@@ -184,7 +191,7 @@ const updateToCart = asyncHandler(async (req, res) => {
     }
     product.quantity += oldItem.quantity;
     await product.save();
-    let cart = await Offline_Cart.findOne({ userId: id,status:'OneTime' });
+    let cart = await Offline_Cart.findOne({ userId: id ,PayId: PayId || undefined,status: "OnGoing"});
     // const discount =await Math.max(price - discountedPrice, 0);
     if (!cart.cartItems.includes(cartItem._id)) {
       cart.cartItems.push(cartItem._id);
@@ -239,8 +246,10 @@ const updateToCart = asyncHandler(async (req, res) => {
   }
 });
 const getCartDetails = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`;
+  const { PayId, uId } = req.query;
+  id= (uId===id && uId)? uId:id;
   const tenantId = req.user.tenantId;
   const Offline_Cart = await getTenantModel(
     tenantId,
@@ -276,7 +285,8 @@ const getCartDetails = asyncHandler(async (req, res) => {
   try {
     const cart = await Offline_Cart.findOne({
       userId: id,
-      status: "OneTime",
+      status: "OnGoing",
+      PayId: PayId || undefined,
     }).populate({
       path: "cartItems",
       populate: {
@@ -284,7 +294,6 @@ const getCartDetails = asyncHandler(async (req, res) => {
         model: "Product",
       },
     });
-
     if (!cart) {
       return res
         .status(404)
@@ -300,8 +309,10 @@ const getCartDetails = asyncHandler(async (req, res) => {
   }
 });
 const getCartDetailsOngoing = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`;
+  const { PayId,uId } = req.query;
+  id= (uId===id && uId)? uId:id;
   const tenantId = req.user.tenantId;
   const Offline_Cart = await getTenantModel(
     tenantId,
@@ -325,7 +336,7 @@ const getCartDetailsOngoing = asyncHandler(async (req, res) => {
     AdvancePaySchema
   );
 
-  console.log(id);
+
 
   if (!id) {
     return res
@@ -341,9 +352,9 @@ const getCartDetailsOngoing = asyncHandler(async (req, res) => {
 
   try {
     const cart = await Offline_Cart.findOne({
+      PayId: PayId || undefined,
       userId: id,
-      status: "Ongoing",
-      ClinetId: { $ne: ClinetId },
+      status: "OnGoing",
     }).populate({
       path: "cartItems",
       populate: {
@@ -366,8 +377,10 @@ const getCartDetailsOngoing = asyncHandler(async (req, res) => {
   }
 });
 const getCartItemsById = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  let { id } = req.user;
   const { productQR } = req.query;
+  const { PayId, uId } = req.query;
+  id= (uId===id && uId)? uId:id;
   const tenantId = req.user.tenantId;
   const CounterUser = await getTenantModel(
     tenantId,
@@ -403,10 +416,13 @@ const getCartItemsById = asyncHandler(async (req, res) => {
 });
 
 const removeOneCart = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`;
-  const { itemId } = req.query;
+
+  const {itemId, PayId, uId } = req.query;
+  console.log(req.query)
   const tenantId = req.user.tenantId;
+  id= (uId===id && uId)? uId:id;
   const CounterUser = await getTenantModel(
     tenantId,
     "CounterUser",
@@ -430,7 +446,7 @@ const removeOneCart = asyncHandler(async (req, res) => {
   }
 
   try {
-    const cartItem = await Offline_CartItem.findById({ _id: itemId });
+    const cartItem = await Offline_CartItem.findById(itemId);
 
     if (!cartItem) {
       return res
@@ -451,7 +467,7 @@ const removeOneCart = asyncHandler(async (req, res) => {
         .status(404)
         .json(new ApiResponse(404, "Product not found", null));
     }
-    let cart = await Offline_Cart.findOne({ userId: id ,status:'OneTime'});
+    let cart = await Offline_Cart.findOne({ userId: id ,PayId: PayId || undefined,status: "OnGoing"});
     const cartItemExists = cart.cartItems.some(
       (item) => item.toString() === cartItem._id.toString()
     );
@@ -487,8 +503,10 @@ const removeOneCart = asyncHandler(async (req, res) => {
 });
 
 const removeAllCart = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`;
+  const { PayId, uId } = req.query;
+  id= (uId===id && uId)? uId:id;
   const tenantId = req.user.tenantId;
   const CounterUser = await getTenantModel(
     tenantId,
@@ -511,13 +529,14 @@ const removeAllCart = asyncHandler(async (req, res) => {
   }
 
   try {
-    const cart = await Offline_Cart.findOne({ userId: id ,status:'OneTime'});
+    const cart = await Offline_Cart.findOne({ userId: id,PayId: PayId || undefined, status: "OnGoing"});
+    console.log(cart)
     if (!cart) {
       return res.status(404).json(new ApiResponse(404, "Cart not found"));
     }
 
     await Offline_CartItem.deleteMany({ _id: { $in: cart.cartItems } });
-    await Offline_Cart.findOneAndDelete({ userId: id,status:'OneTime'});
+    await Offline_Cart.findOneAndDelete({ userId: id,PayId: PayId || undefined, status: "OnGoing"});
 
     return res
       .status(200)
@@ -532,9 +551,11 @@ const removeAllCart = asyncHandler(async (req, res) => {
 });
 
 const removeItemQuantityCart = asyncHandler(async (req, res) => {
-  const { id } = req.user;
+  let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`
+  const { PayId, uId } = req.query;
   const { itemId } = req.query;
+  id= (uId===id && uId)? uId:id;
   console.log(itemId);
   const tenantId = req.user.tenantId;
   const CounterUser = await getTenantModel(
@@ -560,7 +581,7 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
   }
 
   try {
-    const cartItem = await Offline_CartItem.findById({ _id: itemId });
+    const cartItem = await Offline_CartItem.findById(itemId);
 
     if (!cartItem) {
       return res
@@ -573,7 +594,7 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
           .json(
             new ApiResponse(403, "Unauthorized to delete this cart item", null)
           );
-      }
+      } 
     }
 
     const productId = cartItem.product;
@@ -588,7 +609,7 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
       await cartItem.save();
       product.quantity += 1;
       await product.save();
-      let cart = await Offline_Cart.findOne({ userId: id ,status:'OneTime'});
+      let cart = await Offline_Cart.findOne({ userId: id,PayId: PayId || undefined,status: "OnGoing" });
       const cartItemExists = cart.cartItems.some(
         (item) => item.toString() === cartItem._id.toString()
       );

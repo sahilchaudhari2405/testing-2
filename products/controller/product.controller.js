@@ -17,6 +17,7 @@ export const viewProduct = async (req, res) => {
 
     const tenantId = req.user.tenantId;
     const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Category = await getTenantModel(tenantId, "Category", categorySchema);
 
     const product = await Product.findOne({ BarCode:id}).populate('category');
    
@@ -60,7 +61,7 @@ export const deleteProduct = async (req, res) => {
   try {
     const tenantId = req.user.tenantId;
     const Product = await getTenantModel(tenantId, "Product", productSchema);
-
+   
     const deletedProduct = await Product.findByIdAndDelete(id);
 
     if (!deletedProduct) {
@@ -87,6 +88,7 @@ export const viewProducts = async (req, res) => {
     // Query to get products sorted by updatedAt, with pagination
     const tenantId = req.user.tenantId;
     const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Category = await getTenantModel(tenantId, "Category", categorySchema);
 
     const products = await Product.find()
       .sort({ updatedAt: -1 }) 
@@ -116,7 +118,8 @@ export const getProducts = async (req, res) => {
     const tenantId = req.user.tenantId;
     const Product = await getTenantModel(tenantId, "Product", productSchema);
     //  console.log(noOtherFilters);
-     
+    const Category = await getTenantModel(tenantId, "Category", categorySchema);
+
     if(lowStock && noOtherFilters)
     {      let sortedProducts=[];
       sortedProducts = await Product.find()
@@ -202,7 +205,8 @@ export const sortProducts = async (req, res) => {
     const tenantId = req.user.tenantId;
     const Product = await getTenantModel(tenantId, "Product", productSchema);
     //  console.log(noOtherFilters);
-     
+    const Category = await getTenantModel(tenantId, "Category", categorySchema);
+
     // if(lowStock && noOtherFilters)
     // {      let sortedProducts=[];
     //   sortedProducts = await Product.find()
@@ -278,6 +282,7 @@ export const sortProductsfordescription = async (req, res) => {
 
     const tenantId = req.user.tenantId;
     const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Category = await getTenantModel(tenantId, "Category", categorySchema);
 
      console.log(noOtherFilters);
      

@@ -16,10 +16,8 @@ OrderRouter.post('/sortOrder', authenticateToken,sortOrder);
 OrderRouter.post('/searchOfflineOrders',searchOfflineOrders);
 OrderRouter.post('/addProductOnEdit',authenticateToken,AddOrder);
 OrderRouter.post('/addCustomProductOnEdit',authenticateToken,AddCustomOrder);
-// OrderRouter.get('/getCounterOrder', authenticateToken,getCounterBill);
-    
-OrderRouter.get('/getCounterOrderbyID/:id',getOrderById);
-OrderRouter.put('/updateOrderbyID/:id',updateOrder); 
+OrderRouter.get('/getCounterOrderbyID/:id',authenticateToken,getOrderById);
+OrderRouter.put('/updateOrderbyID/:id',authenticateToken,updateOrder); 
 OrderRouter.put('/cancelOrder',authenticateToken,cancelledOrder);
 OrderRouter.put('/decreaseQuantity',authenticateToken,removeItemQuantityOrder);
 

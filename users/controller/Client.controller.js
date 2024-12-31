@@ -1,5 +1,5 @@
 import { getTenantModel } from "../database/getTenantModel.js";
-import { clientSchema } from "../model/Client.model.js";
+import { ClientPurchaseSchema, clientSchema, ClosingBalanceSchema } from "../model/Client.model.js";
 
 
 const getAllClients = async (req, res) => {
@@ -8,6 +8,8 @@ const getAllClients = async (req, res) => {
   try {
     const tenantId = req.user.tenantId;
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     const clients = await Client.find().sort({updatedAt: -1 }) 
       .limit(limit)
       .populate('ClosingBalance')
@@ -28,6 +30,8 @@ const searchClients = async (req, res) => {
     let matchCriteria = { Type: 'Client'};
     const tenantId = req.user.tenantId;
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     // Build the match criteria based on the provided alphabet (Name prefix)
     if (alphabet) {
       matchCriteria.Name = { $regex: `^${alphabet}`, $options: 'i' }; // Match Name exactly starting with the alphabet
@@ -48,7 +52,7 @@ const searchClients = async (req, res) => {
       },
       {
         $group: {
-          _id: "$Mobile", // Group by Mobile to ensure distinct entries
+          _id: "$_id", // Group by Mobile to ensure distinct entries
           Name: { $first: "$Name" },
           Mobile: { $first: "$Mobile" },
           Email: { $first: "$Email" },
@@ -79,6 +83,8 @@ const searchClientsDistributer = async (req, res) => {
   try {
     const tenantId = req.user.tenantId;
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     let matchCriteria = { Type: 'Supplier'};
 
     // Build the match criteria based on the provided alphabet (Name prefix)
@@ -138,6 +144,8 @@ const getAllCustomer = async (req, res) => {
   try {
     const tenantId = req.user.tenantId;
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     const clients = await Client.find().sort({updatedAt: -1 }) 
       .skip(skip)
       .limit(limit)
@@ -172,7 +180,8 @@ const searchCustomer = async (req, res) => {
     // Find clients based on the constructed query
     const tenantId = req.user.tenantId;
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
-
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     const clients = await Client.find(query)
       .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
       .populate('ClosingBalance')
