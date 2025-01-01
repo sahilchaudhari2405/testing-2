@@ -16,23 +16,36 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (status, { rej
   }
 });
 
-export const addToCart = createAsyncThunk('cart/addToCart', async ({productCode,status },{ rejectWithValue }) => {
-// console.log(productId)
-  try {
-    console.log("yes")
-    const response = await axiosInstance.post('/sales/cart/addCart', { productCode,status});
-    if (response.data.success) {
-      toast.success('Product added to cart');
+export const addToCart = createAsyncThunk(
+  "cart/addToCart",
+  async ({ productCode, status, formData }, { rejectWithValue }) => {
+    try {
+      const payload = { status, formData };
+      if (productCode) {
+        payload.productCode = productCode; // Add barcode only if it exists
+      }
+
+      console.log("Payload sent to API:", payload);
+
+      const response = await axiosInstance.post("/sales/cart/addCart", payload);
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      return rejectWithValue({ message: "Failed to add product to cart" });
+    } catch (error) {
+      console.error("Add to cart error:", error);
+
+      if (error.response && error.response.status === 401) {
+        return rejectWithValue({ isUnauthorized: true });
+      }
+
+      return rejectWithValue(error.response?.data || { message: "Unknown error occurred" });
     }
-    return response.data;
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      return rejectWithValue({ isUnauthorized: true });
-    }
-    // toast.error('Failed to add product to cart');
-    return rejectWithValue(error.response.data);
   }
-});
+);
+
 
 export const addQuantity = createAsyncThunk('cart/addQuantity', async (productId) => {
   const response = await axiosInstance.post('/sales/cart/addCart', { productId });

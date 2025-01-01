@@ -7,15 +7,14 @@ import productSchema from "../model/product.model.js";
 import Offline_cartItemSchema from "../model/cartItem.model.js";
 import Offline_cartSchema from "../model/cart.model.js";
 import AdvancePaySchema from "../model/advancePay.js";
+import createProduct from "../utils/productCreate.js";
 
 const addToCart = asyncHandler(async (req, res) => {
   let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`;
-  const { productCode, status,PayId,uId } = req.body;
+  const { productCode, status,PayId,uId,formData } = req.body;
   id= (uId===id && uId)? uId:id;
   const tenantId = req.user.tenantId;
-  console.log("data",productCode)
-  console.log("payid", req.body);
   const CounterUser = await getTenantModel(
     tenantId,
     "CounterUser",
@@ -38,13 +37,19 @@ const addToCart = asyncHandler(async (req, res) => {
   }
 
   try {
-    const product = await Product.findOne({ BarCode: productCode });
-    if (!product) {
-      return res
-        .status(404)
-        .json(new ApiResponse(404, "Product not found", null));
+    let product;
+    if (!productCode) {
+      // If no productCode is provided, create a new product
+      product = await createProduct(formData, tenantId);
+    } else {
+      // Try to find the product with the given productCode
+      product = await Product.findOne({ BarCode: productCode });
+  
+      if (!product) {
+        // If product is not found, return a 404 response
+        return res.status(404).json(new ApiResponse(404, "Product not found", null));
+      }
     }
-
     let cartItem = await Offline_CartItem.findOne({
       PayId: PayId || undefined,
       status:'OnGoing',

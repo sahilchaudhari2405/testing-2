@@ -495,7 +495,7 @@ console.log(editItem);
       const response = await axiosInstance.get(`/products/product/view/${id}`); // Adjust the URL to your API endpoint
       // setProducts(response.data);
       console.log("barcode fetch product reponse ",response)
-      dispatch(addToCart(id)).then(() => {
+      dispatch(addToCart({productCode:id,status:"OneTime",formData:formData })).then(() => {
         dispatch(fetchCart());})
       setProductDetails({})
     } catch (err) {
@@ -755,21 +755,43 @@ const handleRemoveAllItem = async () => {
       });
     }
   }, [productDetails]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(productDetails){
-      const id = productDetails.BarCode;
-      console.log(id);
-      const status ='OneTime';
-      dispatch(addToCart({ productCode: id, status })).then(() => {
-        dispatch(fetchCart());
-      });
+  
+    const id = productDetails?.BarCode || null; // Optional barcode
+    const status = "OneTime";
+  
+    console.log("Barcode:", id);
+    console.log("Status:", status);
+    console.log("FormData:", formData);
+  
+    try {
+      await dispatch(addToCart({ productCode: id, status, formData })).unwrap();
+      dispatch(fetchCart());
+      toast.success("Product successfully added to cart");
+       setFormData({
+        barcode: "",
+        brand: "",
+        description: "",
+        category: "",
+        stockType: "",
+        unit: "",
+        qty: "",
+        saleRate: "",
+        profit: "",
+        hsn: "",
+        gst: "",
+        total: "",
+      })
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      toast.error(error.message || "Failed to add product to cart");
     }
-    // setProductDetails({...productDetails,['qty']:" "});
-    setProductDetails();
+  
+    setProductDetails(null); // Reset product details
   };
-
+  
+  
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       console.log("inside handle key press == Enter")
@@ -1096,42 +1118,60 @@ const handleRemoveAllItem = async () => {
                 id="qty"
                 value={formData.qty}
                 onKeyDown={handleKeys}
+                onChange={handleChange}
                 className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter quantity"
               />
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
-                htmlFor="sale-rate"
+                htmlFor="profit"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Purchase Rate
+              </label>
+              <input
+                type="profit"
+                id="profit"
+                value={formData.profit}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter MRP"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="total"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                MRP
+              </label>
+              <input
+                type="text"
+                id="total"
+                value={formData.total}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter MRP"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="saleRate"
                 className="block text-gray-700 text-sm font-medium"
               >
                 Sale Rate
               </label>
               <input
                 type="text"
-                id="sale-rate"
+                id="saleRate"
                 value={formData.saleRate}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter Sale rate"
-              />
-            </div>
-            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-              <label
-                htmlFor="hsn"
-                className="block text-gray-700 text-sm font-medium"
-              >
-                HSN
-              </label>
-              <input
-                type="text"
-                id="hsn"
-                value={formData.hsn}
-                onKeyDown={handleKeys}
-                onChange={handleChange}
-                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter HSN"
               />
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
@@ -1156,20 +1196,6 @@ const handleRemoveAllItem = async () => {
             <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 mt-5">
               <button
                 type="submit"
-                onClick={() => setFormData({
-                  barcode: "",
-                  brand: "",
-                  description: "",
-                  category: "",
-                  stockType: "",
-                  unit: "",
-                  qty: "",
-                  saleRate: "",
-                  profit: "",
-                  hsn: "",
-                  gst: "",
-                  total: "",
-                })}
                 className="w-full bg-green-700 text-white py-1 rounded font-medium hover:bg-green-800 transition-colors"
               >
 

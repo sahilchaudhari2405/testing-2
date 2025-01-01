@@ -384,25 +384,29 @@ const OngoingSale = () => {
       }
     } catch (error) {
       // Handle error while fetching advance payment details
+
       if (error.response && error.response.status === 404) {
-        setAdvancePaid([]);
-        setAdvancePaidId("");
-        setMessage("");
-        setCardPay("");
-        setCashPay("");
-        setUPIPay("");
-        setBorrow("");
-        setDetails([]);
-        setDiscount("");
-        setTotalPrice("");
-        setCartId("");
-        setGst("");
-        setFinalTotal("");
+      setAdvancePaid([]);
+      setAdvancePaidId("");
+      setMessage("");
+      setCardPay("");
+      setCashPay("");
+      setUPIPay("");
+      setBorrow("");
+      setDiscount("");
+      setTotalPrice("");
+      setCartId("");
+      setGst("");
+      setDetails([]);
+      setFinalTotal("");
+      dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
         console.error("No data found for the given Client ID.");
-        dispatch(fetchCart());
+     
       } else {
         console.error("Error fetching advance payment details:", error);
       }
+      console.log(items)
+      console.log(CartId)
     }
 
     // Close the modals after selection
@@ -549,6 +553,7 @@ const OngoingSale = () => {
       }
 
       const summary = items[1];
+      console.log(summary)
       if (summary) {
         setDiscount(summary.discount || 0);
         setTotalPrice(summary.totalPrice || 0);
@@ -621,6 +626,7 @@ const OngoingSale = () => {
           status,
           PayId: AdvancePaidId,
           uId: UserId,
+          formData,
         })
       ).then(() => {
         dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
@@ -932,30 +938,54 @@ const OngoingSale = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (productDetails) {
-      const id = productDetails.BarCode;
-      console.log(id);
-      const status = "Ongoing";
-
-      const data = {
-        PayId: AdvancePaidId,
-        uId: UserId,
-      };
-      console.log(data);
-      dispatch(
+  
+    const id = productDetails?.BarCode || null; // Use null if BarCode is undefined
+    const status = "Ongoing";
+  
+    const data = {
+      PayId: AdvancePaidId,
+      uId: UserId,
+    };
+  
+    console.log("Payload data:", { ...data, productCode: id, status, formData });
+  
+    try {
+      // Dispatch the addToCart action
+      await dispatch(
         addToCart({
           productCode: id,
           status,
           PayId: AdvancePaidId,
           uId: UserId,
+          formData,
         })
-      ).then(() => {
-        dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
-      });
+      ).unwrap();
+  
+      // Fetch the updated cart after successfully adding the product
+      dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
+      toast.success("Product added to cart successfully");
+      setFormData({
+        barcode: "",
+        brand: "",
+        description: "",
+        category: "",
+        stockType: "",
+        unit: "",
+        qty: "",
+        saleRate: "",
+        profit: "",
+        hsn: "",
+        gst: "",
+        total: "",
+      })
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      toast.error(error.message || "Failed to add product to cart");
     }
-    // setProductDetails({...productDetails,['qty']:" "});
-    setProductDetails();
+  
+    setProductDetails(null); // Reset productDetails after submission
   };
+  
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -1028,7 +1058,7 @@ const OngoingSale = () => {
     const data = date;
     const timeData = time;
     console.log(clientId);
-    console.log(cart);
+    console.log();
     console.log(amount);
     try {
       // Send the data to the server
@@ -1038,7 +1068,7 @@ const OngoingSale = () => {
         amount,
         AdvancePaidId,
         date: data,
-        time: timeData,
+        time: timeData, 
       });
       console.log("Response data:", response.data);
       const { advancePay } = response.data.advancePayment;
@@ -1382,42 +1412,60 @@ const OngoingSale = () => {
                 id="qty"
                 value={formData.qty}
                 onKeyDown={handleKeys}
+                onChange={handleChange}
                 className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter quantity"
               />
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
-                htmlFor="sale-rate"
+                htmlFor="profit"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                Purchase Rate
+              </label>
+              <input
+                type="profit"
+                id="profit"
+                value={formData.profit}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter MRP"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="total"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                MRP
+              </label>
+              <input
+                type="text"
+                id="total"
+                value={formData.total}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter MRP"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="saleRate"
                 className="block text-gray-700 text-sm font-medium"
               >
                 Sale Rate
               </label>
               <input
                 type="text"
-                id="sale-rate"
+                id="saleRate"
                 value={formData.saleRate}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter Sale rate"
-              />
-            </div>
-            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
-              <label
-                htmlFor="hsn"
-                className="block text-gray-700 text-sm font-medium"
-              >
-                HSN
-              </label>
-              <input
-                type="text"
-                id="hsn"
-                value={formData.hsn}
-                onKeyDown={handleKeys}
-                onChange={handleChange}
-                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter HSN"
               />
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
@@ -1441,22 +1489,6 @@ const OngoingSale = () => {
             <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 mt-5">
               <button
                 type="submit"
-                onClick={() =>
-                  setFormData({
-                    barcode: "",
-                    brand: "",
-                    description: "",
-                    category: "",
-                    stockType: "",
-                    unit: "",
-                    qty: "",
-                    saleRate: "",
-                    profit: "",
-                    hsn: "",
-                    gst: "",
-                    total: "",
-                  })
-                }
                 className="w-full bg-green-700 text-white py-1 rounded font-medium hover:bg-green-800 transition-colors"
               >
                 Enter
@@ -1473,13 +1505,11 @@ const OngoingSale = () => {
                 Total Items Quantity:{" "}
               </span>
               <span className="text-primary px-3">
-                {items[1] && items[1].cartItems
-                  ? items[1].cartItems.reduce(
-                      (total, item) => total + item.quantity,
-                      0
-                    )
-                  : 0}
-              </span>
+  {details && details.length > 0
+    ? details.reduce((total, item) => total + item.quantity, 0)
+    : 0}
+</span>
+
             </div>
             <Button
               variant="contained"
