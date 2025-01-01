@@ -348,7 +348,7 @@ const OngoingSale = () => {
       Address: Client.Address || "Shrigonda",
       State: Client.State || "Maharashtra",
     });
-    if (Client._id === ClinetId) return;
+
     try {
       // Fetch advance payment data for the selected client
       const response = await axiosInstance.get(
