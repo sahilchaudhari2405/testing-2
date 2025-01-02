@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 export async function UserCreate(req, res) {
     try {
-        const { fullName, username, email, password, counterNumber, mobile, role } = req.body;
+        const { fullName, username, email, password, counterNumber, mobile, role, date } = req.body;
 
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,11 +31,14 @@ export async function UserCreate(req, res) {
                 email,
                 mobile,
                 tenantId:username+tenantId,
+                expiryDate:date
             });
             await tenantUser.save();
         }
         else {
             // If tenant exists, return error
+            tenantUser.expiryDate=date;
+            await tenantUser.save();
             return res.status(400).json({ error: "User is already present, please use another account" });
         }
         const tenantId =tenantUser.tenantId;
@@ -81,6 +84,48 @@ export async function UserCreate(req, res) {
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
+export async function UserCheck(req, res) {
+    try {
+        const { email, mobile, date } = req.body;
+
+        // Validate input
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const mobileRegex = /^[6-9]\d{9}$/; // Adjust as per your mobile validation needs
+
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: "Invalid email format" });
+        }
+
+        if (!mobileRegex.test(mobile)) {
+            return res.status(400).json({ error: "Invalid mobile format" });
+        }
+
+        if (date && isNaN(Date.parse(date))) {
+            return res.status(400).json({ error: "Invalid date format" });
+        }
+
+        // Find user by email or mobile
+        const tenantUser = await TenantUser.findOne({ $or: [{ email }, { mobile }] });
+        if (date && tenantUser) {
+            tenantUser.expiryDate = date;
+            await tenantUser.save();
+            return res.status(200).json({
+                message: "User updated successfully",
+            });
+        } 
+        if (tenantUser && !date) {
+                return res.status(400).json({ error: "User already exists. Please use another account." });
+        }
+
+        return res.status(201).json({
+            message: "User not found.",
+        });
+    } catch (error) {
+        console.error("Error in UserCheck controller:", error.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
 export async function signup(req, res) {
     try {
         const { fullName, username, email, password, counterNumber, mobile,role } = req.body;
@@ -88,10 +133,13 @@ export async function signup(req, res) {
         let tenantUser = await TenantUser.findOne({ email }) || await TenantUser.findOne({ mobile });
 
         if (!tenantUser) {
+          const  tenantdata = await TenantUser.findOne({ email:req.user.email,mobile:req.user.mobile,tenantId:req.user.tenantId})
             tenantUser = new TenantUser({
                 email,
                 mobile,
-                tenantId:req.user.tenantId,
+                tenantId:tenantdata.tenantId,   
+                softwarePlan:tenantdata.softwarePlan,
+                expiryDate:tenantdata.expiryDate,
             });
             await tenantUser.save();
         }
@@ -158,6 +206,9 @@ export async function login(req, res) {
                 if (!tenantUser) {
                     return res.status(400).json({ error: 'Invalid email or tenant not found' });
                 }
+                if (tenantUser.softwarePlan===false) {
+                    return res.status(401).json({ error: 'Plan is expire'});
+                }
                 const tenantId = tenantUser.tenantId;
            const CounterUser= await getTenantModel(tenantId, 'CounterUser', CounterUserSchema);
         const user = await CounterUser.findOne({ email }) || await CounterUser.findOne({mobile: email });
@@ -165,7 +216,7 @@ export async function login(req, res) {
         if (!user) {
             return res.status(400).json({ error: "Invalid email or password" });
         }
-        
+
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         
         if (!isPasswordCorrect) {

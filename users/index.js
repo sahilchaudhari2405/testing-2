@@ -7,6 +7,7 @@ import allRouter from './Router/router.js';
 import bodyParser from 'body-parser';
 import cluster from 'cluster';
 import os from 'os';
+import './utils/dailyExpireCheck.js'
 const totalCPUs = os.cpus().length;
 dotenv.config({
   path: './env',
@@ -34,6 +35,7 @@ const app = express();
 
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:5173',
   'http://client:80',
   'http://apalabajar.shop',
   'https://apalabajar.shop',  
