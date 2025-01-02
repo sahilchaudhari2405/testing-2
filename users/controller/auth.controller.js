@@ -107,6 +107,7 @@ export async function UserCheck(req, res) {
         // Find user by email or mobile
         const tenantUser = await TenantUser.findOne({ $or: [{ email }, { mobile }] });
         if (date && tenantUser) {
+            tenantUser.softwarePlan=true;
             tenantUser.expiryDate = date;
             await tenantUser.save();
             return res.status(200).json({
