@@ -34,11 +34,25 @@ const Purchase = () => {
   const [Inputnameforsearch, setInputnameforsearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [matchingOrders, setMatchingOrders] = useState([]);
-
+ const [Address, setFinalAddress] = useState("");
   const [Inputdescriptionforsearch, setInputdescriptionforsearch] = useState('');
   const [showModaldescription, setShowModaldescription] = useState(false);
   const [matchingProducts, setMatchingProducts] = useState([]);
-
+  useEffect(() => {
+    const data = localStorage.getItem("invoiceSettings");
+    if (data) {
+      try {
+        const parsedData = JSON.parse(data); // Parse the string into an object
+        console.log(parsedData); // Log the parsed object
+        setFinalAddress(parsedData.language.english.address || ""); 
+        finalform.address=Address
+      } catch (error) {
+        console.error("Error parsing localStorage data:", error);
+      }
+    } else {
+      console.warn("No data found in localStorage");
+    }
+  }, [Address]);
   const handleTokenExpiration = () => {
     const token = localStorage.getItem('token');
     if (token) {

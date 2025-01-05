@@ -40,12 +40,12 @@ const OngoingSale = () => {
   const [showPopup, setShowPopup] = useState(false);
 
   //   let productDetails = useSelector((State) => State.products.productDetails);
-  const [invoice, setInvoice] = useState();
+  const [invoice, setInvoice] = useState(null);
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const [ClinetId, setClinetId] = useState("");
   const [CartId, setCartId] = useState("");
-  const handlePrintRef = useRef();
+  const printRef = useRef();
   const { orderId } = useParams();
   let { items, status, fetchCartError } = useSelector(
     (State) => State.OnGoingcart
@@ -67,7 +67,7 @@ const OngoingSale = () => {
   const [editItem, setEditItem] = useState({});
   // const users = useSelector((State) => State.user.users);
   // const orders = useSelector((State) => State.orders.orders);
-
+  const [Address, setFinalAddress] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [Inputnameforsearch, setInputnameforsearch] = useState("");
   const [Inputmobilenumberforsearch, setInputmobilenumberforsearch] =
@@ -116,7 +116,21 @@ const OngoingSale = () => {
     amountPaid: 0,
     __v: 0,
   });
-
+  useEffect(() => {
+    const data = localStorage.getItem("invoiceSettings");
+    if (data) {
+      try {
+        const parsedData = JSON.parse(data); // Parse the string into an object
+        console.log(parsedData); // Log the parsed object
+        setFinalAddress(parsedData.language.english.address || ""); 
+        finalform.Address=Address
+      } catch (error) {
+        console.error("Error parsing localStorage data:", error);
+      }
+    } else {
+      console.warn("No data found in localStorage");
+    }
+  }, [Address]);
   const handleTokenExpiration = () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -587,10 +601,10 @@ const OngoingSale = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (print && invoice && handlePrintRef.current) {
-      console.log(handlePrintRef.current);
-      handlePrintRef.current.handlePrint();
+    if (invoice && printRef.current) {
+      printRef.current.handlePrint();
     }
+    setInvoice(null)
   }, [invoice]);
 
   const handleKeys = (e) => {
@@ -1983,14 +1997,14 @@ const OngoingSale = () => {
         <Invoice
           componentRef={componentRef}
           details={invoice}
-          setPrint={setPrint}
           language={language}
         />
 
+
         <ReactToPrint
-          trigger={() => <button style={{ display: "none" }} />}
+          trigger={() => <button style={{ display: 'none' }} />}
           content={() => componentRef.current}
-          ref={(el) => (handlePrintRef.current = el)}
+          ref={printRef}
         />
       </div>
       <AdvancePayPopup

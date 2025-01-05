@@ -1,389 +1,886 @@
-// // import React ,{useState,useEffect}from 'react';
-// // import logo from "../logo.png";
-// // import Barcode from 'react-barcode';
-// // const InvoiceTest = ({ componentRef, details }) => {
-// //   const [currentDate, setCurrentDate] = useState('');
-// //     const sharedClasses = {
-// //         flex: 'flex ',
-// //         justifyBetween: 'justify-between',
-// //         itemsCenter: 'items-center',
-// //         mb4: 'mb-4',
-// //         border: 'border text-center',
-// //         p2: 'p-2',
-// //         fontBold:'font-bold',
-// //       };
-// //       useEffect(() => {
-// //         // Get the current date in the required format (YYYY-MM-DD)
-// //         const today = new Date();
-// //         const year = today.getFullYear();
-// //         const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-// //         const day = String(today.getDate()).padStart(2, '0');
-// //         const formattedDate = `${year}-${month}-${day}`;
-    
-// //         // Set the current date as the default value
-// //         setCurrentDate(formattedDate);
-// //       }, []);
-// //       console.log(details)  
-// //   return (
-// //     details&&details.type=="customer"?
-// //     <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200 hidden">
-// //       <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
-// //         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-// //           <div>
-// //             <h1 className="text-2xl font-bold mb-4">AAPLA BAJAR</h1>
-// //             <p>AAPLA BAJAR</p>
-// //             <p>SHRIGONDA, AHMADNAGAR</p>
-// //             <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
-// //             <p>PHONE:9423750349</p>
-// //             <p>EMAIL:aaplabajar@gmail.com</p>
-// //           </div>
-// //           <div className="w-24 h-24 border flex items-center justify-center">
-// //             <img src={logo} alt="Insert Logo Above" />
-// //           </div>
-// //         </div>
-// //         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
-// //         <div>
-// //             <span className={sharedClasses.fontBold}>INVOICE: </span>
-// //             <div><Barcode value={details._id} width={0.8} // Adjust the width of the bars
-// //             height={70}   /></div>
-// //           </div>
-// //           <div>
-// //             <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-// //             <span>{currentDate}</span>
-// //           </div>
-// //         </div>
-// //         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
-// //           <div className="w-1/2 pr-2">
-// //             <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
-// //             <p>{details.Name?.toUpperCase()}</p>
-// //             <p>{details.Address?.toUpperCase()}</p>
-// //             <p>PHONE:{details.mobileNumber}</p>
-// //             <p>EMAIL:{details.email}</p>
-// //           </div>
-// //         </div>
-// //         <table className="w-full border-collapse border mb-4">
-// //           <thead>
-// //             <tr className="bg-black text-white">
-// //               <th className={sharedClasses.border + " " + sharedClasses.p2}>DESCRIPTION</th>
-// //               <th className={sharedClasses.border + " " + sharedClasses.p2}>QUANTITY</th>
-// //               <th className={sharedClasses.border + " " + sharedClasses.p2}>GST</th>
-// //               <th className={sharedClasses.border + " " + sharedClasses.p2}>DISCOUNT</th>
-// //               <th className={sharedClasses.border + " " + sharedClasses.p2}>PRICE</th>
-// //               <th className={sharedClasses.border + " " + sharedClasses.p2}>UNIT PRICE</th>
-// //             </tr>
-// //           </thead>
-// //           <tbody>
-// //             {details?.orderItems?.map((e, index) => (
-// //               <tr key={index}>
-// //                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.product?.title }</td>
-// //                 <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
-// //                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.GST}</td>
-// //                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{(e.price - e.discountedPrice)}</td>
-// //                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.price}</td>
-// //                 <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.discountedPrice}</td>
-                
-// //               </tr>
-// //             ))}
-// //           </tbody>
-// //         </table>
-// //         <div className={`${sharedClasses.flex} justify-end ${sharedClasses.mb4}`}>
-// //           <div className="w-1/4">
-// //             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-// //               <span>SUBTOTAL</span>
-// //               <span>₹{details.totalPrice}</span>
-// //             </div>
-// //             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-// //               <span>DISCOUNT</span>
-// //               <span>₹{(details.totalPrice-details.totalDiscountedPrice)}</span>
-// //             </div>
-// //             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-// //               <span>GST</span>
-// //               <span>₹{details.GST}</span>
-// //             </div>
-// //             <div>
-// //       <span>PAYMENT BY</span>
-// //       <span>Cash:₹{details.paymentType.cash}</span>
-// //       <span>Card:₹{details.paymentType.Card}</span>
-// //       <span>UPI:₹{details.paymentType.UPI}</span>
-// //       <span>Borrow:₹{details.paymentType?.borrow}</span>
-// //       </div>
-// //             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
-// //               <span>Amount Pay</span>
-// //               <span>₹{details.finalPriceWithGST}</span>
-// //             </div>
-// //           </div>
-// //         </div>
-// //         <div className="mb-4">
-// //           <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2>
-// //           <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div>
-// //         </div>
-// //         <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
-// //       </div>
-// //     </div>
-// //     :
-// // details && (
-// //   <div className="invoice__preview bg-white p-5 rounded-2xl border-4 border-blue-200 hidden">
-// //      <div ref={componentRef} className="max-w-4xl mx-auto p-4 bg-white text-black">
-// //   <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}>
-// //     <div>
-// //       <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
-// //       <p>APALA BAJAR</p>
-// //       <p>SHRIGONDA, AHMADNAGAR</p>
-// //       <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
-// //       <p>PHONE: 9849589588</p>
-// //       <p>EMAIL: aaplabajar1777@gmail.com</p>
-// //     </div>
-// //     <div className="w-24 h-24 border flex items-center justify-center">
-// //       <img src={logo} alt="Insert Logo Above" />
-// //     </div>
-// //   </div>
-// //   <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
-// //     <div>
-// //       <span className={sharedClasses.fontBold}>INVOICE: </span>
-// //       <div><Barcode value={details._id} width={0.8} // Adjust the width of the bars
-// //       height={70}   /></div>
-// //     </div>
-// //     <div>
-// //       <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-// //       <span>{details.updatedAt?.substring(0, 10)}</span>
-// //     </div>
-// //   </div>
-// //   <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}>
-// //     <div className="w-1/2 pr-2">
-// //       <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
-// //       <p>{details.Name?.toUpperCase()}</p>
-// //       <p>{details.Address?.toUpperCase()}</p>
-// //       <p>PHONE:{details.mobileNumber}</p>
-// //       <p>EMAIL:{details.email}</p>
-// //     </div>
-// //   </div>
-// //   <table className="w-full border-collapse border mb-4">
-// //     <thead>
-// //       <tr className="bg-black text-white">
-// //         <th className={sharedClasses.border + " " + sharedClasses.p2}>DESCRIPTION</th>
-// //         <th className={sharedClasses.border + " " + sharedClasses.p2}>QUANTITY</th>
-// //         <th className={sharedClasses.border + " " + sharedClasses.p2}>PURCHASE PRICE</th>
-// //         <th className={sharedClasses.border + " " + sharedClasses.p2}>RETAIL PRICE</th>
-// //         <th className={sharedClasses.border + " " + sharedClasses.p2}>UNIT PRICE</th>
-// //       </tr>
-// //     </thead>
-// //     <tbody>
-// //       {details.orderItems?.map((e, index) => (
-// //         <tr key={index}>
-// //           <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.productId?.title}</td>
-// //           <td className={sharedClasses.border + " " + sharedClasses.p2 + "h-12"}>{e.quantity}</td>
-// //           <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.purchaseRate} </td>
-// //           <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.retailPrice}</td>
-// //           <td className={sharedClasses.border + " " + sharedClasses.p2}>{e.retailPrice}</td>
-          
-// //         </tr>
-// //       ))}
-// //     </tbody>
-// //   </table>
-// //   <div className={`${sharedClasses.flex} justify-end ${sharedClasses.mb4}`}>
-// //     <div className="w-1/4">
-// //       <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-// //         <span>SUBTOTAL</span>
-// //         <span>₹{details.totalPurchaseRate}</span>
-// //       </div>
-// //       <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-// //         <span>TOTAL ITEMS</span>
-// //         <span>₹{details.totalItem}</span>
-// //       </div>
-// //       <div>
-// //       <span>PAYMENT BY</span>
-// //       <div className='flex ml-5'>
-// //       <span>Cash:₹{details.paymentType?.cash}</span>
-// //       <span>Card:₹{details.paymentType?.Card}</span>
-// //       <span>UPI:₹{details.paymentType?.UPI}</span>
-// //       <span>Borrow:₹{details.paymentType?.borrow}</span>
-// //       </div>
-// //       </div>
-// //       <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
-// //         <span>Amount Pay</span>
-// //         <span>₹{details.totalPurchaseRate}</span>
-// //       </div>
-// //     </div>
-// //   </div>
-// //   <div className="mb-4">
-// //     <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2>
-// //     <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div>
-// //   </div>
-// //   <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
-// // </div>
-// //   </div>
-// // )
+import React, { useState, useEffect } from "react";
+import logo from "../logo.png";
+import Barcode from "react-barcode";
+import axiosInstance from "../axiosConfig";
+const InvoiceTest = ({ componentRef, details, setPrint, language}) => {
 
+  const [currentDate, setCurrentDate] = useState("");
+  const [settings, setSettings] = useState({
+    language: {
+      english: {
+        title: "",
+        address: "",
+        customerService: "",
+        phone: "",
+        email: "",
+      },
+      marathi: {
+        title: "",
+        address: "",
+        customerService: "",
+        phone: "",
+        email: "",
+      },
+    },
+    Logo: "",
+    displayOptions: {
+      email: true,
+      address: true,
+      mobileNumber: true,
+      showLogo: true,
+      showTotalPrice: true,
+      showDiscount: true,
+      showGST: true,
+      showPayType: true,
+      showQR: true,
+    },
+    productDataVisibility: {
+      unitPrice: true,
+      GST: true,
+      Discount: true,
+      price: true,
+    },
+  });
+  useEffect(() => {
+    const data = localStorage.getItem("invoiceSettings");
+    const fetchSettings = async () => {
+      try {
+        const response = await axiosInstance.get('/users/setting');
+        console.log(response.data.data);
+        const fetchedData = response.data.data;
+        if (fetchedData) {
+          setSettings(fetchedData); // Set settings if data is not null
+          localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
 
-// //   );
-// // };
+        } else {
+          console.error("No settings data found");
+        }
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      }
+    };
+  
+    if (data) {
+      const parsedData = JSON.parse(data);
+      console.log(parsedData)
+      if (parsedData) {
+        setSettings(parsedData); 
+      } else {
+        fetchSettings(); // Fetch from API if localStorage data is invalid
+      }
+    } else {
+      fetchSettings(); // Fetch from API if no data in localStorage
+    }
+  }, [settings]);
+  const sharedClasses = {
+    flex: "flex ",
+    justifyBetween: "justify-between",
+    itemsCenter: "items-center",
+    mb4: "mb-4",
+    border: "border text-center",
+    p2: "p-2",
+    fontBold: "font-bold",
+  };
+  const invoiceDetails = {
+    title: settings.language.marathi.title,
+    address: [
+      `${settings.language.marathi.address}`,
+      `<span class='font-bold'>ग्राहक सेवा</span>:${settings.language.marathi.customerService}`,
+      `<span class='font-bold'>फोन</span>:${settings.language.marathi.phone}`,
+      `<span class='font-bold'>ईमेल</span>: ${settings.language.marathi.email}`,
+    ],
+  };
+  const invoiceDetailEngilsh = {
+    title: settings.language.english.title,
+    address: [
+      `${settings.language.english.address}`,
+      `<span class='font-bold'>Customer Service</span>: ${settings.language.english.customerService}`,
+      `<span class='font-bold'>Phone</span>: ${settings.language.english.phone}`,
+      `<span class='font-bold'>Email</span>: ${settings.language.english.email}`,
+    ],
+  };
+  useEffect(() => {
+    // Get the current date in the required format (YYYY-MM-DD)
+    console.log("Data")
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const day = String(today.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
+    // if (setPrint) {
+    //   setPrint(false);
+    // }
+    // Set the current date as the default value
+    setCurrentDate(formattedDate);
+  }, [details]);
+console.log(settings)
+  return language == "Marathi" ? (
+    details?.type === "customer" ? (
+      <div className="invoice__preview mt-20 bg-white p-5 w-32 rounded-2xl border-4 border-blue-200">
+        <div
+          ref={componentRef}
+          className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black"
+        >
+          {settings.displayOptions.showLogo && (
+            <div className="w-24 h-24 border flex items-center justify-center">
+              <img src={settings.Logo || logo} alt="लोगो वरती घाला" />
+            </div>
+          )}
 
-// // export default InvoiceTest;
+          <div
+            className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4} justify-center`}
+          >
+            <div className="flex flex-col items-center">
+              <h1 className="text-2xl font-bold mt-2">
+                {invoiceDetails.title}
+              </h1>
+              {settings.displayOptions.address &&
+                invoiceDetails.address.map((line, index) => (
+                  <p key={index} dangerouslySetInnerHTML={{ __html: line }}></p>
+                ))}
+            </div>
+          </div>
 
-// import React, { useState, useEffect } from 'react';
-// import logo from "../logo.png";
-// import Barcode from 'react-barcode';
+          <div
+            className={`${sharedClasses.flex} flex-col w-full ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}
+          >
+            <div>
+              <span className={sharedClasses.fontBold}>चलन दिनांक: </span>
+              <span>{currentDate}</span>
+            </div>
+          </div>
 
-// const InvoiceTest = () => {
-//   const [currentDate, setCurrentDate] = useState('');
+          <div className="grid grid-cols-2 gap-4">
+            {/* Left Column */}
+            <div>
+              <p>
+                <span className="font-bold">चलाकाचे नाव: </span>
+                {details.Name?.toUpperCase()}
+              </p>
+              {settings.displayOptions.address && (
+                <p>
+                  <span className="font-bold">पत्ता: </span>
+                  {details.Address?.toUpperCase()}
+                </p>
+              )}
+            </div>
+            {/* Right Column */}
+            <div className="flex flex-col items-start">
+              {" "}
+              {/* Updated this div */}
+              {settings.displayOptions.mobileNumber && (
+                <p>
+                  <span className="font-bold">फोन: </span>
+                  {details.mobileNumber}
+                </p>
+              )}
+              {settings.displayOptions.email && (
+                <p>
+                  <span className="font-bold">ईमेल: </span>
+                  {details.email}
+                </p>
+              )}
+            </div>
+          </div>
 
-//   // Dummy data
-//   const details = {
-//     _id: '123456789',
-//     Name: 'Ankit Malik',
-//     Address: '123 TITAWI CHANDIGARH',
-//     mobileNumber: '555-1234',
-//     email: 'aniketmalik@gmail.com',
-//     orderItems: [
-//       {
-//         product: { title: 'Product A' },
-//         quantity: 2,
-//         GST: 18,
-//         price: 100,
-//         discountedPrice: 90
-//       },
-//       {
-//         product: { title: 'Product B' },
-//         quantity: 1,
-//         GST: 5,
-//         price: 50,
-//         discountedPrice: 45
-//       }
-//     ],
-//     totalPrice: 150,
-//     totalDiscountedPrice: 135,
-//     GST: 23,
-//     paymentType: {
-//       cash: 100,
-//       Card: 30,
-//       UPI: 20,
-//       borrow: 0
-//     },
-//     finalPriceWithGST: 150
-//   };
+          <table className="w-full border-collapse border mb-2 text-xs">
+            <thead>
+              <tr className="bg-gray-800 text-white">
+                <th className="border p-1">वर्णन</th>
+                <th className="border p-1">प्रमाण</th>
+                {settings.productDataVisibility.unitPrice && (
+                  <th className="border p-1">युनिट किंमत</th>
+                )}
+                {settings.productDataVisibility.GST && (
+                  <th className="border p-1">जीएसटी</th>
+                )}
+                {settings.productDataVisibility.Discount && (
+                  <th className="border p-1">सवलत</th>
+                )}
+                {settings.productDataVisibility.price && (
+                  <th className="border p-1">किंमत</th>
+                )}
+                <th className="border p-1">सवलतीनंतरची किंमत</th>
+              </tr>
+            </thead>
+            <tbody>
+              {details?.orderItems?.map((e, index) => (
+                <tr key={index}>
+                  <td className="border p-1 truncate">{e.product?.title}</td>
+                  <td className="border p-1 text-center">{e.quantity}</td>
+                  {settings.productDataVisibility.unitPrice && (
+                    <td className="border p-1 text-center">
+                      {(e.discountedPrice / e.quantity).toFixed(2)}
+                    </td>
+                  )}
+                  {settings.productDataVisibility.GST && (
+                    <td className="border p-1 text-center">{e.GST}</td>
+                  )}
+                  {settings.productDataVisibility.Discount && (
+                    <td className="border p-1 text-center">
+                      {(e.price
+                        ? e.price - e.discountedPrice
+                        : (e.product.discountedPrice -
+                            e.discountedPrice / e.quantity) *
+                          e.quantity
+                      ).toFixed(2)}
+                    </td>
+                  )}
+                  {settings.productDataVisibility.price && (
+                    <td className="border p-1 text-center">{e.price}</td>
+                  )}
+                  <td className="border p-1 text-center">
+                    {e.discountedPrice}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-//   const sharedClasses = {
-//     flex: 'flex ',
-//     justifyBetween: 'justify-between',
-//     itemsCenter: 'items-center',
-//     mb4: 'mb-4',
-//     border: 'border text-center',
-//     p2: 'p-2',
-//     fontBold: 'font-bold',
-//   // };
+          <div
+            className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}
+          >
+            <div className="w-full">
+              {settings.displayOptions.showTotalPrice && (
+                <div
+                  className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+                >
+                  <span>उपयोगिता</span>
+                  <span>₹{details.totalPrice}</span>
+                </div>
+              )}
+              {settings.displayOptions.showDiscount && (
+                <div
+                  className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+                >
+                  <span>सवलत</span>
+                  <span>₹{details.discount}</span>
+                </div>
+              )}
+              {settings.displayOptions.showGST && (
+                <div
+                  className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+                >
+                  <span>जीएसटी</span>
+                  <span>₹{details.GST}</span>
+                </div>
+              )}
+              {settings.displayOptions.showPayType && (
+                <div className="flex flex-col items-center">
+                  <span className="font-semibold">पेमेंट कसे केले</span>
+                  <div className="flex flex-col w-full">
+                    {details.paymentType.cash > 0 && (
+                      <div className="flex justify-between">
+                        <span>नगद:</span>
+                        <span>₹{details.paymentType.cash}</span>
+                      </div>
+                    )}
+                    {details.paymentType.Card > 0 && (
+                      <div className="flex justify-between">
+                        <span>कार्ड:</span>
+                        <span>₹{details.paymentType.Card}</span>
+                      </div>
+                    )}
+                    {details.paymentType.UPI > 0 && (
+                      <div className="flex justify-between">
+                        <span>यूपीआय:</span>
+                        <span>₹{details.paymentType.UPI}</span>
+                      </div>
+                    )}
+                    {details.paymentType.borrow > 0 && (
+                      <div className="flex justify-between">
+                        <span>उधार:</span>
+                        <span>₹{details.paymentType.borrow}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div
+                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}
+              >
+                <span>प्रदान रक्कम </span>
+                <span>₹{details.finalPriceWithGST}</span>
+              </div>
+            </div>
+          </div>
 
-//   useEffect(() => {
-//     // Get the current date in the required format (YYYY-MM-DD)
-//     const today = new Date();
-//     const year = today.getFullYear();
-//     const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-//     const day = String(today.getDate()).padStart(2, '0');
-//     const formattedDate = `${year}-${month}-${day}`;
+          {settings.displayOptions.showQR && (
+            <div>
+              <Barcode
+                value={details._id}
+                width={0.8}
+                height={40}
+                displayValue={false}
+              />
+            </div>
+          )}
 
-//     // Set the current date as the default value
-//     setCurrentDate(formattedDate);
-//   }, []);
+          <p className="text-center font-bold">
+            आपला बाजार भेट दिल्याबद्दल धन्यवाद!
+          </p>
+        </div>
+      </div>
+    ) : (
+      details && (
+        <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200 hidden">
+          <div
+            ref={componentRef}
+            className="max-w-4xl mx-auto p-4 bg-white text-black"
+          >
+            <div
+              className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}
+            >
+              <div className="flex flex-col items-start ">
+                <h1 className="text-2xl font-bold mt-2">
+                  {invoiceDetails.title}
+                </h1>
+                {settings.displayOptions.address &&
+                  invoiceDetails.address.map((line, index) => (
+                    <p
+                      key={index}
+                      dangerouslySetInnerHTML={{ __html: line }}
+                    ></p>
+                  ))}
+              </div>
+              {settings.displayOptions.showLogo && (
+                <div className="w-24 h-24 border flex items-center justify-center">
+                  <img src={settings.Logo || logo} alt="लोगो वरती घाला" />
+                </div>
+              )}
+            </div>
+            <div
+              className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}
+            >
+              {settings.displayOptions.showQR && (
+                <div>
+                  <span className={sharedClasses.fontBold}>चलन क्र.: </span>
+                  <Barcode
+                    value={details._id}
+                    width={0.8}
+                    height={40}
+                    displayValue={false}
+                  />
+                </div>
+              )}
+              <div>
+                <span className={sharedClasses.fontBold}>तारीख: </span>
+                <span>{currentDate}</span>
+              </div>
+            </div>
+            <div
+              className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}
+            >
+              <div className="w-1/2 pr-2">
+                <h2 className={sharedClasses.fontBold}>बिल:</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Left Column */}
 
-//   return (
-//     <div className="invoice__preview mt-20 bg-white p-5 w-fit  rounded-2xl border-4 border-blue-200">
-//       <div  ref={componentRef} className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black">
-//           <div className="w-24 h-24 border flex items-center justify-center">
-//             <img src={logo} alt="Insert Logo Above" />
-//           </div>
-//         <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4} justify-center`}>
-//           <div className='flex flex-col items-center'>
-//             <h1 className="text-2xl font-bold mt-2">APLA BAJAR</h1>
-//             <p>SHRIGONDA, AHMADNAGAR</p>
-//             <p>Customer Care +91 9576383726</p>
-//             {/* <p>AHMADNAGAR, MAHARASHTRA, 444002</p>
-//             <p>PHONE: 9423750349</p>
-//             <p>EMAIL: aaplabajar@gmail.com</p> */}
-//           </div>
-          
-//         </div>
-//         <div className={`${sharedClasses.flex} flex-col w-full ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}>
-          
-//           <div>
-//             <span className={sharedClasses.fontBold}>INVOICE DATE: </span>
-//             <span>{currentDate}</span>
-//           </div>
-          
-//         </div>
-//         <div className={`${sharedClasses.flex} justify-self-start  w-full ${sharedClasses.mb4}`}>
-//           <div className="w-full flex gap-4 pr-2">
-//             <div><h2 className={sharedClasses.fontBold}>BILL TO:   </h2></div>
-//             <div><p>{details.Name?.toUpperCase()}</p></div>
-//             {/* <p>{details.Address?.toUpperCase()}</p> */}
-//             {/* <p>PHONE:{details.mobileNumber}</p>
-//             <p>EMAIL:{details.email}</p> */}
-//           </div>
-//         </div>
-//         <table className="w-fit border-collapse border mb-2 text-xs">
-//           <thead>
-//             <tr className="bg-gray-800 text-white">
-//               <th className="border p-1">DESCRIPTION</th>
-//               <th className="border p-1">QUANTITY</th>
-//               <th className="border p-1">GST</th>
-//               <th className="border p-1">DISCOUNT</th>
-//               <th className="border p-1">PRICE</th>
-//               <th className="border p-1">UNIT PRICE</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {details?.orderItems?.map((e, index) => (
-//               <tr key={index}>
-//                 <td className="border p-1 truncate">{e.product?.title}</td>
-//                 <td className="border p-1 text-center">{e.quantity}</td>
-//                 <td className="border p-1 text-center">{e.GST}</td>
-//                 <td className="border p-1 text-center">{(e.price - e.discountedPrice)}</td>
-//                 <td className="border p-1 text-center">{e.price}</td>
-//                 <td className="border p-1 text-center">{e.discountedPrice}</td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
+                  <div>
+                    <p>
+                      <span className="font-bold">चलाकाचे नाव: </span>
+                      {details.Name?.toUpperCase()}
+                    </p>
+                    {settings.displayOptions.address && (
+                      <p>
+                        <span className="font-bold">पत्ता: </span>
+                        {details.Address?.toUpperCase()}
+                      </p>
+                    )}
+                  </div>
+                  {/* Right Column */}
+                  <div className="flex flex-col items-end">
+                    {" "}
+                    {/* Updated this div */}
+                    {settings.displayOptions.mobileNumber && (
+                      <p>
+                        <span className="font-bold">फोन: </span>
+                        {details.mobileNumber}
+                      </p>
+                    )}
+                    {settings.displayOptions.email && (
+                      <p>
+                        <span className="font-bold">ईमेल: </span>
+                        {details.email}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-//         <div className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}>
-//           <div className="w-full">
-//             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-//               <span>SUBTOTAL</span>
-//               <span>₹{details.totalPrice}</span>
-//             </div>
-//             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-//               <span>DISCOUNT</span>
-//               <span>₹{(details.totalPrice - details.totalDiscountedPrice)}</span>
-//             </div>
-//             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}>
-//               <span>GST</span>
-//               <span>₹{details.GST}</span>
-//             </div>
-//             <div className='flex flex-col items-center'>
-//               <span className='font-semibold'>PAYMENT BY</span>
-//               <div className='flex flex-col w-full'>
-//                 {details.paymentType.cash > 0 && <div className='flex justify-between'><span>Cash:</span><span> ₹{details.paymentType.cash}</span></div>}
-//                 {details.paymentType.Card > 0 && <div className='flex justify-between'><span>Card:</span><span>₹{details.paymentType.Card}</span></div>}
-//                 {details.paymentType.UPI > 0 && <div className='flex justify-between'><span>UPI:</span><span>₹{details.paymentType.UPI}</span></div>}
-//                 {details.paymentType.borrow > 0 && <div className='flex justify-between'><span>Borrow:</span><span>₹{details.paymentType.borrow}</span></div>}
-//               </div>
-//             </div>
-//             <div className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}>
-//               <span>Amount Pay </span>
-//               <span>₹{details.finalPriceWithGST}</span>
-//             </div>
-//           </div>
-//         </div>
-//         <div className="mb-4">
-//           {/* <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2> */}
-//           {/* <div className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}></div> */}
-//         </div>
-//         <div>
-//           {/* <span className={sharedClasses.fontBold}>INVOICE: </span> */}
-//           <div><Barcode value={details._id} width={1.5} height={40} /></div>
-//         </div>
-//         <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
-//       </div>
-//     </div>
-//   );
-// };
+            <table className="w-full border-collapse border mb-2 text-xs">
+              <thead>
+                <tr className="bg-gray-800 text-white">
+                  <th className="border p-1">वर्णन</th>
+                  <th className="border p-1">संख्या</th>
+                  <th className="border p-1">युनिट किंमत</th>
+                  <th className="border p-1">जीएसटी</th>
+                  <th className="border p-1">एकूण किंमत</th>
+                </tr>
+              </thead>
+              <tbody>
+                {details.orderItems?.map((e, index) => (
+                  <tr key={index}>
+                    <td className="border p-1 truncate">
+                      {e.productId?.title}
+                    </td>
+                    <td className="border p-1 text-center">{e.quantity}</td>
+                    <td className="border p-1 text-center">
+                      {(e.purchaseRate / e.quantity).toFixed(2)}
+                    </td>
+                    <td className="border p-1 text-center">{e.GST}</td>
+                    <td className="border p-1 text-center">
+                      {e.purchaseRate * e.quantity}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div
+              className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}
+            >
+              <div className="w-full">
+                <div
+                  className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+                >
+                  <span>उपएकूण</span>
+                  <span>₹{details.totalPurchaseRate}</span>
+                </div>
 
-// export default InvoiceTest;
+                <div
+                  className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+                >
+                  <span>जीएसटी</span>
+                  <span>₹{details.GST}</span>
+                </div>
+                {settings.displayOptions.showPayType && (
+                  <div className="flex flex-col items-center">
+                    <span className="font-semibold">पेमेंट कसे केले</span>
+                    <div className="flex flex-col w-full">
+                      {details.paymentType.cash > 0 && (
+                        <div className="flex justify-between">
+                          <span>नगद:</span>
+                          <span>₹{details.paymentType.cash}</span>
+                        </div>
+                      )}
+                      {details.paymentType.Card > 0 && (
+                        <div className="flex justify-between">
+                          <span>कार्ड:</span>
+                          <span>₹{details.paymentType.Card}</span>
+                        </div>
+                      )}
+                      {details.paymentType.UPI > 0 && (
+                        <div className="flex justify-between">
+                          <span>यूपीआय:</span>
+                          <span>₹{details.paymentType.UPI}</span>
+                        </div>
+                      )}
+                      {details.paymentType.borrow > 0 && (
+                        <div className="flex justify-between">
+                          <span>उधार:</span>
+                          <span>₹{details.paymentType.borrow}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                <div
+                  className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}
+                >
+                  <span>भरणा रक्कम</span>
+                  <span>₹{details.AmountPaid}</span>
+                </div>
+              </div>
+            </div>
+            <div className="mb-4">
+              <h2 className={sharedClasses.fontBold}>अटी व शर्ती:</h2>
+              <div
+                className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}
+              ></div>
+            </div>
+            <p className="text-center font-bold">
+              आपल्या व्यवसायासाठी धन्यवाद!
+            </p>
+          </div>
+        </div>
+      )
+    )
+  ) : details?.type === "customer" ? (
+    <div className="invoice__preview mt-20 bg-white p-5 w-32 rounded-2xl border-4 border-blue-200">
+      <div
+        ref={componentRef}
+        className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black"
+      >
+        {settings.displayOptions.showLogo && (
+          <div className="w-24 h-24 border flex items-center justify-center">
+            <img src={settings.Logo || logo} alt="Insert Logo Above" />
+          </div>
+        )}
+
+        <div
+          className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4} justify-center`}
+        >
+          <div className="flex flex-col items-center">
+            <h1 className="text-2xl font-bold mt-2">
+              {invoiceDetailEngilsh.title}
+            </h1>
+            {settings.displayOptions.address &&
+              invoiceDetailEngilsh.address.map((line, index) => (
+                <p key={index} dangerouslySetInnerHTML={{ __html: line }}></p>
+              ))}
+          </div>
+        </div>
+
+        <div
+          className={`${sharedClasses.flex} flex-col w-full ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}
+        >
+          <div>
+            <span className={sharedClasses.fontBold}>Invoice Date: </span>
+            <span>{currentDate}</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          {/* Left Column */}
+          <div>
+            <p>
+              <span className="font-bold">Customer Name: </span>
+              {details.Name?.toUpperCase()}
+            </p>
+            {settings.displayOptions.address && (
+              <p>
+                <span className="font-bold">Address: </span>
+                {details.Address?.toUpperCase()}
+              </p>
+            )}
+          </div>
+          {/* Right Column */}
+          <div className="flex flex-col items-start">
+            {settings.displayOptions.mobileNumber && (
+              <p>
+                <span className="font-bold">Phone: </span>
+                {details.mobileNumber}
+              </p>
+            )}
+            {settings.displayOptions.email && (
+              <p>
+                <span className="font-bold">Email: </span>
+                {details.email}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <table className="w-full border-collapse border mb-2 text-xs">
+          <thead>
+            <tr className="bg-gray-800 text-white">
+              <th className="border p-1">Description</th>
+              <th className="border p-1">Quantity</th>
+              {settings.productDataVisibility.unitPrice && (
+                <th className="border p-1">Unit Price</th>
+              )}
+              {settings.productDataVisibility.GST && (
+                <th className="border p-1">GST</th>
+              )}
+              {settings.productDataVisibility.Discount && (
+                <th className="border p-1">Discount</th>
+              )}
+              {settings.productDataVisibility.price && (
+                <th className="border p-1">Price</th>
+              )}
+              <th className="border p-1">Discounted Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {details?.orderItems?.map((e, index) => (
+              <tr key={index}>
+                <td className="border p-1 truncate">{e.product?.title}</td>
+                <td className="border p-1 text-center">{e.quantity}</td>
+                {settings.productDataVisibility.unitPrice && (
+                  <td className="border p-1 text-center">
+                    {(e.discountedPrice / e.quantity).toFixed(2)}
+                  </td>
+                )}
+                {settings.productDataVisibility.GST && (
+                  <td className="border p-1 text-center">{e.GST}</td>
+                )}
+                {settings.productDataVisibility.Discount && (
+                  <td className="border p-1 text-center">
+                    {(e.price
+                      ? e.price - e.discountedPrice
+                      : (e.product.discountedPrice -
+                          e.discountedPrice / e.quantity) *
+                        e.quantity
+                    ).toFixed(2)}
+                  </td>
+                )}
+                {settings.productDataVisibility.price && (
+                  <td className="border p-1 text-center">{e.price}</td>
+                )}
+                <td className="border p-1 text-center">{e.discountedPrice}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div
+          className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}
+        >
+          <div className="w-full">
+            {settings.displayOptions.showTotalPrice && (
+              <div
+                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+              >
+                <span>Total</span>
+                <span>₹{details.totalPrice}</span>
+              </div>
+            )}
+            {settings.displayOptions.showDiscount && (
+              <div
+                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+              >
+                <span>Discount</span>
+                <span>₹{details.discount}</span>
+              </div>
+            )}
+            {settings.displayOptions.showGST && (
+              <div
+                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+              >
+                <span>GST</span>
+                <span>₹{details.GST}</span>
+              </div>
+            )}
+            {settings.displayOptions.showPayType && (
+              <div className="flex flex-col items-center">
+                <span className="font-semibold">Payment Methods</span>
+                <div className="flex flex-col w-full">
+                  {details.paymentType.cash > 0 && (
+                    <div className="flex justify-between">
+                      <span>Cash:</span>
+                      <span>₹{details.paymentType.cash}</span>
+                    </div>
+                  )}
+                  {details.paymentType.Card > 0 && (
+                    <div className="flex justify-between">
+                      <span>Card:</span>
+                      <span>₹{details.paymentType.Card}</span>
+                    </div>
+                  )}
+                  {details.paymentType.UPI > 0 && (
+                    <div className="flex justify-between">
+                      <span>UPI:</span>
+                      <span>₹{details.paymentType.UPI}</span>
+                    </div>
+                  )}
+                  {details.paymentType.borrow > 0 && (
+                    <div className="flex justify-between">
+                      <span>Credit:</span>
+                      <span>₹{details.paymentType.borrow}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <div
+              className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}
+            >
+              <span>Grand Total</span>
+              <span>₹{details.finalPriceWithGST}</span>
+            </div>
+          </div>
+        </div>
+
+        {settings.displayOptions.showQR && (
+          <div>
+            <Barcode
+              value={details._id}
+              width={0.8}
+              height={40}
+              displayValue={false}
+            />
+          </div>
+        )}
+
+        <p className="text-center font-bold">Thank you for shopping with us!</p>
+      </div>
+    </div>
+  ) : (
+    details && (
+      <div className="invoice__preview mt-20 bg-white p-5 w-fit rounded-2xl border-4 border-blue-200 hidden">
+        <div
+          ref={componentRef}
+          className="max-w-4xl mx-auto p-4 bg-white text-black"
+        >
+          <div
+            className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}
+          >
+            <div className="flex flex-col items-start">
+              <h1 className="text-2xl font-bold mt-2">
+                {invoiceDetailEngilsh.title}
+              </h1>
+              {settings.displayOptions.address &&
+                invoiceDetailEngilsh.address.map((line, index) => (
+                  <p key={index} dangerouslySetInnerHTML={{ __html: line }}></p>
+                ))}
+            </div>
+            {settings.displayOptions.showLogo && (
+              <div className="w-24 h-24 border flex items-center justify-center">
+                <img src={settings.Logo || logo} alt="Insert Logo Above" />
+              </div>
+            )}
+          </div>
+          <div
+            className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}
+          >
+            {settings.displayOptions.showQR && (
+              <div>
+                <span className={sharedClasses.fontBold}>INVOICE NO: </span>
+                <Barcode
+                  value={details._id}
+                  width={0.8}
+                  height={40}
+                  displayValue={false}
+                />
+              </div>
+            )}
+            <div>
+              <span className={sharedClasses.fontBold}>DATE: </span>
+              <span>{currentDate}</span>
+            </div>
+          </div>
+          <div
+            className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.mb4}`}
+          >
+            <div className="w-1/2 pr-2">
+              <h2 className={sharedClasses.fontBold}>BILL TO:</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {/* Left Column */}
+                <div>
+                  <p>
+                    <span className="font-bold">Customer Name: </span>
+                    {details.Name?.toUpperCase()}
+                  </p>
+                  {settings.displayOptions.address && (
+                    <p>
+                      <span className="font-bold">Address: </span>
+                      {details.Address?.toUpperCase()}
+                    </p>
+                  )}
+                </div>
+                {/* Right Column */}
+                <div className="flex flex-col items-end">
+                  {settings.displayOptions.mobileNumber && (
+                    <p>
+                      <span className="font-bold">Phone: </span>
+                      {details.mobileNumber}
+                    </p>
+                  )}
+                  {settings.displayOptions.email && (
+                    <p>
+                      <span className="font-bold">Email: </span>
+                      {details.email}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <table className="w-full border-collapse border mb-2 text-xs">
+            <thead>
+              <tr className="bg-gray-800 text-white">
+                <th className="border p-1">DESCRIPTION</th>
+                <th className="border p-1">QUANTITY</th>
+                <th className="border p-1">UNIT PRICE</th>
+                <th className="border p-1">GST</th>
+                <th className="border p-1">TOTAL PRICE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {details.orderItems?.map((e, index) => (
+                <tr key={index}>
+                  <td className="border p-1 truncate">{e.productId?.title}</td>
+                  <td className="border p-1 text-center">{e.quantity}</td>
+                  <td className="border p-1 text-center">
+                    {(e.purchaseRate / e.quantity).toFixed(2)}
+                  </td>
+                  <td className="border p-1 text-center">{e.GST}</td>
+                  <td className="border p-1 text-center">
+                    {e.purchaseRate * e.quantity}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div
+            className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}
+          >
+            <div className="w-full">
+              <div
+                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+              >
+                <span>SUBTOTAL</span>
+                <span>₹{details.totalPurchaseRate}</span>
+              </div>
+
+              <div
+                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+              >
+                <span>GST</span>
+                <span>₹{details.GST}</span>
+              </div>
+              {settings.displayOptions.showPayType && (
+                <div className="flex flex-col items-center">
+                  <span className="font-semibold">Payment Methods</span>
+                  <div className="flex flex-col w-full">
+                    {details.paymentType.cash > 0 && (
+                      <div className="flex justify-between">
+                        <span>Cash:</span>
+                        <span>₹{details.paymentType.cash}</span>
+                      </div>
+                    )}
+                    {details.paymentType.Card > 0 && (
+                      <div className="flex justify-between">
+                        <span>Card:</span>
+                        <span>₹{details.paymentType.Card}</span>
+                      </div>
+                    )}
+                    {details.paymentType.UPI > 0 && (
+                      <div className="flex justify-between">
+                        <span>UPI:</span>
+                        <span>₹{details.paymentType.UPI}</span>
+                      </div>
+                    )}
+                    {details.paymentType.borrow > 0 && (
+                      <div className="flex justify-between">
+                        <span>Credit:</span>
+                        <span>₹{details.paymentType.borrow}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div
+                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.fontBold}`}
+              >
+                <span>Amount Pay</span>
+                <span>₹{details.AmountPaid}</span>
+              </div>
+            </div>
+          </div>
+          <div className="mb-4">
+            {/* <h2 className={sharedClasses.fontBold}>TERMS & CONDITIONS:</h2> */}
+            <div
+              className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}
+            ></div>
+          </div>
+          <p className="text-center font-bold">THANK YOU FOR YOUR BUSINESS!</p>
+        </div>
+      </div>
+    )
+  );
+};
+
+export default InvoiceTest;

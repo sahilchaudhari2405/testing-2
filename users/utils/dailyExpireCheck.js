@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import TenantUser from '../model/tenent.model.js';
 
 // Schedule a cron job to run daily at midnight IST
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
   console.log('Running daily expiry check...');
   
   const todayIST = getIndianDateAsString(); // Get today's date as a string in ISO format
