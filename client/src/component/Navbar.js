@@ -36,6 +36,35 @@ const Navbar = () => {
       console.warn("No data found in localStorage");
     }
   }, [Name]);
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await axiosInstance.get("/users/setting");
+        const fetchedData = response.data.data;
+        if (fetchedData) {
+          localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
+          setFinalName(fetchedData.language?.english?.title || "");
+        } else {
+          console.error("No settings data found");
+        }
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      }
+    };
+  
+    const data = localStorage.getItem("invoiceSettings");
+    if (data) {
+      try {
+        const parsedData = JSON.parse(data);
+        setFinalName(parsedData.language?.english?.title || "");
+      } catch (error) {
+        console.error("Error parsing localStorage data:", error);
+      }
+    } else {
+      console.warn("No data found in localStorage, fetching from API...");
+      fetchSettings();
+    }
+  }, [Name]); 
   return (
     <div className="bg-gray-800 fixed top-0 z-50 w-full p-4 flex justify-between items-center shadow-lg">
       <div className="flex items-center space-x-6">

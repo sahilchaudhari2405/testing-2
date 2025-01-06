@@ -128,20 +128,37 @@ const Sale = () => {
     handleTokenExpiration();
   }, []);
   useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await axiosInstance.get("/users/setting");
+        const fetchedData = response.data.data;
+        if (fetchedData) {
+          localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
+          setFinalAddress(fetchedData.language?.english?.address || "");
+          finalform.Address = fetchedData.language?.english?.address || ""; 
+        } else {
+          console.error("No settings data found");
+        }
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      }
+    };
+  
     const data = localStorage.getItem("invoiceSettings");
     if (data) {
       try {
-        const parsedData = JSON.parse(data); // Parse the string into an object
-        console.log(parsedData); // Log the parsed object
-        setFinalAddress(parsedData.language.english.address || ""); 
-        finalform.Address=Address
+        const parsedData = JSON.parse(data);
+        setFinalAddress(parsedData.language?.english?.address || "");
+        finalform.Address = parsedData.language?.english?.address || ""; // Ensure this matches your usage pattern
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
     } else {
-      console.warn("No data found in localStorage");
+      console.warn("No data found in localStorage, fetching from API...");
+      fetchSettings();
     }
-  }, [Address]);
+  }, [Address]); // Removed `Address` dependency to avoid redundant calls
+  
   
   const handleViewProduct = (product) => {
     setSelectedProduct(product);
