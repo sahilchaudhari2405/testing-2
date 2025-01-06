@@ -36,9 +36,12 @@ export async function UserCreate(req, res) {
             await tenantUser.save();
         }
         else {
-            // If tenant exists, return error
-            tenantUser.expiryDate=date;
-            await tenantUser.save();
+            await TenantUser.updateMany(
+                {
+                  tenantId:tenantUser.tenantId,
+                },
+                { $set: { softwarePlan: true,expiryDate:date } }
+              );
             return res.status(400).json({ error: "User is already present, please use another account" });
         }
         const tenantId =tenantUser.tenantId;
@@ -107,9 +110,12 @@ export async function UserCheck(req, res) {
         // Find user by email or mobile
         const tenantUser = await TenantUser.findOne({ $or: [{ email }, { mobile }] });
         if (date && tenantUser) {
-            tenantUser.softwarePlan=true;
-            tenantUser.expiryDate = date;
-            await tenantUser.save();
+            await TenantUser.updateMany(
+                {
+                  tenantId:tenantUser.tenantId,
+                },
+                { $set: { softwarePlan: true,expiryDate:date } }
+              );
             return res.status(200).json({
                 message: "User updated successfully",
             });
@@ -132,9 +138,9 @@ export async function signup(req, res) {
         const { fullName, username, email, password, counterNumber, mobile,role } = req.body;
 
         let tenantUser = await TenantUser.findOne({ email }) || await TenantUser.findOne({ mobile });
-
         if (!tenantUser) {
-          const  tenantdata = await TenantUser.findOne({ email:req.user.email,mobile:req.user.mobile,tenantId:req.user.tenantId})
+          const  tenantdata = await TenantUser.findOne({tenantId:req.user.tenantId})
+          console.log(tenantdata)
             tenantUser = new TenantUser({
                 email,
                 mobile,

@@ -154,7 +154,7 @@ const App = () => {
            <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
            <Route path="/generateimage" element={<PageWithNavbar><ImageGenerator /></PageWithNavbar>} />
            <Route path="/admin/client" element={<PageWithNavbar><Clients /></PageWithNavbar>} />
-           <Route path="/settings" element={<PageWithNavbar><InvoiceSettings /></PageWithNavbar>} /> 
+           <Route path="/settings" element={  <ProtectedRoute requiredRole="admin"><PageWithNavbar><InvoiceSettings /></PageWithNavbar></ProtectedRoute>} /> 
           {/*<Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
           <Route path="/reports" element={<PageWithNavbar><Reports /></PageWithNavbar>} />
           <Route path="/msg" element={<PageWithNavbar><Msg /></PageWithNavbar>} />

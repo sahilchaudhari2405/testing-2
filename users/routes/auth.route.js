@@ -4,7 +4,7 @@ import { signup, login, logout, refresh, getUsers, updateUser, deleteUser, UserC
 
 const auth = express.Router();
 
-auth.post('/signup',authenticateToken , checkAdmin, signup);
+auth.post('/signup',authenticateToken ,checkAdmin, signup);
 auth.post('/login', login);
 auth.post('/logout', logout);
 auth.post('/refresh', refresh);
