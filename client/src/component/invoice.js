@@ -423,11 +423,11 @@ const Invoice = ({ componentRef, details, setPrint, language }) => {
                     </td>
                     <td className="border p-1 text-center">{e.quantity}</td>
                     <td className="border p-1 text-center">
-                      {(e.purchaseRate / e.quantity).toFixed(2)}
+                      {(e.productId?.purchaseRate).toFixed(2)}
                     </td>
                     <td className="border p-1 text-center">{e.GST}</td>
                     <td className="border p-1 text-center">
-                      {e.purchaseRate * e.quantity}
+                      {e.productId?.purchaseRate * e.quantity}
                     </td>
                   </tr>
                 ))}
@@ -800,11 +800,11 @@ const Invoice = ({ componentRef, details, setPrint, language }) => {
                   <td className="border p-1 truncate">{e.productId?.title}</td>
                   <td className="border p-1 text-center">{e.quantity}</td>
                   <td className="border p-1 text-center">
-                    {(e.purchaseRate / e.quantity).toFixed(2)}
+                    {(e.productId.purchaseRate).toFixed(2)}
                   </td>
                   <td className="border p-1 text-center">{e.GST}</td>
                   <td className="border p-1 text-center">
-                    {e.purchaseRate * e.quantity}
+                    {e.productId.purchaseRate * e.quantity}
                   </td>
                 </tr>
               ))}

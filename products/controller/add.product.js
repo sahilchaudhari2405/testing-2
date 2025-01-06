@@ -1,12 +1,19 @@
 import { getTenantModel } from "../database/getTenantModel.js";
+import categorySchema from "../model/category.model.js";
 import productSchema from "../model/product.model.js";
 import offlinePurchaseOrderSchema from "../model/purchaseOrder.js";
 import OfflinePurchaseOrder from "../model/purchaseOrder.js";
 import { createClient } from "./Client.controller.js";
 
+async function CreateCategory(name, level, slug, parentId, CategoryModel) {
+    const category = new CategoryModel({ name, level, slug, parentId });
+    await category.save();
+    return category;
+}
+
 export const generateOrderWithProductCheck = async (req, res) => {
     console.log(req.body);
-    
+
     if (!req.body || !req.body.products || !req.body.orderDetails) {
         return res.status(400).json({ message: "Invalid input", error: "Missing products or orderDetails" });
     }
@@ -17,6 +24,10 @@ export const generateOrderWithProductCheck = async (req, res) => {
         const tenantId = req.user.tenantId;
         const Product = await getTenantModel(tenantId, "Product", productSchema);
         const OfflinePurchaseOrder = await getTenantModel(tenantId, "OfflinePurchaseOrder", offlinePurchaseOrderSchema);
+        const Category = await getTenantModel(tenantId, "Category", categorySchema);
+
+        const parentCategory = await Category.findOne({ name: "GENERAL" });
+
         if (!id) {
             return res.status(400).json({ message: "User ID is missing in the request" });
         }
@@ -80,7 +91,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                             brand: productData.brand || null,
                             imageUrl: productData.imageUrl || 'default-image-url',
                             BarCode: productData.barcode,
-                            category: productData.category,
+                            category: parentCategory._id,
                             purchaseRate,
                             profitPercentage: parseFloat(productData.profit, 10) || 0,
                             GST: gst,
@@ -109,6 +120,28 @@ export const generateOrderWithProductCheck = async (req, res) => {
         // Execute the bulkWrite operation for all products
         await Product.bulkWrite(bulkOperations);
 
+        // Now update each orderItem with the correct productId
+        for (let i = 0; i < orderItems.length; i++) {
+            const productData = products[i];
+            const productBarcode = productData.barcode;
+            const orderItem = orderItems[i];
+
+            // If the product exists in the database, it should already have an _id
+            if (existingProductMap[productBarcode]) {
+                orderItem.productId = existingProductMap[productBarcode]._id; // Set productId to the existing product _id
+            } else {
+                // If the product is newly created, find its _id
+                const newProduct = await Product.findOne({ BarCode: productBarcode }).select('_id');
+
+                if (newProduct) {
+                    orderItem.productId = newProduct._id; // Set productId to the newly created product _id
+                } else {
+                    // Handle the case where the product could not be found (this shouldn't happen if everything works correctly)
+                    console.error(`Product with barcode ${productBarcode} not found after bulkWrite`);
+                }
+            }
+        }
+console.log(orderItems)
         // Calculate total amounts for the order
         const totalPrice = orderItems.reduce((sum, item) => sum + item.retailPrice * item.quantity, 0);
         const totalPurchaseRate = orderItems.reduce((sum, item) => sum + item.purchaseRate * item.quantity, 0);
@@ -129,7 +162,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
             billImageURL: orderDetails.billImageURL || null,
             discount: orderDetails.discount || 0,
             orderStatus: orderDetails.orderStatus || 'first time',
-            orderItems,
+            orderItems, // Use updated orderItems with correct productId
             totalPrice,
             totalPurchaseRate,
             GST: totalGST,
@@ -149,7 +182,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                 Mobile: orderDetails.mobileNumber,
                 Purchase: newOrder.AmountPaid + orderDetails.paymentType.borrow || 0,
                 Closing: orderDetails.paymentType.borrow || 0,
-                tenantId:tenantId,
+                tenantId: tenantId,
             }
         };
 
@@ -169,4 +202,3 @@ export const generateOrderWithProductCheck = async (req, res) => {
         res.status(500).json({ message: "Failed to create order", error: error.message });
     }
 };
-

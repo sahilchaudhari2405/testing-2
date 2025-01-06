@@ -159,6 +159,7 @@ const Purchase = () => {
       stockType: product.stockType || "",
       unit: product.unit || "",
       qty:1,
+      MRP:product.MRP || "",
       saleRate:product.discountedPrice,
       purchaseRate:product.purchaseRate,
       hsn: product.HSN,
@@ -316,6 +317,7 @@ const Purchase = () => {
     qty: "",
     saleRate: "",
     purchaseRate: "",
+    MRP: "",
     profit: "",
     hsn: "",
     gst: "",
@@ -336,6 +338,7 @@ const Purchase = () => {
         qty: 1,
         saleRate: productDetails.discountedPrice || "",
         purchaseRate: productDetails.purchaseRate || "",
+        MRP:productDetails.MRP,
         profit:
         (productDetails.purchaseRate >0)?  productDetails.discountedPrice - productDetails.purchaseRate: 0,
         hsn: productDetails.HSN || "",
@@ -372,6 +375,7 @@ const Purchase = () => {
       unit: productDetails.unit || "",
       qty: productDetails.BarCode ? 1 : "",
       saleRate: productDetails.discountedPrice || "",
+      MRP:productDetails.MRP || "",
       purchaseRate: productDetails.purchaseRate || "",
       profit:(productDetails.purchaseRate >0)?  productDetails.discountedPrice - productDetails.purchaseRate: 0,
       hsn: productDetails.HSN || "",
@@ -490,6 +494,7 @@ const Purchase = () => {
             qty: "",
             saleRate: "",
             purchaseRate: "",
+            MRP: "",
             profit: "",
             hsn: "",
             gst: "",
@@ -848,6 +853,23 @@ const Purchase = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter quantity"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="MRP"
+                className="block text-gray-700 text-sm w-max font-medium"
+              >
+                MRP Rate
+              </label>
+              <input
+                type="text"
+                id="MRP"
+                value={formData.MRP}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter MRP rate"
               />
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
