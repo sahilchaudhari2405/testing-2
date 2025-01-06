@@ -567,7 +567,7 @@ const OngoingSale = () => {
       uId: UserId,
     };
     dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     console.log("This is cart item: ", items);
@@ -575,7 +575,7 @@ const OngoingSale = () => {
 
   useEffect(() => {
     // Reset details at the beginning
-
+    setDetails([])
     if (items.length === 2) {
       // Handle case where both cart details and summary are present
       const productsData = items[0];
