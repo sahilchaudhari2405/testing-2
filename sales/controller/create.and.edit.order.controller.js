@@ -384,7 +384,7 @@ const placeOrder = asyncHandler(async (req, res) => {
     const { paymentType, BillUser,PayId,uId,status } = req.body;
     id= (uId===id && uId)? uId:id;
     // Start session for transaction
-
+   console.log(req.body)
     try {
         const tenantId =req.user.tenantId
         const Product = await getTenantModel(tenantId, "Product", productSchema);

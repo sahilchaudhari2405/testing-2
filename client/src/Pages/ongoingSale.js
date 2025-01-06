@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useId } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct, fetchProducts } from "../Redux/Product/productSlice";
 import { useNavigate, useParams } from "react-router-dom";
@@ -807,6 +807,7 @@ const OngoingSale = () => {
         finalform.Address
       ) {
         try {
+        
           const createdOrder = await dispatch(
             createOrder({
               paymentType: {
@@ -821,6 +822,7 @@ const OngoingSale = () => {
               status: "OnGoing",
             })
           ).unwrap();
+          console.log("yes call");
           console.log(createdOrder);
           setInvoice(createdOrder.data);
           items = [];
@@ -830,7 +832,6 @@ const OngoingSale = () => {
             Date: currentDate,
             Mobile: "",
             ShipTo: "",
-            Address: "Shrigonda",
             State: "Maharastra",
             GSTNo: "",
           });
@@ -848,11 +849,8 @@ const OngoingSale = () => {
             gst: "",
             total: "",
           });
-          const data = {
-            PayId: AdvancePaidId,
-            uId: UserId,
-          };
-          dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
+ 
+          // dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
           setMessage("");
           setCardPay("");
           setCashPay("");
@@ -872,6 +870,9 @@ const OngoingSale = () => {
           toast.error(`Failed to create Client: ${err.message}`);
         }
       } else {
+        console.log(finalform);
+        console.log(UserId);
+        console.log(AdvancePaidId);
         alert(`fill the client details`);
       }
     } else if (amount > Total) {
@@ -1102,7 +1103,7 @@ const OngoingSale = () => {
         time: timeData, 
       });
       console.log("Response data:", response.data);
-      const { advancePay } = response.data.advancePayment;
+      const { advancePay,_id } = response.data.advancePayment;
 
       const advancePayData = advancePay;
       console.log("Advance Payment Data:", advancePayData);
@@ -1110,6 +1111,7 @@ const OngoingSale = () => {
       // Set the advance payment and cart details if available
       if (advancePayData) {
         setAdvancePaid(advancePayData); // Set the advance paid amount
+        setAdvancePaidId(_id)
       }
       setAdvancePay();
       setBlocking(false);

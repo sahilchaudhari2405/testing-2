@@ -316,7 +316,7 @@ const Invoice = ({ componentRef, details, setPrint, language }) => {
           )}
 
           <p className="text-center font-bold">
-            आपला बाजार भेट दिल्याबद्दल धन्यवाद!
+            {settings.language.marathi.title} भेट दिल्याबद्दल धन्यवाद!
           </p>
         </div>
       </div>
@@ -699,7 +699,7 @@ const Invoice = ({ componentRef, details, setPrint, language }) => {
           </div>
         )}
 
-        <p className="text-center font-bold">Thank you for shopping with us!</p>
+        <p className="text-center font-bold">Thank you for shopping with {settings.language.english.title}!</p>
       </div>
     </div>
   ) : (

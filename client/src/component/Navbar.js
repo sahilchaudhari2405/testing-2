@@ -27,7 +27,6 @@ const Navbar = () => {
     if (data) {
       try {
         const parsedData = JSON.parse(data); // Parse the string into an object
-        console.log(parsedData); // Log the parsed object
         setFinalName(parsedData.language?.english?.title || ""); // Safely access the nested address
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
