@@ -36,7 +36,8 @@ const Dashboard = () => {
   const [monthWiseCustomers, setmonthWiseCustomers] = useState('');
   const [isAdmin, setisAdmin] = useState(false);
   const [TotalView, setTotalView] = useState(false);
-
+  const [Name, setFinalName] = useState("");
+  
   const handleTokenExpiration = () => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -52,7 +53,19 @@ const Dashboard = () => {
       }
     }
   };
-
+  useEffect(() => {
+    const data = localStorage.getItem("invoiceSettings");
+    if (data) {
+      try {
+        const parsedData = JSON.parse(data); // Parse the string into an object
+        setFinalName(parsedData.language?.english?.title || ""); // Safely access the nested address
+      } catch (error) {
+        console.error("Error parsing localStorage data:", error);
+      }
+    } else {
+      console.warn("No data found in localStorage");
+    }
+  }, [Name]);
   const handlenewLogout = () => {
     localStorage.removeItem('token');
     axiosInstance.post('/auth/logout').catch((err) => console.error(err));
@@ -386,7 +399,7 @@ const calculateCustomers = (orders_data) => {
       <div className="flex flex-col justify-center items-center">
         <div className="p-8 w-[95vw] mt-4">
         <p className="mb-12 text-black text-xm font-semibold">
-            Welcome to <span className="font-bold text-4xl text-gray-600">Apala Bazaar</span>
+            Welcome to <span className="font-bold text-4xl text-gray-600">{Name}</span>
           </p>
         <div className='flex flex-row justify-between mx-5 my-5'>
         <select className='bg-gray-300' value={timeFrame} onChange={handleTimeFrameChange}>
