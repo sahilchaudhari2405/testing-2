@@ -215,61 +215,81 @@ const OngoingSale = () => {
   };
 
   const searchOfflineOrders = async () => {
-    // const value = e.target.value;
-    // console.log("value is: ",value);
-    setFinal({
-      ...finalform,
-      name: Inputnameforsearch,
-    });
-    // setSearchInput(value);
-
-    console.log("searching Inputnameforsearch are: ", Inputnameforsearch);
-    if (Inputnameforsearch) {
-      const response = await axiosInstance.post(
-        "/users/admin/SearchClientSale",
-        { alphabet: Inputnameforsearch }
-      );
-      const distinctOrders = response.data.data;
-      console.log(response.data);
-      if (distinctOrders == []) {
-        setMatchingOrders([]);
+    try {
+      setFinal({
+        ...finalform,
+        name: Inputnameforsearch,
+      });
+  
+      console.log("searching Inputnameforsearch is: ", Inputnameforsearch);
+  
+      if (Inputnameforsearch) {
+        const response = await axiosInstance.post(
+          "/users/admin/SearchClientSale",
+          { alphabet: Inputnameforsearch }
+        );
+  
+        const distinctOrders = response.data.data || [];
+        console.log("Response data: ", response.data);
+  
+        if (distinctOrders.length === 0) {
+          setMatchingOrders([]);
+        } else {
+          setMatchingOrders(distinctOrders);
+        }
+  
+        setShowModal(true);
+      } else {
+        setShowModal(false);
       }
-
-      console.log("distinctOrders users are: ", distinctOrders);
-      setMatchingOrders(distinctOrders);
-      setShowModal(true);
-    } else {
-      setShowModal(false);
+    } catch (error) {
+      console.error("Error occurred while searching offline orders:", error);
     }
   };
-
-  const searchOfflineOrdersForMobileNumber = async () => {
+  
+const searchOfflineOrdersForMobileNumber = async () => {
+  try {
+    // Update the final form with the mobile number for search
     setFinal({
       ...finalform,
       Mobile: Inputmobilenumberforsearch,
     });
-    // setSearchInput(value);
 
     console.log(
-      "searching Inputmobilenumberforsearch are: ",
+      "Searching Inputmobilenumberforsearch: ",
       Inputmobilenumberforsearch
     );
+
     if (Inputmobilenumberforsearch) {
       const response = await axiosInstance.post(
         "/users/admin/SearchClientSale",
         { number: Inputmobilenumberforsearch }
       );
-      const distinctOrders = response.data.data;
-      if (distinctOrders == []) {
-        setMatchingOrders([]);
+
+      // Ensure distinctOrders is always an array
+      const distinctOrders = response.data.data || [];
+      console.log("Response data: ", response.data);
+
+      if (distinctOrders.length === 0) {
+        setMatchingMobileNumbers([]);
+      } else {
+        setMatchingMobileNumbers(distinctOrders);
       }
-      console.log("distinctOrders users are: ", distinctOrders);
-      setMatchingMobileNumbers(distinctOrders);
+
+      // Show the mobile number modal if results are found
       setShowMobileModal(true);
     } else {
+      // Hide the modal if input is empty
       setShowMobileModal(false);
     }
-  };
+  } catch (error) {
+    console.error(
+      "Error occurred while searching offline orders by mobile number:",
+      error
+    );
+  }
+};
+
 
   useEffect(() => {
     setMatchingProducts([]);
@@ -295,24 +315,38 @@ const OngoingSale = () => {
     console.log("Inputnameforsearch changed: ", Inputnameforsearch);
   }, [Inputnameforsearch]);
 
-  const handleSearchandChange = async () => {
+const handleSearchandChange = async () => {
+  try {
+    // Update the form data with the input description
     setFormData({
       ...formData,
       description: Inputdescriptionforsearch,
     });
+
+    console.log("Searching for description: ", Inputdescriptionforsearch);
+
     if (Inputdescriptionforsearch) {
       const response = await axiosInstance.post(
         "/products/product/sortProductsfordescription",
         { description: Inputdescriptionforsearch }
       );
-      const filteredOrders = response.data.data;
-      console.log("Inputdescriptionforsearch : ", filteredOrders);
+
+      // Ensure filteredOrders is always an array
+      const filteredOrders = response.data.data || [];
+      console.log("Filtered products by description: ", filteredOrders);
+
+      // Update state with matching products and show the modal if there are results
       setMatchingProducts(filteredOrders);
-      setShowModaldescription(true);
+      setShowModaldescription(filteredOrders.length > 0);
     } else {
+      // Hide the modal if input is empty
       setShowModaldescription(false);
     }
-  };
+  } catch (error) {
+    console.error("Error while searching products by description:", error);
+  }
+};
+
 
   const handleMobileSearchChange = async () => {
     // const value = e.target.value;
