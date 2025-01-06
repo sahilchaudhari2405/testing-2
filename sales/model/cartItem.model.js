@@ -16,6 +16,11 @@ const Offline_cartItemSchema = new mongoose.Schema({
   //   type:String,
   //   required: true,
   // },
+  status:{
+    type: String,
+    enum : ['OnGoing','OneTime'],
+    default: 'OneTime'
+  },
   quantity: {
     type: Number,
     required: true,
@@ -24,6 +29,10 @@ const Offline_cartItemSchema = new mongoose.Schema({
   OneUnit:{
   type:Number,
   required:true,
+  },
+  PayId:{
+          type:mongoose.Schema.Types.ObjectId,
+          ref: "AdvancePay",
   },
   price: {
     type: Number,
@@ -53,6 +62,6 @@ const Offline_cartItemSchema = new mongoose.Schema({
 
 });
 
-const Offline_CartItem = mongoose.model("OfflineCartItems", Offline_cartItemSchema);
 
-export default Offline_CartItem;
+
+export default Offline_cartItemSchema;

@@ -224,15 +224,10 @@ const fetchCustomer = async (page) => {
           users: data, // Sending only the data as payload
         });
 
-        if (!response.data.success) {
-          throw new Error('Failed to import users');
-        }
-
         toast.success('Import successful!');
        fetchCustomer(page); // Fetch the updated data
       } catch (error) {
         console.error('Error during import:', error);
-        toast.error('Error during import: ' + error.message);
       }
     };
 

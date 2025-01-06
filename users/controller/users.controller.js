@@ -1,4 +1,5 @@
-import CounterUser from '../model/user.model.js';
+import { getTenantModel } from '../database/getTenantModel.js';
+import CounterUserSchema from '../model/user.model.js';
 import bcrypt from 'bcryptjs';
 
 // Utility function for error handling
@@ -16,6 +17,8 @@ export const createUser = async (req, res) => {
   }
 
   try {
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new CounterUser({ fullName, password: hashedPassword, email, mobile, counterNumber });
 
@@ -31,6 +34,8 @@ export const viewUser = async (req, res) => {
   const { id } = req.params;
 
   try {
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
     const user = await CounterUser.findById(id);
     if (!user) {
       return res.status(404).send({ message: "User not found", status: false });
@@ -49,6 +54,8 @@ export const updateUser = async (req, res) => {
   
     try {
       // Retrieve the existing user
+      const tenantId =req.user.tenantId
+      const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
       const existingUser = await CounterUser.findById(id);
       if (!existingUser) {
         return res.status(404).send({ message: "User not found", status: false });
@@ -85,6 +92,8 @@ export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
   try {
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
     const deletedUser = await CounterUser.findByIdAndDelete(id);
     if (!deletedUser) {
       return res.status(404).send({ message: "User not found", status: false });
@@ -99,6 +108,8 @@ export const deleteUser = async (req, res) => {
 // View All Counter Users
 export const viewUsers = async (req, res) => {
   try {
+    const tenantId =req.user.tenantId
+    const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
     const users = await CounterUser.find();
     return res.status(200).send({ message: "Users retrieved successfully", status: true, data: users });
   } catch (error) {

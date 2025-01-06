@@ -1,10 +1,14 @@
-import { Client, ClientPurchase, ClosingBalance } from "../model/Client.model.js";
+import { ClientPurchaseSchema, clientSchema, ClosingBalanceSchema } from "../../users/model/Client.model.js";
+import { getTenantModel } from "../database/getTenantModel.js";
+
 
 const createClient = async (req) => {
   try {
-    const { Type, Name, Address, State, Mobile, Purchase, Closing } = req.body;
+    const { Type, Name, Address, State, Mobile, Purchase, Closing,tenantId } = req.body;
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-
+    const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     // Check if the client already exists
     const existingClient = await Client.findOne({ Type, Name, Mobile });
     if (existingClient) {
@@ -49,9 +53,11 @@ const createClient = async (req) => {
 // Update Client Controller
 const updateClient = async (req) => {
   try {
-    const { Type, Name, Mobile, Address, State, Purchase, Closing } = req.body;
+    const { Type, Name, Mobile, Address, State, Purchase, Closing,tenantId } = req.body;
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-
+    const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     const existingClient = await Client.findOne({ Type, Name, Mobile });
     if (!existingClient) {
       return 'Client not found';
@@ -122,8 +128,11 @@ const reduceClient = async (data) => {
   try {
     const orderDate = new Date();
     const currentMonth = orderDate.toISOString().slice(0, 7); // YYYY-MM
-
     // Find the client using the data provided
+    const tenantId= data.tenantId;
+    const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     const updatedClient = await Client.findOne({
       Type: data.Type,
       Name: data.Name,
@@ -181,182 +190,6 @@ const reduceClient = async (data) => {
 };
 
 
-const getAllClients = async (req, res) => {
- // Get the page number from query, default to 1
-  const limit =500; // Get the limit from query, default to 20 // Calculate how many products to skip
-  try {
-    const clients = await Client.find().sort({updatedAt: -1 }) 
-      .limit(limit)
-      .populate('ClosingBalance')
-      .populate('CompletePurchase');
 
-    // Respond with the retrieved clients
-    res.status(200).json(clients);
-  } catch (error) {
-    console.error('Failed to retrieve clients:', error);
-    res.status(500).json({ message: 'Failed to retrieve clients', error: error.message });
-  }
-};
-
-const searchClients = async (req, res) => {
-  const { alphabet, number } = req.body; // Get the alphabet (name prefix) and mobile number from the request body
-
-  try {
-    let matchCriteria = { Type: 'Client'};
-
-    // Build the match criteria based on the provided alphabet (Name prefix)
-    if (alphabet) {
-      matchCriteria.Name = { $regex: `^${alphabet}`, $options: 'i' }; // Match Name exactly starting with the alphabet
-    }
-
-    // Aggregate pipeline to match and group the records
-    const distinctClients = await Client.aggregate([
-      {
-        $addFields: {
-          mobileNumberStr: { $toString: "$Mobile" }, // Convert Mobile to string
-        },
-      },
-      {
-        $match: {
-          ...matchCriteria,
-          mobileNumberStr: number ? { $regex: `^${number}` } : { $exists: true }, // Match Mobile containing the digit
-        },
-      },
-      {
-        $group: {
-          _id: "$Mobile", // Group by Mobile to ensure distinct entries
-          Name: { $first: "$Name" },
-          Mobile: { $first: "$Mobile" },
-          Email: { $first: "$Email" },
-          Address: { $first: "$Address" },
-          State: { $first: "$State" },
-        },
-      },
-    ]);
-
-    return res.status(200).send({
-      message: "Distinct clients retrieved successfully",
-      status: true,
-      data: distinctClients,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({
-      message: "Internal server error",
-      status: false,
-      error: error.message,
-    });
-  }
-};
-const searchClientsDistributer = async (req, res) => {
-  const { alphabet, number } = req.body; // Get the alphabet (name prefix) and mobile number from the request body
-
-
-  try {
-    let matchCriteria = { Type: 'Supplier'};
-
-    // Build the match criteria based on the provided alphabet (Name prefix)
-    if (alphabet) {
-      matchCriteria.Name = { $regex: `^${alphabet}`, $options: 'i' }; // Match Name exactly starting with the alphabet
-    }
-
-    // Aggregate pipeline to match and group the records
-    const distinctClients = await Client.aggregate([
-      {
-        $addFields: {
-          mobileNumberStr: { $toString: "$Mobile" }, // Convert Mobile to string
-        },
-      },
-      {
-        $match: {
-          ...matchCriteria,
-          mobileNumberStr: number ? { $regex: `^${number}` } : { $exists: true }, // Match Mobile containing the digit
-        },
-      },
-      {
-        $group: {
-          _id: "$Mobile", // Group by Mobile to ensure distinct entries
-          Name: { $first: "$Name" },
-          Mobile: { $first: "$Mobile" },
-          Email: { $first: "$Email" },
-          Address: { $first: "$Address" },
-          State: { $first: "$State" },
-        },
-      },
-    ]);
-
-    return res.status(200).send({
-      message: "Distinct clients retrieved successfully",
-      status: true,
-      data: distinctClients,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({
-      message: "Internal server error",
-      status: false,
-      error: error.message,
-    });
-  }
-};
-
-
-
-
-const getAllCustomer = async (req, res) => {
-
-  console.log("page:",req.query)
-  const page = parseInt(req.query.page) || 1; // Get the page number from query, default to 1
-  const limit = parseInt(req.query.limit) ||20; // Get the limit from query, default to 20
-  const skip = (page - 1) * limit; // Calculate how many products to skip
-  try {
-    const clients = await Client.find().sort({updatedAt: -1 }) 
-      .skip(skip)
-      .limit(limit)
-      .populate('ClosingBalance')
-      .populate('CompletePurchase');
-    // Respond with the retrieved clients
-    res.status(200).json(clients);
-  } catch (error) {
-    console.error('Failed to retrieve clients:', error);
-    res.status(500).json({ message: 'Failed to retrieve clients', error: error.message });
-  }
-};
-
-
-
-const searchCustomer = async (req, res) => {
-  const { alphabet, number } = req.body;
-
-  // Initialize an empty query object
-  let query = {};
-
-  // Add conditions to the query object if fields are provided
-  if (alphabet) {
-    query.Name = { $regex: `^${alphabet}`, $options: 'i' }; // Case-insensitive regex for names starting with alphabet
-  }
-
-  if (number) {
-    query.Mobile = number; // Exact match for mobile number
-  }
-
-  try {
-    // Find clients based on the constructed query
-    const clients = await Client.find(query)
-      .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
-      .populate('ClosingBalance')
-      .populate('CompletePurchase');
-
-    // Respond with the retrieved clients
-    res.status(200).json(clients);
-  } catch (error) {
-    console.error('Failed to retrieve clients:', error);
-    res.status(500).json({ message: 'Failed to retrieve clients', error: error.message });
-  }
-};
-
-
-
-
-export { updateClient, createClient ,reduceClient, getAllClients,searchCustomer,searchClientsDistributer,getAllCustomer,searchClients};
+export { updateClient, createClient ,reduceClient};
  

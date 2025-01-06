@@ -1,5 +1,6 @@
-import Category from '../model/category.model.js';
+import { getTenantModel } from '../database/getTenantModel.js';
 import slugify from 'slugify';
+import categorySchema from '../model/category.model.js';
 
 // Create category
 export const createCategory = async (req, res) => {
@@ -10,6 +11,8 @@ export const createCategory = async (req, res) => {
     }
 
     try {
+        const tenantId = req.user.tenantId;
+        const Category = await getTenantModel(tenantId, "Category", categorySchema);
         const slug = slugify(name, { lower: true });
         const category = new Category({ name, slug, parentCategory, level });
         const savedCategory = await category.save();
@@ -25,6 +28,8 @@ export const viewCategory = async (req, res) => {
     const { id } = req.params;
 
     try {
+        const tenantId = req.user.tenantId;
+        const Category = await getTenantModel(tenantId, "Category", categorySchema);
         const category = await Category.findById(id).populate('parentCategory');
 
         if (!category) {
@@ -49,6 +54,8 @@ export const updateCategory = async (req, res) => {
 
     try {
         const slug = slugify(name, { lower: true });
+        const tenantId = req.user.tenantId;
+        const Category = await getTenantModel(tenantId, "Category", categorySchema);
         const updatedCategory = await Category.findByIdAndUpdate(
             id,
             { name, slug, parentCategory, level },
@@ -71,6 +78,8 @@ export const deleteCategory = async (req, res) => {
     const { id } = req.params;
 
     try {
+        const tenantId = req.user.tenantId;
+        const Category = await getTenantModel(tenantId, "Category", categorySchema);
         const deletedCategory = await Category.findByIdAndDelete(id);
 
         if (!deletedCategory) {
@@ -87,6 +96,8 @@ export const deleteCategory = async (req, res) => {
 // View all categories
 export const viewCategories = async (req, res) => {
     try {
+        const tenantId = req.user.tenantId;
+        const Category = await getTenantModel(tenantId, "Category", categorySchema);
         const categories = await Category.find().limit(10).populate('parentCategory');
         return res.status(200).send({ message: "Categories retrieved successfully", status: true, data: categories });
     } catch (error) {

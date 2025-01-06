@@ -158,6 +158,6 @@ totalOnlineSalesSchema.pre('save', function (next) {
     next();
 });
 
-const TotalOnlineSales = mongoose.model("TotalOnlineSales", totalOnlineSalesSchema);
 
-export default TotalOnlineSales;
+
+export default totalOnlineSalesSchema;

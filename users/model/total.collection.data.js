@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const totalCollectionSalesSchema = new Schema({
+const TotalCollectionSalesSchema = new Schema({
     dailySales: [{
         totalPrice: {
             type: Number,
@@ -147,11 +147,11 @@ const totalCollectionSalesSchema = new Schema({
     },
 },);
 
-totalCollectionSalesSchema.pre('save', function (next) {
+TotalCollectionSalesSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
 });
 
-const TotalCollectionSales = mongoose.model("TotalCollectionSales", totalCollectionSalesSchema);
 
-export default TotalCollectionSales;
+
+export default TotalCollectionSalesSchema;

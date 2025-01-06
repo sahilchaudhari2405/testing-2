@@ -2,9 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../axiosConfig';
 import { toast } from 'react-toastify';
 
-export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue }) => {
+export const fetchCart = createAsyncThunk('cart/fetchCart', async (status, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get('/sales/cart/getCart');
+    const response =await axiosInstance.get('/sales/cart/getCart');
     const items = [response.data.data.cartItems, response.data.data];
     // console.log(response)
     return items;
@@ -16,22 +16,36 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWi
   }
 });
 
-export const addToCart = createAsyncThunk('cart/addToCart', async (productCode, { rejectWithValue }) => {
-// console.log(productId)
-  try {
-    const response = await axiosInstance.post('/sales/cart/addCart', { productCode });
-    if (response.data.success) {
-      toast.success('Product added to cart');
+export const addToCart = createAsyncThunk(
+  "cart/addToCart",
+  async ({ productCode, status, formData }, { rejectWithValue }) => {
+    try {
+      const payload = { status, formData };
+      if (productCode) {
+        payload.productCode = productCode; // Add barcode only if it exists
+      }
+
+      console.log("Payload sent to API:", payload);
+
+      const response = await axiosInstance.post("/sales/cart/addCart", payload);
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      return rejectWithValue({ message: "Failed to add product to cart" });
+    } catch (error) {
+      console.error("Add to cart error:", error);
+
+      if (error.response && error.response.status === 401) {
+        return rejectWithValue({ isUnauthorized: true });
+      }
+
+      return rejectWithValue(error.response?.data || { message: "Unknown error occurred" });
     }
-    return response.data;
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      return rejectWithValue({ isUnauthorized: true });
-    }
-    // toast.error('Failed to add product to cart');
-    return rejectWithValue(error.response.data);
   }
-});
+);
+
 
 export const addQuantity = createAsyncThunk('cart/addQuantity', async (productId) => {
   const response = await axiosInstance.post('/sales/cart/addCart', { productId });
@@ -45,7 +59,7 @@ export const removeFromCart = createAsyncThunk('cart/removeFromCart', async (pro
 });
 
 export const clearCart = createAsyncThunk('cart/clearCart', async () => {
-  await axiosInstance.delete('/cart/removeAllCart');
+  await axiosInstance.delete('/sales/cart/removeAllItem');
 });
 
 export const updateCartQuantity = createAsyncThunk('cart/updateCartQuantity', async ({ productId }) => {
@@ -77,8 +91,7 @@ const cartSlice = createSlice({
       .addCase(fetchCart.rejected, (state, action) => {
         state.status = 'failed';
         state.fetchCartError = action.payload;
-        state.items[0] = [];
-     
+        state.items = [];
       })
       .addCase(addToCart.pending, (state) => {
         state.addToCartStatus = 'loading';
@@ -93,6 +106,7 @@ const cartSlice = createSlice({
       .addCase(addToCart.rejected, (state, action) => {
         state.addToCartStatus = 'failed';
         state.addToCartError = action.payload;
+        
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         const { data } = action.payload;

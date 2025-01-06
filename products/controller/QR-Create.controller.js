@@ -1,6 +1,8 @@
 // Ensure correct path and file name
 import bwipjs from 'bwip-js';
 import Product from '../model/product.model.js';
+import productSchema from '../model/product.model.js';
+import { getTenantModel } from '../database/getTenantModel.js';
 function generateRandomString() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const numbers = '0123456789';
@@ -22,7 +24,8 @@ function generateRandomString() {
 async function generateRandomBarcode(req,res) {
   let newBarcode;
   let isUnique = false;
-
+  const tenantId = req.user.tenantId;
+  const Product = await getTenantModel(tenantId, "Product", productSchema);
   while (!isUnique) {
     //  newBarcode = Math.floor(1000000000000 + Math.random() * 9000000000000).toString();
     newBarcode =generateRandomString();

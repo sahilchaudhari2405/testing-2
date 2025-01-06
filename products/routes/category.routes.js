@@ -5,9 +5,8 @@ import { createCategory, deleteCategory, updateCategory, viewCategories, viewCat
 const router = express.Router();
 
 router.post('/create', authenticateToken, createCategory);
-router.get('/view/:id', viewCategory);
+router.get('/view/:id',authenticateToken, viewCategory);
 router.put('/update/:id', authenticateToken, updateCategory);
 router.delete('/delete/:id', authenticateToken, deleteCategory);
-router.get('/view', viewCategories);
-
+router.get('/view',authenticateToken, viewCategories);
 export default router;

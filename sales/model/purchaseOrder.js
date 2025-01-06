@@ -121,6 +121,6 @@ offlinePurchaseOrderSchema.pre('save', function (next) {
     next();
 });
 
-const OfflinePurchaseOrder = mongoose.model("offlinePurchaseOrder", offlinePurchaseOrderSchema);
 
-export default OfflinePurchaseOrder;
+
+export default offlinePurchaseOrderSchema;

@@ -34,11 +34,44 @@ const Purchase = () => {
   const [Inputnameforsearch, setInputnameforsearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [matchingOrders, setMatchingOrders] = useState([]);
-
+ const [Address, setFinalAddress] = useState("");
   const [Inputdescriptionforsearch, setInputdescriptionforsearch] = useState('');
   const [showModaldescription, setShowModaldescription] = useState(false);
   const [matchingProducts, setMatchingProducts] = useState([]);
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await axiosInstance.get("/users/setting");
 
+        const fetchedData = response.data.data;
+        if (fetchedData) {
+          localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
+          setFinalAddress(fetchedData.language?.english?.address || "");
+          finalform.address = fetchedData.language?.english?.address || ""; // Ensure this logic aligns with your app's state management
+        } else {
+          console.error("No settings data found");
+        }
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      }
+    };
+  
+    const data = localStorage.getItem("invoiceSettings");
+    if (data) {
+      try {
+        const parsedData = JSON.parse(data);
+
+        setFinalAddress(parsedData.language?.english?.address || "");
+        finalform.address = parsedData.language?.english?.address || ""; // Ensure this matches your usage pattern
+      } catch (error) {
+        console.error("Error parsing localStorage data:", error);
+      }
+    } else {
+      console.warn("No data found in localStorage, fetching from API...");
+      fetchSettings();
+    }
+  }, [Address]); 
+  
   const handleTokenExpiration = () => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -126,6 +159,7 @@ const Purchase = () => {
       stockType: product.stockType || "",
       unit: product.unit || "",
       qty:1,
+      MRP:product.MRP || "",
       saleRate:product.discountedPrice,
       purchaseRate:product.purchaseRate,
       hsn: product.HSN,
@@ -283,6 +317,7 @@ const Purchase = () => {
     qty: "",
     saleRate: "",
     purchaseRate: "",
+    MRP: "",
     profit: "",
     hsn: "",
     gst: "",
@@ -303,6 +338,7 @@ const Purchase = () => {
         qty: 1,
         saleRate: productDetails.discountedPrice || "",
         purchaseRate: productDetails.purchaseRate || "",
+        MRP:productDetails.MRP,
         profit:
         (productDetails.purchaseRate >0)?  productDetails.discountedPrice - productDetails.purchaseRate: 0,
         hsn: productDetails.HSN || "",
@@ -339,6 +375,7 @@ const Purchase = () => {
       unit: productDetails.unit || "",
       qty: productDetails.BarCode ? 1 : "",
       saleRate: productDetails.discountedPrice || "",
+      MRP:productDetails.MRP || "",
       purchaseRate: productDetails.purchaseRate || "",
       profit:(productDetails.purchaseRate >0)?  productDetails.discountedPrice - productDetails.purchaseRate: 0,
       hsn: productDetails.HSN || "",
@@ -457,6 +494,7 @@ const Purchase = () => {
             qty: "",
             saleRate: "",
             purchaseRate: "",
+            MRP: "",
             profit: "",
             hsn: "",
             gst: "",
@@ -815,6 +853,23 @@ const Purchase = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter quantity"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="MRP"
+                className="block text-gray-700 text-sm w-max font-medium"
+              >
+                MRP Rate
+              </label>
+              <input
+                type="text"
+                id="MRP"
+                value={formData.MRP}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter MRP rate"
               />
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">

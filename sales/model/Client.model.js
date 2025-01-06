@@ -11,7 +11,7 @@ const ClosingBalanceSchema = new mongoose.Schema({
     default: 0,
   }
 });
-const ClosingBalance = mongoose.model('ClosingBalance', ClosingBalanceSchema);
+
 const ClientPurchaseSchema = new mongoose.Schema({
   monthYear: {
     type: String,
@@ -23,7 +23,7 @@ const ClientPurchaseSchema = new mongoose.Schema({
     default: 0,
   }
 });
-const ClientPurchase = mongoose.model('ClientPurchase', ClientPurchaseSchema);
+
 const clientSchema = new mongoose.Schema({
   Type: {
     type: String,
@@ -85,8 +85,8 @@ clientSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
-const Client = mongoose.model('Client', clientSchema);
+
 
 export {
-  Client,ClosingBalance,ClientPurchase,
+  clientSchema,ClosingBalanceSchema,ClientPurchaseSchema,
 };

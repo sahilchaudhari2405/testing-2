@@ -51,6 +51,6 @@ const offlineOrderItemSchema = new Schema({
     },
 });
 
-const OfflineOrderItem = mongoose.model("OfflineOrderItem", offlineOrderItemSchema);
 
-export default OfflineOrderItem;
+
+export default offlineOrderItemSchema;

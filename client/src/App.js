@@ -33,6 +33,7 @@ import {jwtDecode} from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from './axiosConfig.js';
 import OngoingSale from './Pages/ongoingSale.js';
+import InvoiceSettings from './Pages/setting.js';
 
 const validateToken = () => {
   const token = localStorage.getItem('token');
@@ -100,7 +101,7 @@ const App = () => {
           <Route path="/users" element={<PageWithNavbar><Users /></PageWithNavbar>} />
           <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
           <Route path="/invoicetest" element={<PageWithNavbar><InvoiceTest /></PageWithNavbar>} />
-
+          {/* <Route path="/setting" element={<PageWithNavbar><InvoiceSettings /></PageWithNavbar>} />/ */}
           {/* Admin protected routes */}
           <Route
             path="/admin"
@@ -153,6 +154,7 @@ const App = () => {
            <Route path="/view" element={<PageWithNavbar><View /></PageWithNavbar>} />
            <Route path="/generateimage" element={<PageWithNavbar><ImageGenerator /></PageWithNavbar>} />
            <Route path="/admin/client" element={<PageWithNavbar><Clients /></PageWithNavbar>} />
+           <Route path="/settings" element={  <ProtectedRoute requiredRole="admin"><PageWithNavbar><InvoiceSettings /></PageWithNavbar></ProtectedRoute>} /> 
           {/*<Route path="/accounts" element={<PageWithNavbar><Accounts /></PageWithNavbar>} />
           <Route path="/reports" element={<PageWithNavbar><Reports /></PageWithNavbar>} />
           <Route path="/msg" element={<PageWithNavbar><Msg /></PageWithNavbar>} />

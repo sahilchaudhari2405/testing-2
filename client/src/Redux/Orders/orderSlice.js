@@ -38,11 +38,11 @@ export const sortOrders = createAsyncThunk('orders/sortOrders', async ({ fromDat
   }
 });
 
-export const createOrder = createAsyncThunk('orders/createOrder', async ({ paymentType, BillUser }) => {
+export const createOrder = createAsyncThunk('orders/createOrder', async ({ paymentType, BillUser,PayId,uId,status }) => {
 
   // console.log(" hallo",paymentType, "fello",BillUser )
   try {
-    const response = await axiosInstance.post('/sales/order/placeOrder', { paymentType, BillUser });
+    const response = await axiosInstance.post('/sales/order/placeOrder', { paymentType, BillUser ,PayId,uId,status});
     console.log(response.data)
     return response.data;  // Return the data directly from axios response
   } catch (error) {

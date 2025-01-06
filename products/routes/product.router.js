@@ -11,12 +11,12 @@ router.post('/create', authenticateToken, createProduct);
 router.get('/view/:id', authenticateToken, viewProduct);
 router.put('/update/:id', authenticateToken, updateProduct);
 router.delete('/delete/:id', authenticateToken, deleteProduct);
-router.post('/view', getProducts);
-router.post('/sortProducts', sortProducts);
-router.post('/sortProductsfordescription', sortProductsfordescription);
+router.post('/view',authenticateToken, getProducts);
+router.post('/sortProducts',authenticateToken, sortProducts);
+router.post('/sortProductsfordescription',authenticateToken, sortProductsfordescription);
 
-router.get('/SuggestProduct', SuggestProduct);
+router.get('/SuggestProduct',authenticateToken, SuggestProduct);
 router.post('/purchaseOrder', authenticateToken, generateOrderWithProductCheck);
-router.post('/importProducts', importProducts);
+router.post('/importProducts',authenticateToken, importProducts);
 router.get('/getBarcode',authenticateToken,generateRandomBarcode);
 export default router;

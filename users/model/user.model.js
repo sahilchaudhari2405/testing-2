@@ -17,8 +17,11 @@ const CounterUserSchema = new mongoose.Schema(
         },
         email: {
             type: String,
-            required: true,
             unique: true,
+        },
+        tenantId: {
+            type: String,
+            required: true,
         },
         counterNumber: {
             type: String,
@@ -34,13 +37,11 @@ const CounterUserSchema = new mongoose.Schema(
             enum: ['user', 'admin'],
             default: 'user',
         },
-        counterNumber: {
-            type: String,
-        }
+
     },
     { timestamps: true }
 );
 
-const CounterUser = mongoose.model('CounterUser', CounterUserSchema);
 
-export default CounterUser;
+
+export default CounterUserSchema;
