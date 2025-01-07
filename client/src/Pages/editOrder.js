@@ -76,7 +76,6 @@ const EditOrder = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/sales/order/getCounterOrderbyID/${orderId}`);
-      console.log("editorderresponse: ",response.data);
       setFormData(response.data);
       const orderData = response.data.data;
       const formattedOrderDate = orderData.orderDate.split('T')[0];
@@ -100,7 +99,6 @@ const EditOrder = () => {
         totalProfit: orderData.totalProfit,
         finalPriceWithGST: orderData.finalPriceWithGST,
       });
-      console.log("setFormData: ",formData);
       setpaymenttype(orderData.paymentType);
       setfetchedOrder(true);
 
@@ -140,7 +138,6 @@ const EditOrder = () => {
       ...prevData,
       [name]: value
     }));
-    console.log("changed formdata: ",formData);
   };
 
   const handlePaymentChange = (e) => {
@@ -152,7 +149,6 @@ const EditOrder = () => {
         [name]: Number(value)
       }
     }));
-    console.log("changed formdata: ",formData);
 
   };
   const handleOrderItemChange = (index, e) => {
@@ -184,7 +180,6 @@ const EditOrder = () => {
       .catch(err => {
         toast.error('Failed to remove item.');
       });
-    console.log("changed formdata: ",formData);
   };
 
   const handleSubmit = (e) => {

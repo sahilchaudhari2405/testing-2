@@ -33,7 +33,7 @@ const OngoingSale = () => {
 
   const [AdvancePay, setAdvancePay] = useState();
   const [AdvancePaid, setAdvancePaid] = useState([]);
-  const [AdvancePaidId, setAdvancePaidId] = useState();
+  const [AdvancePaidId, setAdvancePaidId] = useState("");
   const [UserId, setUserId] = useState();
   const [blocking, setBlocking] = useState(false); // Blocking UI state
   const [missingFields, setMissingFields] = useState([]);
@@ -221,7 +221,6 @@ const OngoingSale = () => {
         name: Inputnameforsearch,
       });
   
-      console.log("searching Inputnameforsearch is: ", Inputnameforsearch);
   
       if (Inputnameforsearch) {
         const response = await axiosInstance.post(
@@ -230,7 +229,7 @@ const OngoingSale = () => {
         );
   
         const distinctOrders = response.data.data || [];
-        console.log("Response data: ", response.data);
+
   
         if (distinctOrders.length === 0) {
           setMatchingOrders([]);
@@ -255,10 +254,6 @@ const searchOfflineOrdersForMobileNumber = async () => {
       Mobile: Inputmobilenumberforsearch,
     });
 
-    console.log(
-      "Searching Inputmobilenumberforsearch: ",
-      Inputmobilenumberforsearch
-    );
 
     if (Inputmobilenumberforsearch) {
       const response = await axiosInstance.post(
@@ -268,7 +263,7 @@ const searchOfflineOrdersForMobileNumber = async () => {
 
       // Ensure distinctOrders is always an array
       const distinctOrders = response.data.data || [];
-      console.log("Response data: ", response.data);
+
 
       if (distinctOrders.length === 0) {
         setMatchingMobileNumbers([]);
@@ -294,25 +289,16 @@ const searchOfflineOrdersForMobileNumber = async () => {
   useEffect(() => {
     setMatchingProducts([]);
     handleSearchandChange();
-    console.log(
-      "Inputdescriptionforsearch changed: ",
-      Inputdescriptionforsearch
-    );
   }, [Inputdescriptionforsearch]);
 
   useEffect(() => {
     setMatchingMobileNumbers([]);
     searchOfflineOrdersForMobileNumber();
-    console.log(
-      "Inputmobilenumberforsearch changed: ",
-      Inputmobilenumberforsearch
-    );
   }, [Inputmobilenumberforsearch]);
 
   useEffect(() => {
     setMatchingOrders([]);
     searchOfflineOrders();
-    console.log("Inputnameforsearch changed: ", Inputnameforsearch);
   }, [Inputnameforsearch]);
 
 const handleSearchandChange = async () => {
@@ -323,8 +309,6 @@ const handleSearchandChange = async () => {
       description: Inputdescriptionforsearch,
     });
 
-    console.log("Searching for description: ", Inputdescriptionforsearch);
-
     if (Inputdescriptionforsearch) {
       const response = await axiosInstance.post(
         "/products/product/sortProductsfordescription",
@@ -333,7 +317,7 @@ const handleSearchandChange = async () => {
 
       // Ensure filteredOrders is always an array
       const filteredOrders = response.data.data || [];
-      console.log("Filtered products by description: ", filteredOrders);
+
 
       // Update state with matching products and show the modal if there are results
       setMatchingProducts(filteredOrders);
@@ -361,10 +345,7 @@ const handleSearchandChange = async () => {
         { description: Inputdescriptionforsearch }
       );
       const filteredOrders = response.data.data;
-      console.log(
-        "Inputdescriptionforsearch filteredorders by mobile number: ",
-        filteredOrders
-      );
+
       setMatchingMobileNumbers(filteredOrders);
       setShowMobileModal(true);
     } else {
@@ -400,7 +381,7 @@ const handleSearchandChange = async () => {
   // };
 
   const handleSelectOrder = async (Client) => {
-    console.log("Handling selection for mobile number:", Client);
+
 
     // Set basic client information
     setClinetId(Client._id);
@@ -419,7 +400,7 @@ const handleSearchandChange = async () => {
       const response = await axiosInstance.get(
         `/sales/AdvancePay/advance-payment/${Client._id}`
       );
-      console.log("Full response data:", response.data.advancePayment);
+
 
       // Get the first object from advancePay and cart (since they are arrays)
       const { cart, advancePay } = response.data.advancePayment;
@@ -428,8 +409,7 @@ const handleSearchandChange = async () => {
       const advancePayData = advancePay; // Accessing the first object in advancePay array
       const AdvancePayId = response.data.advancePayment._id;
       // Log the fetched data to ensure it's being received correctly
-      console.log("Cart Data:", cartData);
-      console.log("Advance Payment Data:", advancePayData);
+
 
       // Set the advance payment and cart details if available
       if (advancePayData) {
@@ -449,7 +429,6 @@ const handleSearchandChange = async () => {
       }
     } catch (error) {
       // Handle error while fetching advance payment details
-
       if (error.response && error.response.status === 404) {
       setAdvancePaid([]);
       setAdvancePaidId("");
@@ -464,14 +443,11 @@ const handleSearchandChange = async () => {
       setGst("");
       setDetails([]);
       setFinalTotal("");
-      dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
         console.error("No data found for the given Client ID.");
-     
+        dispatch(fetchCart({ PayId: '', uId: UserId }));
       } else {
         console.error("Error fetching advance payment details:", error);
       }
-      console.log(items)
-      console.log(CartId)
     }
 
     // Close the modals after selection
@@ -528,11 +504,9 @@ const handleSearchandChange = async () => {
           ? mrp - OneUnit
           : newState.product.discountedPrice - OneUnit;
       newState.discountedPrice = OneUnit * quantity;
-      console.log(discount);
       newState.discount = discount;
       return newState;
     });
-    console.log("edittem after input change: ", editItem);
   };
 
   // const handleSaveClick = (itemId) => {
@@ -545,7 +519,6 @@ const handleSearchandChange = async () => {
   const handleSaveClick = async (itemId) => {
     // Extract necessary fields from editItem
     const { product } = editItem;
-    console.log(items);
 
     const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
     let { title: productTitle, price: productPrice } = product;
@@ -555,7 +528,6 @@ const handleSearchandChange = async () => {
       (product.price > Oneunit
         ? product.price - Oneunit
         : product.discountedPrice - Oneunit) * quantity;
-    console.log(editItem);
     // Construct the payload for the API request
     const payload = {
       productCode: product.BarCode,
@@ -580,7 +552,6 @@ const handleSearchandChange = async () => {
       //   throw new Error('Network response was not ok' + response.statusText);
       // }
       const resData = response.data;
-      console.log("Save changes for item:", resData);
       setEditId(null);
       setEditItem({});
       dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
@@ -604,12 +575,13 @@ const handleSearchandChange = async () => {
   }, []);
 
   useEffect(() => {
-    console.log("This is cart item: ", items);
-  }, [items]);
-
-  useEffect(() => {
     // Reset details at the beginning
-    setDetails([])
+    setDetails([]);
+    setDiscount(0);
+    setTotalPrice( 0);
+    setCartId();
+    setGst(0);
+    setFinalTotal(0);
     if (items.length === 2) {
       // Handle case where both cart details and summary are present
       const productsData = items[0];
@@ -618,7 +590,6 @@ const handleSearchandChange = async () => {
       }
 
       const summary = items[1];
-      console.log(summary)
       if (summary) {
         setDiscount(summary.discount || 0);
         setTotalPrice(summary.totalPrice || 0);
@@ -640,7 +611,6 @@ const handleSearchandChange = async () => {
     }
   }, [items]);
 
-  console.log(details);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -659,7 +629,6 @@ const handleSearchandChange = async () => {
   }, [invoice]);
 
   const handleKeys = (e) => {
-    console.log(e.key);
     if (e.key === "Enter") {
       e.preventDefault(); // Prevent form submission on Enter
       const form = e.target.form;
@@ -676,7 +645,6 @@ const handleSearchandChange = async () => {
   };
 
   const fetchProducts = async (id) => {
-    console.log(id + "hallo");
     try {
       const response = await axiosInstance.get(`/products/product/view/${id}`); // Adjust the URL to your API endpoint
       // setProducts(response.data);
@@ -684,7 +652,6 @@ const handleSearchandChange = async () => {
         PayId: AdvancePaidId,
         uId: UserId,
       };
-      console.log("barcode fetch product reponse ", response);
       dispatch(
         addToCart({
           productCode: id,
@@ -707,14 +674,11 @@ const handleSearchandChange = async () => {
   };
 
   const fetchAllProducts = async () => {
-    console.log(".............fetching All Products............");
     try {
       const response = await axiosInstance.get(`/products/product/view`);
-      console.log("All Products are: ", response);
       const respdata = response.data.data;
       setAllproducts(respdata);
     } catch (err) {
-      console.log("All Products error are: ");
       console.log(err.message);
     }
   };
@@ -723,9 +687,6 @@ const handleSearchandChange = async () => {
     fetchAllProducts();
   }, []);
 
-  useEffect(() => {
-    console.log("allprodcut State : ", allProducts);
-  }, [allProducts]);
 
   useEffect(() => {
     // Get the current date in the required format (YYYY-MM-DD)
@@ -856,8 +817,6 @@ const handleSearchandChange = async () => {
               status: "OnGoing",
             })
           ).unwrap();
-          console.log("yes call");
-          console.log(createdOrder);
           setInvoice(createdOrder.data);
           items = [];
           setFinal({
@@ -904,9 +863,6 @@ const handleSearchandChange = async () => {
           toast.error(`Failed to create Client: ${err.message}`);
         }
       } else {
-        console.log(finalform);
-        console.log(UserId);
-        console.log(AdvancePaidId);
         alert(`fill the client details`);
       }
     } else if (amount > Total) {
@@ -1013,7 +969,6 @@ const handleSearchandChange = async () => {
       uId: UserId,
     };
   
-    console.log("Payload data:", { ...data, productCode: id, status, formData });
   
     try {
       // Dispatch the addToCart action
@@ -1055,10 +1010,8 @@ const handleSearchandChange = async () => {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      console.log("inside handle key press == Enter");
 
       if (e.target.value.trim() != "") {
-        console.log("fetchroducts ");
 
         fetchProducts(e.target.value);
       }
@@ -1100,7 +1053,6 @@ const handleSearchandChange = async () => {
       setShowPopup(true);
     } else {
       setBlocking(true);
-      console.log(items);
     }
   };
 
@@ -1123,9 +1075,6 @@ const handleSearchandChange = async () => {
     const amount = AdvancePay;
     const data = date;
     const timeData = time;
-    console.log(clientId);
-    console.log();
-    console.log(amount);
     try {
       // Send the data to the server
       const response = await axiosInstance.post("/sales/AdvancePay/add-entry", {
@@ -1136,11 +1085,10 @@ const handleSearchandChange = async () => {
         date: data,
         time: timeData, 
       });
-      console.log("Response data:", response.data);
       const { advancePay,_id } = response.data.advancePayment;
 
       const advancePayData = advancePay;
-      console.log("Advance Payment Data:", advancePayData);
+
 
       // Set the advance payment and cart details if available
       if (advancePayData) {
@@ -1210,7 +1158,7 @@ const handleSearchandChange = async () => {
               {showModal && (
                 <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
                   {matchingOrders?.length > 0 ? (
-                    (console.log(matchingOrders),
+                    (
                     matchingOrders.map((Client) => (
                       <div
                         key={Client._id}

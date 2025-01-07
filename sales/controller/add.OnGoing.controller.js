@@ -254,6 +254,7 @@ const getCartDetails = asyncHandler(async (req, res) => {
   let { id } = req.user;
   // const id=`669b9afa72e1e9138e2a64a3`;
   const { PayId, uId } = req.query;
+  console.log(  req.query)
   id= (uId===id && uId)? uId:id;
   const tenantId = req.user.tenantId;
   const Offline_Cart = await getTenantModel(

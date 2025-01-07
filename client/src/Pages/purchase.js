@@ -103,7 +103,6 @@ const Purchase = () => {
   // ============================functions to search name and description===============================
 
   const handleSelectOrder = (Client) => {
-    console.log("handlie select form mobile number");
     setFinal({
       ...finalform,
       name: Client.Name,
@@ -121,7 +120,6 @@ const Purchase = () => {
   useEffect(() => {
     setMatchingOrders([]);
     searchOfflineOrders();
-    console.log("Inputnameforsearch changed: ",Inputnameforsearch)
   },[Inputnameforsearch])
 
   const searchOfflineOrders = async () => {
@@ -132,7 +130,6 @@ const Purchase = () => {
         name: Inputnameforsearch,
       });
   
-      console.log("Searching Inputnameforsearch: ", Inputnameforsearch);
   
       if (Inputnameforsearch) {
         // Send the request to search for offline orders
@@ -143,8 +140,6 @@ const Purchase = () => {
   
         // Extract and validate the response data
         const distinctOrders = response.data.data || [];
-        console.log("Response data: ", response.data);
-  
         // Check if there are any matching orders
         if (distinctOrders.length === 0) {
           setMatchingOrders([]);
@@ -165,7 +160,7 @@ const Purchase = () => {
   
 
   const handleSelectProduct =(product) => {
-    console.log("handling ");
+
 
     setFormData({
       barcode: product.BarCode,
@@ -191,7 +186,6 @@ const Purchase = () => {
   useEffect(() => {
     setMatchingProducts([]);
     handleSearchandChange();
-    console.log("Inputdescriptionforsearch changed: ",Inputdescriptionforsearch)
   },[Inputdescriptionforsearch])
 
   const handleSearchandChange = async () => {
@@ -202,7 +196,6 @@ const Purchase = () => {
         description: Inputdescriptionforsearch,
       });
   
-      console.log("Searching for description: ", Inputdescriptionforsearch);
   
       if (Inputdescriptionforsearch) {
         // Send a POST request to fetch filtered orders
@@ -212,9 +205,7 @@ const Purchase = () => {
         );
   
         // Extract and validate the response data
-        const filteredOrders = response.data.data || [];
-        console.log("Filtered products by description: ", filteredOrders);
-  
+        const filteredOrders = response.data.data || [];  
         // Update the state with matching products
         setMatchingProducts(filteredOrders);
   
@@ -279,13 +270,11 @@ const Purchase = () => {
   
   useEffect(() => {
     if (print&&purchaseOrders && handlePrintRef.current) {
-      console.log(handlePrintRef.current)
       handlePrintRef.current.handlePrint();
     }
   }, [purchaseOrders]);
 
   const handleKeys = (e) => {
-    console.log(e.key);
     if (e.key === "Enter") {
       e.preventDefault(); // Prevent form submission on Enter
       const form = e.target.form;
@@ -318,7 +307,6 @@ const Purchase = () => {
 
   // ============================functions for scanning product===============================
   const handleScan = (data) => {
-    // console.log(isChecked)
     if (isChecked && data) {
       dispatch(fetchProduct(data)).then(()=>{
         if (formData.barcode&&formData.description&&formData.purchaseRate) {
@@ -482,7 +470,7 @@ const Purchase = () => {
     const amount = Math.round(gen)
  const all= invoice+totalGst
  const total = Math.round(all)
- console.log(amount," and ",total)
+
 
 
     if (amount == total) {
