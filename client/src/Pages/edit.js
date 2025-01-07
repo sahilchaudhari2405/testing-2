@@ -75,9 +75,7 @@ const Edit = () => {
 
   // Function to handle form submission and validate payments
   const handleSavePayment = () => {
-    console.log('Payment successful:', payment);
     if (remainingAmount === 0) {
-      console.log('Payment successful:', payment);
       handleSave()
       setError('');
      // Close the popup after saving
@@ -233,7 +231,6 @@ const Edit = () => {
   useEffect(() => {
     setMatchingProducts([]);
     handleSearchandChange();
-    console.log("Inputdescriptionforsearch changed: ", Inputdescriptionforsearch)
   }, [Inputdescriptionforsearch])
 
   useEffect(() => {
@@ -258,7 +255,6 @@ const Edit = () => {
   useEffect(() => {
     if (orderIdFromURL) {
       setOrderId(orderIdFromURL);
-      console.log("yes")
       handleOrderIdChange({ target: { value: orderIdFromURL } });
       fetchOrderData();
     }
@@ -273,9 +269,7 @@ const Edit = () => {
   const handleSave = async (itemId) => {
 
     try {
-      console.log("editedItemData:", editedItemData);
       const oneUnit = editedItemData.discountedPrice / editedItemData.quantity;
-      console.log(oneUnit)
       const Discount = (editedItemData.product?.price > oneUnit ? editedItemData.product?.price - oneUnit : editedItemData.product.discountedPrice - oneUnit) * editedItemData.quantity
       const payload = {
         orderId: orderId,
@@ -293,7 +287,6 @@ const Edit = () => {
       const response = await axiosInstance.post('/sales/order/addCustomProductOnEdit', payload)
         .then(async response => {
           toast.success('Order updated successfully!');
-          console.log("yes")
           handleSetData(response.data.data);
           setPopupVisible(false); 
           setEditingItem(null);
@@ -301,13 +294,10 @@ const Edit = () => {
         .catch(err => {
           alert('Failed to update order.');
         });;
-
-      console.log("Response from server:", response);
       setEditingItemId(null);
     } catch (error) {
       console.error("Error saving item:", error);
     }
-    console.log("editedItemData:", editedItemData);
     setEditingItemId(null);
 
   };
@@ -346,7 +336,6 @@ const Edit = () => {
 
       return newState;
     });
-    console.log("edittem after input change: ", editItem);
   };
 
   const handleCheckboxChange = (event) => {
@@ -371,7 +360,6 @@ const Edit = () => {
   const handleScan = (data) => {
     // console.log(isChecked)
     if (isChecked && data) {
-      console.log("yes")
       setOrderId(data);
       fetchOrderData();
     }
@@ -379,9 +367,7 @@ const Edit = () => {
 
   const fetchProduct = async (barcode) => {
     try {
-      console.log("inside fetchprodcut barcode: ",barcode)
       const response = await axiosInstance.get(`/products/product/view/${barcode}`);
-      console.log("inside fetchprodcut response: ",response.data)
 
       return response.data.data; 
     } catch (error) {
@@ -392,10 +378,8 @@ const Edit = () => {
 
   const handleScanproduct = (data) => {
     // console.log(isChecked)
-    console.log("after scanning data barcode: ",data)
     if (isChecked&&data) {
       // dispatch(fetchProduct(data));
-      console.log("after scanning data barcode: ",data)
 
       fetchProduct(data)
       .then((product) => {
@@ -458,7 +442,6 @@ const Edit = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/sales/order/getCounterOrderbyID/${orderId}`);
-      console.log("editorderresponse: ", response.data);
       handleSetData(response.data.data);
       setError('');
     } catch (err) {
@@ -489,7 +472,6 @@ const Edit = () => {
   };
   
   const handleSetData = (orderData) => {
-    console.log("setFormData: ", orderData);
     setinvoice(orderData);
     setFormData(orderData);
     const formattedOrderDate = orderData.orderDate.split('T')[0];
@@ -505,7 +487,6 @@ const Edit = () => {
       ...prevData,
       [name]: value
     }));
-    console.log("changed formdata: ", formData);
   };
 
   const handleChangeAddProductonEdit = (e) => {
@@ -514,7 +495,6 @@ const Edit = () => {
       ...prevData,
       [id]: value
     }));
-    console.log("changed addprocudtoneditformData: ", addprocudtoneditformData);
   };
 
   // const handlePaymentChange = (e) => {
@@ -556,13 +536,11 @@ const Edit = () => {
     axiosInstance.put('/sales/order/RemoveOneItem', remove_payload)
       .then(async response => {
         toast.success('Order item removed successfully!');
-        console.log("yes")
         fetchOrderData();
       })
       .catch(err => {
         toast.error('Failed to remove item.');
       });
-    console.log("changed formdata: ", formData);
   };
 
   const handleSubmit = (e) => {
@@ -570,7 +548,6 @@ const Edit = () => {
     axiosInstance.put(`/sales/order/updateOrderbyID/${orderId}`, formData)
       .then(async response => {
         toast.success('Order updated successfully!');
-        console.log("yes")
         handleSetData(response.data.data);
         navigate('/view')
       })
@@ -587,7 +564,6 @@ const Edit = () => {
   axiosInstance.put('/sales/order/cancelOrder', cancelOrder_payload)
       .then(async response => {
         toast.success('Order cancelled successfully!');
-        console.log("yes")
       await fetchOrderData();
       })
       .catch(err => {
@@ -630,7 +606,6 @@ const Edit = () => {
     axiosInstance.put('/sales/order/decreaseQuantity', decreaseQuantity_payload)
       .then(async response => {
         toast.success('Quantity decreased successfully!');
-        console.log("yes")
          fetchOrderData()
       })
       .catch(err => {
@@ -653,11 +628,9 @@ const Edit = () => {
   };
   //fucntions to add new item to order
   const fetchProducts = async (id) => {
-    console.log(id + "hallo")
     try {
       const response = await axiosInstance.get(`/products/product/view/${id}`); // Adjust the URL to your API endpoint
       // setProducts(response.data);
-      console.log("barcode fetch product reponse ", response)
       dispatch(addToCart(id)).then(() => {
         dispatch(fetchCart());
       })
@@ -665,8 +638,6 @@ const Edit = () => {
     } catch (err) {
       if (err.response && err.response.status === 404) {
         toast.error("Product not found!");
-      } else {
-        console.log(err.message);
       }
     }
   };
@@ -684,15 +655,12 @@ const Edit = () => {
   const handleKeyPress = (e) => {
     setHandleKeyPress(true);
     if (e.key === "Enter") {
-      console.log("inside handle key press == Enter")
+
 
       if (e.target.value.trim() != "") {
-        console.log("fetchroducts ")
         const barcode = addprocudtoneditformData.barcode;
-        console.log(" key pressed bardcode: ",barcode)
         fetchProduct(barcode)
         .then((product) => {
-          console.log("prodcut after fetching inside handle key press: ",product)
           setProductDetails(product);
           
           }
@@ -718,7 +686,6 @@ const Edit = () => {
   };
 
   const handleKeys = (e) => {
-    console.log(e.key)
     if (e.key === 'Enter') {
       e.preventDefault(); // Prevent form submission on Enter
       const form = e.target.form;
@@ -731,7 +698,6 @@ const handleReturn = ()=>{
   navigate('/view')
 }
   const handleSelectProduct = (product) => {
-    console.log("handling ");
     setaddprocudtoneditformData({
       barcode: product.BarCode,
       brand: product.brand || "",
@@ -758,7 +724,6 @@ const handleReturn = ()=>{
     if (Inputdescriptionforsearch) {
       const response = await axiosInstance.post('/products/product/sortProductsfordescription', { description: Inputdescriptionforsearch })
       const filteredOrders = response.data.data;
-      console.log("Inputdescriptionforsearch : ", filteredOrders);
       setMatchingProducts(filteredOrders);
       setShowModaldescription(true);
     } else {
@@ -767,17 +732,14 @@ const handleReturn = ()=>{
   }
   const handleAddProductSubmit = async (e=null) => {
     if (e){ e.preventDefault();}
-    console.log("productDetails: ", productDetails)
     if (productDetails) {
       const id = productDetails.BarCode;
-      console.log(id);
       const payload = {
         orderId: orderId,
         productCode: id
       }
       const response = await axiosInstance.post('/products/order/addProductOnEdit', payload)
      await fetchOrderData();
-      console.log("resposne: ", response);
     }
     // setProductDetails({...productDetails,['qty']:" "});
     setProductDetails();
@@ -795,7 +757,6 @@ const handleReturn = ()=>{
       gst: "",
       total: "",
     })
-    console.log("yes")
   };
 
   const saveAndClosePopup = () => {
@@ -803,8 +764,6 @@ const handleReturn = ()=>{
     if (!formData.paymentType.cash && !formData.paymentType.card && !formData.paymentType.upi) {
       setError('Please fill in at least one payment type');
     } else {
-      // Save logic
-      console.log('Saving data:', formData);
       setPopupVisible(false); // Close the popup
     }
   };

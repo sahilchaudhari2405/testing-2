@@ -183,12 +183,8 @@ const Sale = () => {
     dispatch(fetchUsers());
   }, [dispatch]);
 
-  useEffect(() => {
-    console.log("users are: ", users);
-  }, [users]);
 
   const handleKeyDown = (e) => {
-    console.log(e.key);
     if (e.key === "Enter") {
       e.preventDefault(); // Prevent form submission on Enter
       const form = e.target.form;
@@ -222,7 +218,6 @@ const Sale = () => {
         name: Inputnameforsearch,
       });
   
-      console.log("Searching Inputnameforsearch: ", Inputnameforsearch);
   
       if (Inputnameforsearch) {
         // Make an API request to search for client sales
@@ -233,7 +228,6 @@ const Sale = () => {
   
         // Extract and validate the response data
         const distinctOrders = response.data.data || [];
-        console.log("Response data: ", response.data);
   
         // Update the state based on the results
         if (distinctOrders.length === 0) {
@@ -262,10 +256,7 @@ const Sale = () => {
         Mobile: Inputmobilenumberforsearch,
       });
   
-      console.log(
-        "Searching for Inputmobilenumberforsearch: ",
-        Inputmobilenumberforsearch
-      );
+
   
       if (Inputmobilenumberforsearch) {
         // Make an API request to search by mobile number
@@ -276,7 +267,7 @@ const Sale = () => {
   
         // Extract and validate the response data
         const distinctOrders = response.data.data || [];
-        console.log("Response data: ", response.data);
+
   
         if (distinctOrders.length === 0) {
           // If no results, clear matching orders
@@ -301,25 +292,16 @@ const Sale = () => {
   useEffect(() => {
     setMatchingProducts([]);
     handleSearchandChange();
-    console.log(
-      "Inputdescriptionforsearch changed: ",
-      Inputdescriptionforsearch
-    );
   }, [Inputdescriptionforsearch]);
 
   useEffect(() => {
     setMatchingMobileNumbers([]);
     searchOfflineOrdersForMobileNumber();
-    console.log(
-      "Inputmobilenumberforsearch changed: ",
-      Inputmobilenumberforsearch
-    );
   }, [Inputmobilenumberforsearch]);
 
   useEffect(() => {
     setMatchingOrders([]);
     searchOfflineOrders();
-    console.log("Inputnameforsearch changed: ", Inputnameforsearch);
   }, [Inputnameforsearch]);
 
   const handleSearchandChange = async () => {
@@ -330,7 +312,6 @@ const Sale = () => {
         description: Inputdescriptionforsearch,
       });
   
-      console.log("Searching for Inputdescriptionforsearch:", Inputdescriptionforsearch);
   
       if (Inputdescriptionforsearch) {
         // Make an API request to search for products by description
@@ -341,10 +322,9 @@ const Sale = () => {
   
         // Extract and validate the response data
         const filteredOrders = response.data.data || [];
-        console.log("Filtered products:", filteredOrders);
+
   
         if (filteredOrders.length === 0) {
-          console.log("No matching products found.");
           setMatchingProducts([]);
         } else {
           setMatchingProducts(filteredOrders);
@@ -353,7 +333,6 @@ const Sale = () => {
         // Show the modal if there are results
         setShowModaldescription(true);
       } else {
-        console.log("Input description is empty. Hiding modal.");
         setShowModaldescription(false);
       }
     } catch (error) {
@@ -364,7 +343,6 @@ const Sale = () => {
 
   const handleMobileSearchChange = async () => {
     // const value = e.target.value;
-    // console.log("Mobile number is: ", value);
     setFinal({
       ...finalform,
       description: Inputdescriptionforsearch,
@@ -375,10 +353,6 @@ const Sale = () => {
         { description: Inputdescriptionforsearch }
       );
       const filteredOrders = response.data.data;
-      console.log(
-        "Inputdescriptionforsearch filteredorders by mobile number: ",
-        filteredOrders
-      );
       setMatchingMobileNumbers(filteredOrders);
       setShowMobileModal(true);
     } else {
@@ -387,7 +361,6 @@ const Sale = () => {
   };
 
   const handleSelectOrder = (Client) => {
-    console.log("handlie select form mobile number");
     setFinal({
       ...finalform,
       name: Client.Name,
@@ -402,7 +375,7 @@ const Sale = () => {
   };
 
   const handleSelectProduct = (product) => {
-    console.log("handling ");
+
 
     // setFormData({
     //   barcode: product.BarCode,
@@ -450,25 +423,19 @@ const Sale = () => {
           ? mrp - OneUnit
           : newState.product.discountedPrice - OneUnit;
       newState.discountedPrice = OneUnit * quantity;
-      console.log(discount);
       newState.discount = discount;
       return newState;
     });
-    console.log("edittem after input change: ", editItem);
   };
 
   // const handleSaveClick = (itemId) => {
   //   // Implement save functionality here
-  //   console.log("Save changes for item:", editItem);
-
   //   setEditId(null);
   // };
 
   const handleSaveClick = async (itemId) => {
     // Extract necessary fields from editItem
     const { product } = editItem;
-    console.log(items);
-
     const { discountedPrice, quantity, GST, finalPrice_with_GST } = editItem;
     let { title: productTitle, price: productPrice } = product;
     const Oneunit = discountedPrice / quantity;
@@ -477,7 +444,6 @@ const Sale = () => {
       (product.price > Oneunit
         ? product.price - Oneunit
         : product.discountedPrice - Oneunit) * quantity;
-    console.log(editItem);
     // Construct the payload for the API request
     const payload = {
       productCode: product.BarCode,
@@ -499,8 +465,6 @@ const Sale = () => {
       // if (!response.ok) {
       //   throw new Error('Network response was not ok' + response.statusText);
       // }
-      const resData = response.data;
-      console.log("Save changes for item:", resData);
 
       setEditId(null);
       setEditItem({});
@@ -517,13 +481,9 @@ const Sale = () => {
 
   useEffect(() => {
     clearCart();
-    console.log("sagar");
     dispatch(fetchCart());
   }, [dispatch]);
 
-  useEffect(() => {
-    console.log("This is cart item: ", items);
-  }, [items]);
 
   useEffect(() => {
     // Reset details at the beginning
@@ -555,7 +515,6 @@ const Sale = () => {
     }
   }, [items]);
 
-  console.log(details);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -574,7 +533,6 @@ const Sale = () => {
   }, [invoice]);
 
   const handleKeys = (e) => {
-    console.log(e.key);
     if (e.key === "Enter") {
       e.preventDefault(); // Prevent form submission on Enter
       const form = e.target.form;
@@ -591,11 +549,9 @@ const Sale = () => {
   };
 
   const fetchProducts = async (id) => {
-    console.log(id + "hallo");
     try {
       const response = await axiosInstance.get(`/products/product/view/${id}`); // Adjust the URL to your API endpoint
       // setProducts(response.data);
-      console.log("barcode fetch product reponse ", response);
       dispatch(
         addToCart({ productCode: id, status: "OneTime", formData: formData })
       ).then(() => {
@@ -612,14 +568,11 @@ const Sale = () => {
   };
 
   const fetchAllProducts = async () => {
-    console.log(".............fetching All Products............");
     try {
       const response = await axiosInstance.get(`/products/product/view`);
-      console.log("All Products are: ", response);
       const respdata = response.data.data;
       setAllproducts(respdata);
     } catch (err) {
-      console.log("All Products error are: ");
       console.log(err.message);
     }
   };
@@ -628,9 +581,7 @@ const Sale = () => {
     fetchAllProducts();
   }, []);
 
-  useEffect(() => {
-    console.log("allprodcut State : ", allProducts);
-  }, [allProducts]);
+
 
   useEffect(() => {
     // Get the current date in the required format (YYYY-MM-DD)
@@ -730,7 +681,6 @@ const Sale = () => {
     const amount = Math.round(gen);
 
     const Total = Math.round(total);
-    console.log(amount == Total);
     if (amount == Total) {
       if (
         items[0].length > 0 &&
@@ -751,7 +701,6 @@ const Sale = () => {
               status: "OneTime",
             })
           ).unwrap();
-          console.log(createdOrder);
 
           setInvoice(createdOrder.data);
           items = [];
@@ -880,10 +829,6 @@ const Sale = () => {
     const id = productDetails?.BarCode || null; // Optional barcode
     const status = "OneTime";
 
-    console.log("Barcode:", id);
-    console.log("Status:", status);
-    console.log("FormData:", formData);
-
     try {
       await dispatch(addToCart({ productCode: id, status, formData })).unwrap();
       dispatch(fetchCart());
@@ -912,11 +857,8 @@ const Sale = () => {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      console.log("inside handle key press == Enter");
 
       if (e.target.value.trim() != "") {
-        console.log("fetchroducts ");
-
         fetchProducts(e.target.value);
       }
 

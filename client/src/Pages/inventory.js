@@ -100,7 +100,6 @@ const Inventory = () => {
 // Fetch products with pagination and optional filtering (using POST)
 const fetchProducts = async () => {
   setLoading(true); // Set loading state before fetching
-console.log(formValues);
   const { barcode, description, category, brand, size, expiringDays, lowStock } = formValues
   try {
     // Construct the request body with page, limit, and filter criteria
@@ -174,7 +173,6 @@ Suggestions(true);
         cat.name.toLowerCase().startsWith(formValues.category.toLowerCase())
       );
       setFilteredCategories(filtered);
-      console.log(filteredCategories)
       setShowSuggestions(true);
     } else {
       setFilteredCategories([]);
@@ -268,14 +266,12 @@ Suggestions(true);
   const handleCloseSuccessModal = async () => {
     setIsModalOpen(false);
     setPage(1);
-    console.log("yes")
    await fetchProducts();
   };
   const handleCloseAddSuccessModal = async () => {
     setIsModalOpen(false);
     setProd([]);
     setPage(1);
-    console.log("yes")
    await fetchProducts();
   };
   
@@ -294,11 +290,7 @@ Suggestions(true);
         setProd(data);
         try {
           const response = await axiosInstance.post('/products/product/importProducts', { products: data });
-          console.log('Data imported successfully:', response.data);
           dispatch((response.data.data));
-          if (response.data.skipped.length > 0) {
-            console.log('Skipped products:', response.data.skipped);
-          }
         } catch (error) {
           console.error('Error importing data:', error);
         }
@@ -338,7 +330,6 @@ const handleError = (err) => {
 
 
 const handleScan = (data) => {
-  console.log(data)
   setFormValues({
     barcode: '',
     description: '',
@@ -359,7 +350,6 @@ const handleScan = (data) => {
 
 const handleCheckboxChange = (event) => {
   const checked = event.target.checked;
-  console.log(event)
   setIsChecked(checked);
 };
 
@@ -517,7 +507,6 @@ const handleCheckboxChange = (event) => {
 
         <div className="bg-gray-100 rounded-lg text-foreground p-4 space-y-4 mt-5 z-0">
          {prod && prod.map((items) => (
-          //console.log(items)
           <ProductCard
             key={items._id}
             items={items}
