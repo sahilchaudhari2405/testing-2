@@ -125,28 +125,44 @@ const Purchase = () => {
   },[Inputnameforsearch])
 
   const searchOfflineOrders = async () => {
-    // const value = e.target.value;
-    // console.log("value is: ",value);
-    setFinal({
-      ...finalform,
-      "name": Inputnameforsearch,
-    });
-    // setSearchInput(value);
-
-    console.log("searching Inputnameforsearch are: ",Inputnameforsearch);
-    if (Inputnameforsearch) {
-      const response = await axiosInstance.post('users/admin/SearchClientDistributer',{ alphabet : Inputnameforsearch})
-      const distinctOrders = response.data.data;
-      if ( distinctOrders == [] ){
-        setMatchingOrders([]);
+    try {
+      // Update the final form with the input name for search
+      setFinal({
+        ...finalform,
+        name: Inputnameforsearch,
+      });
+  
+      console.log("Searching Inputnameforsearch: ", Inputnameforsearch);
+  
+      if (Inputnameforsearch) {
+        // Send the request to search for offline orders
+        const response = await axiosInstance.post(
+          "users/admin/SearchClientDistributer",
+          { alphabet: Inputnameforsearch }
+        );
+  
+        // Extract and validate the response data
+        const distinctOrders = response.data.data || [];
+        console.log("Response data: ", response.data);
+  
+        // Check if there are any matching orders
+        if (distinctOrders.length === 0) {
+          setMatchingOrders([]);
+        } else {
+          setMatchingOrders(distinctOrders);
+        }
+  
+        // Show the modal if results are found
+        setShowModal(true);
+      } else {
+        // Hide the modal if input is empty
+        setShowModal(false);
       }
-      console.log("distinctOrders users are: ", distinctOrders);
-      setMatchingOrders(distinctOrders);
-      setShowModal(true);
-    } else {
-      setShowModal(false);
+    } catch (error) {
+      console.error("Error occurred while searching offline orders:", error);
     }
   };
+  
 
   const handleSelectProduct =(product) => {
     console.log("handling ");
@@ -179,23 +195,40 @@ const Purchase = () => {
   },[Inputdescriptionforsearch])
 
   const handleSearchandChange = async () => {
-    setFormData({
-      ...formData,
-      "description": Inputdescriptionforsearch,
-    });
-    if (Inputdescriptionforsearch) {
-      const response = await axiosInstance.post('products/product/sortProductsfordescription',{ description : Inputdescriptionforsearch})
-      const filteredOrders = response.data.data;
-      console.log("Inputdescriptionforsearch : ", filteredOrders);
-      setMatchingProducts(filteredOrders);
-      setShowModaldescription(true);
-    } else {
-      setShowModaldescription(false);
+    try {
+      // Update the form data with the input description
+      setFormData({
+        ...formData,
+        description: Inputdescriptionforsearch,
+      });
+  
+      console.log("Searching for description: ", Inputdescriptionforsearch);
+  
+      if (Inputdescriptionforsearch) {
+        // Send a POST request to fetch filtered orders
+        const response = await axiosInstance.post(
+          "products/product/sortProductsfordescription",
+          { description: Inputdescriptionforsearch }
+        );
+  
+        // Extract and validate the response data
+        const filteredOrders = response.data.data || [];
+        console.log("Filtered products by description: ", filteredOrders);
+  
+        // Update the state with matching products
+        setMatchingProducts(filteredOrders);
+  
+        // Show the modal if there are matching products
+        setShowModaldescription(filteredOrders.length > 0);
+      } else {
+        // Hide the modal if input is empty
+        setShowModaldescription(false);
+      }
+    } catch (error) {
+      console.error("Error while searching products by description:", error);
     }
-
-  }
-
-
+  };
+  
 
 
   useEffect(() => {

@@ -215,61 +215,88 @@ const Sale = () => {
   // };
 
   const searchOfflineOrders = async () => {
-    // const value = e.target.value;
-    // console.log("value is: ",value);
-    setFinal({
-      ...finalform,
-      name: Inputnameforsearch,
-    });
-    // setSearchInput(value);
-
-    console.log("searching Inputnameforsearch are: ", Inputnameforsearch);
-    if (Inputnameforsearch) {
-      const response = await axiosInstance.post(
-        "/users/admin/SearchClientSale",
-        { alphabet: Inputnameforsearch }
-      );
-      const distinctOrders = response.data.data;
-      if (distinctOrders == []) {
-        setMatchingOrders([]);
+    try {
+      // Update the form data with the input name for search
+      setFinal({
+        ...finalform,
+        name: Inputnameforsearch,
+      });
+  
+      console.log("Searching Inputnameforsearch: ", Inputnameforsearch);
+  
+      if (Inputnameforsearch) {
+        // Make an API request to search for client sales
+        const response = await axiosInstance.post(
+          "/users/admin/SearchClientSale",
+          { alphabet: Inputnameforsearch }
+        );
+  
+        // Extract and validate the response data
+        const distinctOrders = response.data.data || [];
+        console.log("Response data: ", response.data);
+  
+        // Update the state based on the results
+        if (distinctOrders.length === 0) {
+          setMatchingOrders([]);
+        } else {
+          setMatchingOrders(distinctOrders);
+        }
+  
+        // Show the modal if there are results
+        setShowModal(true);
+      } else {
+        // Hide the modal if input is empty
+        setShowModal(false);
       }
-      console.log("distinctOrders users are: ", distinctOrders);
-      setMatchingOrders(distinctOrders);
-      setShowModal(true);
-    } else {
-      setShowModal(false);
+    } catch (error) {
+      console.error("Error while searching offline orders:", error);
     }
   };
+  
 
   const searchOfflineOrdersForMobileNumber = async () => {
-    setFinal({
-      ...finalform,
-      Mobile: Inputmobilenumberforsearch,
-    });
-    // setSearchInput(value);
-
-    console.log(
-      "searching Inputmobilenumberforsearch are: ",
-      Inputmobilenumberforsearch
-    );
-    if (Inputmobilenumberforsearch) {
-      const response = await axiosInstance.post(
-        "/users/admin/SearchClientSale",
-        { number: Inputmobilenumberforsearch }
+    try {
+      // Update the form data with the mobile number for search
+      setFinal({
+        ...finalform,
+        Mobile: Inputmobilenumberforsearch,
+      });
+  
+      console.log(
+        "Searching for Inputmobilenumberforsearch: ",
+        Inputmobilenumberforsearch
       );
-      const distinctOrders = response.data.data;
-
-      console.log(distinctOrders);
-      if (distinctOrders == []) {
-        setMatchingOrders([]);
+  
+      if (Inputmobilenumberforsearch) {
+        // Make an API request to search by mobile number
+        const response = await axiosInstance.post(
+          "/users/admin/SearchClientSale",
+          { number: Inputmobilenumberforsearch }
+        );
+  
+        // Extract and validate the response data
+        const distinctOrders = response.data.data || [];
+        console.log("Response data: ", response.data);
+  
+        if (distinctOrders.length === 0) {
+          // If no results, clear matching orders
+          setMatchingOrders([]);
+        } else {
+          // Update state with the results
+          setMatchingMobileNumbers(distinctOrders);
+        }
+  
+        // Show the modal if there are results
+        setShowMobileModal(true);
+      } else {
+        // Hide the modal if input is empty
+        setShowMobileModal(false);
       }
-      console.log("distinctOrders users are: ", distinctOrders);
-      setMatchingMobileNumbers(distinctOrders);
-      setShowMobileModal(true);
-    } else {
-      setShowMobileModal(false);
+    } catch (error) {
+      console.error("Error while searching offline orders by mobile number:", error);
     }
   };
+  
 
   useEffect(() => {
     setMatchingProducts([]);
@@ -296,23 +323,44 @@ const Sale = () => {
   }, [Inputnameforsearch]);
 
   const handleSearchandChange = async () => {
-    setFormData({
-      ...formData,
-      description: Inputdescriptionforsearch,
-    });
-    if (Inputdescriptionforsearch) {
-      const response = await axiosInstance.post(
-        "/products/product/sortProductsfordescription",
-        { description: Inputdescriptionforsearch }
-      );
-      const filteredOrders = response.data.data;
-      console.log("Inputdescriptionforsearch : ", filteredOrders);
-      setMatchingProducts(filteredOrders);
-      setShowModaldescription(true);
-    } else {
-      setShowModaldescription(false);
+    try {
+      // Update the form data with the input description for search
+      setFormData({
+        ...formData,
+        description: Inputdescriptionforsearch,
+      });
+  
+      console.log("Searching for Inputdescriptionforsearch:", Inputdescriptionforsearch);
+  
+      if (Inputdescriptionforsearch) {
+        // Make an API request to search for products by description
+        const response = await axiosInstance.post(
+          "/products/product/sortProductsfordescription",
+          { description: Inputdescriptionforsearch }
+        );
+  
+        // Extract and validate the response data
+        const filteredOrders = response.data.data || [];
+        console.log("Filtered products:", filteredOrders);
+  
+        if (filteredOrders.length === 0) {
+          console.log("No matching products found.");
+          setMatchingProducts([]);
+        } else {
+          setMatchingProducts(filteredOrders);
+        }
+  
+        // Show the modal if there are results
+        setShowModaldescription(true);
+      } else {
+        console.log("Input description is empty. Hiding modal.");
+        setShowModaldescription(false);
+      }
+    } catch (error) {
+      console.error("Error while searching products by description:", error);
     }
   };
+  
 
   const handleMobileSearchChange = async () => {
     // const value = e.target.value;
