@@ -35,6 +35,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://client:80',
+'http://localhost',
   'http://apalabajar.shop',
   'https://apalabajar.shop',  
   'http://www.apalabajar.shop',

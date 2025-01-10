@@ -3,6 +3,8 @@ import { useEffect, useState, useRef } from "react";
 import InvoiceTest from "../component/invoicetest"; // Ensure this is the correct path
 import ReactToPrint from "react-to-print";
 import axiosInstance from "../axiosConfig";
+import mockDetails from "../component/data/Purchase";
+import sampleInvoiceData from "../component/data/gstData";
 const InvoiceSettings = () => {
   const [settings, setSettings] = useState({
     language: {
@@ -43,6 +45,7 @@ const InvoiceSettings = () => {
 
   const printRef = useRef();
   const componentRef = useRef();
+  const [GstBill,setGstBill] = useState(false);
   const [invoice, setInvoice] = useState(null);
   const [previewLanguage, setPreviewLanguage] = useState("english");
   const [LogoUpload, setLogoUploade] = useState(null);
@@ -104,10 +107,15 @@ const InvoiceSettings = () => {
 
   const handlePreviewPurchase = (language) => {
     setPreviewLanguage(language);
-    details.type = "purchase";
-    setInvoice(details);
+    setInvoice(mockDetails);
   };
-
+ const handlePreviewGstEnglish =(language)=>{
+  setPreviewLanguage(language);
+  setGstBill(true);
+  console.log(sampleInvoiceData)
+  setInvoice(sampleInvoiceData);
+  console.log(sampleInvoiceData)
+ }
   const handleChange = (e, section, subSection, field) => {
     const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
     setSettings((prev) => {
@@ -298,6 +306,12 @@ console.log(cloudName)
             >
               Preview Purchase (Marathi)
             </button>
+            <button
+              onClick={() => handlePreviewGstEnglish("English")}
+              className="bg-red-400 text-white px-6 py-2 rounded-md shadow hover:bg-green-700"
+            >
+              Preview Sale Gst (English)
+            </button>
           </div>
           <button
             onClick={handleSave}
@@ -312,6 +326,7 @@ console.log(cloudName)
         componentRef={componentRef}
         details={invoice}
         language={previewLanguage}
+        GstBill={GstBill}
       />
 
       <ReactToPrint

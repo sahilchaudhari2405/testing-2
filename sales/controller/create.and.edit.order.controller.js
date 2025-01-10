@@ -8,7 +8,7 @@ import { createClient, reduceClient } from "./Client.controller.js";
 import mongoose from "mongoose";
 
 import { getTenantModel } from "../database/getTenantModel.js";
-import { clientSchema } from "../../users/model/Client.model.js";
+import { clientSchema } from "../model/Client.model.js";
 import productSchema from "../model/product.model.js";
 import CounterUserSchema from "../model/user.model.js";
 import offlineOrderSchema from "../model/order.model.js";

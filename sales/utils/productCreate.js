@@ -1,4 +1,4 @@
-import categorySchema from "../../products/model/category.model.js";
+import categorySchema from "../model//category.model.js";
 import { getTenantModel } from "../database/getTenantModel.js";
 import productSchema from "../model/product.model.js";
 

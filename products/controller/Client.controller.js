@@ -1,4 +1,4 @@
-import { ClientPurchaseSchema, clientSchema, ClosingBalanceSchema } from "../../users/model/Client.model.js";
+import { ClientPurchaseSchema, clientSchema, ClosingBalanceSchema } from "../model/Client.model.js";
 import { getTenantModel } from "../database/getTenantModel.js";
 
 
