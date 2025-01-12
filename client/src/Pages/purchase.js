@@ -174,7 +174,8 @@ const Purchase = () => {
       saleRate:product.discountedPrice,
       purchaseRate:product.purchaseRate,
       hsn: product.HSN,
-      gst: product.GST,
+      sgst: product.SGST || "",
+      cgst: product.CGST || "",
       total: product.totalAmount,
     });
     // setProductDetails(product);
@@ -341,7 +342,8 @@ const Purchase = () => {
     MRP: "",
     profit: "",
     hsn: "",
-    gst: "",
+    sgst: "",
+    cgst:  "",
     total: "",
     amountpaid: "",
     image: null,
@@ -363,7 +365,8 @@ const Purchase = () => {
         profit:
         (productDetails.purchaseRate >0)?  productDetails.discountedPrice - productDetails.purchaseRate: 0,
         hsn: productDetails.HSN || "",
-        gst: productDetails.GST || "",
+        sgst: productDetails.SGST || "",
+        cgst: productDetails.CGST || "",
         amountpaid: "",
         image: null,
       });
@@ -400,7 +403,9 @@ const Purchase = () => {
       purchaseRate: productDetails.purchaseRate || "",
       profit:(productDetails.purchaseRate >0)?  productDetails.discountedPrice - productDetails.purchaseRate: 0,
       hsn: productDetails.HSN || "",
-      gst: productDetails.GST || "",
+      sgst: productDetails.SGST || "",
+      cgst: productDetails.CGST || "",
+
       amountpaid: "",
       image: null,
     });
@@ -518,7 +523,8 @@ const Purchase = () => {
             MRP: "",
             profit: "",
             hsn: "",
-            gst: "",
+            sgst:   "",
+            cgst:  "",
             amountpaid: "",
             image: null,
           });
@@ -946,15 +952,32 @@ const Purchase = () => {
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
-                htmlFor="gst"
+                htmlFor="sgst"
                 className="block text-gray-700 text-sm font-medium"
               >
-                GST%
+                SGST%
               </label>
               <input
                 type="text"
-                id="gst"
-                value={formData.gst}
+                id="sgst"
+                value={formData.sgst}
+                onChange={handleChange}
+                onKeyDown={handleKeys}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter GST percentage"
+              />
+            </div>
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="cgst"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                CGST%
+              </label>
+              <input
+                type="text"
+                id="cgst"
+                value={formData.cgst}
                 onChange={handleChange}
                 onKeyDown={handleKeys}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1023,7 +1046,12 @@ const Purchase = () => {
                   Profit%
                 </th>
                 <th className="p-3 border border-gray-600 text-left">HSN</th>
-                <th className="p-3 border border-gray-600 text-left">GST</th>
+                <th className="p-3 border border-gray-600 text-left">
+                  SGST%
+                </th>
+                <th className="p-3 border border-gray-600 text-left">
+                  CGST%
+                </th>
 
                 <th className="p-3 border border-gray-600 text-left">
                   Actions
@@ -1065,8 +1093,8 @@ const Purchase = () => {
                       {item.profit}
                     </td>
                     <td className="p-3 border border-gray-600">{item.hsn}</td>
-                    <td className="p-3 border border-gray-600">{item.gst}</td>
-
+                    <td className="p-3 border border-gray-600">{item.sgst}</td>
+                    <td className="p-3 border border-gray-600">{item.cgst}</td>
                     <td className="p-3 border border-gray-600 text-center">
                       <button
                         className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600 "

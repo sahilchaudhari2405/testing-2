@@ -6,7 +6,7 @@ const Offline_cartItemSchema = new mongoose.Schema({
   //   ref: "cart",
   //   required: true,
   // },
-  
+
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "products",
@@ -16,23 +16,23 @@ const Offline_cartItemSchema = new mongoose.Schema({
   //   type:String,
   //   required: true,
   // },
-  status:{
+  status: {
     type: String,
-    enum : ['OnGoing','OneTime'],
-    default: 'OneTime'
+    enum: ["OnGoing", "OneTime"],
+    default: "OneTime",
   },
   quantity: {
     type: Number,
     required: true,
     default: 1,
   },
-  OneUnit:{
-  type:Number,
-  required:true,
+  OneUnit: {
+    type: Number,
+    required: true,
   },
-  PayId:{
-          type:mongoose.Schema.Types.ObjectId,
-          ref: "AdvancePay",
+  PayId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AdvancePay",
   },
   price: {
     type: Number,
@@ -44,24 +44,25 @@ const Offline_cartItemSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    default:'normal',
+    default: "normal",
   },
-  GST:{
-    type:Number,
-    required:true,
+  CGST: {
+    type: Number,
+    required: true,
   },
-  finalPrice_with_GST:{
-  type:Number,
-  required:true,
+  SGST: {
+    type: Number,
+    required: true,
+  },
+  finalPrice_with_GST: {
+    type: Number,
+    required: true,
   },
   userId: {
-    type:mongoose.Schema.Types.ObjectId,
-        ref:"CounterUser",
-        required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "CounterUser",
+    required: true,
   },
-
 });
-
-
 
 export default Offline_cartItemSchema;

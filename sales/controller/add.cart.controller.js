@@ -62,8 +62,9 @@ const addToCart = asyncHandler(async (req, res) => {
       cartItem.quantity += 1;
       cartItem.price += product.price;
       cartItem.discountedPrice += cartItem.OneUnit;
-      cartItem.GST += product.GST;
-      cartItem.finalPrice_with_GST += cartItem.OneUnit + product.GST;
+      cartItem.SGST += ( cartItem.OneUnit*product.SGST)/100;
+      cartItem.CGST += ( cartItem.OneUnit*product.CGST)/100;
+      cartItem.finalPrice_with_GST += cartItem.OneUnit + ( (cartItem.OneUnit*(product.SGST+product.CGST))/100);
       cartItem.updatedAt = new Date();
       await cartItem.save();
     } else {
@@ -73,9 +74,10 @@ const addToCart = asyncHandler(async (req, res) => {
         discountedPrice: product.discountedPrice,
         userId: id,
         OneUnit: product.discountedPrice,
-        GST: product.GST,
+        SGST : ( product.discountedPrice*product.SGST)/100,
+        CGST : ( product.discountedPrice*product.CGST)/100,
         status:'OneTime',
-        finalPrice_with_GST: product.discountedPrice + product.GST,
+        finalPrice_with_GST: product.discountedPrice +( (product.discountedPrice*(product.SGST+product.CGST))/100),
         product: product._id,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -97,7 +99,7 @@ const addToCart = asyncHandler(async (req, res) => {
         status:'OneTime',
         totalPrice: cartItem.price,
         totalItem: 1,
-        GST: cartItem.GST,
+        GST: cartItem.SGST+cartItem.CGST,
         status: status,
         final_price_With_GST: cartItem.finalPrice_with_GST,
         totalDiscountedPrice: cartItem.discountedPrice,
@@ -109,8 +111,8 @@ const addToCart = asyncHandler(async (req, res) => {
         cart.cartItems.push(cartItem._id);
         cart.totalItem += 1;
       }
-      cart.GST += product.GST;
-      cart.final_price_With_GST += cartItem.OneUnit + product.GST;
+      cart.GST += (cartItem.OneUnit*(product.SGST+product.CGST))/100;
+      cart.final_price_With_GST += cartItem.OneUnit + ((cartItem.OneUnit*(product.SGST+product.CGST))/100);
       cart.totalPrice += product.price;
       cart.totalDiscountedPrice += cartItem.OneUnit;
       cart.discount += value;
@@ -139,7 +141,6 @@ const updateToCart = asyncHandler(async (req, res) => {
     quantity,
     price,
     discount,
-    GST,
     finalPrice_with_GST,
     OneUnit,
   } = req.body;
@@ -184,7 +185,8 @@ const updateToCart = asyncHandler(async (req, res) => {
       cartItem.quantity = 0;
       cartItem.price = 0;
       cartItem.discountedPrice = 0;
-      cartItem.GST = 0;
+      cartItem.SGST = 0;
+      cartItem.CGST = 0;
       cartItem.OneUnit = 0;
       (cartItem.type = "custom"), (cartItem.finalPrice_with_GST = 0);
       cartItem.updatedAt = new Date();
@@ -204,7 +206,7 @@ const updateToCart = asyncHandler(async (req, res) => {
     } else {
       value = product.discountedPrice - oldItem.OneUnit;
     }
-    (cart.GST -= oldItem.GST),
+    (cart.GST -= (oldItem.SGST+oldItem.CGST)),
       (cart.final_price_With_GST -= oldItem.finalPrice_with_GST);
     cart.totalPrice -= oldItem.price;
     cart.totalDiscountedPrice -= oldItem.discountedPrice;
@@ -218,13 +220,14 @@ const updateToCart = asyncHandler(async (req, res) => {
       cartItem.price = product.price * quantity;
       (cartItem.OneUnit = OneUnit),
         (cartItem.discountedPrice = discountedPrice);
-      cartItem.GST = GST * quantity;
+      cartItem.SGST =  ((OneUnit*quantity)*product.SGST)/100;
+      cartItem.CGST =  ((OneUnit*quantity)*product.CGST)/100;
       cartItem.type = "custom";
-      cartItem.finalPrice_with_GST = finalPrice_with_GST;
+      cartItem.finalPrice_with_GST =finalPrice_with_GST + ((OneUnit * quantity) * (product.SGST + product.CGST)) / 100;
       cartItem.updatedAt = new Date();
       await cartItem.save();
     }
-    cart.GST += cartItem.GST;
+    cart.GST += cartItem.SGST+cartItem.CGST;
     cart.final_price_With_GST += cartItem.finalPrice_with_GST;
     cart.totalPrice += cartItem.price;
     cart.totalDiscountedPrice += cartItem.discountedPrice;
@@ -474,7 +477,7 @@ const removeOneCart = asyncHandler(async (req, res) => {
       cart.totalPrice -= cartItem.price;
       cart.totalItem -= 1;
       cart.totalDiscountedPrice -= cartItem.discountedPrice;
-      cart.GST -= cartItem.GST;
+      cart.GST -= (cartItem.SGST+cartItem.CGST);
       cart.final_price_With_GST -= cartItem.finalPrice_with_GST;
       cart.discount -= value * cartItem.quantity;
       await cart.save();
@@ -589,8 +592,9 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
     if (cartItem.quantity > 1) {
       cartItem.quantity -= 1;
       cartItem.price -= product.price;
-      cartItem.GST -= product.GST;
-      cartItem.finalPrice_with_GST -= cartItem.OneUnit + product.GST;
+      cartItem.SGST -=(cartItem.OneUnit* product.SGST)/100;
+      cartItem.CGST-=(cartItem.OneUnit* product.CGST)/100
+      cartItem.finalPrice_with_GST -= (cartItem.OneUnit + ((cartItem.OneUnit*(product.SGST+product.CGST))/100));
       cartItem.discountedPrice -= cartItem.OneUnit;
       cartItem.updatedAt = new Date();
       await cartItem.save();
@@ -608,11 +612,11 @@ const removeItemQuantityCart = asyncHandler(async (req, res) => {
           value = product.discountedPrice - cartItem.OneUnit;
         }
         cart.totalPrice -= product.price;
-        cart.GST -= product.GST;
-        cart.final_price_With_GST -= cartItem.OneUnit + product.GST;
+        cart.GST -= (cartItem.OneUnit*(product.SGST+product.CGST))/100;
+        cart.final_price_With_GST -= cartItem.OneUnit + ((cartItem.OneUnit*(product.SGST+product.CGST))/100);
         cart.totalDiscountedPrice -= cartItem.OneUnit;
         cart.discount -= value;
-        await cart.save();
+        await cart.save(); 
       }
 
       return res

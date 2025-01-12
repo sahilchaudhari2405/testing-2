@@ -65,7 +65,6 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
 
     if (data) {
       const parsedData = JSON.parse(data);
-      console.log(parsedData);
       if (parsedData) {
         setSettings(parsedData); // Set parsed data if it's not null
       } else {
@@ -74,7 +73,7 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
     } else {
       fetchSettings(); // Fetch from API if no data in localStorage
     }
-  }, [settings]);
+  }, [details]);
 
   const [currentDate, setCurrentDate] = useState("");
   const sharedClasses = {
@@ -118,8 +117,6 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
     // Set the current date as the default value
     setCurrentDate(formattedDate);
   }, [details]);
-  console.log(GstBill)
-  console.log(language)
   return language == "Marathi" ? (
     details?.type === "customer" ? (
       <InvoicePreviewMarathiSales

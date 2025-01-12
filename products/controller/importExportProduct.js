@@ -123,7 +123,6 @@ export const importProducts = async (req, res) => {
         await Category.insertMany(uniqueCategories);
       }
     }
-
     if (newProducts.length) {
       await Product.insertMany(newProducts);
     }
@@ -188,7 +187,8 @@ function buildNewProductData(productData, category) {
       "float"
     ),
     HSN: parseField(isGSTPad ? productData.CESS : productData.HSN),
-    GST: parseField(isGSTPad ? productData.TAX : productData.GST, "float"),
+    CGST: parseField(isGSTPad ? productData.TAX/2 : productData.CGST, "float"),
+    SGST: parseField(isGSTPad ? productData.TAX/2 : productData.SGST, "float"),
     retailPrice: parseField(
       isGSTPad ? productData["Net Sale"] : productData.retailPrice,
       "float"

@@ -53,8 +53,8 @@ export const generateOrderWithProductCheck = async (req, res) => {
             const quantity = parseInt(productData.qty, 10) || 0;
             const purchaseRate = parseFloat(productData.purchaseRate, 10) || 0;
             const retailPrice = parseInt(productData.saleRate, 10) || 0;
-            const gst = parseInt(productData.gst, 10) || 0;
-
+            const cgst = parseInt(productData.cgst, 10) || 0;
+            const sgst = parseInt(productData.sgst, 10) || 0;
             if (existingProduct) {
                 // Update existing product in bulk operation
                 bulkOperations.push({
@@ -72,7 +72,8 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     productId: existingProduct._id,
                     quantity,
                     purchaseRate,
-                    GST: gst,
+                    SGST: sgst,
+                    CGST: cgst,
                     retailPrice,
                     AmountPaid: parseFloat(productData.amountpaid) || 0,
                 });
@@ -94,7 +95,8 @@ export const generateOrderWithProductCheck = async (req, res) => {
                             category: parentCategory._id,
                             purchaseRate,
                             profitPercentage: parseFloat(productData.profit, 10) || 0,
-                            GST: gst,
+                            SGST: sgst,
+                            CGST: cgst,
                             retailPrice,
                             totalAmount: parseInt(productData.total, 10) || 0,
                             amountPaid: parseInt(productData.amountpaid, 10) || 0,
@@ -110,7 +112,8 @@ export const generateOrderWithProductCheck = async (req, res) => {
                     productId,
                     quantity,
                     purchaseRate,
-                    GST: gst,
+                    SGST: sgst,
+                    CGST: cgst,
                     retailPrice,
                     AmountPaid: parseFloat(productData.amountpaid) || 0,
                 });
@@ -145,7 +148,10 @@ console.log(orderItems)
         // Calculate total amounts for the order
         const totalPrice = orderItems.reduce((sum, item) => sum + item.retailPrice * item.quantity, 0);
         const totalPurchaseRate = orderItems.reduce((sum, item) => sum + item.purchaseRate * item.quantity, 0);
-        const totalGST = orderItems.reduce((sum, item) => sum + item.GST * item.quantity, 0);
+        const totalGST = orderItems.reduce((sum, item) => {
+            const itemGST = (item.price * item.quantity * (item.CGST + item.SGST)) / 100;
+            return sum + itemGST;
+        }, 0);
         const totalItem = orderItems.length;
 
         const Amount = orderDetails.paymentType.cash + orderDetails.paymentType.Card + orderDetails.paymentType.UPI;

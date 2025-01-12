@@ -88,7 +88,11 @@ const productSchema = new mongoose.Schema({
     type: String,
     default: 'HSN'
   },
-  GST: {
+  CGST: {
+    type: Number,
+    default : 0
+  },
+  SGST: {
     type: Number,
     default : 0
   },

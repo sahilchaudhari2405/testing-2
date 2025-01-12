@@ -110,7 +110,8 @@ const OngoingSale = () => {
     purchaseRate: 50,
     profitPercentage: 0,
     HSN: "HSN Code",
-    GST: 0,
+    SGST: 0,
+    CGST:0,
     retailPrice: 64,
     totalAmount: 64,
     amountPaid: 0,
@@ -493,10 +494,10 @@ const handleSearchandChange = async () => {
         newState.product?.purchaseRate < parseInt(newState.OneUnit)
           ? parseInt(newState.OneUnit)
           : parseInt(newState.product?.purchaseRate + 1);
-      const gst = parseFloat(newState.GST || 0);
+
 
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
-      const totalValue = OneUnit * quantity + gst;
+      const totalValue = OneUnit * quantity;
       newState.finalPrice_with_GST = totalValue;
       const { product } = editItem;
       const discount =
@@ -769,7 +770,8 @@ const handleSearchandChange = async () => {
     saleRate: "",
     profit: "",
     hsn: "",
-    gst: "",
+    sgst: "",
+    cgst: "",
     total: "",
   });
 
@@ -839,7 +841,8 @@ const handleSearchandChange = async () => {
             saleRate: "",
             profit: "",
             hsn: "",
-            gst: "",
+            sgst: "",
+            cgst: "",
             total: "",
           });
  
@@ -953,7 +956,8 @@ const handleSearchandChange = async () => {
         saleRate: productDetails.discountedPrice || "",
         profit: productDetails.profit || "",
         hsn: productDetails.HSN,
-        gst: productDetails.GST || "",
+        sgst: productDetails.SGST || "",
+        cgst: productDetails.CGST || "",
       });
     }
   }, [productDetails]);
@@ -996,7 +1000,8 @@ const handleSearchandChange = async () => {
         saleRate: "",
         profit: "",
         hsn: "",
-        gst: "",
+        sgst: "",
+        cgst:"",
         total: "",
       })
     } catch (error) {
@@ -1027,7 +1032,8 @@ const handleSearchandChange = async () => {
         saleRate: "",
         profit: "",
         hsn: "",
-        gst: "",
+        sgst: "",
+        cgst:"",
         total: "",
       });
     }
@@ -1485,22 +1491,38 @@ const handleSearchandChange = async () => {
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
-                htmlFor="gst"
+                htmlFor="sgst"
                 className="block text-gray-700 text-sm font-medium"
               >
-                GST%
+                SGST%
               </label>
               <input
                 type="text"
-                id="gst"
-                value={formData.gst}
+                id="sgst"
+                value={formData.sgst}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter GST percentage"
               />
             </div>
-
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="cgst"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                CGST%
+              </label>
+              <input
+                type="text"
+                id="cgst"
+                value={formData.cgst}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter GST percentage"
+              />
+            </div>
             <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 mt-5">
               <button
                 type="submit"
@@ -1798,9 +1820,15 @@ const handleSearchandChange = async () => {
                                   </div>
                                   <div className="text-gray-700 mb-2 w-full justify-between flex ">
                                     <div>
-                                      <strong>GST:</strong>
+                                      <strong>SGST:</strong>
                                     </div>{" "}
-                                    <div> {selectedProduct.GST}%</div>
+                                    <div> {selectedProduct.SGST}%</div>
+                                  </div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex ">
+                                    <div>
+                                      <strong>CGST:</strong>
+                                    </div>{" "}
+                                    <div> {selectedProduct.CGST}%</div>
                                   </div>
                                   <div className="text-gray-700 mb-2 w-full justify-between flex ">
                                     <div>

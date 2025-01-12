@@ -22,7 +22,6 @@ import AdvancePaySchema from "../model/advancePay.js";
 const AddCustomOrder = asyncHandler(async (req, res) => {
     const { id } = req.user; // User ID
     const { orderId, productCode, discountedPrice, quantity, price, discount, GST, finalPriceWithGST, OneUnit,payment } = req.body; // Request Body with Custom Info
-     console.log(payment);
     try {
         // Fetch user from database
         const tenantId =req.user.tenantId
@@ -72,7 +71,8 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             
             order.totalPrice -= oldItem.price;
             order.totalDiscountedPrice -= oldItem.discountedPrice;
-            order.GST -= oldItem.GST;
+            order.CGST -= oldItem.CGST;
+            order.SGST -= oldItem.SGST;
             order.discount -= (value*oldItem.quantity);
             order.finalPriceWithGST -= oldItem.finalPriceWithGST;
             order.totalProfit -= oldItem.totalProfit;
@@ -86,6 +86,7 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
                 Mobile: order.mobileNumber,
                 Purchase: oldItem.finalPriceWithGST,
                 Closing: (order.paymentType.borrow >= oldItem.finalPriceWithGST) ? oldItem.finalPriceWithGST : 0,
+                tenantId:tenantId
             }
            const results = await reduceClient(data);
             // Check and deduct from borrow first
@@ -141,7 +142,8 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             orderItem.quantity = 0;
             orderItem.price = 0;
             orderItem.discountedPrice = 0;
-            orderItem.GST = 0;
+            orderItem.SGST = 0;
+            orderItem.CGST = 0;
             orderItem.finalPriceWithGST = 0;
             orderItem.purchaseRate=0;
             orderItem.totalProfit=0;
@@ -158,10 +160,11 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
             orderItem.OneUnit =OneUnit;
             orderItem.price = product.price * quantity;
             orderItem.discountedPrice = discountedPrice;
-            orderItem.GST = GST * quantity;
+            orderItem.SGST = ((OneUnit*quantity)*product.SGST)/100;
+            orderItem.CGST = ((OneUnit*quantity)*product.CGST)/100;
             orderItem.purchaseRate=product.purchaseRate*quantity;
             orderItem.totalProfit=(product.purchaseRate>1)? (OneUnit-product.purchaseRate)*quantity:(discountedPrice*0.10);
-            orderItem.finalPriceWithGST = finalPriceWithGST;
+            orderItem.finalPriceWithGST = finalPriceWithGST+(((OneUnit*quantity)*(product.SGST+product.CGST))/100);
             orderItem.updatedAt = new Date();
             await orderItem.save();
         } else {
@@ -175,8 +178,9 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
                 purchaseRate:product.purchaseRate*quantity,
                 discountedPrice: discountedPrice,
                 totalProfit:(product.purchaseRate)>1? (OneUnit-product.purchaseRate)*quantity:(discountedPrice*0.10),
-                GST: GST * quantity,
-                finalPriceWithGST: finalPriceWithGST,
+                CGST: ((OneUnit*quantity)*product.CGST)/100,
+                SGST: ((OneUnit*quantity)*product.SGST)/100,
+                finalPriceWithGST: finalPriceWithGST+(((OneUnit*quantity)*(product.SGST+product.CGST))/100),
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
@@ -188,12 +192,12 @@ const AddCustomOrder = asyncHandler(async (req, res) => {
         order.user = id;
         order.totalPrice += orderItem.price;
         order.totalDiscountedPrice += discountedPrice;
-        order.GST += orderItem.GST;
+        order.GST += orderItem.SGST+orderItem.CGST;
         order.discount+=discount,
-        order.finalPriceWithGST += finalPriceWithGST;
+        order.finalPriceWithGST +=orderItem.finalPriceWithGST;
         order.paymentType.cash += payment.cash;
         order.paymentType.Card+=payment.card;
-        order.paymentType.UPI+=payment.upi,
+        order.paymentType.UPI+=payment.upi,         
         order.paymentType.borrow+=payment.borrow,
         order.totalProfit += orderItem.totalProfit;
         order.totalPurchaseRate += orderItem.purchaseRate;
@@ -284,9 +288,10 @@ const AddOrder = asyncHandler(async (req, res) => {
             existingOrderItem.quantity += 1;
             existingOrderItem.price += product.price;
             existingOrderItem.discountedPrice += oneUnit;
-            existingOrderItem.GST += product.GST;
+            existingOrderItem.SGST += (oneUnit*product.SGST)/100;
+            existingOrderItem.CGST+=(oneUnit*product.CGST)/100;
             existingOrderItem.purchaseRate+=product.purchaseRate;
-            existingOrderItem.finalPriceWithGST += (oneUnit + product.GST);
+            existingOrderItem.finalPriceWithGST +=oneUnit + ((oneUnit*(product.SGST+product.CGST))/100);
             existingOrderItem.updatedAt = new Date();
              
             // Recalculate totalProfit for existing items
@@ -301,9 +306,10 @@ const AddOrder = asyncHandler(async (req, res) => {
                 quantity: 1,
                 price: product.price,
                 purchaseRate: product.purchaseRate,
-                GST: product.GST,
+                SGST :(product.discountedPrice*product.SGST)/100,
+                CGST :(product.discountedPrice*product.CGST)/100,
                 OneUnit:product.discountedPrice,
-                finalPriceWithGST: product.discountedPrice + product.GST,
+                finalPriceWithGST: product.discountedPrice +((product.discountedPrice*(product.SGST+product.CGST))/100),
                 discountedPrice: product.discountedPrice,
                 userId: id,
                 totalProfit:(product.purchaseRate)>1? (oneUnit-product.purchaseRate):(product.discountedPrice*0.10), // Ensure totalProfit is set
@@ -329,10 +335,10 @@ const AddOrder = asyncHandler(async (req, res) => {
         order.totalPrice += product.price;
         order.totalDiscountedPrice += oneUnit;
         order.totalItem += 1;
-        order.GST += product.GST;
+        order.GST += ((oneUnit*(product.SGST+product.CGST))/100);
         order.discount+=value;
-        order.paymentType.cash += (oneUnit + product.GST);
-        order.finalPriceWithGST += (oneUnit + product.GST);
+        order.paymentType.cash += (oneUnit + ((oneUnit*(product.SGST+product.CGST))/100));
+        order.finalPriceWithGST += (oneUnit +((oneUnit*(product.SGST+product.CGST))/100));
         order.totalPurchaseRate += product.purchaseRate;
         order.totalProfit += (product.purchaseRate)>1? (oneUnit-product.purchaseRate):(oneUnit*0.10);
         order.updatedAt = new Date();
@@ -419,7 +425,8 @@ const placeOrder = asyncHandler(async (req, res) => {
                 quantity: cartItem.quantity,
                 price: cartItem.price,
                 purchaseRate: product.purchaseRate * cartItem.quantity,
-                GST: cartItem.GST,
+                SGST: cartItem.SGST,
+                CGST: cartItem.CGST,
                 OneUnit: cartItem.OneUnit,
                 totalProfit:TotalProfit,
                 finalPriceWithGST: cartItem.finalPrice_with_GST,
@@ -539,10 +546,11 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
         if (cartItem.quantity > 1) {
             cartItem.quantity -= 1;
             cartItem.price -= product.price;
-            cartItem.GST -= product.GST;
+            cartItem.SGST -= ((oneUnit*product.SGST)/100);
+            cartItem.CGST -= ((oneUnit*product.CGST)/100);
             cartItem.purchaseRate -= product.purchaseRate;
             cartItem.totalProfit -= Math.max(0, (oneUnitProfit));
-            cartItem.finalPriceWithGST -= (oneUnit + product.GST);
+            cartItem.finalPriceWithGST -= (oneUnit +  ((oneUnit*(product.CGST+product.SGST))/100));
             cartItem.discountedPrice -= oneUnit;
             cartItem.updatedAt = new Date();
             product.quantity += 1;
@@ -580,11 +588,11 @@ const removeItemQuantityOrder = asyncHandler(async (req, res) => {
 
                     cart.totalDiscountedPrice -= oneUnit;
                     cart.totalPurchaseRate -= product.purchaseRate;
-                    cart.GST -= product.GST;
+                    cart.GST -= ((oneUnit*(product.CGST+product.SGST))/100);
                     cart.discount -= discount;
                     cart.totalProfit -= Math.max(0, oneUnitProfit);
-                    cart.finalPriceWithGST -= (oneUnit + product.GST);
-                    let remainingAmount = (oneUnit + product.GST); // Start with the item's price
+                    cart.finalPriceWithGST -= (oneUnit + ((oneUnit*(product.CGST+product.SGST))/100));
+                    let remainingAmount = (oneUnit + ((oneUnit*(product.CGST+product.SGST))/100)); // Start with the item's price
 
 
                     // First, check and deduct from Borrow
@@ -703,7 +711,7 @@ const RemoveOneItemOnOrder = asyncHandler(async (req, res) => {
                 cart.totalPrice -= cartItem.price;
             cart.totalDiscountedPrice -= cartItem.discountedPrice;
             cart.totalPurchaseRate -= cartItem.purchaseRate;
-            cart.GST -= cartItem.GST;
+            cart.GST -= cartItem.SGST+cartItem.CGST;
             cart.totalItem -= 1,
             cart.discount -= discount;
             cart.totalProfit -= cartItem.totalProfit;

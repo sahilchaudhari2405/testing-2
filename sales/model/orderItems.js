@@ -24,7 +24,11 @@ const offlineOrderItemSchema = new Schema({
         type: String,
         default:'normal'
       },
-    GST: {
+    CGST: {
+        type: Number,
+        required: true, 
+    },
+    SGST: {
         type: Number,
         required: true, 
     },
