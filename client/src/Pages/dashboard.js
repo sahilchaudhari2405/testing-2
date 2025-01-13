@@ -70,7 +70,7 @@ const Dashboard = () => {
     localStorage.removeItem('token');
     axiosInstance.post('/auth/logout').catch((err) => console.error(err));
     // window.location.href = '/login';
-    navigate('/login');
+    navigate('/');
   };
 
   React.useEffect(() => {

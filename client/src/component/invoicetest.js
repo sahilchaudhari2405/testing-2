@@ -74,7 +74,7 @@ const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill }) => {
     } else {
       fetchSettings(); // Fetch from API if no data in localStorage
     }
-  }, [settings]);
+  }, [details]);
 
   const [currentDate, setCurrentDate] = useState("");
   const sharedClasses = {

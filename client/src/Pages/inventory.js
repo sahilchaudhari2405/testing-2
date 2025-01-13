@@ -62,7 +62,7 @@ const Inventory = () => {
     localStorage.removeItem('token');
     axiosInstance.post('/users/auth/logout').catch((err) => console.error(err));
     // window.location.href = '/login';
-    navigate('/login');
+    navigate('/');
   };
 
   React.useEffect(() => {
@@ -75,7 +75,7 @@ const Inventory = () => {
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
     } else { 
-      navigate('/login');
+      navigate('/');
     }
   }, [navigate]);
 
