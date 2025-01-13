@@ -111,12 +111,37 @@ const OngoingSale = () => {
     profitPercentage: 0,
     HSN: "HSN Code",
     SGST: 0,
-    CGST:0,
+    CGST: 0,
     retailPrice: 64,
     totalAmount: 64,
     amountPaid: 0,
     __v: 0,
   });
+  const [BankDetails, setBankDetails] = useState({
+    GSTIN: "",
+    PAN_Number: "",
+  });
+  const [SHIPTO, setSHIPTO] = useState({
+    Name: "",
+    address: "",
+    Pin: "",
+  });
+  const handleChangeGSTBILL = (e) => {
+    const { name, value } = e.target;
+    const [group, field] = name.split("."); // Expecting name in format: group.field
+
+    if (group === "BankDetails") {
+      setBankDetails((prevState) => ({
+        ...prevState,
+        [field]: value,
+      }));
+    } else if (group === "SHIPTO") {
+      setSHIPTO((prevState) => ({
+        ...prevState,
+        [field]: value,
+      }));
+    }
+  };
   useEffect(() => {
     const fetchSettings = async () => {
       try {
@@ -133,7 +158,7 @@ const OngoingSale = () => {
         console.error("Error fetching settings:", error);
       }
     };
-  
+
     const data = localStorage.getItem("invoiceSettings");
     if (data) {
       try {
@@ -148,7 +173,7 @@ const OngoingSale = () => {
       fetchSettings();
     }
   }, [Address]); // Removed `Address` dependency to avoid redundant calls
-  
+
   const handleTokenExpiration = () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -221,23 +246,20 @@ const OngoingSale = () => {
         ...finalform,
         name: Inputnameforsearch,
       });
-  
-  
+
       if (Inputnameforsearch) {
         const response = await axiosInstance.post(
           "/users/admin/SearchClientSale",
           { alphabet: Inputnameforsearch }
         );
-  
-        const distinctOrders = response.data.data || [];
 
-  
+        const distinctOrders = response.data.data || [];
         if (distinctOrders.length === 0) {
           setMatchingOrders([]);
         } else {
           setMatchingOrders(distinctOrders);
         }
-  
+
         setShowModal(true);
       } else {
         setShowModal(false);
@@ -246,46 +268,43 @@ const OngoingSale = () => {
       console.error("Error occurred while searching offline orders:", error);
     }
   };
-  
-const searchOfflineOrdersForMobileNumber = async () => {
-  try {
-    // Update the final form with the mobile number for search
-    setFinal({
-      ...finalform,
-      Mobile: Inputmobilenumberforsearch,
-    });
 
+  const searchOfflineOrdersForMobileNumber = async () => {
+    try {
+      // Update the final form with the mobile number for search
+      setFinal({
+        ...finalform,
+        Mobile: Inputmobilenumberforsearch,
+      });
 
-    if (Inputmobilenumberforsearch) {
-      const response = await axiosInstance.post(
-        "/users/admin/SearchClientSale",
-        { number: Inputmobilenumberforsearch }
-      );
+      if (Inputmobilenumberforsearch) {
+        const response = await axiosInstance.post(
+          "/users/admin/SearchClientSale",
+          { number: Inputmobilenumberforsearch }
+        );
 
-      // Ensure distinctOrders is always an array
-      const distinctOrders = response.data.data || [];
+        // Ensure distinctOrders is always an array
+        const distinctOrders = response.data.data || [];
 
+        if (distinctOrders.length === 0) {
+          setMatchingMobileNumbers([]);
+        } else {
+          setMatchingMobileNumbers(distinctOrders);
+        }
 
-      if (distinctOrders.length === 0) {
-        setMatchingMobileNumbers([]);
+        // Show the mobile number modal if results are found
+        setShowMobileModal(true);
       } else {
-        setMatchingMobileNumbers(distinctOrders);
+        // Hide the modal if input is empty
+        setShowMobileModal(false);
       }
-
-      // Show the mobile number modal if results are found
-      setShowMobileModal(true);
-    } else {
-      // Hide the modal if input is empty
-      setShowMobileModal(false);
+    } catch (error) {
+      console.error(
+        "Error occurred while searching offline orders by mobile number:",
+        error
+      );
     }
-  } catch (error) {
-    console.error(
-      "Error occurred while searching offline orders by mobile number:",
-      error
-    );
-  }
-};
-
+  };
 
   useEffect(() => {
     setMatchingProducts([]);
@@ -302,36 +321,34 @@ const searchOfflineOrdersForMobileNumber = async () => {
     searchOfflineOrders();
   }, [Inputnameforsearch]);
 
-const handleSearchandChange = async () => {
-  try {
-    // Update the form data with the input description
-    setFormData({
-      ...formData,
-      description: Inputdescriptionforsearch,
-    });
+  const handleSearchandChange = async () => {
+    try {
+      // Update the form data with the input description
+      setFormData({
+        ...formData,
+        description: Inputdescriptionforsearch,
+      });
 
-    if (Inputdescriptionforsearch) {
-      const response = await axiosInstance.post(
-        "/products/product/sortProductsfordescription",
-        { description: Inputdescriptionforsearch }
-      );
+      if (Inputdescriptionforsearch) {
+        const response = await axiosInstance.post(
+          "/products/product/sortProductsfordescription",
+          { description: Inputdescriptionforsearch }
+        );
 
-      // Ensure filteredOrders is always an array
-      const filteredOrders = response.data.data || [];
+        // Ensure filteredOrders is always an array
+        const filteredOrders = response.data.data || [];
 
-
-      // Update state with matching products and show the modal if there are results
-      setMatchingProducts(filteredOrders);
-      setShowModaldescription(filteredOrders.length > 0);
-    } else {
-      // Hide the modal if input is empty
-      setShowModaldescription(false);
+        // Update state with matching products and show the modal if there are results
+        setMatchingProducts(filteredOrders);
+        setShowModaldescription(filteredOrders.length > 0);
+      } else {
+        // Hide the modal if input is empty
+        setShowModaldescription(false);
+      }
+    } catch (error) {
+      console.error("Error while searching products by description:", error);
     }
-  } catch (error) {
-    console.error("Error while searching products by description:", error);
-  }
-};
-
+  };
 
   const handleMobileSearchChange = async () => {
     // const value = e.target.value;
@@ -382,26 +399,28 @@ const handleSearchandChange = async () => {
   // };
 
   const handleSelectOrder = async (Client) => {
-
-
     // Set basic client information
     setClinetId(Client._id);
+    console.log(Client)
     setFinal({
       ...finalform,
       name: Client.Name,
       Date: Client.Date || currentDate,
       Mobile: Client.Mobile || "",
       ShipTo: Client.ShipTo || "",
-      Address: Client.Address || "Shrigonda",
-      State: Client.State || "Maharashtra",
+      Address: Client.Address || "",
+      State: Client.State || "",
+      Pin: Client.Pin || "",
     });
-
+  setBankDetails(
+    {...Client.BankDetails }
+  )
+  setSHIPTO({...Client.SHIPTO})
     try {
       // Fetch advance payment data for the selected client
       const response = await axiosInstance.get(
         `/sales/AdvancePay/advance-payment/${Client._id}`
       );
-
 
       // Get the first object from advancePay and cart (since they are arrays)
       const { cart, advancePay } = response.data.advancePayment;
@@ -410,7 +429,6 @@ const handleSearchandChange = async () => {
       const advancePayData = advancePay; // Accessing the first object in advancePay array
       const AdvancePayId = response.data.advancePayment._id;
       // Log the fetched data to ensure it's being received correctly
-
 
       // Set the advance payment and cart details if available
       if (advancePayData) {
@@ -431,21 +449,21 @@ const handleSearchandChange = async () => {
     } catch (error) {
       // Handle error while fetching advance payment details
       if (error.response && error.response.status === 404) {
-      setAdvancePaid([]);
-      setAdvancePaidId("");
-      setMessage("");
-      setCardPay("");
-      setCashPay("");
-      setUPIPay("");
-      setBorrow("");
-      setDiscount("");
-      setTotalPrice("");
-      setCartId("");
-      setGst("");
-      setDetails([]);
-      setFinalTotal("");
+        setAdvancePaid([]);
+        setAdvancePaidId("");
+        setMessage("");
+        setCardPay("");
+        setCashPay("");
+        setUPIPay("");
+        setBorrow("");
+        setDiscount("");
+        setTotalPrice("");
+        setCartId("");
+        setGst("");
+        setDetails([]);
+        setFinalTotal("");
         console.error("No data found for the given Client ID.");
-        dispatch(fetchCart({ PayId: '', uId: UserId }));
+        dispatch(fetchCart({ PayId: "", uId: UserId }));
       } else {
         console.error("Error fetching advance payment details:", error);
       }
@@ -494,7 +512,6 @@ const handleSearchandChange = async () => {
         newState.product?.purchaseRate < parseInt(newState.OneUnit)
           ? parseInt(newState.OneUnit)
           : parseInt(newState.product?.purchaseRate + 1);
-
 
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
       const totalValue = OneUnit * quantity;
@@ -579,7 +596,7 @@ const handleSearchandChange = async () => {
     // Reset details at the beginning
     setDetails([]);
     setDiscount(0);
-    setTotalPrice( 0);
+    setTotalPrice(0);
     setCartId();
     setGst(0);
     setFinalTotal(0);
@@ -589,7 +606,6 @@ const handleSearchandChange = async () => {
       if (Array.isArray(productsData) && productsData.length > 0) {
         setDetails(productsData); // Update details if productsData is valid
       }
-
       const summary = items[1];
       if (summary) {
         setDiscount(summary.discount || 0);
@@ -626,7 +642,7 @@ const handleSearchandChange = async () => {
     if (invoice && printRef.current) {
       printRef.current.handlePrint();
     }
-    setInvoice(null)
+    setInvoice(null);
   }, [invoice]);
 
   const handleKeys = (e) => {
@@ -687,7 +703,6 @@ const handleSearchandChange = async () => {
   useEffect(() => {
     fetchAllProducts();
   }, []);
-
 
   useEffect(() => {
     // Get the current date in the required format (YYYY-MM-DD)
@@ -781,9 +796,9 @@ const handleSearchandChange = async () => {
     Date: currentDate,
     Mobile: "",
     ShipTo: "",
-    Address: "Shrigonda",
-    State: "Maharastra",
-    GSTNo: "",
+    Address: "",
+    State: "",
+    Pin: "",
   });
 
   const bill = async () => {
@@ -804,7 +819,6 @@ const handleSearchandChange = async () => {
         finalform.Address
       ) {
         try {
-        
           const createdOrder = await dispatch(
             createOrder({
               paymentType: {
@@ -817,6 +831,8 @@ const handleSearchandChange = async () => {
               PayId: AdvancePaidId,
               uId: UserId,
               status: "OnGoing",
+              BankDetails,
+              SHIPTO,
             })
           ).unwrap();
           setInvoice(createdOrder.data);
@@ -827,8 +843,8 @@ const handleSearchandChange = async () => {
             Date: currentDate,
             Mobile: "",
             ShipTo: "",
-            State: "Maharastra",
-            GSTNo: "",
+            State: "",
+            Pin: "",
           });
           setFormData({
             barcode: "",
@@ -845,7 +861,15 @@ const handleSearchandChange = async () => {
             cgst: "",
             total: "",
           });
- 
+         setBankDetails({
+          GSTIN:"",
+          PAN_Number:"",
+         });
+         setSHIPTO({
+          Name:"",
+          address:"",
+          Pin:"",
+         })
           // dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
           setMessage("");
           setCardPay("");
@@ -886,9 +910,10 @@ const handleSearchandChange = async () => {
   };
 
   const handleMarathiPrint = async () => {
+
     setPrint(true);
     SetLanguage("Marathi");
-   await bill();
+    await bill();
   };
 
   const handleChange = (e) => {
@@ -928,7 +953,7 @@ const handleSearchandChange = async () => {
     dispatch(
       removeFromCart({ itemId: id, PayId: AdvancePaidId, uId: UserId })
     ).then(() => {
-      setDetails()
+      setDetails();
       dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
     });
   };
@@ -964,16 +989,15 @@ const handleSearchandChange = async () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const id = productDetails?.BarCode || null; // Use null if BarCode is undefined
     const status = "Ongoing";
-  
+
     const data = {
       PayId: AdvancePaidId,
       uId: UserId,
     };
-  
-  
+
     try {
       // Dispatch the addToCart action
       await dispatch(
@@ -985,7 +1009,7 @@ const handleSearchandChange = async () => {
           formData,
         })
       ).unwrap();
-  
+
       // Fetch the updated cart after successfully adding the product
       dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
       toast.success("Product added to cart successfully");
@@ -1001,23 +1025,20 @@ const handleSearchandChange = async () => {
         profit: "",
         hsn: "",
         sgst: "",
-        cgst:"",
+        cgst: "",
         total: "",
-      })
+      });
     } catch (error) {
       console.error("Error adding product to cart:", error);
       toast.error(error.message || "Failed to add product to cart");
     }
-  
+
     setProductDetails(null); // Reset productDetails after submission
   };
-  
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-
       if (e.target.value.trim() != "") {
-
         fetchProducts(e.target.value);
       }
 
@@ -1033,7 +1054,7 @@ const handleSearchandChange = async () => {
         profit: "",
         hsn: "",
         sgst: "",
-        cgst:"",
+        cgst: "",
         total: "",
       });
     }
@@ -1089,17 +1110,16 @@ const handleSearchandChange = async () => {
         amount,
         AdvancePaidId,
         date: data,
-        time: timeData, 
+        time: timeData,
       });
-      const { advancePay,_id } = response.data.advancePayment;
+      const { advancePay, _id } = response.data.advancePayment;
 
       const advancePayData = advancePay;
-
 
       // Set the advance payment and cart details if available
       if (advancePayData) {
         setAdvancePaid(advancePayData); // Set the advance paid amount
-        setAdvancePaidId(_id)
+        setAdvancePaidId(_id);
       }
       setAdvancePay();
       setBlocking(false);
@@ -1164,7 +1184,6 @@ const handleSearchandChange = async () => {
               {showModal && (
                 <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
                   {matchingOrders?.length > 0 ? (
-                    (
                     matchingOrders.map((Client) => (
                       <div
                         key={Client._id}
@@ -1173,7 +1192,7 @@ const handleSearchandChange = async () => {
                       >
                         {Client.Name}
                       </div>
-                    )))
+                    ))
                   ) : (
                     <div
                       key="noresultsfounds"
@@ -1238,17 +1257,6 @@ const handleSearchandChange = async () => {
               )}
             </div>
             <div>
-              <label className=" mr-2 text-gray-700 font-medium">Ship To</label>
-              <input
-                type="text"
-                id="ShipTo"
-                value={finalform.ShipTo}
-                onChange={handleFinal}
-                onKeyDown={handleKeys}
-                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
               <label className=" mr-2 text-gray-700 font-medium">Address</label>
               <input
                 type="text"
@@ -1265,6 +1273,80 @@ const handleSearchandChange = async () => {
                 id="State"
                 value={finalform.State}
                 onChange={handleFinal}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">PinCode</label>
+              <input
+                type="text"
+                id="Pin"
+                value={finalform.Pin}
+                onChange={handleFinal}
+                onKeyDown={handleKeys}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">GSTIN</label>
+              <input
+                type="text"
+                name="BankDetails.GSTIN"
+                placeholder="GSTIN"
+                value={BankDetails.GSTIN}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                PAN Number
+              </label>
+              <input
+                type="text"
+                name="BankDetails.PAN_Number"
+                placeholder="PAN Number"
+                value={BankDetails.PAN_Number}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO Name
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.Name"
+                placeholder="Name"
+                value={SHIPTO.Name}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO Address
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.address"
+                placeholder="Address"
+                value={SHIPTO.address}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO PinCode
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.Pin"
+                placeholder="Pin"
+                value={SHIPTO.Pin}
+                onChange={handleChangeGSTBILL}
                 className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               ></input>
             </div>
@@ -1542,11 +1624,10 @@ const handleSearchandChange = async () => {
                 Total Items Quantity:{" "}
               </span>
               <span className="text-primary px-3">
-  {details && details.length > 0
-    ? details.reduce((total, item) => total + item.quantity, 0)
-    : 0}
-</span>
-
+                {details && details.length > 0
+                  ? details.reduce((total, item) => total + item.quantity, 0)
+                  : 0}
+              </span>
             </div>
             <Button
               variant="contained"
@@ -2029,9 +2110,8 @@ const handleSearchandChange = async () => {
           language={language}
         />
 
-
         <ReactToPrint
-          trigger={() => <button style={{ display: 'none' }} />}
+          trigger={() => <button style={{ display: "none" }} />}
           content={() => componentRef.current}
           ref={printRef}
         />

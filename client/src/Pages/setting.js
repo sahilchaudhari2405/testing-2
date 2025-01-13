@@ -230,9 +230,7 @@ const InvoiceSettings = () => {
   const handlePreviewGstEnglish = (language) => {
     setPreviewLanguage(language);
     setGstBill(true);
-    console.log(sampleInvoiceData);
-    setInvoice(sampleInvoiceData);
-    console.log(sampleInvoiceData);
+    setInvoice(details);
   };
   const handleChange = (e, section, subSection, field, subField) => {
     const value =
@@ -344,41 +342,110 @@ const InvoiceSettings = () => {
   };
 
   const details = {
-    type: "customer",
-    Name: "John Doe",
-    Address: "123 Main Street, Springfield, IL",
-    mobileNumber: "+1234567890",
-    email: "john.doe@example.com",
+    paymentType: {
+      cash: 115,
+      Card: null,
+      UPI: null,
+      borrow: null
+    },
+    _id: "67855e1e39bc841f0cbef87a",
+    user: "67827a9cc45397e095966c46",
+    ClinetID: {
+      _id: "67835d95d97b7ac3c9b588b3",
+      Name: "sahil chaudhari",
+      Address: "gaol bazar, chandrapur",
+      State: "Maharastra",
+      Mobile: 9373576380,
+      ClosingBalance: [
+        "67835d95d97b7ac3c9b588af"
+      ],
+      CompletePurchase: [
+        "67835d95d97b7ac3c9b588b1"
+      ],
+      totalCompletePurchase: 2516,
+      totalClosingBalance: 0,
+      createdAt: "2025-01-12T06:13:41.950Z",
+      updatedAt: "2025-01-13T18:40:30.882Z",
+      Email: "SahilChaudhari@gmail.com",
+      Pin: "442402",
+      BankDetails: {
+        GSTIN: "AFUDS222",
+        PAN_Number: "SDFSAF"
+      },
+      SHIPTO: {
+        Name: "VEDANT CHAUDHARI",
+        address: "AT POST MARDA",
+        Pin: "442403"
+      }
+    },
     orderItems: [
       {
-        product: { title: "Product 1" },
-        quantity: 2,
-        discountedPrice: 200,
-        price: 250,
-        GST: 18,
-      },
-      {
-        product: { title: "Product 2" },
+        _id: "67855e1e39bc841f0cbef878",
+        product: {
+          _id: "67827df17dd3eea565ee3c7b",
+          title: "DABUR LAL TEL 100ML",
+          description: "DABUR LAL TEL 100ML",
+          price: 120,
+          discountedPrice: 115,
+          discountPercent: 0,
+          weight: 0,
+          quantity: -3,
+          brand: null,
+          imageUrl: "https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png",
+          slug: "DABUR LAL TEL 100ML",
+          ratings: [],
+          reviews: [],
+          numRatings: 0,
+          category: "67827ddd7dd3eea565ee3a0d",
+          BarCode: "8901207003875",
+          stockType: null,
+          unit: "PCS",
+          purchaseRate: 98.597,
+          profitPercentage: 0,
+          HSN: '220',
+          CGST: 8,
+          SGST: 8,
+          retailPrice: 115,
+          totalAmount: 115,
+          amountPaid: 0
+        },
         quantity: 1,
-        discountedPrice: 150,
-        price: 180,
-        GST: 18,
-      },
+        purchaseRate: 98.597,
+        price: 120,
+        type: "normal",
+        CGST: 12,
+        SGST: 12,
+        totalProfit: 16.403000000000006,
+        OneUnit: 115,
+        discountedPrice: 115,
+        finalPriceWithGST: 145,
+        userId: "67827a9cc45397e095966c46"
+      }
     ],
-    totalPrice: 500,
-    discount: 50,
-    GST: 90,
-    finalPriceWithGST: 540,
-    paymentType: { cash: 200, Card: 150, UPI: 100, borrow: 90 },
+    Name: "sahil chaudhari",
+    mobileNumber: 9373576380,
+    email: "No",
+    orderDate: "2025-01-13T18:40:30.482Z",
+    totalPrice: 120,
+    totalDiscountedPrice: 115,
+    totalPurchaseRate: 98.597,
+    type: "customer",
+    GST: 111,
+    discount: 5,
+    orderStatus: "first time",
+    totalItem: 1,
+    totalProfit: 16.403000000000006,
+    finalPriceWithGST: 115,
+    createdAt: "2025-01-13T18:40:30.485Z",
+    updatedAt: "2025-01-13T18:40:30.487Z"
   };
-
+  
   return (
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="container mx-auto max-w-6xl bg-white shadow-lg rounded-lg p-8">
         <h1 className="text-3xl font-semibold text-gray-800 mb-6">
           Invoice Settings
         </h1>
-
         {/* Language Settings */}
         <div className="mb-10">
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">

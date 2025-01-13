@@ -7,6 +7,11 @@ const offlineOrderSchema = new Schema({
         ref: "CounterUser",
         // required: true,
     },
+    ClinetID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Client",
+        // required: true,
+    },
     orderItems: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "OfflineOrderItem",

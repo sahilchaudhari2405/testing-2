@@ -1,6 +1,6 @@
 import React from "react";
 import Barcode from "react-barcode";
-import logo from '../../logo.png'
+import logo from "../../logo.png";
 const InvoicePreviewMarathiSales = ({
   componentRef,
   settings,
@@ -15,7 +15,7 @@ const InvoicePreviewMarathiSales = ({
         ref={componentRef}
         className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black"
       >
-        {settings.displayOptions.showLogo && (
+        {settings.Sale.displayOptions.showLogo && (
           <div className="w-24 h-24 border flex items-center justify-center">
             <img src={settings.Logo || logo} alt="लोगो वरती घाला" />
           </div>
@@ -25,10 +25,8 @@ const InvoicePreviewMarathiSales = ({
           className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4} justify-center`}
         >
           <div className="flex flex-col items-center">
-            <h1 className="text-2xl font-bold mt-2">
-              {invoiceDetails.title}
-            </h1>
-            {settings.displayOptions.address &&
+            <h1 className="text-2xl font-bold mt-2">{invoiceDetails.title}</h1>
+            {settings.Sale.displayOptions.address &&
               invoiceDetails.address.map((line, index) => (
                 <p key={index} dangerouslySetInnerHTML={{ __html: line }}></p>
               ))}
@@ -51,7 +49,7 @@ const InvoicePreviewMarathiSales = ({
               <span className="font-bold">चलाकाचे नाव: </span>
               {details.Name?.toUpperCase()}
             </p>
-            {settings.displayOptions.address && (
+            {settings.Sale.displayOptions.address && (
               <p>
                 <span className="font-bold">पत्ता: </span>
                 {details.Address?.toUpperCase()}
@@ -61,13 +59,13 @@ const InvoicePreviewMarathiSales = ({
 
           {/* Right Column */}
           <div className="flex flex-col items-start">
-            {settings.displayOptions.mobileNumber && (
+            {settings.Sale.displayOptions.mobileNumber && (
               <p>
                 <span className="font-bold">फोन: </span>
                 {details.mobileNumber}
               </p>
             )}
-            {settings.displayOptions.email && (
+            {settings.Sale.displayOptions.email && (
               <p>
                 <span className="font-bold">ईमेल: </span>
                 {details.email}
@@ -81,16 +79,16 @@ const InvoicePreviewMarathiSales = ({
             <tr className="bg-gray-800 text-white">
               <th className="border p-1">वर्णन</th>
               <th className="border p-1">प्रमाण</th>
-              {settings.productDataVisibility.unitPrice && (
+              {settings.Sale.productDataVisibility.unitPrice && (
                 <th className="border p-1">युनिट किंमत</th>
               )}
-              {settings.productDataVisibility.GST && (
+              {settings.Sale.productDataVisibility.GST && (
                 <th className="border p-1">जीएसटी</th>
               )}
-              {settings.productDataVisibility.Discount && (
+              {settings.Sale.productDataVisibility.Discount && (
                 <th className="border p-1">सवलत</th>
               )}
-              {settings.productDataVisibility.price && (
+              {settings.Sale.productDataVisibility.price && (
                 <th className="border p-1">किंमत</th>
               )}
               <th className="border p-1">सवलतीनंतरची किंमत</th>
@@ -101,26 +99,25 @@ const InvoicePreviewMarathiSales = ({
               <tr key={index}>
                 <td className="border p-1 truncate">{e.product?.title}</td>
                 <td className="border p-1 text-center">{e.quantity}</td>
-                {settings.productDataVisibility.unitPrice && (
+                {settings.Sale.productDataVisibility.unitPrice && (
                   <td className="border p-1 text-center">
                     {(e.discountedPrice / e.quantity).toFixed(2)}
                   </td>
                 )}
-                {settings.productDataVisibility.GST && (
-                  <td className="border p-1 text-center">{e.GST}</td>
+                {settings.Sale.productDataVisibility.GST && (
+                  <td className="border p-1 text-center">{e.CGST+e.SGST}</td>
                 )}
-                {settings.productDataVisibility.Discount && (
+                {settings.Sale.productDataVisibility.Discount && (
                   <td className="border p-1 text-center">
-                    {(
-                      e.price
-                        ? e.price - e.discountedPrice
-                        : (e.product.discountedPrice -
-                            e.discountedPrice / e.quantity) *
-                          e.quantity
+                    {(e.price
+                      ? e.price - e.discountedPrice
+                      : (e.product.discountedPrice -
+                          e.discountedPrice / e.quantity) *
+                        e.quantity
                     ).toFixed(2)}
                   </td>
                 )}
-                {settings.productDataVisibility.price && (
+                {settings.Sale.productDataVisibility.price && (
                   <td className="border p-1 text-center">{e.price}</td>
                 )}
                 <td className="border p-1 text-center">{e.discountedPrice}</td>
@@ -133,7 +130,7 @@ const InvoicePreviewMarathiSales = ({
           className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}
         >
           <div className="w-full">
-            {settings.displayOptions.showTotalPrice && (
+            {settings.Sale.displayOptions.showTotalPrice && (
               <div
                 className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
               >
@@ -141,7 +138,7 @@ const InvoicePreviewMarathiSales = ({
                 <span>₹{details.totalPrice}</span>
               </div>
             )}
-            {settings.displayOptions.showDiscount && (
+            {settings.Sale.displayOptions.showDiscount && (
               <div
                 className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
               >
@@ -149,7 +146,7 @@ const InvoicePreviewMarathiSales = ({
                 <span>₹{details.discount}</span>
               </div>
             )}
-            {settings.displayOptions.showGST && (
+            {settings.Sale.displayOptions.showGST && (
               <div
                 className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
               >
@@ -157,7 +154,7 @@ const InvoicePreviewMarathiSales = ({
                 <span>₹{details.GST}</span>
               </div>
             )}
-            {settings.displayOptions.showPayType && (
+            {settings.Sale.displayOptions.showPayType && (
               <div className="flex flex-col items-center">
                 <span className="font-semibold">पेमेंट कसे केले</span>
                 <div className="flex flex-col w-full">
@@ -197,7 +194,7 @@ const InvoicePreviewMarathiSales = ({
           </div>
         </div>
 
-        {settings.displayOptions.showQR && (
+        {settings.Sale.displayOptions.showQR && (
           <div>
             <Barcode
               value={details._id}
@@ -209,7 +206,7 @@ const InvoicePreviewMarathiSales = ({
         )}
 
         <p className="text-center font-bold">
-          {settings.language.marathi.title} भेट दिल्याबद्दल धन्यवाद!
+          {settings.language.marathi.UserDetails.title} भेट दिल्याबद्दल धन्यवाद!
         </p>
       </div>
     </div>

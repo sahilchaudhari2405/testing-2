@@ -79,6 +79,7 @@ const View = () => {
 
 
   useEffect(() => {
+    console.log(orders)
     setSort(orders);
     handleBills()
   

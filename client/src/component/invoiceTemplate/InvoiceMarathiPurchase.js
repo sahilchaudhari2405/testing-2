@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import Barcode from "react-barcode";
-import logo from '../../logo.png'
+import logo from "../../logo.png";
 const InvoicePreviewMarathiPurchase = ({
-    componentRef,
+  componentRef,
   invoiceDetails,
   settings,
   details,
@@ -19,18 +19,13 @@ const InvoicePreviewMarathiPurchase = ({
           className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.mb4}`}
         >
           <div className="flex flex-col items-start ">
-            <h1 className="text-2xl font-bold mt-2">
-              {invoiceDetails.title}
-            </h1>
-            {settings.displayOptions.address &&
+            <h1 className="text-2xl font-bold mt-2">{invoiceDetails.title}</h1>
+            {settings.Purchase.displayOptions.address &&
               invoiceDetails.address.map((line, index) => (
-                <p
-                  key={index}
-                  dangerouslySetInnerHTML={{ __html: line }}
-                ></p>
+                <p key={index} dangerouslySetInnerHTML={{ __html: line }}></p>
               ))}
           </div>
-          {settings.displayOptions.showLogo && (
+          {settings.Purchase.displayOptions.showLogo && (
             <div className="w-24 h-24 border flex items-center justify-center">
               <img src={settings.Logo || logo} alt="लोगो वरती घाला" />
             </div>
@@ -39,7 +34,7 @@ const InvoicePreviewMarathiPurchase = ({
         <div
           className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} ${sharedClasses.itemsCenter} ${sharedClasses.border} ${sharedClasses.p2} ${sharedClasses.mb4}`}
         >
-          {settings.displayOptions.showQR && (
+          {settings.Purchase.displayOptions.showQR && (
             <div>
               <span className={sharedClasses.fontBold}>चलन क्र.: </span>
               <Barcode
@@ -67,7 +62,7 @@ const InvoicePreviewMarathiPurchase = ({
                   <span className="font-bold">चलाकाचे नाव: </span>
                   {details.Name?.toUpperCase()}
                 </p>
-                {settings.displayOptions.address && (
+                {settings.Purchase.displayOptions.address && (
                   <p>
                     <span className="font-bold">पत्ता: </span>
                     {details.Address?.toUpperCase()}
@@ -76,13 +71,13 @@ const InvoicePreviewMarathiPurchase = ({
               </div>
               {/* Right Column */}
               <div className="flex flex-col items-start">
-                {settings.displayOptions.mobileNumber && (
+                {settings.Purchase.displayOptions.mobileNumber && (
                   <p>
                     <span className="font-bold">फोन: </span>
                     {details.mobileNumber}
                   </p>
                 )}
-                {settings.displayOptions.email && (
+                {settings.Purchase.displayOptions.email && (
                   <p>
                     <span className="font-bold">ईमेल: </span>
                     {details.email}
@@ -106,9 +101,7 @@ const InvoicePreviewMarathiPurchase = ({
           <tbody>
             {details.orderItems?.map((e, index) => (
               <tr key={index}>
-                <td className="border p-1 truncate">
-                  {e.productId?.title}
-                </td>
+                <td className="border p-1 truncate">{e.productId?.title}</td>
                 <td className="border p-1 text-center">{e.quantity}</td>
                 <td className="border p-1 text-center">
                   {(e.productId?.purchaseRate).toFixed(2)}
@@ -132,13 +125,15 @@ const InvoicePreviewMarathiPurchase = ({
               <span>₹{details.totalPurchaseRate}</span>
             </div>
 
-            <div
-              className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
-            >
-              <span>जीएसटी</span>
-              <span>₹{details.GST}</span>
-            </div>
-            {settings.displayOptions.showPayType && (
+            {settings.Purchase.productDataVisibility.GST && (
+              <div
+                className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
+              >
+                <span>जीएसटी</span>
+                <span>₹{details.GST}</span>
+              </div>
+            )}
+            {settings.Purchase.displayOptions.showPayType && (
               <div className="flex flex-col items-center">
                 <span className="font-semibold">पेमेंट कसे केले</span>
                 <div className="flex flex-col w-full">
@@ -183,9 +178,7 @@ const InvoicePreviewMarathiPurchase = ({
             className={`${sharedClasses.border} ${sharedClasses.p2} h-24`}
           ></div>
         </div>
-        <p className="text-center font-bold">
-          आपल्या व्यवसायासाठी धन्यवाद!
-        </p>
+        <p className="text-center font-bold">आपल्या व्यवसायासाठी धन्यवाद!</p>
       </div>
     </div>
   );

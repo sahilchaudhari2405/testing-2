@@ -47,9 +47,32 @@ const clientSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  Pin: {
+    type: String,
+    required: true,
+  },
   Mobile: {
     type: Number,
     required: true,
+  },
+  BankDetails:{
+    GSTIN:{
+      type: String,
+    },
+    PAN_Number:{
+      type: String,
+    }
+  },
+  SHIPTO:{
+    Name:{
+      type: String,
+    },
+    address:{
+      type: String,
+    },
+    Pin:{
+      type: String,
+    },
   },
   ClosingBalance: [{
     type:mongoose.Schema.Types.ObjectId,

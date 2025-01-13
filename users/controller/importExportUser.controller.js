@@ -22,7 +22,7 @@ export const importUser = async (req, res) => {
 
     for (const data of users) {
       try {
-        const { Type, Name, Address, State, Mobile, 'Closing Balance': ClosingBalanceValue } = data;
+        const { Type, Name, Address, State, Mobile,Pin,BankDetails,SHIPTO, 'Closing Balance': ClosingBalanceValue } = data;
          console.log(Name)
         // Validate input
         if (!Type || !Name || !Mobile || !/^\d{10}$/.test(Mobile)) {
@@ -57,6 +57,9 @@ export const importUser = async (req, res) => {
           Address,
           State,
           Mobile,
+          Pin:Pin || " ",
+          BankDetails:BankDetails || [],
+          SHIPTO:SHIPTO || [],
           ClosingBalance: [closingMonth],
           CompletePurchase: [purchaseMonth],
           totalClosingBalance: ClosingBalanceValue || 0,

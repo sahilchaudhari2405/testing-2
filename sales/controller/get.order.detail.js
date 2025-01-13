@@ -7,6 +7,7 @@ import offlinePurchaseOrderSchema from "../model/purchaseOrder.js";
 import offlineOrderItemSchema from "../model/orderItems.js";
 import productSchema from "../model/product.model.js";
 import CounterUserSchema from "../model/user.model.js";
+import { ClientPurchaseSchema, clientSchema, ClosingBalanceSchema } from "../model/Client.model.js";
 // Function to place an order
 const getCounterBill = asyncHandler(async (req, res) => {
     const { id ,role} = req.user;
@@ -15,30 +16,40 @@ const getCounterBill = asyncHandler(async (req, res) => {
     const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
         const Product = await getTenantModel(tenantId, "Product", productSchema);
         const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
-
+        const Client = await getTenantModel(tenantId, "Client", clientSchema);
+        const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+        const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     if(role ==='admin')
     {
-      cart  = await OfflineOrder.find().populate('user').populate(
-
-            {
-                path:'orderItems',
-                populate: {
-                    path: 'product',
-                    model: 'Product'
-                }
-            }
-        );
+      cart  = await OfflineOrder.find().populate('user').populate([
+          {
+            path: "ClinetID", // Populate the associated client details
+            model: "Client",
+          },
+          {
+            path: "orderItems", // Populate order items
+            populate: {
+              path: "product", // Further populate product details within order items
+              model: "Product",
+            },
+          },
+        ]);
     }
     else{
       cart  = await OfflineOrder.find({ user: id }).populate('user').populate(
-
-            {
-                path:'orderItems',
-                populate: {
-                    path: 'product',
-                    model: 'Product' 
-                }
-            }
+        [
+          {
+            path: "ClinetID", // Populate the associated client details
+            model: "Client",
+          },
+          {
+            path: "orderItems", // Populate order items
+            populate: {
+              path: "product", // Further populate product details within order items
+              model: "Product",
+            },
+          },
+        ]
         );
     }
 
@@ -56,17 +67,23 @@ const getOneBill = asyncHandler(async (req, res) => {
     const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
     const Product = await getTenantModel(tenantId, "Product", productSchema);
     const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
-
+    const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     const cart = await OfflineOrder.findById(id).populate(
-
-
+      [
         {
-            path:'orderItems',
-            populate: {
-                path: 'product',
-                model: 'Product'
-            }
-        }
+          path: "ClinetID", // Populate the associated client details
+          model: "Client",
+        },
+        {
+          path: "orderItems", // Populate order items
+          populate: {
+            path: "product", // Further populate product details within order items
+            model: "Product",
+          },
+        },
+      ]
     );
 
     if (!cart) {
@@ -83,15 +100,23 @@ const getAllBill = asyncHandler(async (req, res) => {
   const OfflineOrder = await getTenantModel(tenantId, "OfflineOrder", offlineOrderSchema);
   const Product = await getTenantModel(tenantId, "Product", productSchema);
   const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
-
+  const Client = await getTenantModel(tenantId, "Client", clientSchema);
+  const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+  const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     const cart = await OfflineOrder.find().populate(
+      [
         {
-            path:'orderItems',
-            populate: {
-                path: 'product',
-                model: 'Product'
-            }
-        }
+          path: "ClinetID", // Populate the associated client details
+          model: "Client",
+        },
+        {
+          path: "orderItems", // Populate order items
+          populate: {
+            path: "product", // Further populate product details within order items
+            model: "Product",
+          },
+        },
+      ]
     );
 
     if (!cart) {
@@ -114,7 +139,9 @@ const sortOrder = asyncHandler(async (req, res) => {
     const Product = await getTenantModel(tenantId, "Product", productSchema);
     const OfflineOrderItem = await getTenantModel(tenantId, "OfflineOrderItem",offlineOrderItemSchema);
     const CounterUser = await getTenantModel(tenantId, "CounterUser", CounterUserSchema);
-
+    const Client = await getTenantModel(tenantId, "Client", clientSchema);
+    const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
+    const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
     // Add date range filter if fromDate and toDate are provided
     if (fromDate && toDate) {
       query.updatedAt = {
@@ -186,13 +213,19 @@ const sortOrder = asyncHandler(async (req, res) => {
                 path: 'user',
                 model: 'CounterUser',
               }).populate(
-              {
-                  path: 'orderItems',
-                  populate: {
-                      path: 'product',
-                      model: 'Product', 
+                [
+                  {
+                    path: "ClinetID", // Populate the associated client details
+                    model: "Client",
                   },
-              }
+                  {
+                    path: "orderItems", // Populate order items
+                    populate: {
+                      path: "product", // Further populate product details within order items
+                      model: "Product",
+                    },
+                  },
+                ]
           )
               .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
         
@@ -205,13 +238,19 @@ const sortOrder = asyncHandler(async (req, res) => {
             path: 'user',
             model: 'CounterUser',
           }).populate(
-          {
-              path: 'orderItems',
-              populate: {
-                  path: 'product',
-                  model: 'Product', 
+            [
+              {
+                path: "ClinetID", // Populate the associated client details
+                model: "Client",
               },
-          }
+              {
+                path: "orderItems", // Populate order items
+                populate: {
+                  path: "product", // Further populate product details within order items
+                  model: "Product",
+                },
+              },
+            ]
       )
           .sort({ date: -1 }); // Change 'date' to the appropriate field if necessary
     

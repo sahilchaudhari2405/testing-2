@@ -50,16 +50,6 @@ const searchClients = async (req, res) => {
           mobileNumberStr: number ? { $regex: `^${number}` } : { $exists: true }, // Match Mobile containing the digit
         },
       },
-      {
-        $group: {
-          _id: "$_id", // Group by Mobile to ensure distinct entries
-          Name: { $first: "$Name" },
-          Mobile: { $first: "$Mobile" },
-          Email: { $first: "$Email" },
-          Address: { $first: "$Address" },
-          State: { $first: "$State" },
-        },
-      },
     ]);
 
     return res.status(200).send({
@@ -103,16 +93,6 @@ const searchClientsDistributer = async (req, res) => {
         $match: {
           ...matchCriteria,
           mobileNumberStr: number ? { $regex: `^${number}` } : { $exists: true }, // Match Mobile containing the digit
-        },
-      },
-      {
-        $group: {
-          _id: "$Mobile", // Group by Mobile to ensure distinct entries
-          Name: { $first: "$Name" },
-          Mobile: { $first: "$Mobile" },
-          Email: { $first: "$Email" },
-          Address: { $first: "$Address" },
-          State: { $first: "$State" },
         },
       },
     ]);
@@ -186,7 +166,6 @@ const searchCustomer = async (req, res) => {
       .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
       .populate('ClosingBalance')
       .populate('CompletePurchase');
-
     // Respond with the retrieved clients
     res.status(200).json(clients);
   } catch (error) {

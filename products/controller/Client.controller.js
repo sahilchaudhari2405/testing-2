@@ -4,7 +4,7 @@ import { getTenantModel } from "../database/getTenantModel.js";
 
 const createClient = async (req) => {
   try {
-    const { Type, Name, Address, State, Mobile, Purchase, Closing,tenantId } = req.body;
+    const { Type, Name, Address, State, Mobile, Purchase,BankDetails,SHIPTO,Pin, Closing,tenantId } = req.body;
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
     const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
@@ -33,6 +33,9 @@ const createClient = async (req) => {
       Address,
       State,
       Mobile,
+      Pin:Pin,
+      BankDetails:BankDetails,
+      SHIPTO:SHIPTO,
       ClosingBalance: [closingMonth._id],
       CompletePurchase: [purchaseMonth._id],
       totalClosingBalance: Closing,
@@ -53,7 +56,7 @@ const createClient = async (req) => {
 // Update Client Controller
 const updateClient = async (req) => {
   try {
-    const { Type, Name, Mobile, Address, State, Purchase, Closing,tenantId } = req.body;
+    const { Type, Name, Mobile, Address, State,BankDetails,SHIPTO,Pin, Purchase, Closing,tenantId } = req.body;
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
     const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
@@ -110,6 +113,9 @@ const updateClient = async (req) => {
     await clientPurchaseLast.save();
 
     // Update client details
+    existingClient.Pin=Pin,
+    existingClient.BankDetails=BankDetails,
+    existingClient.SHIPTO=SHIPTO,
     existingClient.Address = Address;
     existingClient.State = State;
     existingClient.totalCompletePurchase += Purchase;

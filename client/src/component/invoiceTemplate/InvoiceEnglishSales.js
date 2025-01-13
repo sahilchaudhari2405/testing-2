@@ -1,6 +1,6 @@
-import React from 'react';
-import Barcode from 'react-barcode';
-import logo from '../../logo.png'
+import React from "react";
+import Barcode from "react-barcode";
+import logo from "../../logo.png";
 const InvoicePreviewEnglishSales = ({
   componentRef,
   settings,
@@ -9,13 +9,14 @@ const InvoicePreviewEnglishSales = ({
   details,
   sharedClasses,
 }) => {
+  console.log(settings);
   return (
     <div className="invoice__preview mt-20 bg-white p-5 w-32 rounded-2xl border-4 border-blue-200">
       <div
         ref={componentRef}
         className="max-w-4xl flex flex-col items-center mx-auto p-4 bg-white text-black"
       >
-        {settings.displayOptions.showLogo && (
+        {settings.Sale.displayOptions.showLogo && (
           <div className="w-24 h-24 border flex items-center justify-center">
             <img src={settings.Logo || logo} alt="Insert Logo Above" />
           </div>
@@ -28,7 +29,7 @@ const InvoicePreviewEnglishSales = ({
             <h1 className="text-2xl font-bold mt-2">
               {invoiceDetailEngilsh?.title}
             </h1>
-            {settings.displayOptions.address &&
+            {settings.Sale.displayOptions.address &&
               invoiceDetailEngilsh.address.map((line, index) => (
                 <p key={index} dangerouslySetInnerHTML={{ __html: line }}></p>
               ))}
@@ -51,7 +52,7 @@ const InvoicePreviewEnglishSales = ({
               <span className="font-bold">Customer Name: </span>
               {details.Name?.toUpperCase()}
             </p>
-            {settings.displayOptions.address && (
+            {settings.Sale.displayOptions.address && (
               <p>
                 <span className="font-bold">Address: </span>
                 {details.Address?.toUpperCase()}
@@ -60,13 +61,13 @@ const InvoicePreviewEnglishSales = ({
           </div>
           {/* Right Column */}
           <div className="flex flex-col items-start">
-            {settings.displayOptions.mobileNumber && (
+            {settings.Sale.displayOptions.mobileNumber && (
               <p>
                 <span className="font-bold">Phone: </span>
                 {details.mobileNumber}
               </p>
             )}
-            {settings.displayOptions.email && (
+            {settings.Sale.displayOptions.email && (
               <p>
                 <span className="font-bold">Email: </span>
                 {details.email}
@@ -80,16 +81,16 @@ const InvoicePreviewEnglishSales = ({
             <tr className="bg-gray-800 text-white">
               <th className="border p-1">Description</th>
               <th className="border p-1">Quantity</th>
-              {settings.productDataVisibility.unitPrice && (
+              {settings.Sale.productDataVisibility.unitPrice && (
                 <th className="border p-1">Unit Price</th>
               )}
-              {settings.productDataVisibility.GST && (
+              {settings.Sale.productDataVisibility.GST && (
                 <th className="border p-1">GST</th>
               )}
-              {settings.productDataVisibility.Discount && (
+              {settings.Sale.productDataVisibility.Discount && (
                 <th className="border p-1">Discount</th>
               )}
-              {settings.productDataVisibility.price && (
+              {settings.Sale.productDataVisibility.price && (
                 <th className="border p-1">Price</th>
               )}
               <th className="border p-1">Discounted Price</th>
@@ -100,15 +101,15 @@ const InvoicePreviewEnglishSales = ({
               <tr key={index}>
                 <td className="border p-1 truncate">{e.product?.title}</td>
                 <td className="border p-1 text-center">{e.quantity}</td>
-                {settings.productDataVisibility.unitPrice && (
+                {settings.Sale.productDataVisibility.unitPrice && (
                   <td className="border p-1 text-center">
                     {(e.discountedPrice / e.quantity).toFixed(2)}
                   </td>
                 )}
-                {settings.productDataVisibility.GST && (
-                  <td className="border p-1 text-center">{e.GST}</td>
+                {settings.Sale.productDataVisibility.GST && (
+                  <td className="border p-1 text-center">{e.CGST+e.SGST}</td>
                 )}
-                {settings.productDataVisibility.Discount && (
+                {settings.Sale.productDataVisibility.Discount && (
                   <td className="border p-1 text-center">
                     {(e.price
                       ? e.price - e.discountedPrice
@@ -118,7 +119,7 @@ const InvoicePreviewEnglishSales = ({
                     ).toFixed(2)}
                   </td>
                 )}
-                {settings.productDataVisibility.price && (
+                {settings.Sale.productDataVisibility.price && (
                   <td className="border p-1 text-center">{e.price}</td>
                 )}
                 <td className="border p-1 text-center">{e.discountedPrice}</td>
@@ -131,7 +132,7 @@ const InvoicePreviewEnglishSales = ({
           className={`${sharedClasses.flex} w-full justify-center ${sharedClasses.mb4}`}
         >
           <div className="w-full">
-            {settings.displayOptions.showTotalPrice && (
+            {settings.Sale.displayOptions.showTotalPrice && (
               <div
                 className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
               >
@@ -139,7 +140,7 @@ const InvoicePreviewEnglishSales = ({
                 <span>₹{details.totalPrice}</span>
               </div>
             )}
-            {settings.displayOptions.showDiscount && (
+            {settings.Sale.displayOptions.showDiscount && (
               <div
                 className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
               >
@@ -147,7 +148,7 @@ const InvoicePreviewEnglishSales = ({
                 <span>₹{details.discount}</span>
               </div>
             )}
-            {settings.displayOptions.showGST && (
+            {settings.Sale.displayOptions.showGST && (
               <div
                 className={`${sharedClasses.flex} ${sharedClasses.justifyBetween} mb-2`}
               >
@@ -155,7 +156,7 @@ const InvoicePreviewEnglishSales = ({
                 <span>₹{details.GST}</span>
               </div>
             )}
-            {settings.displayOptions?.showPayType && (
+            {settings.Sale.displayOptions?.showPayType && (
               <div className="flex flex-col items-center">
                 <span className="font-semibold">Payment Methods</span>
                 <div className="flex flex-col w-full">
@@ -195,7 +196,7 @@ const InvoicePreviewEnglishSales = ({
           </div>
         </div>
 
-        {settings.displayOptions.showQR && (
+        {settings.Sale.displayOptions.showQR && (
           <div>
             <Barcode
               value={details._id}

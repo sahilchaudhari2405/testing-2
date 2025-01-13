@@ -19,7 +19,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
     }
 
     try {
-        const { products, orderDetails } = req.body;
+        const { products, orderDetails,Pin,BankDetails,SHIPTO } = req.body;
         const { id } = req.user;
         const tenantId = req.user.tenantId;
         const Product = await getTenantModel(tenantId, "Product", productSchema);
@@ -186,6 +186,9 @@ console.log(orderItems)
                 Address: orderDetails.address,
                 State: orderDetails.state,
                 Mobile: orderDetails.mobileNumber,
+                Pin:Pin,
+                BankDetails:BankDetails,
+                SHIPTO: SHIPTO,
                 Purchase: newOrder.AmountPaid + orderDetails.paymentType.borrow || 0,
                 Closing: orderDetails.paymentType.borrow || 0,
                 tenantId: tenantId,

@@ -94,14 +94,22 @@ const Sale = () => {
     purchaseRate: 50,
     profitPercentage: 0,
     HSN: "HSN Code",
-    SGST: "",
-    CGST: "",
+    SGST: 0,
+    CGST: 0,
     retailPrice: 64,
     totalAmount: 64,
     amountPaid: 0,
     __v: 0,
   });
-
+  const [BankDetails, setBankDetails] = useState({
+    GSTIN: "",
+    PAN_Number: "",
+  });
+  const [SHIPTO, setSHIPTO] = useState({
+    Name: "",
+    address: "",
+    Pin: "",
+  });
   const handleTokenExpiration = () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -117,7 +125,22 @@ const Sale = () => {
       }
     }
   };
+  const handleChangeGSTBILL = (e) => {
+    const { name, value } = e.target;
+    const [group, field] = name.split("."); // Expecting name in format: group.field
 
+    if (group === "BankDetails") {
+      setBankDetails((prevState) => ({
+        ...prevState,
+        [field]: value,
+      }));
+    } else if (group === "SHIPTO") {
+      setSHIPTO((prevState) => ({
+        ...prevState,
+        [field]: value,
+      }));
+    }
+  };
   const handlenewLogout = () => {
     localStorage.removeItem("token");
     axiosInstance.post("/auth/logout").catch((err) => console.error(err));
@@ -368,9 +391,14 @@ const Sale = () => {
       Date: Client.Date || currentDate,
       Mobile: Client.Mobile || "",
       ShipTo: Client.ShipTo || "",
-      Address: Client.Address || "Shrigonda",
-      State: Client.State || "Maharastra",
+      Address: Client.Address || "",
+      State: Client.State || "",
+      Pin: Client.Pin || "",
     });
+  setBankDetails(
+    {...Client.BankDetails }
+  )
+  setSHIPTO({...Client.SHIPTO})
     setShowModal(false);
     setShowMobileModal(false);
   };
@@ -669,9 +697,9 @@ const Sale = () => {
     Date: currentDate,
     Mobile: "",
     ShipTo: "",
-    Address:"",
-    State: "Maharastra",
-    GSTNo: "",
+    Address: "",
+    State: "",
+    Pin: "",
   });
 
   const bill = async () => {
@@ -701,6 +729,8 @@ const Sale = () => {
               },
               BillUser: finalform,
               status: "OneTime",
+              BankDetails,
+              SHIPTO,
             })
           ).unwrap();
 
@@ -712,9 +742,8 @@ const Sale = () => {
             Date: currentDate,
             Mobile: "",
             ShipTo: "",
-            Address: "Shrigonda",
-            State: "Maharastra",
-            GSTNo: "",
+            State: "",
+            Pin: "",
           });
           setFormData({
             barcode: "",
@@ -731,6 +760,15 @@ const Sale = () => {
             cgst: "",
             total: "",
           });
+          setBankDetails({
+            GSTIN:"",
+            PAN_Number:"",
+           });
+           setSHIPTO({
+            Name:"",
+            address:"",
+            Pin:"",
+           })
           dispatch(fetchCart());
           setMessage("");
           setCardPay("");
@@ -1010,17 +1048,6 @@ const Sale = () => {
               )}
             </div>
             <div>
-              <label className=" mr-2 text-gray-700 font-medium">Ship To</label>
-              <input
-                type="text"
-                id="ShipTo"
-                value={finalform.ShipTo}
-                onChange={handleFinal}
-                onKeyDown={handleKeys}
-                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
               <label className=" mr-2 text-gray-700 font-medium">Address</label>
               <input
                 type="text"
@@ -1037,6 +1064,80 @@ const Sale = () => {
                 id="State"
                 value={finalform.State}
                 onChange={handleFinal}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">PinCode</label>
+              <input
+                type="text"
+                id="Pin"
+                value={finalform.Pin}
+                onChange={handleFinal}
+                onKeyDown={handleKeys}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">GSTIN</label>
+              <input
+                type="text"
+                name="BankDetails.GSTIN"
+                placeholder="GSTIN"
+                value={BankDetails.GSTIN}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                PAN Number
+              </label>
+              <input
+                type="text"
+                name="BankDetails.PAN_Number"
+                placeholder="PAN Number"
+                value={BankDetails.PAN_Number}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO Name
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.Name"
+                placeholder="Name"
+                value={SHIPTO.Name}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO Address
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.address"
+                placeholder="Address"
+                value={SHIPTO.address}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO PinCode
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.Pin"
+                placeholder="Pin"
+                value={SHIPTO.Pin}
+                onChange={handleChangeGSTBILL}
                 className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               ></input>
             </div>
