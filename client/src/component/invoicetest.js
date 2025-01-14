@@ -7,187 +7,7 @@ import InvoicePreviewMarathiSales from "./invoiceTemplate/InvoiceMarathiSale";
 import InvoicePreviewEnglishSales from "./invoiceTemplate/InvoiceEnglishSales";
 import InvoicePreviewEnglishPurchase from "./invoiceTemplate/InvoiceEnglishPurchase";
 import InvoiceSaleGstEnglish from "./invoiceTemplate/InvoiceSaleGst";
-const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill }) => {
-  const [settings, setSettings] = useState({
-    language: {
-      english: {
-        UserDetails: {
-          title: "",
-          address: "",
-          state: "",
-          pin: "",
-          customerService: "",
-          phone: "",
-          email: "",
-        },
-        BankDetails: {
-          Account_Holder: "",
-          Account_Number: "",
-          Bank: "",
-          Branch: "",
-          IFSC: "",
-          UPI_ID: "",
-          GSTIN: "",
-          PAN_Number: "",
-        },
-        TermsConditions: [],
-      },
-      marathi: {
-        UserDetails: {
-          title: "",
-          address: "",
-          state: "",
-          pin: "",
-          customerService: "",
-          phone: "",
-          email: "",
-        },
-        BankDetails: {
-          Account_Holder: "",
-          Account_Number: "",
-          Bank: "",
-          Branch: "",
-          IFSC: "",
-          UPI_ID: "",
-          GSTIN: "",
-          PAN_Number: "",
-        },
-        TermsConditions: [],
-      },
-    },
-    Logo: "",
-    Sale: {
-      displayOptions: {
-        email: true,
-        address: true,
-        mobileNumber: true,
-        showLogo: true,
-        showTotalPrice: true,
-        showDiscount: true,
-        showGST: true,
-        showPayType: true,
-        showQR: true,
-      },
-      productDataVisibility: {
-        unitPrice: true,
-        GST: true,
-        Discount: true,
-        price: true,
-      },
-    },
-    Purchase: {
-      displayOptions: {
-        email: true,
-        address: true,
-        mobileNumber: true,
-        showLogo: true,
-        showTotalPrice: true,
-        showDiscount: true,
-        showGST: true,
-        showPayType: true,
-        showQR: true,
-      },
-      productDataVisibility: {
-        unitPrice: true,
-        GST: true,
-        Discount: true,
-        price: true,
-      },
-    },
-    GSTBill: {
-      displayOptions: {
-        email: true,
-        address: true,
-        mobileNumber: true,
-        showLogo: true,
-        TotalTaxAmount: true,
-        showDiscount: true,
-        TaxableAmount: true,
-        showPayType: true,
-        showQR: true,
-        Account_Holder: true,
-        Account_Number: true,
-        Bank: true,
-        Branch: true,
-        IFSC: true,
-        UPI_ID: true,
-        GSTIN: true,
-        PAN_Number: true,
-        SIGN: true,
-        TermsConditions: true,
-      },
-      productDataVisibility: {
-        HSN: true,
-        Tax: true,
-        MRP: true,
-        Discount: true,
-        Rate: true,
-        Amount: true,
-      },
-    },
-    ContentionBill: {
-      displayOptions: {
-        email: true,
-        address: true,
-        mobileNumber: true,
-        showLogo: true,
-        TotalTaxAmount: true,
-        showDiscount: true,
-        TaxableAmount: true,
-        showPayType: true,
-        showQR: true,
-        Account_Holder: true,
-        Account_Number: true,
-        Bank: true,
-        Branch: true,
-        IFSC: true,
-        UPI_ID: true,
-        GSTIN: true,
-        PAN_Number: true,
-        SIGN: true,
-        TermsConditions: true,
-      },
-      productDataVisibility: {
-        HSN: true,
-        Tax: true,
-        MRP: true,
-        Discount: true,
-        Rate: true,
-        Amount: true,
-      },
-    },
-  });
-
-  useEffect(() => {
-    const data = localStorage.getItem("invoiceSettings");
-    const fetchSettings = async () => {
-      try {
-        const response = await axiosInstance.get("/users/setting");
-        console.log(response.data.data);
-        const fetchedData = response.data.data;
-        if (fetchedData) {
-          setSettings(fetchedData); // Set settings if data is not null
-          localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
-        } else {
-          console.error("No settings data found");
-        }
-      } catch (error) {
-        console.error("Error fetching settings:", error);
-      }
-    };
-
-    if (data) {
-      const parsedData = JSON.parse(data);
-      console.log(parsedData);
-      if (parsedData) {
-        setSettings(parsedData); // Set parsed data if it's not null
-      } else {
-        fetchSettings(); // Fetch from API if localStorage data is invalid
-      }
-    } else {
-      fetchSettings(); // Fetch from API if no data in localStorage
-    }
-  }, [details]);
+const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill,settings }) => {
 
   const [currentDate, setCurrentDate] = useState("");
   const sharedClasses = {
@@ -219,6 +39,7 @@ const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill }) => {
       `<span class='font-bold'>Email</span>: ${settings.language.english.UserDetails.email}`,
     ],
   };
+  console.log(GstBill)
   useEffect(() => {
     // Get the current date in the required format (YYYY-MM-DD)
     console.log("Data");
@@ -266,7 +87,7 @@ const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill }) => {
      currentDate={currentDate}
      details={details}
      sharedClasses={sharedClasses}
-     />:   <InvoicePreviewEnglishSales
+     />:<InvoicePreviewEnglishSales
      componentRef={componentRef}
      settings={settings}
      invoiceDetailEngilsh={invoiceDetailEngilsh}

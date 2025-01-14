@@ -49,14 +49,25 @@ const InvoicePreviewMarathiSales = ({
               <span className="font-bold">चलाकाचे नाव: </span>
               {details.Name?.toUpperCase()}
             </p>
-            {settings.Sale.displayOptions.address && (
-              <p>
-                <span className="font-bold">पत्ता: </span>
-                {details.Address?.toUpperCase()}
-              </p>
-            )}
-          </div>
-
+          
+          {settings.Sale.displayOptions.address && (
+  <div>
+  <p>
+    <span className="font-bold">पत्ता: </span>
+    {[
+      details.ClinetID.Address?.toUpperCase(),
+      details.ClinetID.State?.toUpperCase(),
+    ]
+      .filter(Boolean) // Remove undefined or null values
+      .join(", ")}
+  </p>
+  <p>
+    <span className="font-bold">Pin: </span>
+    {details.ClinetID.Pin?.toUpperCase()}
+  </p>
+</div>
+)}
+</div>
           {/* Right Column */}
           <div className="flex flex-col items-start">
             {settings.Sale.displayOptions.mobileNumber && (
@@ -68,7 +79,7 @@ const InvoicePreviewMarathiSales = ({
             {settings.Sale.displayOptions.email && (
               <p>
                 <span className="font-bold">ईमेल: </span>
-                {details.email}
+                {details.ClinetID.Email}
               </p>
             )}
           </div>
@@ -105,7 +116,7 @@ const InvoicePreviewMarathiSales = ({
                   </td>
                 )}
                 {settings.Sale.productDataVisibility.GST && (
-                  <td className="border p-1 text-center">{e.CGST+e.SGST}</td>
+                  <td className="border p-1 text-center">{e.CGST + e.SGST}</td>
                 )}
                 {settings.Sale.productDataVisibility.Discount && (
                   <td className="border p-1 text-center">

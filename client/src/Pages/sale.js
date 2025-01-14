@@ -40,6 +40,7 @@ const Sale = () => {
   const [totalPrice, setTotalPrice] = useState("");
   const [discount, setDiscount] = useState("");
   const [gst, setGst] = useState("");
+  const [GstBill, setGstBill] = useState(false);
   const [total, setFinalTotal] = useState("");
   const [Address, setFinalAddress] = useState("");
   const [isChecked, setIsChecked] = useState(false);
@@ -392,6 +393,7 @@ const Sale = () => {
       Mobile: Client.Mobile || "",
       ShipTo: Client.ShipTo || "",
       Address: Client.Address || "",
+      Email:Client.Email || "",
       State: Client.State || "",
       Pin: Client.Pin || "",
     });
@@ -696,6 +698,7 @@ const Sale = () => {
     name: "",
     Date: currentDate,
     Mobile: "",
+    Email: "",
     ShipTo: "",
     Address: "",
     State: "",
@@ -741,6 +744,7 @@ const Sale = () => {
             name: "",
             Date: currentDate,
             Mobile: "",
+            Email: "",
             ShipTo: "",
             State: "",
             Pin: "",
@@ -760,15 +764,15 @@ const Sale = () => {
             cgst: "",
             total: "",
           });
-          setBankDetails({
-            GSTIN:"",
-            PAN_Number:"",
-           });
-           setSHIPTO({
-            Name:"",
-            address:"",
-            Pin:"",
-           })
+            setBankDetails({
+              GSTIN:"",
+              PAN_Number:"",
+            });
+            setSHIPTO({
+              Name:"",
+              address:"",
+              Pin:"",
+            })
           dispatch(fetchCart());
           setMessage("");
           setCardPay("");
@@ -800,6 +804,7 @@ const Sale = () => {
 
   const handlePrint = () => {
     setPrint(true);
+    setGst(false)
     SetLanguage("English");
     bill();
   };
@@ -807,6 +812,17 @@ const Sale = () => {
   const handleMarathiPrint = () => {
     setPrint(true);
     SetLanguage("Marathi");
+    bill();
+  };
+  const handlePreviewGstEnglish = async () => {
+    SetLanguage("English");
+     setGstBill(true);
+    bill();
+  };
+  const handleGSTPrint = () => {
+    setPrint(true);
+    setGstBill(true)
+    SetLanguage("English");
     bill();
   };
 
@@ -950,12 +966,12 @@ const Sale = () => {
       <div className="bg-white p-2 rounded-b-lg shadow-inner">
         <form>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div>
+            {/* <div>
               <label className=" text-gray-700 mr-2 font-medium">Type</label>
               <select className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option>Sale</option>
               </select>
-            </div>
+            </div> */}
             <div>
               <label className="mr-2 text-gray-700 font-medium">Name</label>
               <input
@@ -1046,6 +1062,17 @@ const Sale = () => {
                   )}
                 </div>
               )}
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">Email</label>
+              <input
+                type="text"
+                id="Email"
+                value={finalform.Email}
+                onChange={handleFinal}
+                onKeyDown={handleKeys}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
             <div>
               <label className=" mr-2 text-gray-700 font-medium">Address</label>
@@ -1801,6 +1828,12 @@ const Sale = () => {
             >
               <span className="text-center">सेव्ह अँड प्रिंट</span>
             </button>
+            <button
+              className="bg-blue-400 text-white hover:bg-red-400 px-4 py-2 rounded-md"
+              onClick={handleGSTPrint}
+            >
+              <span className="text-center">GST INVOICE</span>
+            </button>
           </div>
 
           <div className="bg-gray-200  rounded-lg shadow-md  max-w-2xl">
@@ -1892,6 +1925,7 @@ const Sale = () => {
           componentRef={componentRef}
           details={invoice}
           language={language}
+          GstBill={GstBill}
         />
 
         <ReactToPrint

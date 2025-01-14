@@ -11,37 +11,150 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
   const [settings, setSettings] = useState({
     language: {
       english: {
-        title: "",
-        address: "",
-        customerService: "",
-        phone: "",
-        email: "",
+        UserDetails: {
+          title: "",
+          address: "",
+          state: "",
+          pin: "",
+          customerService: "",
+          phone: "",
+          email: "",
+        },
+        BankDetails: {
+          Account_Holder: "",
+          Account_Number: "",
+          Bank: "",
+          Branch: "",
+          IFSC: "",
+          UPI_ID: "",
+          GSTIN: "",
+          PAN_Number: "",
+        },
+        TermsConditions: [],
       },
       marathi: {
-        title: "",
-        address: "",
-        customerService: "",
-        phone: "",
-        email: "",
+        UserDetails: {
+          title: "",
+          address: "",
+          state: "",
+          pin: "",
+          customerService: "",
+          phone: "",
+          email: "",
+        },
+        BankDetails: {
+          Account_Holder: "",
+          Account_Number: "",
+          Bank: "",
+          Branch: "",
+          IFSC: "",
+          UPI_ID: "",
+          GSTIN: "",
+          PAN_Number: "",
+        },
+        TermsConditions: [],
       },
     },
     Logo: "",
-    displayOptions: {
-      email: true,
-      address: true,
-      mobileNumber: true,
-      showLogo: true,
-      showTotalPrice: true,
-      showDiscount: true,
-      showGST: true,
-      showPayType: true,
-      showQR: true,
+    Sale: {
+      displayOptions: {
+        email: true,
+        address: true,
+        mobileNumber: true,
+        showLogo: true,
+        showTotalPrice: true,
+        showDiscount: true,
+        showGST: true,
+        showPayType: true,
+        showQR: true,
+      },
+      productDataVisibility: {
+        unitPrice: true,
+        GST: true,
+        Discount: true,
+        price: true,
+      },
     },
-    productDataVisibility: {
-      unitPrice: true,
-      GST: true,
-      Discount: true,
-      price: true,
+    Purchase: {
+      displayOptions: {
+        email: true,
+        address: true,
+        mobileNumber: true,
+        showLogo: true,
+        showTotalPrice: true,
+        showDiscount: true,
+        showGST: true,
+        showPayType: true,
+        showQR: true,
+      },
+      productDataVisibility: {
+        unitPrice: true,
+        GST: true,
+        Discount: true,
+        price: true,
+      },
+    },
+    GSTBill: {
+      displayOptions: {
+        email: true,
+        address: true,
+        mobileNumber: true,
+        showLogo: true,
+        TotalTaxAmount: true,
+        showDiscount: true,
+        TaxableAmount: true,
+        showPayType: true,
+        showQR: true,
+        Account_Holder: true,
+        Account_Number: true,
+        Bank: true,
+        Branch: true,
+        IFSC: true,
+        UPI_ID: true,
+        GSTIN: true,
+        PAN_Number: true,
+        SIGN: true,
+        TermsConditions: true,
+      },
+      productDataVisibility: {
+        HSN: true,
+        Tax: true,
+        MRP: true,
+        Discount: true,
+        Rate: true,
+        Amount: true,
+      },
+    },
+    ContentionBill: {
+      displayOptions: {
+        email: true,
+        address: true,
+        mobileNumber: true,
+        showLogo: true,
+        TotalTaxAmount: true,
+        showDiscount: true,
+        TaxableAmount: true,
+        showPayType: true,
+        showQR: true,
+        Account_Holder: true,
+        Account_Number: true,
+        Bank: true,
+        Branch: true,
+        IFSC: true,
+        UPI_ID: true,
+        GSTIN: true,
+        PAN_Number: true,
+        SIGN: true,
+        TermsConditions: true,
+      },
+      productDataVisibility: {
+        HSN: true,
+        Tax: true,
+        MRP: true,
+        Discount: true,
+        Rate: true,
+        Amount: true,
+      },
     },
   });
 
@@ -65,6 +178,7 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
 
     if (data) {
       const parsedData = JSON.parse(data);
+      console.log(parsedData);
       if (parsedData) {
         setSettings(parsedData); // Set parsed data if it's not null
       } else {
@@ -74,7 +188,7 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
       fetchSettings(); // Fetch from API if no data in localStorage
     }
   }, [details]);
-
+ console.log(GstBill)
   const [currentDate, setCurrentDate] = useState("");
   const sharedClasses = {
     flex: "flex ",
@@ -86,21 +200,23 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
     fontBold: "font-bold",
   };
   const invoiceDetails = {
-    title: settings.language.marathi.title,
+    title: settings.language.marathi.UserDetails.title,
     address: [
-      `${settings.language.marathi.address}`,
-      `<span class='font-bold'>ग्राहक सेवा</span>:${settings.language.marathi.customerService}`,
-      `<span class='font-bold'>फोन</span>:${settings.language.marathi.phone}`,
-      `<span class='font-bold'>ईमेल</span>: ${settings.language.marathi.email}`,
+      `${settings.language.marathi.UserDetails.address}, ${settings.language.marathi.UserDetails.state}`,
+      `<span class='font-bold'>PinCode</span>: ${settings.language.marathi.UserDetails.pin}`,
+      `<span class='font-bold'>ग्राहक सेवा</span>:${settings.language.marathi.UserDetails.customerService}`,
+      `<span class='font-bold'>फोन</span>:${settings.language.marathi.UserDetails.phone}`,
+      `<span class='font-bold'>ईमेल</span>: ${settings.language.marathi.UserDetails.email}`,
     ],
   };
   const invoiceDetailEngilsh = {
-    title: settings.language.english.title,
+    title: settings.language.english.UserDetails.title,
     address: [
-      `${settings.language.english.address}`,
-      `<span class='font-bold'>Customer Service</span>: ${settings.language.english.customerService}`,
-      `<span class='font-bold'>Phone</span>: ${settings.language.english.phone}`,
-      `<span class='font-bold'>Email</span>: ${settings.language.english.email}`,
+      `${settings.language.english.UserDetails.address}, ${settings.language.english.UserDetails.state}`,
+      `<span class='font-bold'>PinCode</span>: ${settings.language.english.UserDetails.pin}`,
+      `<span class='font-bold'>Customer Service</span>: ${settings.language.english.UserDetails.customerService}`,
+      `<span class='font-bold'>Phone</span>: ${settings.language.english.UserDetails.phone}`,
+      `<span class='font-bold'>Email</span>: ${settings.language.english.UserDetails.email}`,
     ],
   };
   useEffect(() => {
@@ -117,6 +233,7 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
     // Set the current date as the default value
     setCurrentDate(formattedDate);
   }, [details]);
+
   return language == "Marathi" ? (
     details?.type === "customer" ? (
       <InvoicePreviewMarathiSales
@@ -149,7 +266,7 @@ const Invoice = ({ componentRef, details, setPrint, language,GstBill }) => {
      currentDate={currentDate}
      details={details}
      sharedClasses={sharedClasses}
-     />:   <InvoicePreviewEnglishSales
+     />: <InvoicePreviewEnglishSales
      componentRef={componentRef}
      settings={settings}
      invoiceDetailEngilsh={invoiceDetailEngilsh}

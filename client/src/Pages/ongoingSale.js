@@ -85,6 +85,7 @@ const OngoingSale = () => {
   const [reverseOrder, setReverseOrder] = useState(false);
   const [isviewProductModalOpen, setIsViewProductModalOpen] = useState(false);
   const [allProducts, setAllproducts] = useState([]);
+  const [GstBill, setGstBill] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({
     _id: "66ab771af4df2f3e3c09ecb4",
     title: "POSH COCOA POWDER",
@@ -407,6 +408,7 @@ const OngoingSale = () => {
       name: Client.Name,
       Date: Client.Date || currentDate,
       Mobile: Client.Mobile || "",
+      Email: Client.Email ||"",
       ShipTo: Client.ShipTo || "",
       Address: Client.Address || "",
       State: Client.State || "",
@@ -795,6 +797,7 @@ const OngoingSale = () => {
     name: "",
     Date: currentDate,
     Mobile: "",
+    Email:"",
     ShipTo: "",
     Address: "",
     State: "",
@@ -842,6 +845,7 @@ const OngoingSale = () => {
             name: "",
             Date: currentDate,
             Mobile: "",
+            Email:"",
             ShipTo: "",
             State: "",
             Pin: "",
@@ -905,6 +909,13 @@ const OngoingSale = () => {
 
   const handlePrint = () => {
     setPrint(true);
+    setGstBill(false)
+    SetLanguage("English");
+    bill();
+  };
+  const handleGSTPrint = () => {
+    setPrint(true);
+    setGstBill(true)
     SetLanguage("English");
     bill();
   };
@@ -1159,12 +1170,12 @@ const OngoingSale = () => {
       <div className="bg-white p-2 rounded-b-lg shadow-inner">
         <form>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div>
+            {/* <div>
               <label className=" text-gray-700 mr-2 font-medium">Type</label>
               <select className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option>Sale</option>
               </select>
-            </div>
+            </div> */}
             <div>
               <label className="mr-2 text-gray-700 font-medium">Name</label>
               <input
@@ -1255,6 +1266,17 @@ const OngoingSale = () => {
                   )}
                 </div>
               )}
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">Address</label>
+              <input
+                type="text"
+                id="Email"
+                value={finalform.Email}
+                onChange={handleFinal}
+                onKeyDown={handleKeys}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
             <div>
               <label className=" mr-2 text-gray-700 font-medium">Address</label>
@@ -2007,6 +2029,12 @@ const OngoingSale = () => {
             >
               <span className="text-center">सेव्ह अँड प्रिंट</span>
             </button>
+            <button
+              className="bg-blue-400 text-white hover:bg-green-700 px-4 py-2 rounded-md"
+              onClick={handleGSTPrint}
+            >
+              <span className="text-center">GST INVOICE</span>
+            </button>
           </div>
 
           <div className="bg-gray-200  rounded-lg shadow-md  max-w-2xl">
@@ -2108,6 +2136,7 @@ const OngoingSale = () => {
           componentRef={componentRef}
           details={invoice}
           language={language}
+          GstBill={GstBill}
         />
 
         <ReactToPrint

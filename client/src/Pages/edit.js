@@ -214,6 +214,15 @@ const Edit = () => {
     cgst: "",
     total: "",
   });
+    const [BankDetails, setBankDetails] = useState({
+      GSTIN: "",
+      PAN_Number: "",
+    });
+    const [SHIPTO, setSHIPTO] = useState({
+      Name: "",
+      address: "",
+      Pin: "",
+    });
   const [orderId, setOrderId] = useState("");
   const [paymenttype, setpaymenttype] = useState("");
   const [loading, setLoading] = useState(false);
@@ -476,9 +485,13 @@ const Edit = () => {
         `/sales/order/getCounterOrderbyID/${orderId}`
       );
       handleSetData(response.data.data);
+      setBankDetails(response.data.data.ClinetID.BankDetails)
+      setSHIPTO(response.data.data.ClinetID.SHIPTO)
       setError("");
+
     } catch (err) {
       setError("Failed to fetch order data. Please check the Order ID.");
+
       setFormData({
         Name: "",
         mobileNumber: "",
@@ -514,7 +527,22 @@ const Edit = () => {
     setfetchedOrder(true);
     setLoading(false);
   };
+  const handleChangeGSTBILL = (e) => {
+    const { name, value } = e.target;
+    const [group, field] = name.split("."); // Expecting name in format: group.field
 
+    if (group === "BankDetails") {
+      setBankDetails((prevState) => ({
+        ...prevState,
+        [field]: value,
+      }));
+    } else if (group === "SHIPTO") {
+      setSHIPTO((prevState) => ({
+        ...prevState,
+        [field]: value,
+      }));
+    }
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -581,11 +609,10 @@ const Edit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axiosInstance
-      .put(`/sales/order/updateOrderbyID/${orderId}`, formData)
+      .put(`/sales/order/updateOrderbyID/${orderId}`, {formData,BankDetails,SHIPTO})
       .then(async (response) => {
         toast.success("Order updated successfully!");
         handleSetData(response.data.data);
-        navigate("/view");
       })
       .catch((err) => {
         alert("Failed to update order.");
@@ -606,6 +633,15 @@ const Edit = () => {
       .catch((err) => {
         toast.error("Failed to cancel order");
       });
+      setBankDetails({
+        GSTIN:"",
+        PAN_Number:"",
+      });
+      setSHIPTO({
+        Name:"",
+        address:"",
+        Pin:"",
+      })
     setFormData({
       Name: "",
       mobileNumber: "",
@@ -885,6 +921,62 @@ const Edit = () => {
                   className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+              <div>
+              <label className="block text-gray-700 font-medium">GSTIN</label>
+              <input
+                type="text"
+                name="BankDetails.GSTIN"
+                placeholder="GSTIN"
+                value={BankDetails.GSTIN}
+                onChange={handleChangeGSTBILL}
+                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+            <label className="block text-gray-700 font-medium">PAN_Number</label>
+              <input
+                type="text"
+                name="BankDetails.PAN_Number"
+                placeholder="PAN Number"
+                value={BankDetails.PAN_Number}
+                onChange={handleChangeGSTBILL}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                ></input>
+            </div>
+            <div>
+            <label className="block text-gray-700 font-medium">SHIPTO Name</label>
+
+              <input
+                type="text"
+                name="SHIPTO.Name"
+                placeholder="Name"
+                value={SHIPTO.Name}
+                onChange={handleChangeGSTBILL}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+            <label className="block text-gray-700 font-medium">SHIPTO Address</label>
+              <input
+                type="text"
+                name="SHIPTO.address"
+                placeholder="Address"
+                value={SHIPTO.address}
+                onChange={handleChangeGSTBILL}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+            <label className="block text-gray-700 font-medium">SHIPTO PinCode</label>
+              <input
+                type="text"
+                name="SHIPTO.Pin"
+                placeholder="Pin"
+                value={SHIPTO.Pin}
+                onChange={handleChangeGSTBILL}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
               <div>
                 <label className="block text-gray-700 font-medium">
                   Order Date

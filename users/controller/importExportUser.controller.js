@@ -57,6 +57,7 @@ export const importUser = async (req, res) => {
           Address,
           State,
           Mobile,
+          Email:"",
           Pin:Pin || " ",
           BankDetails:BankDetails || [],
           SHIPTO:SHIPTO || [],

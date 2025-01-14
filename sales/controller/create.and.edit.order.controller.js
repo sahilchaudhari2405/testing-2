@@ -576,7 +576,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       ClinetID:null,
       Name: BillUser.name,
       mobileNumber: BillUser.Mobile,
-      email: BillUser.email,
+      email: BillUser.Email,
       totalPrice: cart.totalPrice,
       totalDiscountedPrice: cart.totalDiscountedPrice,
       totalItem: cart.totalItem,
@@ -609,7 +609,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       body: {
         Type: "Client",
         Name: BillUser.name,
-        Email: BillUser.email || "",
+        Email: BillUser.Email || "No",
         Address: BillUser.Address,
         State: BillUser.State,
         Mobile: BillUser.Mobile,
@@ -1033,12 +1033,12 @@ const getOrderById = asyncHandler(async (req, res) => {
 // Function to update order
 const updateOrder = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const UpdateUser = req.body;
-  console.log("Request body:", UpdateUser);
+  const {formData,BankDetails,SHIPTO} = req.body;
+  console.log("Request body:", formData);
 
   try {
     const tenantId = req.user.tenantId;
-
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
     const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
     const ClientPurchase = await getTenantModel(tenantId, "ClientPurchase", ClientPurchaseSchema);
@@ -1047,7 +1047,11 @@ const updateOrder = asyncHandler(async (req, res) => {
       "OfflineOrder",
       offlineOrderSchema
     );
-
+    const OfflineOrderItem = await getTenantModel(
+      tenantId,
+      "OfflineOrderItem",
+      offlineOrderItemSchema
+    );
     const order = await OfflineOrder.findById(id);
 
     if (!order) {
@@ -1065,12 +1069,11 @@ const updateOrder = asyncHandler(async (req, res) => {
     console.log("Existing Client:", existingClient);
 
     if (existingClient) {
-      existingClient.Name = UpdateUser.name || order.Name;
-      existingClient.Mobile = UpdateUser.mobileNumber || order.mobileNumber;
-      existingClient.Email = UpdateUser.email || order.email;
-      existingClient.Pin = UpdateUser.Pin;
-      existingClient.BankDetails = UpdateUser.BankDetails;
-      existingClient.SHIPTO = UpdateUser.SHIPTO
+      existingClient.Name = formData.Name || order.Name;
+      existingClient.Mobile = formData.mobileNumber || order.mobileNumber;
+      existingClient.Email = formData.email || order.email;
+      existingClient.BankDetails =BankDetails;
+      existingClient.SHIPTO = SHIPTO
       await existingClient.save();
       console.log("Updated Client:", existingClient);
     } else {
@@ -1078,9 +1081,9 @@ const updateOrder = asyncHandler(async (req, res) => {
     }
 
     // Update the order fields
-    order.Name = UpdateUser.name || order.Name;
-    order.mobileNumber = UpdateUser.mobileNumber || order.mobileNumber;
-    order.email = UpdateUser.email || order.email;
+    order.Name = formData.Name || order.Name;
+    order.mobileNumber = formData.mobileNumber || order.mobileNumber;
+    order.email = formData.email || order.email;
 
     // Log the updated order before saving
     console.log("Updated Order:", order);

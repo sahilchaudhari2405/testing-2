@@ -220,6 +220,7 @@ const InvoiceSettings = () => {
 
   const handlePreview = (language) => {
     setPreviewLanguage(language);
+    setGstBill(false);
     setInvoice(details);
   };
 
@@ -846,6 +847,7 @@ const InvoiceSettings = () => {
         componentRef={componentRef}
         details={invoice}
         language={previewLanguage}
+        settings={settings}
         GstBill={GstBill}
       />
 

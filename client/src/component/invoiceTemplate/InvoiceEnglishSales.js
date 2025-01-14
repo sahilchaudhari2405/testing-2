@@ -53,10 +53,21 @@ const InvoicePreviewEnglishSales = ({
               {details.Name?.toUpperCase()}
             </p>
             {settings.Sale.displayOptions.address && (
-              <p>
-                <span className="font-bold">Address: </span>
-                {details.Address?.toUpperCase()}
-              </p>
+  <div>
+  <p>
+    <span className="font-bold">पत्ता: </span>
+    {[
+      details.ClinetID.Address?.toUpperCase(),
+      details.ClinetID.State?.toUpperCase(),
+    ]
+      .filter(Boolean) // Remove undefined or null values
+      .join(", ")}
+  </p>
+  <p>
+    <span className="font-bold">Pin: </span>
+    {details.ClinetID.Pin?.toUpperCase()}
+  </p>
+</div>
             )}
           </div>
           {/* Right Column */}
@@ -70,7 +81,7 @@ const InvoicePreviewEnglishSales = ({
             {settings.Sale.displayOptions.email && (
               <p>
                 <span className="font-bold">Email: </span>
-                {details.email}
+                {details.ClinetID.Email}
               </p>
             )}
           </div>
