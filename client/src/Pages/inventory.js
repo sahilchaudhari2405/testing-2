@@ -59,6 +59,7 @@ const Inventory = () => {
   };
 
   const handlenewLogout = () => {
+
     localStorage.removeItem('token');
     axiosInstance.post('/users/auth/logout').catch((err) => console.error(err));
     // window.location.href = '/login';
@@ -284,19 +285,27 @@ Suggestions(true);
   };
 
   const handleImport = (e) => {
+    const data = localStorage.getItem("invoiceSettings");
+    const store = data ? JSON.parse(data) : {}; // Parse the data from localStorage
     const file = e.target.files[0];
+  
     if (file) { 
       importExcelData(file, async (data) => {
         setProd(data);
+  
         try {
-          const response = await axiosInstance.post('/products/product/importProducts', { products: data });
-          dispatch((response.data.data));
+          const response = await axiosInstance.post('/products/product/importProducts', { 
+            products: data,
+            imageUrl: store.Logo // Use store.Logo directly if it exists
+          });
+          dispatch(response.data.data);
         } catch (error) {
           console.error('Error importing data:', error);
         }
       });
     }
   };
+  
 
   const handleExport = async () => {
     try {

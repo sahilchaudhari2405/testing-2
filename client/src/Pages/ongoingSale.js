@@ -150,8 +150,11 @@ const OngoingSale = () => {
         const fetchedData = response.data.data;
         if (fetchedData) {
           localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
-          setFinalAddress(fetchedData.language?.english?.address || "");
-          finalform.Address = fetchedData.language?.english?.address || ""; // Ensure this logic aligns with your app's state management
+          setFinalAddress(fetchedData.language?.english?.UserDetails?.address || "");
+          finalform.Address = fetchedData.language?.english?.UserDetails?.address || "";
+          finalform.State = fetchedData.language?.english?.UserDetails?.state || "";
+          finalform.Pin = fetchedData.language?.english?.UserDetails?.pin || ""; // Ensure this matches your usage pattern
+           // Ensure this logic aligns with your app's state management
         } else {
           console.error("No settings data found");
         }
@@ -164,8 +167,10 @@ const OngoingSale = () => {
     if (data) {
       try {
         const parsedData = JSON.parse(data);
-        setFinalAddress(parsedData.language?.english?.address || "");
-        finalform.Address = parsedData.language?.english?.address || ""; // Ensure this matches your usage pattern
+        setFinalAddress(parsedData.language?.english?.UserDetails?.address || "");
+        finalform.Address = parsedData.language?.english?.UserDetails?.address || "";
+        finalform.State = parsedData.language?.english?.UserDetails?.state || "";
+        finalform.Pin = parsedData.language?.english?.UserDetails?.pin || ""; // Ensure this matches your usage pattern
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
@@ -813,13 +818,19 @@ const OngoingSale = () => {
     const amount = Math.round(gen);
 
     const Total = Math.round(total);
+    // console.log(finalform);
+    // console.log(AdvancePaidId);
+    // console.log(UserId);
+    // console.log(BankDetails);
+    // console.log(SHIPTO);
+    // console.log(details)
     console.log(amount == Total);
     if (amount == Total) {
       if (
-        items[0]?.length > 0 &&
+        details?.length > 0 &&
         finalform.name &&
         finalform.Mobile &&
-        finalform.Address
+        finalform.name
       ) {
         try {
           const createdOrder = await dispatch(
@@ -1000,7 +1011,6 @@ const OngoingSale = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const id = productDetails?.BarCode || null; // Use null if BarCode is undefined
     const status = "Ongoing";
 
@@ -1010,6 +1020,7 @@ const OngoingSale = () => {
     };
 
     try {
+  
       // Dispatch the addToCart action
       await dispatch(
         addToCart({
@@ -1268,7 +1279,7 @@ const OngoingSale = () => {
               )}
             </div>
             <div>
-              <label className=" mr-2 text-gray-700 font-medium">Address</label>
+              <label className=" mr-2 text-gray-700 font-medium">Email</label>
               <input
                 type="text"
                 id="Email"

@@ -8,7 +8,7 @@ import bodyParser from 'body-parser';
 import cluster from 'cluster';
 import os from 'os';
 const totalCPUs = os.cpus().length;
-dotenv.config({
+dotenv.config({ 
   path: './env',
 });
 dotenv.config();

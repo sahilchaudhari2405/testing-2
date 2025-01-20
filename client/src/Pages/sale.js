@@ -159,8 +159,10 @@ const Sale = () => {
         const fetchedData = response.data.data;
         if (fetchedData) {
           localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
-          setFinalAddress(fetchedData.language?.english?.address || "");
-          finalform.Address = fetchedData.language?.english?.address || ""; 
+          setFinalAddress(fetchedData.language?.english?.UserDetails?.address || "");
+          finalform.Address = fetchedData.language?.english?.UserDetails?.address || "";
+          finalform.State = fetchedData.language?.english?.UserDetails?.state || "";
+          finalform.Pin = fetchedData.language?.english?.UserDetails?.pin || "";
         } else {
           console.error("No settings data found");
         }
@@ -173,8 +175,10 @@ const Sale = () => {
     if (data) {
       try {
         const parsedData = JSON.parse(data);
-        setFinalAddress(parsedData.language?.english?.address || "");
-        finalform.Address = parsedData.language?.english?.address || ""; // Ensure this matches your usage pattern
+        setFinalAddress(parsedData.language?.english?.UserDetails?.address || "");
+        finalform.Address = parsedData.language?.english?.UserDetails?.address || "";
+        finalform.State = parsedData.language?.english?.UserDetails?.state || "";
+        finalform.Pin = parsedData.language?.english?.UserDetails?.pin || ""; // Ensure this matches your usage pattern
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
