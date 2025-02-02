@@ -19,7 +19,7 @@ services:
     ports:
       - "4000:4000"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     depends_on:
       - products
       - sales-advancepay
@@ -40,7 +40,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
@@ -52,7 +52,7 @@ services:
     ports:
       - "4001:4001"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
@@ -63,7 +63,7 @@ services:
     ports:
       - "4002:4002"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
@@ -74,7 +74,7 @@ services:
     ports:
       - "4003:4003"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
@@ -85,7 +85,7 @@ services:
     ports:
       - "4004:4004"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
@@ -97,7 +97,7 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
@@ -108,7 +108,7 @@ services:
     ports:
       - "5002:5002"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
@@ -119,7 +119,7 @@ services:
     ports:
       - "5003:5003"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
@@ -130,7 +130,7 @@ services:
     ports:
       - "5004:5004"
     environment:
-      - CORS_ALLOWED_ORIGINS=13.233.134.211
+      - CORS_ALLOWED_ORIGINS=65.0.98.146
     networks:
       - app-network
 
