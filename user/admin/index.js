@@ -43,7 +43,7 @@ const allowedOrigins = [
   'http://apalabajar.shop',
   'https://apalabajar.shop',  
   'http://www.apalabajar.shop',
-  'http://65.0.98.146/',
+  'http://65.0.98.146',
   'https://www.apalabajar.shop',
   test
 ];
