@@ -13,6 +13,7 @@ const allowedOrigins = [
   'http://www.apalabajar.shop',
   'https://www.apalabajar.shop',
   'http://localhost:5173',
+  'http://65.0.98.146/',
   test,
 ];
 
