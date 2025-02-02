@@ -8,11 +8,13 @@ import AdvancePay from './routes/addEntry.route.js';
 import bodyParser from 'body-parser';
 import cluster from 'cluster';
 import os from 'os';
+
 const totalCPUs = os.cpus().length;
 dotenv.config({
   path: './env',
 });
 dotenv.config();
+const test = process.env.CORS_ALLOWED_ORIGINS
 connectDB();
 if(cluster.isPrimary)
 {
@@ -41,6 +43,7 @@ const allowedOrigins = [
   'https://apalabajar.shop',  
   'http://www.apalabajar.shop',
   'https://www.apalabajar.shop',
+  test
 ];
 
 app.use(cors({

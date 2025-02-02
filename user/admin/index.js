@@ -14,6 +14,7 @@ dotenv.config({
   path: './env',
 });
 dotenv.config();
+const test = process.env.CORS_ALLOWED_ORIGINS
 connectDB();
 if(cluster.isPrimary)
 {
@@ -43,6 +44,7 @@ const allowedOrigins = [
   'https://apalabajar.shop',  
   'http://www.apalabajar.shop',
   'https://www.apalabajar.shop',
+  test
 ];
 
 app.use(cors({
