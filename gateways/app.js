@@ -2,7 +2,8 @@ const express = require('express');
 const expressProxy = require('express-http-proxy');
 const cors = require('cors');
 const app = express();
-
+require('dotenv').config()
+const test = process.env.CORS_ALLOWED_ORIGINS
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost',
@@ -12,6 +13,7 @@ const allowedOrigins = [
   'http://www.apalabajar.shop',
   'https://www.apalabajar.shop',
   'http://localhost:5173',
+  test,
 ];
 
 app.use(cors({

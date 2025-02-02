@@ -14,6 +14,7 @@ dotenv.config({
 });
 dotenv.config();
 connectDB();
+const test = process.env.CORS_ALLOWED_ORIGINS
 if(cluster.isPrimary)
 {
   console.log(`Primary ${process.pid} is running`);
@@ -41,6 +42,7 @@ const allowedOrigins = [
   'https://apalabajar.shop',  
   'http://www.apalabajar.shop',
   'https://www.apalabajar.shop',
+  test
 ];
 
 app.use(cors({
