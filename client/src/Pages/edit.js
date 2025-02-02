@@ -28,7 +28,7 @@ const Edit = () => {
   const componentRef = useRef();
 
   const [remainingAmount, setRemainingAmount] = useState(null);
-
+  const [remainingAmountPayBack, setRemainingAmountPayBack] = useState(null);
   const [payment, setPayment] = useState({
     cash: 0,
     card: 0,
@@ -38,6 +38,7 @@ const Edit = () => {
   // Function to handle input changes for payment and borrow
   const handlePaymentChange = (e) => {
     const { name, value } = e.target;
+    console.log( name, value )
     setPayment((prevPayment) => ({
       ...prevPayment,
       [name]: parseFloat(value) || 0, // Ensure value is numeric or 0
@@ -55,28 +56,64 @@ const Edit = () => {
     setPopupVisible(false);
     setPayprice(0); // Close the popup
   };
-  const openPopupForPay = (data) => {
+  const openPopupForPay = (item, editedItemData) => {
     setPopupVisible(true);
-    console.log(data);
+    console.log("Item:", item);
+    console.log("Edited Item Data:", editedItemData);
   
-    // Calculate the GST percentage from the product
-    const gstRate = data.product.CGST + data.product.SGST;
+    if (!item || !editedItemData) {
+      console.error("Missing required data.");
+      return;
+    }
   
-    // Calculate the total price with GST
-    console.log(gstRate)
-    const totalWithGst =editedItemData.discountedPrice+ (editedItemData.discountedPrice * gstRate) / 100;
+    const gstRate = (item.product?.CGST || 0) + (item.product?.SGST || 0);
+    console.log("GST Rate:", gstRate);
   
-    // Update the state
-    setPayprice(totalWithGst);
+    // Calculate the difference in quantity
+    const remainingQuantity = editedItemData.quantity - item.quantity;
+    const remainingQuantityPayBack = item.quantity - editedItemData.quantity;
   
-    // Calculate the remaining amount
-    const remainingAmount = (totalWithGst - data.finalPriceWithGST).toFixed(1);
-    console.log(remainingAmount)
-    setRemainingAmount(remainingAmount);
+    console.log("Remaining Quantity:", remainingQuantity);
+    console.log("Remaining Quantity Pay Back:", remainingQuantityPayBack);
   
-    console.log("Total with GST:", totalWithGst);
-    console.log("Remaining Amount:", remainingAmount);
+    // Set total price for the edited item
+    setPayprice(editedItemData.finalPriceWithGST);
+  
+    // Ensure OneUnit price exists
+    const oneUnitPrice = editedItemData.OneUnit > 0 ? editedItemData.OneUnit : item.OneUnit;
+  
+    // Calculate amounts based on positive differences
+    const remainingAmount = remainingQuantity > 0 ? remainingQuantity * oneUnitPrice : 0;
+    const remainingAmountPayBack = remainingQuantityPayBack > 0 ? remainingQuantityPayBack * oneUnitPrice : 0;
+  
+    console.log("Remaining Amount (before GST):", remainingAmount);
+    console.log("Remaining Amount Pay Back (before GST):", remainingAmountPayBack);
+  
+    // Calculate final prices with GST
+    const gstFinalPrice = remainingAmount + (remainingAmount * gstRate) / 100;
+    const gstFinalPricePayBack = remainingAmountPayBack + (remainingAmountPayBack * gstRate) / 100;
+  
+    // Calculate total unit price and final price with GST
+    const totalUnitPrice = editedItemData.OneUnit * editedItemData.quantity;
+    console.log("Total Unit Price:", totalUnitPrice);
+    
+    const editGstPrice = totalUnitPrice + (totalUnitPrice * gstRate) / 100;
+    console.log("Edited GST Price:", editGstPrice);
+  
+    // Price change calculations
+    const priceChangePay = editedItemData.finalPriceWithGST - item.finalPriceWithGST;
+    const priceChangePayBack = item.finalPriceWithGST - editGstPrice;
+  
+    // Update state with correct values
+    setRemainingAmount(gstFinalPrice > 0 ? gstFinalPrice : priceChangePay > 0 ? priceChangePay : 0);
+    setRemainingAmountPayBack(
+      gstFinalPricePayBack > 0 ? gstFinalPricePayBack : priceChangePayBack > 0 ? priceChangePayBack : 0
+    );
+  
+    console.log("Final Remaining Amount with GST:", gstFinalPrice);
+    console.log("Final Remaining Amount Pay Back with GST:", gstFinalPricePayBack);
   };
+  
   
   // Effect to update remaining amount whenever payment fields change
   // useEffect(() => {
@@ -97,7 +134,7 @@ const Edit = () => {
       parseFloat(payment.card) +
       parseFloat(payment.upi) +
       parseFloat(payment.borrow);
-    if (remainingAmount < totalPaid) {
+    if (remainingAmount === totalPaid) {
       handleSave();
       setError("");
       // Close the popup after saving
@@ -303,10 +340,7 @@ const Edit = () => {
   };
 
   const handleSave = async (itemId) => {
-    payment.borrow +=paymenttype.borrow;
-    payment.cash +=paymenttype.cash;
-    payment.card +=paymenttype.Card;
-    payment.upi+=paymenttype.UPI;
+    console.log(payment,paymenttype)
     try {
       const oneUnit = editedItemData.discountedPrice / editedItemData.quantity;
       const Discount =
@@ -326,7 +360,7 @@ const Edit = () => {
         OneUnit: oneUnit,
         payment,
       };
-
+console.log(payload)
       const response = await axiosInstance
         .post("/sales/order/addCustomProductOnEdit", payload)
         .then(async (response) => {
@@ -523,7 +557,6 @@ const Edit = () => {
     setFormData(orderData);
     const formattedOrderDate = orderData.orderDate.split("T")[0];
     const displayOrderDate = formatDateToDisplay(formattedOrderDate);
-    setpaymenttype(orderData.paymentType);
     setfetchedOrder(true);
     setLoading(false);
   };
@@ -990,7 +1023,7 @@ const Edit = () => {
                   required
                 />
               </div>
-              {/* <div>
+              <div>
               <label className="block text-gray-700 font-medium">Payment (Cash)</label>
               <input
                 type="number"
@@ -1019,7 +1052,7 @@ const Edit = () => {
                 onChange={handlePaymentChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div> */}
+            </div>
               <div>
                 <label className="block text-gray-700 font-medium">
                   Bill Image URL
@@ -1625,7 +1658,9 @@ const Edit = () => {
                               <>
                                 <button
                                   onClick={() =>
-                                    openPopupForPay(item)
+                                   {
+                                    openPopupForPay(item, editedItemData);
+                                   }
                                   }
                                   className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
                                 >
@@ -1974,6 +2009,7 @@ const Edit = () => {
             >
        
            { `Remaining Amount to Pay With GST: ₹${remainingAmount}`}
+           <div className=" text-orange-400">   { `Remaining Amount to Pay Back With GST: ₹${remainingAmountPayBack}`}</div>
             </h4>
             <div className="flex justify-end space-x-4 mt-4">
               <button
