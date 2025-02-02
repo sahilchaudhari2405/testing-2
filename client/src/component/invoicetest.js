@@ -7,74 +7,7 @@ import InvoicePreviewMarathiSales from "./invoiceTemplate/InvoiceMarathiSale";
 import InvoicePreviewEnglishSales from "./invoiceTemplate/InvoiceEnglishSales";
 import InvoicePreviewEnglishPurchase from "./invoiceTemplate/InvoiceEnglishPurchase";
 import InvoiceSaleGstEnglish from "./invoiceTemplate/InvoiceSaleGst";
-const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill }) => {
-  const [settings, setSettings] = useState({
-    language: {
-      english: {
-        title: "",
-        address: "",
-        customerService: "",
-        phone: "",
-        email: "",
-      },
-      marathi: {
-        title: "",
-        address: "",
-        customerService: "",
-        phone: "",
-        email: "",
-      },
-    },
-    Logo: "",
-    displayOptions: {
-      email: true,
-      address: true,
-      mobileNumber: true,
-      showLogo: true,
-      showTotalPrice: true,
-      showDiscount: true,
-      showGST: true,
-      showPayType: true,
-      showQR: true,
-    },
-    productDataVisibility: {
-      unitPrice: true,
-      GST: true,
-      Discount: true,
-      price: true,
-    },
-  });
-
-  useEffect(() => {
-    const data = localStorage.getItem("invoiceSettings");
-    const fetchSettings = async () => {
-      try {
-        const response = await axiosInstance.get("/users/setting");
-        console.log(response.data.data);
-        const fetchedData = response.data.data;
-        if (fetchedData) {
-          setSettings(fetchedData); // Set settings if data is not null
-          localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
-        } else {
-          console.error("No settings data found");
-        }
-      } catch (error) {
-        console.error("Error fetching settings:", error);
-      }
-    };
-
-    if (data) {
-      const parsedData = JSON.parse(data);
-      console.log(parsedData);
-      if (parsedData) {
-        setSettings(parsedData); // Set parsed data if it's not null
-      } else {
-        fetchSettings(); // Fetch from API if localStorage data is invalid
-      }
-    } else {
-      fetchSettings(); // Fetch from API if no data in localStorage
-    }
-  }, [settings]);
+const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill,settings }) => {
 
   const [currentDate, setCurrentDate] = useState("");
   const sharedClasses = {
@@ -87,23 +20,26 @@ const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill }) => {
     fontBold: "font-bold",
   };
   const invoiceDetails = {
-    title: settings.language.marathi.title,
+    title: settings.language.marathi.UserDetails.title,
     address: [
-      `${settings.language.marathi.address}`,
-      `<span class='font-bold'>ग्राहक सेवा</span>:${settings.language.marathi.customerService}`,
-      `<span class='font-bold'>फोन</span>:${settings.language.marathi.phone}`,
-      `<span class='font-bold'>ईमेल</span>: ${settings.language.marathi.email}`,
+      `${settings.language.marathi.UserDetails.address}, ${settings.language.marathi.UserDetails.state}`,
+      `<span class='font-bold'>PinCode</span>: ${settings.language.marathi.UserDetails.pin}`,
+      `<span class='font-bold'>ग्राहक सेवा</span>:${settings.language.marathi.UserDetails.customerService}`,
+      `<span class='font-bold'>फोन</span>:${settings.language.marathi.UserDetails.phone}`,
+      `<span class='font-bold'>ईमेल</span>: ${settings.language.marathi.UserDetails.email}`,
     ],
   };
   const invoiceDetailEngilsh = {
-    title: settings.language.english.title,
+    title: settings.language.english.UserDetails.title,
     address: [
-      `${settings.language.english.address}`,
-      `<span class='font-bold'>Customer Service</span>: ${settings.language.english.customerService}`,
-      `<span class='font-bold'>Phone</span>: ${settings.language.english.phone}`,
-      `<span class='font-bold'>Email</span>: ${settings.language.english.email}`,
+      `${settings.language.english.UserDetails.address}, ${settings.language.english.UserDetails.state}`,
+      `<span class='font-bold'>PinCode</span>: ${settings.language.english.UserDetails.pin}`,
+      `<span class='font-bold'>Customer Service</span>: ${settings.language.english.UserDetails.customerService}`,
+      `<span class='font-bold'>Phone</span>: ${settings.language.english.UserDetails.phone}`,
+      `<span class='font-bold'>Email</span>: ${settings.language.english.UserDetails.email}`,
     ],
   };
+  console.log(GstBill)
   useEffect(() => {
     // Get the current date in the required format (YYYY-MM-DD)
     console.log("Data");
@@ -118,8 +54,7 @@ const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill }) => {
     // Set the current date as the default value
     setCurrentDate(formattedDate);
   }, [details]);
-  console.log(GstBill)
-  console.log(language)
+
   return language == "Marathi" ? (
     details?.type === "customer" ? (
       <InvoicePreviewMarathiSales
@@ -152,7 +87,7 @@ const InvoiceTest = ({ componentRef, details, setPrint, language,GstBill }) => {
      currentDate={currentDate}
      details={details}
      sharedClasses={sharedClasses}
-     />:   <InvoicePreviewEnglishSales
+     />:<InvoicePreviewEnglishSales
      componentRef={componentRef}
      settings={settings}
      invoiceDetailEngilsh={invoiceDetailEngilsh}

@@ -1,0 +1,46 @@
+const express = require('express');
+const expressProxy = require('express-http-proxy');
+const cors = require('cors');
+const app = express();
+
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost',
+  'http://client:80',
+  'http://apalabajar.shop',
+  'https://apalabajar.shop',  
+  'http://www.apalabajar.shop',
+  'https://www.apalabajar.shop',
+  'http://localhost:5173',
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); 
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
+
+// Use container names for service communication within Docker network
+app.use('/products', expressProxy('http://products:3001'));
+
+app.use('/sales/AdvancePay', expressProxy('http://sales-advancepay:4001'));
+app.use('/sales/cart', expressProxy('http://sales-cart:4002'));
+app.use('/sales/OnGoing', expressProxy('http://sales-ongoing:4003'));
+app.use('/sales/order', expressProxy('http://sales-order:4004'));
+
+app.use('/users/admin', expressProxy('http://user-admin:5001'));
+app.use('/users/auth', expressProxy('http://user-auth:5002'));
+app.use('/users/setting', expressProxy('http://user-setting:5003'));
+app.use('/users/users', expressProxy('http://user-users:5004')); // Fixed duplicate issue
+
+app.listen(4000, () => {
+  console.log('Gateway server listening on port 4000');
+});

@@ -98,7 +98,7 @@ export const viewCategories = async (req, res) => {
     try {
         const tenantId = req.user.tenantId;
         const Category = await getTenantModel(tenantId, "Category", categorySchema);
-        const categories = await Category.find().limit(10).populate('parentCategory');
+        const categories = await Category.find().limit(5).populate('parentCategory');
         return res.status(200).send({ message: "Categories retrieved successfully", status: true, data: categories });
     } catch (error) {
         console.error(error);

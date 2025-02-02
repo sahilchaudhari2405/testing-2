@@ -276,47 +276,57 @@ export const sortProducts = async (req, res) => {
 
 export const sortProductsfordescription = async (req, res) => {
   try {
-    const {description} = req.body;
+    const { description } = req.body; // Get description filter from the request body
     let query = {};
-    const noOtherFilters = !description;
 
     const tenantId = req.user.tenantId;
     const Product = await getTenantModel(tenantId, "Product", productSchema);
     const Category = await getTenantModel(tenantId, "Category", categorySchema);
 
-     console.log(noOtherFilters);
-     
-    if(noOtherFilters){
-      let sortedProducts=[];
-      sortedProducts = await Product.find()
-      .sort({ quantity: 1 }) 
-      .limit(100) 
-      .populate('category');
-      return res.status(200).send({ 
-        message: "Only Low stock products retrieved successfully", 
-        status: true, 
-        data: sortedProducts, 
+    // If no filters, return low stock products sorted by quantity
+    if (!description) {
+      const lowStockProducts = await Product.find()
+        .sort({ quantity: 1 })
+        .limit(100)
+        .populate("category");
+
+      return res.status(200).send({
+        message: "Only Low stock products retrieved successfully",
+        status: true,
+        data: lowStockProducts,
       });
     }
-    console.log("yes");
 
-    if (description) {
-      query.description = { $regex: `^${description}`, $options: 'i' }; // 'i' for case-insensitive
-    }
-   
+    // Normalize the input description for consistent querying
+    const normalizedDescription = description;
+    query = {
+      $or: [
+        { description: { $regex: `^${normalizedDescription}`, $options: "i" } },
+        { title: { $regex: `^${normalizedDescription}`, $options: "i" } },
+      ],
+    };
 
-    console.log(query);
-    // Query to get products sorted by discount and createdAt
+    // Fetch products matching the regex for description or title
     const products = await Product.find(query)
+      .sort({ createdAt: -1 }) // Optional: Sort by creation date
       .limit(100)
-      .populate('category');
-    
-    return res.status(200).send({ message: "Products retrieved successfully", status: true, data: products });
+      .populate("category");
+
+    return res.status(200).send({
+      message: "Products retrieved successfully",
+      status: true,
+      data: products,
+    });
   } catch (error) {
-    console.error(error);
-    return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
+    console.error("Error fetching products:", error);
+    return res.status(500).send({
+      message: "Internal server error",
+      status: false,
+      error: error.message,
+    });
   }
 };
+
 
 
 
@@ -341,7 +351,8 @@ export const createProduct = async (req, res) => {
     purchaseRate,
     profitPercentage,
     HSN,
-    GST,
+    CGST,
+    SGST,
     retailPrice,
     totalAmount,
     amountPaid
@@ -349,6 +360,7 @@ export const createProduct = async (req, res) => {
 console.log(req.body)
   try {
     let imageUrl = '';
+    
     if (req.file) {
       try {
         
@@ -382,7 +394,8 @@ console.log(req.body)
     if (purchaseRate) productData.purchaseRate = purchaseRate;
     if (profitPercentage) productData.profitPercentage = profitPercentage;
     if (HSN) productData.HSN = HSN;
-    if (GST) productData.GST = GST;
+    if (SGST) productData.SGST = SGST;
+    if (CGST) productData.CGST = CGST;
     if (retailPrice) productData.retailPrice = retailPrice;
     if (totalAmount) productData.totalAmount = totalAmount;
     if (amountPaid) productData.amountPaid = amountPaid;
@@ -424,13 +437,17 @@ export const updateProduct = async (req, res) => {
     purchaseRate,
     profitPercentage,
     HSN,
-    GST,
+    SGST,
+    CGST,
     retailPrice,
     totalAmount,
     amountPaid
   } = req.body;
-
+  console.log(req.body)
   try {
+    const tenantId = req.user.tenantId;
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Category = await getTenantModel(tenantId, "Category", categorySchema);
     let imageUrl = '';
     if (req.file) {
       console.log("yes request file")
@@ -458,7 +475,7 @@ export const updateProduct = async (req, res) => {
 
     const updatedProductData = {};
     if (title) updatedProductData.title = title;
-    if (description) updatedProductData.description = description;
+    if (description || title) updatedProductData.description = description || title;
     if (price) updatedProductData.price = price;
     if (discountedPrice) updatedProductData.discountedPrice = discountedPrice;
     if (discountPercent) updatedProductData.discountPercent = discountPercent;
@@ -475,13 +492,11 @@ export const updateProduct = async (req, res) => {
     if (purchaseRate) updatedProductData.purchaseRate = purchaseRate;
     if (profitPercentage) updatedProductData.profitPercentage = profitPercentage;
     if (HSN) updatedProductData.HSN = HSN;
-    if (GST) updatedProductData.GST = GST;
+    if (SGST) updatedProductData.SGST = SGST;
+    if (CGST) updatedProductData.CGST = CGST;
     if (retailPrice) updatedProductData.retailPrice = retailPrice;
     if (totalAmount) updatedProductData.totalAmount = totalAmount;
     if (amountPaid) updatedProductData.amountPaid = amountPaid;
-
-    const tenantId = req.user.tenantId;
-    const Product = await getTenantModel(tenantId, "Product", productSchema);
 
     const updatedProduct = await Product.findByIdAndUpdate(
       id,

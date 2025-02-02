@@ -40,6 +40,7 @@ const Sale = () => {
   const [totalPrice, setTotalPrice] = useState("");
   const [discount, setDiscount] = useState("");
   const [gst, setGst] = useState("");
+  const [GstBill, setGstBill] = useState(false);
   const [total, setFinalTotal] = useState("");
   const [Address, setFinalAddress] = useState("");
   const [isChecked, setIsChecked] = useState(false);
@@ -94,13 +95,22 @@ const Sale = () => {
     purchaseRate: 50,
     profitPercentage: 0,
     HSN: "HSN Code",
-    GST: 0,
+    SGST: 0,
+    CGST: 0,
     retailPrice: 64,
     totalAmount: 64,
     amountPaid: 0,
     __v: 0,
   });
-
+  const [BankDetails, setBankDetails] = useState({
+    GSTIN: "",
+    PAN_Number: "",
+  });
+  const [SHIPTO, setSHIPTO] = useState({
+    Name: "",
+    address: "",
+    Pin: "",
+  });
   const handleTokenExpiration = () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -116,7 +126,22 @@ const Sale = () => {
       }
     }
   };
+  const handleChangeGSTBILL = (e) => {
+    const { name, value } = e.target;
+    const [group, field] = name.split("."); // Expecting name in format: group.field
 
+    if (group === "BankDetails") {
+      setBankDetails((prevState) => ({
+        ...prevState,
+        [field]: value,
+      }));
+    } else if (group === "SHIPTO") {
+      setSHIPTO((prevState) => ({
+        ...prevState,
+        [field]: value,
+      }));
+    }
+  };
   const handlenewLogout = () => {
     localStorage.removeItem("token");
     axiosInstance.post("/auth/logout").catch((err) => console.error(err));
@@ -134,8 +159,10 @@ const Sale = () => {
         const fetchedData = response.data.data;
         if (fetchedData) {
           localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
-          setFinalAddress(fetchedData.language?.english?.address || "");
-          finalform.Address = fetchedData.language?.english?.address || ""; 
+          setFinalAddress(fetchedData.language?.english?.UserDetails?.address || "");
+          finalform.Address = fetchedData.language?.english?.UserDetails?.address || "";
+          finalform.State = fetchedData.language?.english?.UserDetails?.state || "";
+          finalform.Pin = fetchedData.language?.english?.UserDetails?.pin || "";
         } else {
           console.error("No settings data found");
         }
@@ -148,8 +175,10 @@ const Sale = () => {
     if (data) {
       try {
         const parsedData = JSON.parse(data);
-        setFinalAddress(parsedData.language?.english?.address || "");
-        finalform.Address = parsedData.language?.english?.address || ""; // Ensure this matches your usage pattern
+        setFinalAddress(parsedData.language?.english?.UserDetails?.address || "");
+        finalform.Address = parsedData.language?.english?.UserDetails?.address || "";
+        finalform.State = parsedData.language?.english?.UserDetails?.state || "";
+        finalform.Pin = parsedData.language?.english?.UserDetails?.pin || ""; // Ensure this matches your usage pattern
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
@@ -367,9 +396,15 @@ const Sale = () => {
       Date: Client.Date || currentDate,
       Mobile: Client.Mobile || "",
       ShipTo: Client.ShipTo || "",
-      Address: Client.Address || "Shrigonda",
-      State: Client.State || "Maharastra",
+      Address: Client.Address || "",
+      Email:Client.Email || "",
+      State: Client.State || "",
+      Pin: Client.Pin || "",
     });
+  setBankDetails(
+    {...Client.BankDetails }
+  )
+  setSHIPTO({...Client.SHIPTO})
     setShowModal(false);
     setShowMobileModal(false);
   };
@@ -415,7 +450,7 @@ const Sale = () => {
       const gst = parseFloat(newState.GST || 0);
 
       // const totalValue = ((mrp * quantity - discount) * (1 + gst / 100)).toFixed(2);
-      const totalValue = OneUnit * quantity + gst;
+      const totalValue = OneUnit * quantity;
       newState.finalPrice_with_GST = totalValue;
       const { product } = editItem;
       const discount =
@@ -657,7 +692,8 @@ const Sale = () => {
     saleRate: "",
     profit: "",
     hsn: "",
-    gst: "",
+    sgst: "",
+    cgst: "",
     total: "",
   });
 
@@ -666,10 +702,11 @@ const Sale = () => {
     name: "",
     Date: currentDate,
     Mobile: "",
+    Email: "",
     ShipTo: "",
-    Address:"",
-    State: "Maharastra",
-    GSTNo: "",
+    Address: "",
+    State: "",
+    Pin: "",
   });
 
   const bill = async () => {
@@ -699,6 +736,8 @@ const Sale = () => {
               },
               BillUser: finalform,
               status: "OneTime",
+              BankDetails,
+              SHIPTO,
             })
           ).unwrap();
 
@@ -709,10 +748,10 @@ const Sale = () => {
             name: "",
             Date: currentDate,
             Mobile: "",
+            Email: "",
             ShipTo: "",
-            Address: "Shrigonda",
-            State: "Maharastra",
-            GSTNo: "",
+            State: "",
+            Pin: "",
           });
           setFormData({
             barcode: "",
@@ -725,9 +764,19 @@ const Sale = () => {
             saleRate: "",
             profit: "",
             hsn: "",
-            gst: "",
+            sgst: "",
+            cgst: "",
             total: "",
           });
+            setBankDetails({
+              GSTIN:"",
+              PAN_Number:"",
+            });
+            setSHIPTO({
+              Name:"",
+              address:"",
+              Pin:"",
+            })
           dispatch(fetchCart());
           setMessage("");
           setCardPay("");
@@ -759,6 +808,7 @@ const Sale = () => {
 
   const handlePrint = () => {
     setPrint(true);
+    setGst(false)
     SetLanguage("English");
     bill();
   };
@@ -766,6 +816,17 @@ const Sale = () => {
   const handleMarathiPrint = () => {
     setPrint(true);
     SetLanguage("Marathi");
+    bill();
+  };
+  const handlePreviewGstEnglish = async () => {
+    SetLanguage("English");
+     setGstBill(true);
+    bill();
+  };
+  const handleGSTPrint = () => {
+    setPrint(true);
+    setGstBill(true)
+    SetLanguage("English");
     bill();
   };
 
@@ -819,7 +880,8 @@ const Sale = () => {
         saleRate: productDetails.discountedPrice || "",
         profit: productDetails.profit || "",
         hsn: productDetails.HSN,
-        gst: productDetails.GST || "",
+        sgst: productDetails.SGST || "",
+        cgst: productDetails.CGST || "",
       });
     }
   }, [productDetails]);
@@ -844,7 +906,8 @@ const Sale = () => {
         saleRate: "",
         profit: "",
         hsn: "",
-        gst: "",
+        sgst: "",
+        cgst:"",
         total: "",
       });
     } catch (error) {
@@ -873,7 +936,8 @@ const Sale = () => {
         saleRate: "",
         profit: "",
         hsn: "",
-        gst: "",
+        sgst: "",
+        cgst:"",
         total: "",
       });
     }
@@ -906,12 +970,12 @@ const Sale = () => {
       <div className="bg-white p-2 rounded-b-lg shadow-inner">
         <form>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div>
+            {/* <div>
               <label className=" text-gray-700 mr-2 font-medium">Type</label>
               <select className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option>Sale</option>
               </select>
-            </div>
+            </div> */}
             <div>
               <label className="mr-2 text-gray-700 font-medium">Name</label>
               <input
@@ -1004,11 +1068,11 @@ const Sale = () => {
               )}
             </div>
             <div>
-              <label className=" mr-2 text-gray-700 font-medium">Ship To</label>
+              <label className=" mr-2 text-gray-700 font-medium">Email</label>
               <input
                 type="text"
-                id="ShipTo"
-                value={finalform.ShipTo}
+                id="Email"
+                value={finalform.Email}
                 onChange={handleFinal}
                 onKeyDown={handleKeys}
                 className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1031,6 +1095,80 @@ const Sale = () => {
                 id="State"
                 value={finalform.State}
                 onChange={handleFinal}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">PinCode</label>
+              <input
+                type="text"
+                id="Pin"
+                value={finalform.Pin}
+                onChange={handleFinal}
+                onKeyDown={handleKeys}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">GSTIN</label>
+              <input
+                type="text"
+                name="BankDetails.GSTIN"
+                placeholder="GSTIN"
+                value={BankDetails.GSTIN}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                PAN Number
+              </label>
+              <input
+                type="text"
+                name="BankDetails.PAN_Number"
+                placeholder="PAN Number"
+                value={BankDetails.PAN_Number}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO Name
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.Name"
+                placeholder="Name"
+                value={SHIPTO.Name}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO Address
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.address"
+                placeholder="Address"
+                value={SHIPTO.address}
+                onChange={handleChangeGSTBILL}
+                className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className=" mr-2 text-gray-700 font-medium">
+                SHIPTO PinCode
+              </label>
+              <input
+                type="text"
+                name="SHIPTO.Pin"
+                placeholder="Pin"
+                value={SHIPTO.Pin}
+                onChange={handleChangeGSTBILL}
                 className="w-60 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               ></input>
             </div>
@@ -1257,22 +1395,38 @@ const Sale = () => {
             </div>
             <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
               <label
-                htmlFor="gst"
+                htmlFor="cgst"
                 className="block text-gray-700 text-sm font-medium"
               >
-                GST%
+                CGST%
               </label>
               <input
                 type="text"
-                id="gst"
-                value={formData.gst}
+                id="cgst"
+                value={formData.cgst}
                 onKeyDown={handleKeys}
                 onChange={handleChange}
                 className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter GST percentage"
               />
             </div>
-
+            <div className="w-full sm:w-1/2 lg:w-1/4 mb-4">
+              <label
+                htmlFor="sgst"
+                className="block text-gray-700 text-sm font-medium"
+              >
+                SGST%
+              </label>
+              <input
+                type="text"
+                id="sgst"
+                value={formData.sgst}
+                onKeyDown={handleKeys}
+                onChange={handleChange}
+                className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter GST percentage"
+              />
+            </div>
             <div className="w-full sm:w-1/2 lg:w-1/6 ml-6 mt-5">
               <button
                 type="submit"
@@ -1318,7 +1472,8 @@ const Sale = () => {
                 <th className="p-1 border border-gray-600 text-left">
                   Total Discount Price
                 </th>
-                <th className="p-1 border border-gray-600 text-left">GST%</th>
+                <th className="p-1 border border-gray-600 text-left">SGST%</th>
+                <th className="p-1 border border-gray-600 text-left">CGST%</th>
                 <th className="p-1 border border-gray-600 text-left">
                   Total Value
                 </th>
@@ -1424,11 +1579,22 @@ const Sale = () => {
                         {editId === item._id ? (
                           <input
                             type="number"
-                            value={editItem.GST}
-                            onChange={(e) => handleInputChange(e, "GST")}
+                            value={editItem.SGST}
+                            onChange={(e) => handleInputChange(e, "SGST")}
                           />
                         ) : (
-                          item.GST
+                          item.SGST
+                        )}
+                      </td>
+                      <td className="p-1 border border-gray-600">
+                        {editId === item._id ? (
+                          <input
+                            type="number"
+                            value={editItem.CGST}
+                            onChange={(e) => handleInputChange(e, "CGST")}
+                          />
+                        ) : (
+                          item.CGST
                         )}
                       </td>
                       <td className="p-1 border border-gray-600">
@@ -1560,9 +1726,15 @@ const Sale = () => {
                                   </div>
                                   <div className="text-gray-700 mb-2 w-full justify-between flex ">
                                     <div>
-                                      <strong>GST:</strong>
+                                      <strong>SGST:</strong>
                                     </div>{" "}
-                                    <div> {selectedProduct.GST}%</div>
+                                    <div> {selectedProduct.SGST}%</div>
+                                  </div>
+                                  <div className="text-gray-700 mb-2 w-full justify-between flex ">
+                                    <div>
+                                      <strong>CGST:</strong>
+                                    </div>{" "}
+                                    <div> {selectedProduct.CGST}%</div>
                                   </div>
                                   <div className="text-gray-700 mb-2 w-full justify-between flex ">
                                     <div>
@@ -1660,6 +1832,12 @@ const Sale = () => {
             >
               <span className="text-center">सेव्ह अँड प्रिंट</span>
             </button>
+            <button
+              className="bg-blue-400 text-white hover:bg-red-400 px-4 py-2 rounded-md"
+              onClick={handleGSTPrint}
+            >
+              <span className="text-center">GST INVOICE</span>
+            </button>
           </div>
 
           <div className="bg-gray-200  rounded-lg shadow-md  max-w-2xl">
@@ -1751,6 +1929,7 @@ const Sale = () => {
           componentRef={componentRef}
           details={invoice}
           language={language}
+          GstBill={GstBill}
         />
 
         <ReactToPrint

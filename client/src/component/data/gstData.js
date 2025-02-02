@@ -1,0 +1,75 @@
+const sampleInvoiceData = {
+    company: {
+      name: "Akash Enterprises",
+      address: "Ajmer Road, Jaipur, Rajasthan 301202",
+      phone: "+91 9912787197",
+      gstin: "08AABLC2785A1ZD",
+      pan: "AVHPC6971A",
+      email: "dpravi799@gmail.com",
+      website: "www.stockregister.in",
+      fssai: "drpravi799@gmail.com",
+    },
+    type: "customer",
+    invoiceInfo: {
+      number: "S01",
+      date: "11 January 2023",
+    },
+    billingInfo: {
+      name: "Sampath Singh",
+      address: "04, KK Buildings, Ajmer Gate, Jodhpur, Rajasthan",
+      pin: "304582",
+      phone: "+91 991028177",
+      pan: "AVHPC6971A",
+    },
+    shippingInfo: {
+      name: "Sampath Singh",
+      address: "06, BB Buildings, Pali Gate, Udaipur, Rajasthan",
+      pin: "308582",
+    },
+    items: [
+      {
+        name: "Apple is ebvds lvldsakjk faos;djfkds  fldjsf j",
+        hsn: "808",
+        quantity: "5 KG",
+        rate: "Rs. 100.00",
+        tax: "Rs. 5.00 (5%)",
+        amount: "Rs. 525.00",
+      },
+      {
+        name: "Banana",
+        hsn: "803",
+        quantity: "5 KG",
+        rate: "Rs. 100.00",
+        tax: "Rs. 5.00 (5%)",
+        amount: "Rs. 525.00",
+      },
+      {
+        name: "Orange",
+        hsn: "805",
+        quantity: "5 KG",
+        rate: "Rs. 100.00",
+        tax: "Rs. 5.00 (5%)",
+        amount: "Rs. 525.00",
+      },
+    ],
+    totals: {
+      amount: "Rs. 1525.00",
+      discount: "Rs. 50.00",
+      tax: "Rs. 75.00",
+      grandTotal: "Rs. 1550.00",
+    },
+    terms: [
+      "Customer will pay the GST",
+      "Customer will pay the Delivery charges",
+      "Pay due amount within 15 days",
+    ],
+    bankDetails: {
+      holder: "Akash Singh",
+      number: "38028101723",
+      bank: "SBI",
+      branch: "Jaipur",
+      ifsc: "SBIN0002836",
+      upi: "1281@paytm",
+    },
+  };
+  export default sampleInvoiceData;

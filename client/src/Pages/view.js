@@ -45,7 +45,7 @@ const View = () => {
   const [toDate, setToDate] = useState('');
   const [name, setName] = useState('');
   const [print, setPrint] = useState(false);
-
+  const [GstBill, setGstBill] = useState(false);
   const [totalBills , setTotalBills] = useState();
   const [totalSales, setTotalSales] = useState();
   const [totalBorrow , setTotalBorrow] = useState();
@@ -56,6 +56,12 @@ const View = () => {
   const [sort, setSort] = useState([])
   const handlePrint = (item) => {
     SetLanguage("English")
+    setGstBill(false);
+    setDetails(item);
+  };
+  const GST_INVOICE_PRINT = (item) => {
+    SetLanguage("English")
+     setGstBill(true);
     setDetails(item);
   };
 
@@ -79,6 +85,7 @@ const View = () => {
 
 
   useEffect(() => {
+    console.log(orders)
     setSort(orders);
     handleBills()
   
@@ -255,7 +262,12 @@ const View = () => {
                       Marathi
                     </span>
                   </button>
-
+                  <button className="text-red-400" onClick={() => GST_INVOICE_PRINT(item)}>
+                    <span className='text-center'>
+                      <TbEyeEdit className="text-2xl whitespace-nowrap" />
+                     GST INVOICE 
+                    </span>
+                  </button>
                 </div>
 
               </div>
@@ -458,6 +470,7 @@ const View = () => {
         componentRef={componentRef}
         details={details}
         language={language}
+        GstBill={GstBill}
       />
 
 

@@ -1,38 +1,26 @@
-version: '3.9'
+version: '3.8'
 
 services:
   gateway:
     build:
-      context: ./gateways
+      context: ./gateways  
       dockerfile: Dockerfile
     ports:
       - "4000:4000"
-    networks:
-      - app-network
     depends_on:
-      - users
-      - sales
-      - product
-
-  users:
-    build:
-      context: ./users
-      dockerfile: Dockerfile
-    ports:
-      - "3003:3003"
+      - products
+      - sales-advancepay
+      - sales-cart
+      - sales-ongoing
+      - sales-order
+      - user-admin
+      - user-auth
+      - user-setting
+      - user-users
     networks:
       - app-network
 
-  sales:
-    build:
-      context: ./sales
-      dockerfile: Dockerfile
-    ports:
-      - "3002:3002"
-    networks:
-      - app-network
-
-  product:
+  products:
     build:
       context: ./products
       dockerfile: Dockerfile
@@ -40,15 +28,81 @@ services:
       - "3001:3001"
     networks:
       - app-network
-  client:
+
+  ## 🛒 SALES SERVICES (Renamed)
+  sales-advancepay:
     build:
-      context: ./client
+      context: ./sales/AdvancePay  
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "4001:4001"
     networks:
       - app-network
- 
+
+  sales-cart:
+    build:
+      context: ./sales/cart  
+      dockerfile: Dockerfile
+    ports:
+      - "4002:4002"
+    networks:
+      - app-network
+
+  sales-ongoing:
+    build:
+      context: ./sales/onGoing  
+      dockerfile: Dockerfile
+    ports:
+      - "4003:4003"
+    networks:
+      - app-network
+
+  sales-order:
+    build:
+      context: ./sales/order  
+      dockerfile: Dockerfile
+    ports:
+      - "4004:4004"
+    networks:
+      - app-network
+
+  ## 👤 USER SERVICES (Renamed)
+  user-admin:
+    build:
+      context: ./user/admin  
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    networks:
+      - app-network
+
+  user-auth:
+    build:
+      context: ./user/Auth  
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    networks:
+      - app-network
+
+  user-setting:
+    build:
+      context: ./user/setting  
+      dockerfile: Dockerfile
+    ports:
+      - "5003:5003"
+    networks:
+      - app-network
+
+  user-users:
+    build:
+      context: ./user/users  
+      dockerfile: Dockerfile
+    ports:
+      - "5004:5004"
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

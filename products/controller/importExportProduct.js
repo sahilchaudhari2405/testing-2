@@ -41,8 +41,8 @@ function parseField(value, type = "string") {
 
 // Main importProducts function
 export const importProducts = async (req, res) => {
-  const { products } = req.body;
-
+  const { products,imageUrl } = req.body;
+   console.log(imageUrl)
   try {
     const tenantId = req.user.tenantId;
     const Product = await getTenantModel(tenantId, "Product", productSchema);
@@ -86,7 +86,7 @@ export const importProducts = async (req, res) => {
       if (barcode) {
         const existingProduct = await Product.findOne({ BarCode: barcode });
         if (existingProduct) {
-          const updateData = buildUpdateData(productData);
+          const updateData = buildUpdateData(productData,imageUrl);
           updateOperations.push({
             updateOne: {
               filter: { BarCode: barcode },
@@ -94,13 +94,13 @@ export const importProducts = async (req, res) => {
             },
           });
         } else {
-          const newProduct = buildNewProductData(productData, category);
+          const newProduct = buildNewProductData(productData, category,imageUrl);
           newProducts.push(newProduct);
         }
       } else {
         const newBarcode = await generateUniqueBarcode(Product);
         productData.BarCode = newBarcode;
-        const newProduct = buildNewProductData(productData, category);
+        const newProduct = buildNewProductData(productData, category,imageUrl);
         newProducts.push(newProduct);
       }
       console.log("data", barcode)
@@ -123,7 +123,6 @@ export const importProducts = async (req, res) => {
         await Category.insertMany(uniqueCategories);
       }
     }
-
     if (newProducts.length) {
       await Product.insertMany(newProducts);
     }
@@ -144,7 +143,7 @@ export const importProducts = async (req, res) => {
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
-function buildNewProductData(productData, category) {
+function buildNewProductData(productData, category,imageUrl) {
   const isGSTPad = !productData.BarCode; // Determine data format
 
   return {
@@ -164,9 +163,7 @@ function buildNewProductData(productData, category) {
       "int"
     ),
     brand: parseField(productData.brand),
-    imageUrl:
-      productData.imageUrl ||
-      "https://res.cloudinary.com/dc77zxyyk/image/upload/v1722436071/jodogeuuufbcrontd3ik.png",
+    imageUrl:productData.imageUrl || imageUrl,
     slug:
       parseField(isGSTPad ? productData.Name : productData.slug, "string") ||
       "default-slug",
@@ -188,7 +185,8 @@ function buildNewProductData(productData, category) {
       "float"
     ),
     HSN: parseField(isGSTPad ? productData.CESS : productData.HSN),
-    GST: parseField(isGSTPad ? productData.TAX : productData.GST, "float"),
+    CGST: parseField(isGSTPad ? productData.TAX/2 : productData.CGST, "float"),
+    SGST: parseField(isGSTPad ? productData.TAX/2 : productData.SGST, "float"),
     retailPrice: parseField(
       isGSTPad ? productData["Net Sale"] : productData.retailPrice,
       "float"
@@ -202,7 +200,7 @@ function buildNewProductData(productData, category) {
 }
 
 // Helper function to build update data
-function buildUpdateData(productData) {
+function buildUpdateData(productData,imageUrl) {
   const isGSTPad = !productData.BarCode; // Determine data format
 
   return {
@@ -214,6 +212,7 @@ function buildUpdateData(productData) {
       isGSTPad ? productData["Net Sale"] : productData.totalAmount,
       "float"
     ),
+    imageUrl:productData.imageUrl || imageUrl,
     amountPaid: parseField(productData.amountpaid, "float"),
     quantity: parseField(
       isGSTPad ? productData["Qty."] : productData.quantity,
