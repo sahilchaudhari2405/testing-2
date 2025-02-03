@@ -32,7 +32,7 @@ app.use(cors({
 }));
 
 // Use container names for service communication within Docker network
-app.use('/products/import', expressProxy('http://products:3001'));
+app.use('/products/import', expressProxy('http://import-export:3001'));
 app.use('/products', expressProxy('http://products:3002'));
 
 app.use('/sales/AdvancePay', expressProxy('http://sales-advancepay:4001'));
