@@ -76,7 +76,7 @@ app.use(bodyParser.json())
 // y
 app.use('/', allRouter);
 
-app.listen(3001, () => {
-    console.log('listening on *:3001');
+app.listen(3002, () => {
+    console.log('listening on *:3002');
 });
 }

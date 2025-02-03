@@ -23,6 +23,7 @@ services:
       - CORS_ALLOWED_ORIGINS=http://65.0.98.146
     depends_on:
       - products
+      - import-export
       - sales-advancepay
       - sales-cart
       - sales-ongoing
@@ -36,7 +37,7 @@ services:
 
   products:
     build:
-      context: ./products
+      context: ./products/product
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
@@ -45,7 +46,17 @@ services:
 
     networks:
       - app-network
+  import-export:
+    build:
+      context: ./products/ImportExport
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - CORS_ALLOWED_ORIGINS=http://65.0.98.146
 
+    networks:
+      - app-network
   ## 🛒 SALES SERVICES (Renamed)
   sales-advancepay:
     build:
