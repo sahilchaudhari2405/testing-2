@@ -39,7 +39,7 @@ const allowedOrigins = [
    'http://localhost',
   'http://client:80',
   'http://apalabajar.shop',
-  'https://apalabajar.shop',  
+  'http://software.apalabajar.shop',  
   'http://www.apalabajar.shop',
   'https://www.apalabajar.shop',
   'http://65.0.98.146',
