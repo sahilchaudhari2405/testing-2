@@ -3,11 +3,10 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './database/mongo.db.js';
-import allRouter from './Router/router.js';
 import bodyParser from 'body-parser';
 import cluster from 'cluster';
 import os from 'os';
-import { importProducts } from './controller/importExportProduct.js';
+import { importProducts } from '../product/controller/importExportProduct.js';
 
 const totalCPUs = os.cpus().length;
 dotenv.config({ 

@@ -3,7 +3,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './database/mongo.db.js';
-import allRouter from './Router/router.js';
 import bodyParser from 'body-parser';
 import cluster from 'cluster';
 import OnGoingCart from './routes/OnGoing.route.js';
