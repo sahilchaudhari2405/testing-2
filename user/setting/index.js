@@ -7,7 +7,6 @@ import allRouter from './Router/router.js';
 import bodyParser from 'body-parser';
 import cluster from 'cluster';
 import os from 'os';
-import './utils/dailyExpireCheck.js'
 import Settingsrouter from './routes/setting.route.js';
 const totalCPUs = os.cpus().length;
 dotenv.config({
