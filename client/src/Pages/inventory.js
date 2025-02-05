@@ -6,6 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import { logoutUser } from '../Redux/User/userSlices';
 import { toast } from 'react-toastify';
 import Modal from '../component/Modal';
+import { HashLoader } from "react-spinners";
 import { fetchProduct, fetchProducts, sortProducts } from "../Redux/Product/productSlice";
 import { fetchCategories } from "../Redux/Category/categoriesSlice";
 import CategorySuggestions from '../component/CategorySuggestions';
@@ -522,7 +523,9 @@ const handleCheckboxChange = (event) => {
             OnAction={handleCloseSuccessModal}
           />
          ))}
-         {loading && <div>Loading more products...</div>}
+         {loading &&     <div className="flex items-center  h-30 w-full justify-center">
+      <HashLoader size={100} />
+    </div>}
          {prod.length === 0 && !loading ? <div className='bg-white text-black text-2xl w-full h-[80vh] pt-[30vh] text-center'> Sorry No Product Found As Per Your Search Combination</div> : null}
         </div>
       </div>

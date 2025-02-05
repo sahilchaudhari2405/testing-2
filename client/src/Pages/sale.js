@@ -894,7 +894,6 @@ const Sale = () => {
     try {
       await dispatch(addToCart({ productCode: id, status, formData })).unwrap();
       dispatch(fetchCart());
-      toast.success("Product successfully added to cart");
       setFormData({
         barcode: "",
         brand: "",

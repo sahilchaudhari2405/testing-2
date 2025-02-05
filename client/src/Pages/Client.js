@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { deleteOrder} from '../Redux/Orders/orderSlice';
 import { logoutUser } from '../Redux/User/userSlices';
 import axiosInstance from '../axiosConfig';
+import { HashLoader } from 'react-spinners';
 
 const Clients = () => {
   const navigate = useNavigate();
@@ -561,9 +562,9 @@ const alphabet = searchQuery
         )}
         {selectedView === 'Imported' && renderOrdersTable(importedData)}
         {loading && (
-      <div className="text-center py-4">
-        <span>Loading more clients...</span>
-      </div>
+          <div className="flex items-center  h-30 w-full justify-center">
+      <HashLoader size={100} />
+    </div>
     )}
 
     {/* End of data message */}

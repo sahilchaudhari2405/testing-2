@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { deleteOrder, fetchOrders } from '../Redux/Orders/orderSlice';
 import { logoutUser } from '../Redux/User/userSlices';
 import axiosInstance from '../axiosConfig';
+import { HashLoader } from 'react-spinners';
 
 const Accounts = () => {
   const navigate = useNavigate();
@@ -479,7 +480,9 @@ const Accounts = () => {
           </div>
         )}
         {status === 'loading' ? (
-          <div>Loading...</div>
+            <div className="flex items-center  h-30 w-full justify-center">
+            <HashLoader size={100} />
+          </div>
         ) : error ? (
           <div>Error: {error}</div>
         ) : (

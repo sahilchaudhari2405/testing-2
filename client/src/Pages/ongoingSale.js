@@ -1034,7 +1034,6 @@ const OngoingSale = () => {
 
       // Fetch the updated cart after successfully adding the product
       dispatch(fetchCart({ PayId: AdvancePaidId, uId: UserId }));
-      toast.success("Product added to cart successfully");
       setFormData({
         barcode: "",
         brand: "",
@@ -2161,74 +2160,76 @@ const OngoingSale = () => {
         onClose={() => setPopupOpen(false)}
         advancePay={AdvancePaid}
       />
-      {showPopup && (
-        <div className="absolute inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-white p-5 rounded-lg shadow-lg w-80">
-            <h2 className="text-center text-lg font-semibold mb-3 text-red-500">
-              Missing Fields
-            </h2>
-            <ul className="list-disc list-inside text-gray-700">
-              {missingFields.map((field, index) => (
-                <li key={index} className="capitalize">
-                  {field} is required
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5 flex justify-center">
-              <button
-                onClick={handleClosePopup}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {blocking && (
-        <div className="absolute inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm z-20 flex justify-center items-center">
-          <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-            <h2 className="text-center text-xl font-semibold text-gray-800 mb-5">
-              Payment Details
-            </h2>
-            <div className="mb-4">
-              <p className="text-gray-600 text-lg mb-2">
-                <span className="font-medium">Total Amount:</span> {total}
-              </p>
-              <p className="text-gray-600 text-lg mb-4">
-                <span className="font-medium">Advance Payment: </span>
-              </p>
-              <input
-                type="number"
-                name="cash"
-                value={AdvancePay}
-                onChange={(e) => setAdvancePay(e.target.value)}
-                placeholder="Enter advance payment amount"
-                className="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                style={{
-                  appearance: "textfield",
-                  MozAppearance: "textfield",
-                  WebkitAppearance: "none",
-                }}
-              />
-            </div>
-            <div className="flex justify-between mt-6">
-              <button
-                onClick={handleSaveData}
-                className="px-6 py-3 bg-indigo-500 text-white rounded-lg shadow hover:bg-indigo-600 transition duration-200"
-              >
-                Save
-              </button>
-              <button
-                onClick={handleCancel}
-                className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg shadow hover:bg-gray-400 transition duration-200"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+     {showPopup && (
+  <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-5 rounded-lg shadow-lg w-80">
+      <h2 className="text-center text-lg font-semibold mb-3 text-red-500">
+        Missing Fields
+      </h2>
+      <ul className="list-disc list-inside text-gray-700">
+        {missingFields.map((field, index) => (
+          <li key={index} className="capitalize">
+            {field} is required
+          </li>
+        ))}
+      </ul>
+      <div className="mt-5 flex justify-center">
+        <button
+          onClick={handleClosePopup}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{blocking && (
+  <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+      <h2 className="text-center text-xl font-semibold text-gray-800 mb-5">
+        Payment Details
+      </h2>
+      <div className="mb-4">
+        <p className="text-gray-600 text-lg mb-2">
+          <span className="font-medium">Total Amount:</span> {total}
+        </p>
+        <p className="text-gray-600 text-lg mb-4">
+          <span className="font-medium">Advance Payment: </span>
+        </p>
+        <input
+          type="number"
+          name="cash"
+          value={AdvancePay}
+          onChange={(e) => setAdvancePay(e.target.value)}
+          placeholder="Enter advance payment amount"
+          className="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          style={{
+            appearance: "textfield",
+            MozAppearance: "textfield",
+            WebkitAppearance: "none",
+          }}
+        />
+      </div>
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={handleSaveData}
+          className="px-6 py-3 bg-indigo-500 text-white rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+        >
+          Save
+        </button>
+        <button
+          onClick={handleCancel}
+          className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg shadow hover:bg-gray-400 transition duration-200"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
