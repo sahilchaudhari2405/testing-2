@@ -21,8 +21,8 @@ const Purchase = () => {
   const purchaseOrders = useSelector((state) => state.orders.purchaseOrders);
   const [currentDate, setCurrentDate] = useState("");
   const [cart, setCart] = useState([]);
-  const [invoice, setInvoicePrice] = useState();
-  const [totalGst, setTotalGst] = useState();
+  const [invoice, setInvoicePrice] = useState(0);
+  const [totalGst, setTotalGst] = useState(0);
   const [paid, setPaid] = useState();
   const [invoiceData, setInvoice] = useState();
   const [isChecked, setIsChecked] = useState(false);
@@ -42,12 +42,13 @@ const Purchase = () => {
     const fetchSettings = async () => {
       try {
         const response = await axiosInstance.get("/users/setting");
-
         const fetchedData = response.data.data;
         if (fetchedData) {
           localStorage.setItem("invoiceSettings", JSON.stringify(fetchedData));
-          setFinalAddress(fetchedData.language?.english?.address || "");
-          finalform.address = fetchedData.language?.english?.address || ""; // Ensure this logic aligns with your app's state management
+          setFinalAddress(fetchedData.language?.english?.UserDetails?.address || "");
+          finalform.address = fetchedData.language?.english?.UserDetails?.address || "";
+          finalform.state = fetchedData.language?.english?.UserDetails?.state || "";
+          finalform.Pin = fetchedData.language?.english?.UserDetails?.pin || "";
         } else {
           console.error("No settings data found");
         }
@@ -60,9 +61,10 @@ const Purchase = () => {
     if (data) {
       try {
         const parsedData = JSON.parse(data);
-
-        setFinalAddress(parsedData.language?.english?.address || "");
-        finalform.address = parsedData.language?.english?.address || ""; // Ensure this matches your usage pattern
+        setFinalAddress(parsedData.language?.english?.UserDetails?.address || "");
+        finalform.address = parsedData.language?.english?.UserDetails?.address || "";
+        finalform.state = parsedData.language?.english?.UserDetails?.state || "";
+        finalform.Pin = parsedData.language?.english?.UserDetails?.pin || ""; // Ensure this matches your usage pattern
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
@@ -70,7 +72,8 @@ const Purchase = () => {
       console.warn("No data found in localStorage, fetching from API...");
       fetchSettings();
     }
-  }, [Address]); 
+  }, [Address]); // Removed `Address` dependency to avoid redundant calls
+  
   
   const handleTokenExpiration = () => {
     const token = localStorage.getItem('token');
@@ -109,7 +112,8 @@ const Purchase = () => {
       date: Client.Date || currentDate,
       mobileNumber: Client.Mobile || '',
       ShipTo: Client.ShipTo || '',
-      address: Client.Address || 'Shrigonda',
+      Pin:Client.Pin,
+      address: Client.Address || '',
       state: Client.State || 'Maharastra',
     });
     setShowModal(false);
@@ -430,6 +434,7 @@ const Purchase = () => {
     name: "",
     date: "",
     mobileNumber: "",
+    Pin:"",
     ShipTo: "",
     address:"Shrigonda",
     ref: "",
@@ -467,23 +472,22 @@ const Purchase = () => {
 
   const bill = async () => {
     const gen =
-      (finalform?.paymentType?.cash ? parseInt(finalform?.paymentType?.cash) : 0) +
-      (finalform?.paymentType?.upi ? parseInt(finalform?.paymentType?.upi) : 0) +
-      (finalform?.paymentType?.card ? parseInt(finalform?.paymentType?.card) : 0) +
-      (finalform?.paymentType?.borrow? parseInt(finalform?.paymentType?.borrow) : 0);
-
-    const amount = Math.round(gen)
- const all= invoice+totalGst
- const total = Math.round(all)
-
-
-
+    (parseInt(finalform?.paymentType?.cash) || 0) +
+    (parseInt(finalform?.paymentType?.upi) || 0) +
+    (parseInt(finalform?.paymentType?.card) || 0) +
+    (parseInt(finalform?.paymentType?.borrow) || 0);
+  
+  const amount = Math.round(gen);
+  
+  const all = (Number(invoice) || 0) + (Number(totalGst) || 0);
+  const total = Math.round(all);
+  
     if (amount == total) {
       if (
         cart.length > 0 &&
         finalform.name &&
         finalform.mobileNumber &&
-        finalform.address
+        finalform.address && finalform.Pin
       ) {
         try {
           dispatch(
@@ -494,6 +498,7 @@ const Purchase = () => {
             name: "",
             date: "",
             mobileNumber: "",
+            Pin:"",
             ShipTo: "",
             address:"Shrigonda",
             ref: "",
@@ -529,8 +534,8 @@ const Purchase = () => {
             image: null,
           });
 
-          setInvoicePrice("");
-          setTotalGst("");
+          setInvoicePrice(0);
+          setTotalGst(0);
           setPaid("");
 
           setCart([]);
@@ -683,7 +688,7 @@ const Purchase = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-medium">Vendor</label>
+              <label className="block text-gray-700 font-medium">Vendor Name</label>
               <input
                 type="text"
                 onKeyDown={handleKeys}
@@ -709,6 +714,15 @@ const Purchase = () => {
               <input
                 id="state"
                 value={finalform.state}
+                onChange={handleFinal}
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></input>
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium">Pin</label>
+              <input
+                id="Pin"
+                value={finalform.Pin}
                 onChange={handleFinal}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               ></input>

@@ -62,7 +62,7 @@ export const generateOrderWithProductCheck = async (req, res) => {
                         filter: { BarCode: productData.barcode },
                         update: {
                             $inc: { quantity },
-                            $set: { purchaseRate, retailPrice, GST: gst, updatedAt: new Date() }
+                            $set: { purchaseRate, retailPrice, CGST: cgst,SGST:sgst, updatedAt: new Date() }
                         }
                     }
                 });
@@ -144,7 +144,6 @@ export const generateOrderWithProductCheck = async (req, res) => {
                 }
             }
         }
-console.log(orderItems)
         // Calculate total amounts for the order
         const totalPrice = orderItems.reduce((sum, item) => sum + item.retailPrice * item.quantity, 0);
         const totalPurchaseRate = orderItems.reduce((sum, item) => sum + item.purchaseRate * item.quantity, 0);
@@ -171,7 +170,7 @@ console.log(orderItems)
             orderItems, // Use updated orderItems with correct productId
             totalPrice,
             totalPurchaseRate,
-            GST: totalGST,
+            GST: totalGST || 0,
             totalItem,
             AmountPaid: parseInt(Amount, 10) || 0,
             orderDate: new Date(),
@@ -186,7 +185,7 @@ console.log(orderItems)
                 Address: orderDetails.address,
                 State: orderDetails.state,
                 Mobile: orderDetails.mobileNumber,
-                Pin:Pin,
+                Pin:orderDetails.Pin,
                 BankDetails:BankDetails,
                 SHIPTO: SHIPTO,
                 Purchase: newOrder.AmountPaid + orderDetails.paymentType.borrow || 0,
