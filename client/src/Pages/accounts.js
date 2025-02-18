@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowDown, FaEdit, FaTrash, FaBalanceScale, FaCheckCircle, FaWhatsapp } from 'react-icons/fa';
+import { FaArrowDown, FaEdit, FaTrash, FaBalanceScale, FaCheckCircle, FaWhatsapp, FaSave } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
@@ -24,16 +24,29 @@ const Accounts = () => {
   const [message, setMessage] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
+  const [clientId, setClientId] = useState('');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
   const orders = useSelector((state) => state.orders.orders);
-
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [payment, setPayment] = useState({
+    balance: 0,
+    loyalty: 0,
+  });
+  const [Balance, setBalance] = useState(0); // Example, replace with actual logic
+  const [loyalty, setLoyalty] = useState(0); // Example, replace with actual logic
+  const [remainingAmountLoyelty, setRemainingAmountLoyelty] = useState(0); // Example, replace with actual logic
+  const [remainingAmountBalance, setRemainingAmountBalance] = useState(0); // Example, replace with actual logic
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
-
+  const setData = (order) => {
+   setBalance(order.totalClosingBalance)
+   setLoyalty(order.loyalty)
+   setClientId(order._id)
+  setPopupVisible(true)
+  };
   useEffect(() => {
     if (orders.length > 0) {
       orders.forEach(order => {
@@ -72,13 +85,60 @@ const Accounts = () => {
     const file = e.target.files[0];
     setSelectedFile(file);
   };
-
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+    setPayment({
+      ...payment,
+      [name]: parseFloat(value) || 0,
+    });
+  };
+  
+  const handleSavePayment = async () => {
+    // Implement logic to save payment details
+    try {
+console.log("yes")
+      const response = await axiosInstance.post('/sales/AdvancePay/UpdateAmount', {
+        clientId,
+        amount: payment.balance,
+        loyaltyReduction:payment.loyalty,
+      });
+      setPopupVisible(false);
+      console.log(response)
+      dispatch(fetchOrders());
+      setPayment({
+        balance:"",
+        loyalty:"",
+      })
+      setClientId("");
+    } catch (error) {
+      setMessage(error.response?.data?.message || 'An error occurred');
+    } finally {
+    }
+  
+  };
+  
+  const handleCancel = () => {
+    setPayment({
+      balance:"",
+      loyalty:"",
+    })
+    setClientId("");
+    setPopupVisible(false);
+  };
+  useEffect(() => {
+    const totalAmountBalance = Balance - payment.balance;
+    const remaining = loyalty- payment.loyalty;
+    setRemainingAmountLoyelty(remaining >= 0 ? remaining : 0);
+    setRemainingAmountBalance(totalAmountBalance > 0 ? Math.abs(totalAmountBalance) : 0);
+  }, [payment]);
+  
   const handleLogout = () => {
     dispatch(logoutUser());
     localStorage.removeItem('token');
     toast.error("Logout Successfully!");
     navigate('/');
   };
+
 
   const openWhatsAppPopup = (order) => {
     setSelectedOrder(order);
@@ -233,6 +293,7 @@ const Accounts = () => {
             <th className="border border-zinc-800 px-4 py-2">Type</th>
             <th className="border border-zinc-800 px-4 py-2">Time</th>
             <th className="border border-zinc-800 px-4 py-2">Date</th>
+            <th className="border border-zinc-800 px-0.5 py-2">loyalty</th>
             <th className="border border-zinc-800 px-0.5 py-2">Purchase</th>
             <th className="border border-zinc-800 px-0.5 py-2">Balance</th>
             <th className="border border-zinc-800 px-4 py-2">Action</th>
@@ -240,8 +301,7 @@ const Accounts = () => {
         </thead>
         <tbody>
           {data?.map((order, i) => {
-            // Log each order to the console
-            console.log("Map ka andar ka data ", order);
+
 
             return (
               <tr key={order._id || i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
@@ -257,6 +317,7 @@ const Accounts = () => {
                   timeZone: 'Asia/Kolkata'
                 })}</td>
                 <td className="border border-zinc-800 px-4 py-2">{new Date(order.updatedAt).toLocaleDateString()}</td>
+                <td className="border border-zinc-800 px-4 py-2">{order?.loyalty?.toFixed(2)}</td>
                 <td className="border border-zinc-800 px-4 py-2">{order.totalCompletePurchase}</td>
                 <td className="border border-zinc-800 px-4 py-2">{order.totalClosingBalance}</td>
                 <td className="border border-zinc-800 px-4 py-2">
@@ -278,6 +339,10 @@ const Accounts = () => {
                         aria-hidden="true"
                         onClick={() => fetchCompletePurchaseData(order)}
                       />
+                    </button>
+                    <button
+                    ><FaEdit  aria-hidden="true"   onClick={() => setData(order)}/>
+                    
                     </button>
                   </div>
                 </td>
@@ -490,6 +555,75 @@ const Accounts = () => {
         )}
         {selectedView === 'Imported' && renderOrdersTable(importedData)}
       </div>
+      {popupVisible && (
+  <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+      <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Total Amount: ₹{Balance.toFixed(2)}
+      </h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Loyalty Amount: ₹{loyalty.toFixed(2)}
+      </h3>
+      <div className="space-y-4">
+        <span className="text-gray-600">Balance Amount</span>
+        <input
+          type="number"
+          name="balance"
+          value={payment.balance || ""}
+          onChange={handlePaymentChange}
+          placeholder=""
+          className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          style={{
+            appearance: "textfield",
+            MozAppearance: "textfield",
+            WebkitAppearance: "none",
+          }}
+        />
+        <span className="text-gray-600">Loyalty Amount</span>
+        <input
+          type="number"
+          name="loyalty"
+          value={payment.loyalty || ""}
+          onChange={handlePaymentChange}
+          placeholder=""
+          className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          style={{
+            appearance: "textfield",
+            MozAppearance: "textfield",
+            WebkitAppearance: "none",
+          }}
+        />
+        <h4
+          className={`mt-4 ${
+            "text-green-500"
+          }`}
+        >
+          {`Remaining Amount Balance: ₹${remainingAmountBalance.toFixed(2)}`}
+          <div className="text-orange-400">
+            {`Remaining Amount Loyelty: ₹${remainingAmountLoyelty.toFixed(2)}`}
+          </div>
+        </h4>
+        <div className="flex justify-end space-x-4 mt-4">
+          <button
+            onClick={handleSavePayment}
+            className="bg-green-400 text-white p-2 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out flex items-center"
+          >
+            <FaSave className="mr-2" />
+            Save Changes
+          </button>
+          <button
+            onClick={handleCancel}
+            className="bg-gray-300 text-gray-800 p-2 rounded-lg hover:bg-gray-400 transition duration-150 ease-in-out flex items-center"
+          >
+            <FaTrash className="mr-2" />
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

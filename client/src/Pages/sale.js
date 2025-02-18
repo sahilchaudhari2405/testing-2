@@ -35,6 +35,7 @@ const Sale = () => {
   const [currentDate, setCurrentDate] = useState("");
   const [cardPay, setCardPay] = useState("");
   const [borrow, setBorrow] = useState("");
+   const [loyeltyRate, setLoyelty] = useState(0);
   const [cashPay, setCashPay] = useState("");
   const [upiPay, setUPIPay] = useState("");
   const [totalPrice, setTotalPrice] = useState("");
@@ -163,6 +164,7 @@ const Sale = () => {
           finalform.Address = fetchedData.language?.english?.UserDetails?.address || "";
           finalform.State = fetchedData.language?.english?.UserDetails?.state || "";
           finalform.Pin = fetchedData.language?.english?.UserDetails?.pin || "";
+          setLoyelty(fetchedData.loyalty);
         } else {
           console.error("No settings data found");
         }
@@ -179,6 +181,7 @@ const Sale = () => {
         finalform.Address = parsedData.language?.english?.UserDetails?.address || "";
         finalform.State = parsedData.language?.english?.UserDetails?.state || "";
         finalform.Pin = parsedData.language?.english?.UserDetails?.pin || ""; // Ensure this matches your usage pattern
+        setLoyelty(parsedData.loyalty);
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
@@ -259,7 +262,7 @@ const Sale = () => {
         const distinctOrders = response.data.data || [];
   
         // Update the state based on the results
-        if (distinctOrders.length === 0) {
+        if (distinctOrders?.length === 0) {
           setMatchingOrders([]);
         } else {
           setMatchingOrders(distinctOrders);
@@ -298,7 +301,7 @@ const Sale = () => {
         const distinctOrders = response.data.data || [];
 
   
-        if (distinctOrders.length === 0) {
+        if (distinctOrders?.length === 0) {
           // If no results, clear matching orders
           setMatchingOrders([]);
         } else {
@@ -353,7 +356,7 @@ const Sale = () => {
         const filteredOrders = response.data.data || [];
 
   
-        if (filteredOrders.length === 0) {
+        if (filteredOrders?.length === 0) {
           setMatchingProducts([]);
         } else {
           setMatchingProducts(filteredOrders);
@@ -524,10 +527,10 @@ const Sale = () => {
     // Reset details at the beginning
     setDetails([]);
 
-    if (items.length === 2) {
+    if (items?.length === 2) {
       // Handle case where both cart details and summary are present
       const productsData = items[0];
-      if (Array.isArray(productsData) && productsData.length > 0) {
+      if (Array.isArray(productsData) && productsData?.length > 0) {
         setDetails(productsData); // Update details if productsData is valid
       }
 
@@ -538,7 +541,7 @@ const Sale = () => {
         setGst(summary.GST || 0);
         setFinalTotal(summary.final_price_With_GST || 0);
       }
-    } else if (items.length === 1) {
+    } else if (items?.length === 1) {
       // Handle case where only summary data is present
       const summary = items[0];
       if (summary) {
@@ -702,13 +705,20 @@ const Sale = () => {
     name: "",
     Date: currentDate,
     Mobile: "",
+    loyalty:0,
     Email: "",
     ShipTo: "",
     Address: "",
     State: "",
     Pin: "",
   });
-
+  const calculateLoyalty = (amount) => {
+    const amoutTo = (amount + (amount * loyeltyRate)) / 100;
+    setFinal((prev) => ({
+      ...prev,
+      loyalty:amoutTo
+    }));
+  };
   const bill = async () => {
     const gen =
       (cashPay ? parseInt(cashPay) : 0) +
@@ -719,11 +729,13 @@ const Sale = () => {
 
     const Total = Math.round(total);
     if (amount == Total) {
+      const amoutTo = (amount + (amount * loyeltyRate)) / 100;
+      finalform.loyalty =(loyeltyRate>0)? amoutTo:0;
       if (
-        items[0].length > 0 &&
+        items[0]?.length > 0 &&
         finalform.name &&
         finalform.Mobile &&
-        finalform.Address
+        finalform.Address &&  (loyeltyRate===0 || (loyeltyRate && finalform.loyalty))
       ) {
         try {
           const createdOrder = await dispatch(
@@ -748,6 +760,7 @@ const Sale = () => {
             name: "",
             Date: currentDate,
             Mobile: "",
+            loyalty:0,
             Email: "",
             ShipTo: "",
             State: "",
@@ -994,7 +1007,7 @@ const Sale = () => {
               {showModal && (
                 <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
                   {matchingOrders?.length > 0 ? (
-                    matchingOrders.map((Client) => (
+                    matchingOrders?.map((Client) => (
                       <div
                         key={Client._id}
                         onClick={() => handleSelectOrder(Client)}
@@ -1045,7 +1058,7 @@ const Sale = () => {
               />
               {showMobileModal && (
                 <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
-                  {matchingMobileNumbers.length > 0 ? (
+                  {matchingMobileNumbers?.length > 0 ? (
                     matchingMobileNumbers.map((Client) => (
                       <div
                         key={Client._id}

@@ -55,6 +55,10 @@ const clientSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  loyalty: {
+    type: Number,
+    default:0
+  },
   BankDetails:{
     GSTIN:{
       type: String,
@@ -77,7 +81,6 @@ const clientSchema = new mongoose.Schema({
   ClosingBalance: [{
     type:mongoose.Schema.Types.ObjectId,
     ref: "ClosingBalance",
-
     required: true,  
 }],  
   CompletePurchase: [{

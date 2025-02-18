@@ -54,6 +54,7 @@ const InvoiceSettings = () => {
       },
     },
     Logo: "",
+    loyalty:0,
     Sale: {
       displayOptions: {
         email: true,
@@ -474,7 +475,24 @@ const InvoiceSettings = () => {
               </div>
             </div>
           ))}
-        </div><div className="mb-10">
+        </div>
+        <div className="mb-10">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          Loyalty Settings
+          </h2>
+        <div>
+  <label className="flex items-center space-x-2">
+    <span className="capitalize">Loyalty</span>
+    <input
+      type="text"
+      value={settings.loyalty}
+      onChange={(e) => handleChange(e, "loyalty")}
+      className="h-10 w-20 border border-gray-300 rounded-md text-center"
+    />
+  </label>
+</div>
+</div>
+        <div className="mb-10">
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
             BankDetails Settings
           </h2>
@@ -500,7 +518,9 @@ const InvoiceSettings = () => {
               </div>
             </div>
           ))}
+          
         </div>
+ 
         <div>
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700">Select Language</label>
@@ -549,6 +569,8 @@ const InvoiceSettings = () => {
         </li>
       ))}
     </ul>
+
+
   </div>
         {/* Logo Upload */}
         <div className="mb-10">

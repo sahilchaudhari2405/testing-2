@@ -1,70 +1,135 @@
-import React, { useState, useEffect } from 'react';
-import { FaArrowDown, FaEdit, FaTrash, FaBalanceScale, FaCheckCircle, FaWhatsapp } from 'react-icons/fa';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import * as XLSX from 'xlsx';
-import { jwtDecode } from 'jwt-decode';
-import { saveAs } from 'file-saver';
-import { toast } from 'react-toastify';
-import { deleteOrder} from '../Redux/Orders/orderSlice';
-import { logoutUser } from '../Redux/User/userSlices';
-import axiosInstance from '../axiosConfig';
-import { HashLoader } from 'react-spinners';
+import React, { useState, useEffect } from "react";
+import {
+  FaArrowDown,
+  FaEdit,
+  FaTrash,
+  FaBalanceScale,
+  FaCheckCircle,
+  FaWhatsapp,
+  FaSave,
+} from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
+import { jwtDecode } from "jwt-decode";
+import { saveAs } from "file-saver";
+import { toast } from "react-toastify";
+import { deleteOrder } from "../Redux/Orders/orderSlice";
+import { logoutUser } from "../Redux/User/userSlices";
+import axiosInstance from "../axiosConfig";
+import { HashLoader } from "react-spinners";
 
 const Clients = () => {
   const navigate = useNavigate();
-  const [selectedView, setSelectedView] = useState('clients');
-  const [fullName, setFullName] = useState('');
+  const [selectedView, setSelectedView] = useState("clients");
+  const [fullName, setFullName] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [importedData, setImportedData] = useState([]);
   const [showImportModal, setShowImportModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const dispatch = useDispatch();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [message, setMessage] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [clients, setClients] = useState([]);   // Stores fetched clients
-  const [page, setPage] = useState(1);          // Tracks page number
+  const [searchQuery, setSearchQuery] = useState("");
+  const [message, setMessage] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [clients, setClients] = useState([]); // Stores fetched clients
+  const [page, setPage] = useState(1); // Tracks page number
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true); // Tracks if more clients are available
+  const [clientId, setClientId] = useState("");
 
-
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [payment, setPayment] = useState({
+    balance: 0,
+    loyalty: 0,
+  });
+  const [Balance, setBalance] = useState(0); // Example, replace with actual logic
+  const [loyalty, setLoyalty] = useState(0); // Example, replace with actual logic
+  const [remainingAmountLoyelty, setRemainingAmountLoyelty] = useState(0); // Example, replace with actual logic
+  const [remainingAmountBalance, setRemainingAmountBalance] = useState(0);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
   const orders = useSelector((state) => state.orders.orders);
 
-//   useEffect(() => {
-//     // Fetch initial clients when the component mounts
-//     dispatch(fetchClientOrders(page)); 
- 
-//   }, []);
+  //   useEffect(() => {
+  //     // Fetch initial clients when the component mounts
+  //     dispatch(fetchClientOrders(page));
 
-//   useEffect(() => {
-//     // Fetch initial clients when the component mounts
-//    setClients(orders) 
- 
-//   }, [orders]);
+  //   }, []);
 
+  //   useEffect(() => {
+  //     // Fetch initial clients when the component mounts
+  //    setClients(orders)
 
+  //   }, [orders]);
 
+  const setData = (order) => {
+    setBalance(order.totalClosingBalance);
+    setLoyalty(order.loyalty);
+    setClientId(order._id);
+    setPopupVisible(true);
+  };
+  useEffect(() => {
+    const totalAmountBalance = Balance - payment.balance;
+    const remaining = loyalty - payment.loyalty;
+    setRemainingAmountLoyelty(remaining >= 0 ? remaining : 0);
+    setRemainingAmountBalance(
+      totalAmountBalance > 0 ? Math.abs(totalAmountBalance) : 0
+    );
+  }, [payment]);
 
-const fetchCustomer = async (page) => {
+  const fetchCustomer = async (page) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/users/admin/Customer?page=${page}&limit=70`);
+      const response = await axiosInstance.get(
+        `/users/admin/Customer?page=${page}&limit=70`
+      );
       setClients((prev) => [...prev, ...response.data]); // Append new products
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
-  }; 
-
+  };
+  const handleCancel = () => {
+    setPayment({
+      balance: "",
+      loyalty: "",
+    });
+    setClientId("");
+    setPopupVisible(false);
+  };
+  const handleSavePayment = async () => {
+    // Implement logic to save payment details
+    try {
+      const response = await axiosInstance.post(
+        "/sales/AdvancePay/UpdateAmount",
+        {
+          clientId,
+          amount: payment.balance,
+          loyaltyReduction: payment.loyalty,
+        }
+      );
+      setPopupVisible(false);
+      console.log(response);
+     await fetchCustomer(page);
+      setPayment({
+        balance: "",
+        loyalty: "",
+      });
+      setClientId("");
+    } catch (error) {
+      setMessage(error.response?.data?.message || "An error occurred");
+    } finally {
+    }
+  };
 
   const handleScroll = () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
+    if (
+      window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
+      !loading
+    ) {
       setPage((prev) => prev + 1); // Load the next page
     }
   };
@@ -73,61 +138,47 @@ const fetchCustomer = async (page) => {
   }, [page]);
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [loading]);
 
-
-
-
-
-
-
-
-
-
-
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       const decodedToken = jwtDecode(token);
       setFullName(decodedToken.fullName);
     } else {
-      navigate('/');
+      navigate("/");
     }
   }, [navigate]);
-
-
 
   useEffect(() => {
     const handleScroll = () => {
       // Check if user is near the bottom of the page
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 0 && !loading && hasMore) {
-        setPage((prevPage) => prevPage + 1);  // Increase the page number to load more clients
-      console.log(page)
-    }
+      if (
+        window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 0 &&
+        !loading &&
+        hasMore
+      ) {
+        setPage((prevPage) => prevPage + 1); // Increase the page number to load more clients
+        console.log(page);
+      }
     };
-  
-    window.addEventListener('scroll', handleScroll);
-  
+
+    window.addEventListener("scroll", handleScroll);
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [loading, hasMore]);
-
-
-
-
-
-
 
   // useEffect(() => {
   //   const fetchClients = async () => {
   //     setLoading(true);
   //     try {
-
 
   //       const response = await dispatch(fetchfetchCustomer(page)).unwrap();
   //       if (response.length === 0) {
@@ -140,18 +191,9 @@ const fetchCustomer = async (page) => {
   //     }
   //     setLoading(false);
   //   };
-  
+
   //   fetchClients();
   // }, [page, dispatch]);
-
-
-
-
-
-
-
-
-
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -160,9 +202,9 @@ const fetchCustomer = async (page) => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     toast.error("Logout Successfully!");
-    navigate('/');
+    navigate("/");
   };
 
   const openWhatsAppPopup = (order) => {
@@ -171,39 +213,47 @@ const fetchCustomer = async (page) => {
   };
 
   const handleSendMessage = () => {
-    const whatsappUrl = `https://wa.me/${selectedOrder.mobileNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    const whatsappUrl = `https://wa.me/${
+      selectedOrder.mobileNumber
+    }?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
     setIsPopupOpen(false);
   };
 
   const handleDelete = async (order) => {
     try {
       await dispatch(deleteOrder(order._id)).unwrap();
-   fetchCustomer(page);
-      toast.success('Client deleted successfully!');
+      fetchCustomer(page);
+      toast.success("Client deleted successfully!");
     } catch (error) {
-      console.error('Failed to delete client:', error);
-      toast.error('Failed to delete client: ' + error.message);
+      console.error("Failed to delete client:", error);
+      toast.error("Failed to delete client: " + error.message);
     }
   };
 
   const exportToExcel = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Clients_Report');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clients_Report");
 
     const excelBuffer = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
+      bookType: "xlsx",
+      type: "array",
     });
 
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'Clients_Report.xlsx');
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, "Clients_Report.xlsx");
   };
-
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+    setPayment({
+      ...payment,
+      [name]: parseFloat(value) || 0,
+    });
+  };
   const handleFileUpload = async () => {
     if (!selectedFile) {
-      toast.error('Please select a file to upload.');
+      toast.error("Please select a file to upload.");
       return;
     }
 
@@ -211,7 +261,7 @@ const fetchCustomer = async (page) => {
 
     reader.onload = async (event) => {
       const binaryStr = event.target.result;
-      const workbook = XLSX.read(binaryStr, { type: 'binary' });
+      const workbook = XLSX.read(binaryStr, { type: "binary" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(sheet);
@@ -221,34 +271,34 @@ const fetchCustomer = async (page) => {
 
       // Send the data to the backend
       try {
-        const response = await axiosInstance.post('/users/admin/UserImport', {
+        const response = await axiosInstance.post("/users/admin/UserImport", {
           users: data, // Sending only the data as payload
         });
 
-        toast.success('Import successful!');
-       fetchCustomer(page); // Fetch the updated data
+        toast.success("Import successful!");
+        fetchCustomer(page); // Fetch the updated data
       } catch (error) {
-        console.error('Error during import:', error);
+        console.error("Error during import:", error);
       }
     };
 
     reader.readAsBinaryString(selectedFile); // Read the file as binary string
   };
 
-
-
-  
-  const filterclient = async() => {
-const alphabet = searchQuery
-    const number= startDate
+  const filterclient = async () => {
+    const alphabet = searchQuery;
+    const number = startDate;
     try {
-        const response = await axiosInstance.post(`/users/admin/SearchClient`,{alphabet,number});
-        console.log(response)
-        setClients(response.data);
-      } catch (error) {
-        console.error('Error sort clients:', error);
-      }
-    };
+      const response = await axiosInstance.post(`/users/admin/SearchClient`, {
+        alphabet,
+        number,
+      });
+      console.log(response);
+      setClients(response.data);
+    } catch (error) {
+      console.error("Error sort clients:", error);
+    }
+  };
 
   const [closingBalanceData, setClosingBalanceData] = useState(null);
   const [isClosingBalanceOpen, setIsClosingBalanceOpen] = useState(false);
@@ -268,9 +318,6 @@ const alphabet = searchQuery
     setIsCompletePurchaseOpen(true);
   };
 
-
-
-
   const renderOrdersTable = (data) => (
     <div>
       <table className="w-full mb-6 border-collapse bg-white rounded-lg shadow-md ">
@@ -283,43 +330,68 @@ const alphabet = searchQuery
             <th className="border border-zinc-800 px-4 py-2">Type</th>
             <th className="border border-zinc-800 px-4 py-2">Time</th>
             <th className="border border-zinc-800 px-4 py-2">Date</th>
+            <th className="border border-zinc-800 px-0.5 py-2">loyalty</th>
             <th className="border border-zinc-800 px-0.5 py-2">Purchase</th>
             <th className="border border-zinc-800 px-0.5 py-2">Balance</th>
             <th className="border border-zinc-800 px-4 py-2">Action</th>
           </tr>
         </thead>
         <tbody>
-
-          {
-            console.log(data)
-          }
+          {console.log(data)}
           {data?.map((order, i) => {
             // Log each order to the console
             // console.log("Map ka andar ka data ", order);
 
             return (
-              <tr key={order._id +i|| i} className={(i + 1) % 2 === 0 ? 'bg-zinc-100' : 'bg-white'}>
+              <tr
+                key={order._id + i || i}
+                className={(i + 1) % 2 === 0 ? "bg-zinc-100" : "bg-white"}
+              >
                 <td className="border border-zinc-800 px-4 py-2">{i + 1}</td>
-                <td className="border border-zinc-800 px-1 py-2">{order.Name}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.Mobile}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.Email || 'N/A'}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.Type}</td>
-                <td className="border border-zinc-800 px-4 py-2">{new Date(order.updatedAt).toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true,
-                  timeZone: 'Asia/Kolkata'
-                })}</td>
-                <td className="border border-zinc-800 px-4 py-2">{new Date(order.updatedAt).toLocaleDateString()}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.totalCompletePurchase}</td>
-                <td className="border border-zinc-800 px-4 py-2">{order.totalClosingBalance}</td>
+                <td className="border border-zinc-800 px-1 py-2">
+                  {order.Name}
+                </td>
                 <td className="border border-zinc-800 px-4 py-2">
-                  <div className='flex justify-around'>
+                  {order.Mobile}
+                </td>
+                <td className="border border-zinc-800 px-4 py-2">
+                  {order.Email || "N/A"}
+                </td>
+                <td className="border border-zinc-800 px-4 py-2">
+                  {order.Type}
+                </td>
+                <td className="border border-zinc-800 px-4 py-2">
+                  {new Date(order.updatedAt).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: true,
+                    timeZone: "Asia/Kolkata",
+                  })}
+                </td>
+                <td className="border border-zinc-800 px-4 py-2">
+                  {new Date(order.updatedAt).toLocaleDateString()}
+                </td>
+                <td className="border border-zinc-800 px-4 py-2">{order?.loyalty?.toFixed(2)}</td>
+                <td className="border border-zinc-800 px-4 py-2">
+                  {order.totalCompletePurchase}
+                </td>
+               
+                <td className="border border-zinc-800 px-4 py-2">
+                  {order.totalClosingBalance}
+                </td>
+                <td className="border border-zinc-800 px-4 py-2">
+                  <div className="flex justify-around">
                     <button className="text-green-500 text-xl">
-                      <FaWhatsapp aria-hidden="true" onClick={() => openWhatsAppPopup(order)} />
+                      <FaWhatsapp
+                        aria-hidden="true"
+                        onClick={() => openWhatsAppPopup(order)}
+                      />
                     </button>
                     <button className="text-red-500">
-                      <FaTrash aria-hidden="true" onClick={() => handleDelete(order)} />
+                      <FaTrash
+                        aria-hidden="true"
+                        onClick={() => handleDelete(order)}
+                      />
                     </button>
                     <button className="text-red-500">
                       <FaBalanceScale
@@ -332,6 +404,10 @@ const alphabet = searchQuery
                         aria-hidden="true"
                         onClick={() => fetchCompletePurchaseData(order)}
                       />
+                    </button>
+                    <button
+                    ><FaEdit  aria-hidden="true"   onClick={() => setData(order)}/>
+                    
                     </button>
                   </div>
                 </td>
@@ -380,14 +456,11 @@ const alphabet = searchQuery
                     <td className="border px-4 py-2">{balance.balance}</td>
                   </tr>
                 ))}
-
               </tbody>
             </table>
           </div>
         </div>
       )}
-
-
 
       {/* Conditionally render the Complete Purchase data */}
       {isCompletePurchaseOpen && (
@@ -429,7 +502,6 @@ const alphabet = searchQuery
                     <td className="border px-4 py-2">{balance.Purchase}</td>
                   </tr>
                 ))}
-
               </tbody>
             </table>
           </div>
@@ -463,7 +535,10 @@ const alphabet = searchQuery
               </svg>
             </button>
             <h2 className="text-lg font-bold mb-4 flex items-center">
-              <FaWhatsapp aria-hidden="true" className='text-green-600 text-4xl mr-2' />
+              <FaWhatsapp
+                aria-hidden="true"
+                className="text-green-600 text-4xl mr-2"
+              />
               Send WhatsApp Message
             </h2>
             <textarea
@@ -487,8 +562,14 @@ const alphabet = searchQuery
       <div className="bg-emerald-600 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Customers</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm">client Management | Hi, <span className='font-bold'>{fullName}</span></span>
-          <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">
+          <span className="text-sm">
+            client Management | Hi,{" "}
+            <span className="font-bold">{fullName}</span>
+          </span>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
             Logout
           </button>
         </div>
@@ -496,37 +577,47 @@ const alphabet = searchQuery
 
       <div className="p-4">
         <div className="flex justify-between items-center mb-6">
-
           <div className="flex space-x-2">
-            <button onClick={() => exportToExcel(clients)} className="bg-white text-black border-black border-[1px] px-4 py-2 rounded hover:text-red-600">
+            <button
+              onClick={() => exportToExcel(clients)}
+              className="bg-white text-black border-black border-[1px] px-4 py-2 rounded hover:text-red-600"
+            >
               Export clients
             </button>
-            <button onClick={() => setShowImportModal(true)} className="bg-white text-black border-black border-[1px] px-4 py-2 rounded hover:text-red-600">
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="bg-white text-black border-black border-[1px] px-4 py-2 rounded hover:text-red-600"
+            >
               Import clients
             </button>
-
           </div>
         </div>
 
-        <form className='space-x-4'>
-      <input
-        type="text"
-        placeholder="Enter name of customer"
-        value={searchQuery}
+        <form className="space-x-4">
+          <input
+            type="text"
+            placeholder="Enter name of customer"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border p-2 rounded-lg mb-4 border-gray-700 hover:border-gray-900"
+          />
+          <input
+            type="number"
+            value={startDate}
+            placeholder="Enter mobile number"
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border p-2 rounded-lg"
+          />
 
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="border p-2 rounded-lg mb-4 border-gray-700 hover:border-gray-900"
-      />
-        <input
-          type="number"
-          value={startDate}
-          placeholder='Enter mobile number'
-          onChange={(e) => setStartDate(e.target.value)}
-          className="border p-2 rounded-lg"
-        />
-
-        <button type='button' onClick={filterclient} className='p-2 rounded-lg bg-blue-500 hover:bg-blue-600'> Search</button>
-  </form>  
+          <button
+            type="button"
+            onClick={filterclient}
+            className="p-2 rounded-lg bg-blue-500 hover:bg-blue-600"
+          >
+            {" "}
+            Search
+          </button>
+        </form>
 
         {showImportModal && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -553,32 +644,98 @@ const alphabet = searchQuery
             </div>
           </div>
         )}
-         {status === 'loading' ? (
+        {status === "loading" ? (
           <div>Loading...</div>
         ) : error ? (
           <div>Error: {error}</div>
         ) : (
           renderOrdersTable(clients)
         )}
-        {selectedView === 'Imported' && renderOrdersTable(importedData)}
+        {selectedView === "Imported" && renderOrdersTable(importedData)}
         {loading && (
           <div className="flex items-center  h-30 w-full justify-center">
-      <HashLoader size={100} />
-    </div>
-    )}
+            <HashLoader size={100} />
+          </div>
+        )}
 
-    {/* End of data message */}
-     {!hasMore && (
-      <div className="text-center py-4">
-        <span>No more clients to load</span>
+        {/* End of data message */}
+        {!hasMore && (
+          <div className="text-center py-4">
+            <span>No more clients to load</span>
+          </div>
+        )}
       </div>
-    )}
-
-      
-      </div>
+      {popupVisible && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Total Amount: ₹{Balance.toFixed(2)}
+            </h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Loyalty Amount: ₹{loyalty.toFixed(2)}
+            </h3>
+            <div className="space-y-4">
+              <span className="text-gray-600">Balance Amount</span>
+              <input
+                type="number"
+                name="balance"
+                value={payment.balance || ""}
+                onChange={handlePaymentChange}
+                placeholder=""
+                className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{
+                  appearance: "textfield",
+                  MozAppearance: "textfield",
+                  WebkitAppearance: "none",
+                }}
+              />
+              <span className="text-gray-600">Loyalty Amount</span>
+              <input
+                type="number"
+                name="loyalty"
+                value={payment.loyalty || ""}
+                onChange={handlePaymentChange}
+                placeholder=""
+                className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{
+                  appearance: "textfield",
+                  MozAppearance: "textfield",
+                  WebkitAppearance: "none",
+                }}
+              />
+              <h4 className={`mt-4 ${"text-green-500"}`}>
+                {`Remaining Amount Balance: ₹${remainingAmountBalance.toFixed(
+                  2
+                )}`}
+                <div className="text-orange-400">
+                  {`Remaining Amount Loyelty: ₹${remainingAmountLoyelty.toFixed(
+                    2
+                  )}`}
+                </div>
+              </h4>
+              <div className="flex justify-end space-x-4 mt-4">
+                <button
+                  onClick={handleSavePayment}
+                  className="bg-green-400 text-white p-2 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out flex items-center"
+                >
+                  <FaSave className="mr-2" />
+                  Save Changes
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="bg-gray-300 text-gray-800 p-2 rounded-lg hover:bg-gray-400 transition duration-150 ease-in-out flex items-center"
+                >
+                  <FaTrash className="mr-2" />
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Clients;
-

@@ -55,6 +55,10 @@ const clientSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  loyalty: {
+    type: Number,
+    default:0
+  },
   BankDetails:{
     GSTIN:{
       type: String,

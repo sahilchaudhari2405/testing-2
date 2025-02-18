@@ -4,7 +4,7 @@ import { getTenantModel } from "../database/getTenantModel.js";
 
 const createClient = async (req) => {
   try {
-    const { Type, Name, Address, State, Mobile, Purchase,Email,BankDetails,SHIPTO,Pin, Closing,tenantId } = req.body;
+    const { Type, Name, Address, State, Mobile, Purchase,Email,BankDetails,SHIPTO,Pin, Closing,tenantId,loyalty } = req.body;
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
     const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
@@ -33,6 +33,7 @@ const createClient = async (req) => {
       Address,
       State,
       Mobile,
+      loyalty,
       Email,
       Pin:Pin,
       BankDetails:BankDetails,
@@ -57,7 +58,7 @@ const createClient = async (req) => {
 // Update Client Controller
 const updateClient = async (req) => {
   try {
-    const { Type, Name, Mobile, Address,Email, State,BankDetails,SHIPTO,Pin, Purchase, Closing,tenantId } = req.body;
+    const { Type, Name, Mobile, Address,Email, State,BankDetails,SHIPTO,Pin, Purchase, Closing,tenantId,loyalty } = req.body;
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
     const Client = await getTenantModel(tenantId, "Client", clientSchema);
     const ClosingBalance = await getTenantModel(tenantId, "ClosingBalance", ClosingBalanceSchema);
@@ -112,7 +113,7 @@ const updateClient = async (req) => {
       existingClient.CompletePurchase.push(clientPurchaseLast._id);
     }
     await clientPurchaseLast.save();
-
+console.log(loyalty);
     // Update client details
     existingClient.Pin=Pin,
     existingClient.BankDetails=BankDetails,
@@ -121,6 +122,7 @@ const updateClient = async (req) => {
     existingClient.Email =Email;
     existingClient.State = State;
     existingClient.totalCompletePurchase += Purchase;
+    existingClient.loyalty +=loyalty;
     existingClient.totalClosingBalance += Closing;
     existingClient.updatedAt = new Date();
 

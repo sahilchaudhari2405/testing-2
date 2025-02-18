@@ -64,6 +64,7 @@ const OngoingSale = () => {
   const [print, setPrint] = useState(false);
   const [language, SetLanguage] = useState("");
   const [editId, setEditId] = useState(null);
+  const [loyeltyRate, setLoyelty] = useState(0);
   const [editItem, setEditItem] = useState({});
   // const users = useSelector((State) => State.user.users);
   // const orders = useSelector((State) => State.orders.orders);
@@ -154,6 +155,7 @@ const OngoingSale = () => {
           finalform.Address = fetchedData.language?.english?.UserDetails?.address || "";
           finalform.State = fetchedData.language?.english?.UserDetails?.state || "";
           finalform.Pin = fetchedData.language?.english?.UserDetails?.pin || ""; // Ensure this matches your usage pattern
+          setLoyelty(fetchedData.loyalty);
            // Ensure this logic aligns with your app's state management
         } else {
           console.error("No settings data found");
@@ -167,10 +169,12 @@ const OngoingSale = () => {
     if (data) {
       try {
         const parsedData = JSON.parse(data);
+        console.log(parsedData)
         setFinalAddress(parsedData.language?.english?.UserDetails?.address || "");
         finalform.Address = parsedData.language?.english?.UserDetails?.address || "";
         finalform.State = parsedData.language?.english?.UserDetails?.state || "";
-        finalform.Pin = parsedData.language?.english?.UserDetails?.pin || ""; // Ensure this matches your usage pattern
+        finalform.Pin = parsedData.language?.english?.UserDetails?.pin || ""; 
+        setLoyelty(parsedData.loyalty);
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
@@ -178,7 +182,7 @@ const OngoingSale = () => {
       console.warn("No data found in localStorage, fetching from API...");
       fetchSettings();
     }
-  }, [Address]); // Removed `Address` dependency to avoid redundant calls
+  }, [Address,loyeltyRate]); // Removed `Address` dependency to avoid redundant calls
 
   const handleTokenExpiration = () => {
     const token = localStorage.getItem("token");
@@ -260,7 +264,7 @@ const OngoingSale = () => {
         );
 
         const distinctOrders = response.data.data || [];
-        if (distinctOrders.length === 0) {
+        if (distinctOrders?.length === 0) {
           setMatchingOrders([]);
         } else {
           setMatchingOrders(distinctOrders);
@@ -292,7 +296,7 @@ const OngoingSale = () => {
         // Ensure distinctOrders is always an array
         const distinctOrders = response.data.data || [];
 
-        if (distinctOrders.length === 0) {
+        if (distinctOrders?.length === 0) {
           setMatchingMobileNumbers([]);
         } else {
           setMatchingMobileNumbers(distinctOrders);
@@ -346,7 +350,7 @@ const OngoingSale = () => {
 
         // Update state with matching products and show the modal if there are results
         setMatchingProducts(filteredOrders);
-        setShowModaldescription(filteredOrders.length > 0);
+        setShowModaldescription(filteredOrders?.length > 0);
       } else {
         // Hide the modal if input is empty
         setShowModaldescription(false);
@@ -607,10 +611,10 @@ const OngoingSale = () => {
     setCartId();
     setGst(0);
     setFinalTotal(0);
-    if (items.length === 2) {
+    if (items?.length === 2) {
       // Handle case where both cart details and summary are present
       const productsData = items[0];
-      if (Array.isArray(productsData) && productsData.length > 0) {
+      if (Array.isArray(productsData) && productsData?.length > 0) {
         setDetails(productsData); // Update details if productsData is valid
       }
       const summary = items[1];
@@ -621,7 +625,7 @@ const OngoingSale = () => {
         setGst(summary.GST || 0);
         setFinalTotal(summary.final_price_With_GST || 0);
       }
-    } else if (items.length === 1) {
+    } else if (items?.length === 1) {
       // Handle case where only summary data is present
       setDetails([]);
       const summary = items[0];
@@ -802,13 +806,21 @@ const OngoingSale = () => {
     name: "",
     Date: currentDate,
     Mobile: "",
+    loyalty:0,
     Email:"",
     ShipTo: "",
     Address: "",
     State: "",
     Pin: "",
   });
-
+  const calculateLoyalty = (amount) => {
+    console.log((amount + (amount * loyeltyRate)) / 100,loyeltyRate)
+    const amoutTo = (amount + (amount * loyeltyRate)) / 100;
+    setFinal((prev) => ({
+      ...prev,
+      loyalty:amoutTo
+    }));
+  };
   const bill = async () => {
     const gen =
       (cashPay ? parseInt(cashPay) : 0) +
@@ -826,11 +838,13 @@ const OngoingSale = () => {
     // console.log(details)
     console.log(amount == Total);
     if (amount == Total) {
+      const amoutTo = (amount + (amount * loyeltyRate)) / 100;
+      finalform.loyalty =(loyeltyRate>0)? amoutTo:0;
       if (
         details?.length > 0 &&
         finalform.name &&
         finalform.Mobile &&
-        finalform.name
+        finalform.name && (loyeltyRate===0 || (loyeltyRate && finalform.loyalty))
       ) {
         try {
           const createdOrder = await dispatch(
@@ -856,6 +870,7 @@ const OngoingSale = () => {
             name: "",
             Date: currentDate,
             Mobile: "",
+            loyalty:0,
             Email:"",
             ShipTo: "",
             State: "",
@@ -1087,7 +1102,7 @@ const OngoingSale = () => {
   const handleSave = async () => {
     let blanks = Object.keys(finalform).filter((key) => !finalform[key]);
 
-    if (details.length === 0) {
+    if (details?.length === 0) {
       blanks.push("No Product");
     }
 
@@ -1096,7 +1111,7 @@ const OngoingSale = () => {
       (key) => !["ShipTo", "GSTNo"].includes(key)
     );
 
-    if (filteredBlanks.length > 0) {
+    if (filteredBlanks?.length > 0) {
       setMissingFields(filteredBlanks);
       setShowPopup(true);
     } else {
@@ -1256,7 +1271,7 @@ const OngoingSale = () => {
               />
               {showMobileModal && (
                 <div className="absolute bg-white border border-gray-300 rounded shadow-lg p-3 mt-2 w-fit max-h-60 overflow-y-auto z-10">
-                  {matchingMobileNumbers.length > 0 ? (
+                  {matchingMobileNumbers?.length > 0 ? (
                     matchingMobileNumbers.map((Client) => (
                       <div
                         key={Client._id}
@@ -1656,7 +1671,7 @@ const OngoingSale = () => {
                 Total Items Quantity:{" "}
               </span>
               <span className="text-primary px-3">
-                {details && details.length > 0
+                {details && details?.length > 0
                   ? details.reduce((total, item) => total + item.quantity, 0)
                   : 0}
               </span>

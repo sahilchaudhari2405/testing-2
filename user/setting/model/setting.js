@@ -31,7 +31,10 @@ const InvoiceSettingsSchema = new mongoose.Schema({
   Logo:{
     type:String,
   },
-  
+  loyalty:{
+    type:Number,
+    default:0,
+ },
   Sale:{
     displayOptions: {
       email:{ type: Boolean, default: true },

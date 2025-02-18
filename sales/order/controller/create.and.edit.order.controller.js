@@ -489,6 +489,7 @@ const placeOrder = asyncHandler(async (req, res) => {
     status,
     BankDetails,
     SHIPTO,
+    loyelty,
   } = req.body;
   id = uId === id && uId ? uId : id;
   // Start session for transaction
@@ -613,6 +614,7 @@ const placeOrder = asyncHandler(async (req, res) => {
         Address: BillUser.Address,
         State: BillUser.State,
         Mobile: BillUser.Mobile,
+        loyalty:BillUser.loyalty,
         Pin: BillUser.Pin,
         BankDetails: BankDetails,
         SHIPTO: SHIPTO,
