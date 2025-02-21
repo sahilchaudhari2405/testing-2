@@ -5,21 +5,32 @@ import { FaTachometerAlt, FaTruck, FaBox,FaPersonBooth, FaShoppingCart, FaEye, F
 import Moment from 'react-moment';
 import { FaImage } from "react-icons/fa6";
 import axiosInstance from '../axiosConfig';
-
+import { format, differenceInDays, parseISO } from 'date-fns';
+import { jwtDecode } from 'jwt-decode';
 
 const Navbar = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const navigate = useNavigate();
   const [Name, setFinalName] = useState("");
-
+  const [expiryDate, setExpiryDate] = useState(null);
+  const [showWarning, setShowWarning] = useState(false);
   useEffect(() => {
-    // Check if the token exists in localStorage
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setExpiryDate(decodedToken.expiryDate);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
     }
+  }, []);
+  useEffect(() => {
 
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
     return () => clearInterval(timer);
   }, [navigate]);
   useEffect(() => {
@@ -64,6 +75,21 @@ const Navbar = () => {
       fetchSettings();
     }
   }, [Name]); 
+  useEffect(() => {
+    if (expiryDate) {
+      try {
+        const expiry = parseISO(expiryDate); // Parse expiryDate
+        const daysLeft = differenceInDays(expiry, new Date());
+        if (daysLeft <= 10 && daysLeft >= 0) {
+          setShowWarning(true);
+        } else {
+          setShowWarning(false);
+        }
+      } catch (error) {
+        console.error("Invalid expiry date format:", error);
+      }
+    }
+  }, [expiryDate]);
   return (
     <div className="bg-gray-800 fixed top-0 z-50 w-full p-4 flex justify-between items-center shadow-lg">
       <div className="flex items-center space-x-6">
@@ -85,8 +111,15 @@ const Navbar = () => {
           <NavItem icon={<FaBuilding className="text-yellow-400" />} label="Company" to="/company" /> */}
           <NavItem icon={<FaPersonBooth className="text-blue-400" />} label="admin" to="/admin" />
         </div>
+        
       </div>
-      <div className="flex items-center space-x-4">
+      {showWarning && (
+        <div className="bg-white p-1 rounded-md text-red-400">
+          <h1>⚠️ Your subscription is expiring soon</h1>
+        <h2> (Expiry Date: {format(parseISO(expiryDate), "yyyy-MM-dd")})!</h2>
+        </div>
+      )}
+      <div className="flex items-center space-x-2">
         <div className="text-white text-sm">
           <Moment format="DD-MM-YYYY">{currentTime}</Moment>
         </div>
@@ -96,7 +129,9 @@ const Navbar = () => {
         <NavItem icon={<FaUsersCog className="text-purple-400" />} label="Users" to="/admin/users" />
         <NavItem icon={<FaCog className="text-gray-400" />} label="Settings" to="/settings" />
       </div>
+      
     </div>
+    
   );
 };
 

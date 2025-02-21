@@ -230,7 +230,7 @@ export async function login(req, res) {
             return res.status(400).json({ error: "Invalid email or password" });
         }
 
-        const { accessToken, refreshToken } = setTokens(user, res);
+        const { accessToken, refreshToken } = setTokens(user, res,tenantUser);
 
         res.status(200).json({
             accessToken,
