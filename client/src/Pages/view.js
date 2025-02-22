@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import logo from "../logo.png";
 import Barcode from 'react-barcode';
 import Invoice from "../component/invoice.js";
+import ExpireDate from '../component/ExpireDate.js';
 
 const sharedClasses = {
   flex: 'flex ',
@@ -283,7 +284,8 @@ const View = () => {
 
 
   return (
-    <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
+    <div className="bg-white mt-20  rounded-lg mx-6 shadow-lg">
+      <ExpireDate/>
       <div className="bg-slate-700 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">View Data</h1>
         <div className="flex items-center space-x-4">

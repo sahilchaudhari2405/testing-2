@@ -10,6 +10,7 @@ import { deleteOrder, fetchOrders } from '../Redux/Orders/orderSlice';
 import { logoutUser } from '../Redux/User/userSlices';
 import axiosInstance from '../axiosConfig';
 import { HashLoader } from 'react-spinners';
+import ExpireDate from '../component/ExpireDate';
 
 const Accounts = () => {
   const navigate = useNavigate();
@@ -450,7 +451,8 @@ console.log("yes")
   );
 
   return (
-    <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
+    <div className="bg-white mt-20 rounded-lg mx-6 shadow-lg">
+      <ExpireDate/>
       {isPopupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg border-[1px] border-gray-600 relative">

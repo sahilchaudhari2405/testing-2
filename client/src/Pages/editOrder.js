@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axiosInstance from '../axiosConfig';
 import { toast } from 'react-toastify';
 import BarcodeReader from 'react-barcode';
+import ExpireDate from '../component/ExpireDate';
 
 const EditOrder = () => {
   const [formData, setFormData] = useState({
@@ -256,6 +257,7 @@ const EditOrder = () => {
 
   return (
     <div className="bg-gray-100 mt-20  mx-6 rounded-lg shadow-lg">
+        <ExpireDate/>
       <div className="bg-blue-700 text-white p-4 rounded-t-lg">
         <h1 className="text-xl font-bold">Edit Order</h1>
       </div>

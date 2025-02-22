@@ -20,6 +20,7 @@ import { createOrder } from "../Redux/Orders/orderSlice";
 import Invoice from "../component/invoice.js";
 import axiosInstance from "../axiosConfig.js";
 import { fetchUsers } from "../Redux/User/userSlices";
+import ExpireDate from "../component/ExpireDate.js";
 
 const Sale = () => {
   const [details, setDetails] = useState([]);
@@ -958,6 +959,7 @@ const Sale = () => {
   const componentRef = useRef();
   return (
     <div className="bg-gray-100 mt-20 mx-6 rounded-lg shadow-lg">
+        <ExpireDate/>
       <BarcodeReader onError={handleError} onScan={handleScan} />
       <div className="bg-green-700 text-white p-1 px-6 rounded-t-lg flex justify-between items-center">
         <h1 className="text-xl font-bold">Sale</h1>

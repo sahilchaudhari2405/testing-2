@@ -184,6 +184,7 @@ import ChartofCustomers from '../component/lineGraphVisitors';
 import Chartofdonut from '../component/donutChart';
 import axiosInstance from '../axiosConfig';
 import { jwtDecode } from 'jwt-decode';
+import ExpireDate from '../component/ExpireDate';
 
 
 const Admin = () => {
@@ -380,7 +381,8 @@ const Admin = () => {
   }, [filteredOrders]);
 
   return (
-    <div className='flex flex-col justify-center items-center '>
+    <div className='flex flex-col mt-20 justify-center items-center '>
+        <ExpireDate/>
       <div className="p-8 w-[95vw] mt-20">
         <h1 className="text-3xl font-bold mb-4">Counter Wise Dashboards</h1>
         <select className="my-5" value={selectedCounter} onChange={onCounterChange}>

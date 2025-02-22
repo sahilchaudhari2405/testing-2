@@ -13,6 +13,7 @@ import CategorySuggestions from '../component/CategorySuggestions';
 import { importExcelData, exportExcelData } from '../component/Card'; 
 import axiosInstance from '../axiosConfig';
 import BarcodeReader from "react-barcode-reader";
+import ExpireDate from '../component/ExpireDate';
 const Inventory = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -374,7 +375,8 @@ const handleCheckboxChange = (event) => {
 
 
   return (
-    <div className="bg-white mt-[7rem] rounded-lg mx-6 shadow-lg">
+    <div className="bg-white mt-20 rounded-lg mx-6 shadow-lg">
+        <ExpireDate/>
            <BarcodeReader onError={handleError} onScan={handleScan} />
       <div className="bg-slate-700 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Inventory</h1>

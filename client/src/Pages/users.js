@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axiosInstance from "../axiosConfig";
 import { HashLoader } from "react-spinners";
+import ExpireDate from "../component/ExpireDate";
 
 const Users = () => {
   const navigate = useNavigate();
@@ -110,6 +111,7 @@ const Users = () => {
 
   return (
     <div className="min-h-screen mt-20 bg-gray-100 p-6">
+        <ExpireDate/>
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Available Users */}

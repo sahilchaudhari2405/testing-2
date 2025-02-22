@@ -24,6 +24,7 @@ import { createOrder } from "../Redux/Orders/orderSlice";
 import Users from "./users.js";
 import { Button } from "@mui/material";
 import AdvancePayPopup from "../component/AdvancePay.js";
+import ExpireDate from "../component/ExpireDate.js";
 
 const OngoingSale = () => {
   const [details, setDetails] = useState([]);
@@ -1100,7 +1101,8 @@ const OngoingSale = () => {
     setMissingFields([]);
   };
   const handleSave = async () => {
-    let blanks = Object.keys(finalform).filter((key) => !finalform[key]);
+    let blanks = Object.keys(finalform).filter((key) => !finalform[key] && key !== "loyalty");
+
 
     if (details?.length === 0) {
       blanks.push("No Product");
@@ -1171,6 +1173,8 @@ const OngoingSale = () => {
   const componentRef = useRef();
   return (
     <div className="bg-gray-100 mt-20 mx-6 rounded-lg shadow-lg">
+        <ExpireDate
+        />
       <BarcodeReader onError={handleError} onScan={handleScan} />
       <div className="bg-purple-700 text-white p-1 px-6 rounded-t-lg flex justify-between items-center">
         <h1 className="text-xl font-bold">OnGoing Sale</h1>

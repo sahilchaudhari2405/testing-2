@@ -11,6 +11,7 @@ import ReactToPrint from "react-to-print";
 import { FaSave, FaTrash } from "react-icons/fa";
 // import BarcodeReader from "react-barcode-reader";
 import { jwtDecode } from "jwt-decode";
+import ExpireDate from "../component/ExpireDate";
 
 const Edit = () => {
   const navigate = useNavigate();
@@ -878,6 +879,7 @@ console.log(payload)
   };
   return (
     <div className="bg-gray-100 mt-20  mx-6 rounded-lg shadow-lg">
+        <ExpireDate/>
       <div className="bg-blue-700 text-white p-4 rounded-t-lg">
         <h1 className="text-xl font-bold">Edit Order</h1>
       </div>

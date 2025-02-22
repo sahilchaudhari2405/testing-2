@@ -5,6 +5,7 @@ import ReactToPrint from "react-to-print";
 import axiosInstance from "../axiosConfig";
 import mockDetails from "../component/data/Purchase";
 import sampleInvoiceData from "../component/data/gstData";
+import ExpireDate from "../component/ExpireDate";
 const InvoiceSettings = () => {
   const [settings, setSettings] = useState({
     language: {
@@ -443,7 +444,8 @@ const InvoiceSettings = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
+    <div className="min-h-screen mt-10 bg-gray-50 py-10">
+        <ExpireDate/>
       <div className="container mx-auto max-w-6xl bg-white shadow-lg rounded-lg p-8">
         <h1 className="text-3xl font-semibold text-gray-800 mb-6">
           Invoice Settings

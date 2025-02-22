@@ -11,6 +11,7 @@ import Chartofdonut from '../component/donutChart';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import axiosInstance from '../axiosConfig';
+import ExpireDate from '../component/ExpireDate';
 
 
 
@@ -155,7 +156,7 @@ const Dashboard = () => {
     return { daywise, weekwise, monthwise };
   };
 const transformDataforAdmin = (data) => {
-  if (!data || data.length === 0) {
+  if (!data || data?.length === 0) {
     return { daywise: [], weekwise: [], monthwise: [] };
   }
 
@@ -163,7 +164,7 @@ const transformDataforAdmin = (data) => {
   const weekwiseArray = [];
   const monthwiseArray = [];
 
-  data.forEach(order => {
+  data?.forEach(order => {
     (order.dailySales || []).forEach(sale => {
       daywiseArray.push({
         name: `Day ${sale.date}`,
@@ -382,7 +383,8 @@ const calculateCustomers = (orders_data) => {
   };
 
   return (
-    <div className="bg-white border-[1px] mt-28 mx-6 rounded-lg shadow-lg">
+    <div className="bg-white mt-20 mx-6 rounded-lg shadow-lg">
+        <ExpireDate/>
       <div className="bg-teal-700 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <div className="flex items-center space-x-4">

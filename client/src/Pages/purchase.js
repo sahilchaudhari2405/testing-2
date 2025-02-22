@@ -12,6 +12,7 @@ import axiosInstance from "../axiosConfig.js";
 import { createPurchaseOrder } from "../Redux/Orders/orderSlice";
 import Invoice from "../component/invoice.js";
 import BarcodeReader from "react-barcode-reader";
+import ExpireDate from "../component/ExpireDate.js";
 
 const Purchase = () => {
   const dispatch = useDispatch();
@@ -575,7 +576,8 @@ const Purchase = () => {
 
   const componentRef = useRef();
   return (
-    <div className="bg-gray-100 mt-28 mx-6 rounded-lg shadow-lg">
+    <div className="bg-gray-100 mt-20 mx-6 rounded-lg shadow-lg">
+        <ExpireDate/>
       <BarcodeReader onError={handleError} onScan={handleScan} />
       <div className="bg-green-700 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Purchase</h1>

@@ -113,12 +113,6 @@ const Navbar = () => {
         </div>
         
       </div>
-      {showWarning && (
-        <div className="bg-white p-1 rounded-md text-red-400">
-          <h1>⚠️ Your subscription is expiring soon</h1>
-        <h2> (Expiry Date: {format(parseISO(expiryDate), "yyyy-MM-dd")})!</h2>
-        </div>
-      )}
       <div className="flex items-center space-x-2">
         <div className="text-white text-sm">
           <Moment format="DD-MM-YYYY">{currentTime}</Moment>

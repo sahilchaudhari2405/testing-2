@@ -251,6 +251,7 @@ import { updateProduct } from '../Redux/Product/productSlice';
 import { useDispatch } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import axiosInstance from '../axiosConfig';
+import ExpireDate from '../component/ExpireDate';
 
 
 const ImageGenerator = ({ item, onImageUpdate, setImageGenModal }) => {
@@ -426,6 +427,7 @@ const ImageGenerator = ({ item, onImageUpdate, setImageGenModal }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 w-full ml-0 bg-opacity-50 backdrop-blur-sm">
+              <ExpireDate/>
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
                 <button 
                     onClick={() => setImageGenModal(false)} 
