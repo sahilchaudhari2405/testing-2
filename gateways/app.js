@@ -31,31 +31,31 @@ app.use(cors({
   credentials: true,
 }));
 
-// app.use('/products/import', expressProxy('http://import-export:3001'));
-// app.use('/products', expressProxy('http://products:3002'));
+app.use('/products/import', expressProxy('http://import-export:3001'));
+app.use('/products', expressProxy('http://products:3002'));
 
-// app.use('/sales/AdvancePay', expressProxy('http://sales-advancepay:4001'));
-// app.use('/sales/cart', expressProxy('http://sales-cart:4002'));
-// app.use('/sales/OnGoing', expressProxy('http://sales-ongoing:4003'));
-// app.use('/sales/order', expressProxy('http://sales-order:4004'));
+app.use('/sales/AdvancePay', expressProxy('http://sales-advancepay:4001'));
+app.use('/sales/cart', expressProxy('http://sales-cart:4002'));
+app.use('/sales/OnGoing', expressProxy('http://sales-ongoing:4003'));
+app.use('/sales/order', expressProxy('http://sales-order:4004'));
 
-// app.use('/users/admin', expressProxy('http://user-admin:5001'));
-// app.use('/users/auth', expressProxy('http://user-auth:5002'));
-// app.use('/users/setting', expressProxy('http://user-setting:5003'));
-// app.use('/users/users', expressProxy('http://user-users:5004')); // Fixed duplicate issue
+app.use('/users/admin', expressProxy('http://user-admin:5001'));
+app.use('/users/auth', expressProxy('http://user-auth:5002'));
+app.use('/users/setting', expressProxy('http://user-setting:5003'));
+app.use('/users/users', expressProxy('http://user-users:5004')); // Fixed duplicate issue
 
-app.use('/products/import', expressProxy('http://localhost:3001'));
-app.use('/products', expressProxy('http://localhost:3002'));
+// app.use('/products/import', expressProxy('http://localhost:3001'));
+// app.use('/products', expressProxy('http://localhost:3002'));
 
-app.use('/sales/AdvancePay', expressProxy('http://localhost:4001'));
-app.use('/sales/cart', expressProxy('http://localhost:4002'));
-app.use('/sales/OnGoing', expressProxy('http://localhost:4003'));
-app.use('/sales/order', expressProxy('http://localhost:4004'));
+// app.use('/sales/AdvancePay', expressProxy('http://localhost:4001'));
+// app.use('/sales/cart', expressProxy('http://localhost:4002'));
+// app.use('/sales/OnGoing', expressProxy('http://localhost:4003'));
+// app.use('/sales/order', expressProxy('http://localhost:4004'));
 
-app.use('/users/admin', expressProxy('http://localhost:5001'));
-app.use('/users/auth', expressProxy('http://localhost:5002'));
-app.use('/users/setting', expressProxy('http://localhost:5003'));
-app.use('/users/users', expressProxy('http://localhost:5004')); // Fixed duplicate issue
+// app.use('/users/admin', expressProxy('http://localhost:5001'));
+// app.use('/users/auth', expressProxy('http://localhost:5002'));
+// app.use('/users/setting', expressProxy('http://localhost:5003'));
+// app.use('/users/users', expressProxy('http://localhost:5004')); // Fixed duplicate issue
 
 app.listen(4000, () => {
   console.log('Gateway server listening on port 4000');
