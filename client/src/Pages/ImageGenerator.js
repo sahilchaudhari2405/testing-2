@@ -293,7 +293,7 @@ const ImageGenerator = ({ item, onImageUpdate, setImageGenModal }) => {
             const response = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer HuggingFace_API_KEY`, 
+                    'Authorization': `Bearer ${process.env.REACT_APP_HUGGINGFACE_API_KEY}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ inputs: finalPrompt })
