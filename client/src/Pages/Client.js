@@ -114,7 +114,7 @@ const Clients = () => {
       );
       setPopupVisible(false);
       console.log(response);
-     await fetchCustomer(page);
+      await fetchCustomer(page);
       setPayment({
         balance: "",
         loyalty: "",
@@ -214,9 +214,17 @@ const Clients = () => {
   };
 
   const handleSendMessage = () => {
+    console.log(selectedOrder);
+    if (!selectedOrder?.Mobile) {
+      console.error("Error: Mobile number is missing.");
+      return;
+    }
+
+    const textMessage = message || "Hello"; // Default message if empty
     const whatsappUrl = `https://wa.me/${
-      selectedOrder.mobileNumber
-    }?text=${encodeURIComponent(message)}`;
+      selectedOrder.Mobile
+    }?text=${encodeURIComponent(textMessage)}`;
+
     window.open(whatsappUrl, "_blank");
     setIsPopupOpen(false);
   };
@@ -372,11 +380,13 @@ const Clients = () => {
                 <td className="border border-zinc-800 px-4 py-2">
                   {new Date(order.updatedAt).toLocaleDateString()}
                 </td>
-                <td className="border border-zinc-800 px-4 py-2">{order?.loyalty?.toFixed(2)}</td>
+                <td className="border border-zinc-800 px-4 py-2">
+                  {order?.loyalty?.toFixed(2)}
+                </td>
                 <td className="border border-zinc-800 px-4 py-2">
                   {order.totalCompletePurchase}
                 </td>
-               
+
                 <td className="border border-zinc-800 px-4 py-2">
                   {order.totalClosingBalance}
                 </td>
@@ -406,9 +416,11 @@ const Clients = () => {
                         onClick={() => fetchCompletePurchaseData(order)}
                       />
                     </button>
-                    <button
-                    ><FaEdit  aria-hidden="true"   onClick={() => setData(order)}/>
-                    
+                    <button>
+                      <FaEdit
+                        aria-hidden="true"
+                        onClick={() => setData(order)}
+                      />
                     </button>
                   </div>
                 </td>
@@ -513,7 +525,7 @@ const Clients = () => {
 
   return (
     <div className="bg-white mt-20 rounded-lg mx-6 shadow-lg">
-        <ExpireDate/>
+      <ExpireDate />
       {isPopupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg border-[1px] border-gray-600 relative">
