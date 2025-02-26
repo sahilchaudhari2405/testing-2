@@ -44,6 +44,9 @@ const allowedOrigins = [
   'http://www.apalabajar.shop',
   'http://65.0.98.146',
   'https://www.apalabajar.shop',
+  'https://www.software.apalabajar.shop',
+  'https://software.apalabajar.shop',
+  'https://software.apalabajar.shop/',
   test
 ];
 
