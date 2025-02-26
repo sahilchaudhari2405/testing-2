@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import cluster from 'cluster';
 import os from 'os';
 import importProducts from './controller/importExportProduct.js';
+import { authenticateToken } from './middleware/verify.js';
 
 const totalCPUs = os.cpus().length;
 dotenv.config({ 
@@ -78,7 +79,7 @@ app.use(bodyParser.json())
 
 
 // y
-app.use('/', importProducts);
+app.post('/',authenticateToken, importProducts);
 
 app.listen(3001, () => {
     console.log('listening on *:3001');

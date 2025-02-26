@@ -34,7 +34,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
-
+app.use(express.json({ limit: '100mb' }));
 app.use('/products/import', expressProxy('http://import-export:3001'));
 app.use('/products', expressProxy('http://products:3002'));
 

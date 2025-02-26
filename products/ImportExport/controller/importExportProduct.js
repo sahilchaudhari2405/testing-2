@@ -51,14 +51,14 @@ function parseField(value, type = "string") {
     const updateOperations = [];
     const newCategories = [];
     const existingCategories = await Category.find().lean();
-    const existingProducts = await Product.findOne();
+    const existingProducts = await Product.find().lean();
 // Convert fetched categories into a Map for quick lookup
 const categoryMap = new Map();
-existingCategories.forEach((category) => {
+existingCategories?.forEach((category) => {
   categoryMap.set(category.name, category);
 });
 const ProductMap = new Map();
-existingProducts.forEach((product) => {
+existingProducts?.forEach((product) => {
   ProductMap.set(product.BarCode, product);
 });
     const parentCategory =
@@ -69,9 +69,10 @@ existingProducts.forEach((product) => {
       delete productData._id;
 
       const categoryName =
-        productData.title?.trim().substring(0, 50) ||
-        productData.Name?.trim().substring(0, 50) ||
-        generateRandomStringCategory();
+      (typeof productData?.title === "string" ? productData.title.trim().substring(0, 50) : null) ||
+      (typeof productData?.Name === "string" ? productData.Name.trim().substring(0, 50) : null) ||
+      generateRandomStringCategory();
+  
 
       if (!categoryMap.has(categoryName)) {
         let category =categoryMap.get(categoryName);
@@ -135,10 +136,10 @@ existingProducts.forEach((product) => {
         // Update product categories based on categoryMap
         newProducts.forEach((product) => {
           const categoryName =
-            product.title?.trim().substring(0, 50) ||
-            product.Name?.trim().substring(0, 50);
+          (typeof product?.title === "string" ? product.title.trim().substring(0, 50) : null) ||
+          (typeof product?.Name === "string" ? product.Name.trim().substring(0, 50) : null) ;
       
-          const updatedCategoryId = categoryMap.get(categoryName) || "Uncategorized";
+          const updatedCategoryId = categoryMap.get(categoryName) || null;
           product.category = updatedCategoryId; // Assign category _id
         });
       }
