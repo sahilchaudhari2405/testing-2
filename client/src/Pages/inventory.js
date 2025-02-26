@@ -298,7 +298,7 @@ Suggestions(true);
         setProd(data);
   
         try {
-          const response = await axiosInstance.post('/products/product/importProducts', { 
+          const response = await axiosInstance.post('/products/import', { 
             products: data,
             imageUrl: store.Logo // Use store.Logo directly if it exists
           });
