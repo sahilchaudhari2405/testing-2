@@ -169,7 +169,7 @@ const Accounts = () => {
 
     const mobileNumber = selectedOrder.Mobile.replace(/\D/g, ""); // Remove non-numeric characters
     const textMessage = message?.trim() || "Hello!"; // Default message if empty
-    const whatsappUrl = `https://wa.me/${mobileNumber}?text=${encodeURIComponent(
+    const whatsappUrl = `https://wa.me/${selectedOrder.Mobile}?text=${encodeURIComponent(
       textMessage
     )}`;
 
