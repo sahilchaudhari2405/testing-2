@@ -10,6 +10,7 @@ const allowedOrigins = [
   'http://client:80',
   'http://apalabajar.shop',
   'https://apalabajar.shop',  
+  'https://apalabajar.shop/', 
   'http://www.apalabajar.shop',
   'https://www.apalabajar.shop',
   'https://www.software.apalabajar.shop',
