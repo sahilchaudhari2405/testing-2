@@ -1,12 +1,12 @@
 import mongoose from 'mongoose'
 const InvoiceLanguageSchema = new mongoose.Schema({
 UserDetails:{
-  title: { type: String, required: true }, // Title in the respective language
-  address: { type: String, required: true },
-  state:{ type: String, required: true },
-  pin:{ type: String, required: true },
-  customerService: { type: String, required: true }, // Customer service contact
-  phone: { type: String, required: true }, // Phone number
+  title: { type: String}, // Title in the respective language
+  address: { type: String},
+  state:{ type: String},
+  pin:{ type: String, },
+  customerService: { type: String}, // Customer service contact
+  phone: { type: String}, // Phone number
   email: { type: String, },
 },
 BankDetails:{

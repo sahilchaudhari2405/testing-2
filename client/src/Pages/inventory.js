@@ -36,7 +36,7 @@ const Inventory = () => {
     lowStock: false,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const categoryInputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
@@ -262,7 +262,9 @@ Suggestions(true);
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
-
+  const handleOpenDelete= () => {
+    setIsModalOpenDelete(true);
+  };
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
@@ -370,7 +372,14 @@ const handleCheckboxChange = (event) => {
 
 
 
-
+const handleDelete = async ()=>{
+  try {
+    const response = await axiosInstance.delete('/products/product/deleteAll');
+    setProd([]);
+  } catch (error) {
+    console.log("error: ",error);
+  }
+}
 
 
 
@@ -412,6 +421,12 @@ const handleCheckboxChange = (event) => {
             onClick={handleOpenModal}
           >
             Add Item
+          </button>
+          <button 
+            className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded" 
+            onClick={handleOpenDelete}
+          >
+            Delete Inventory
           </button>
         </div>
 
@@ -533,6 +548,28 @@ const handleCheckboxChange = (event) => {
       </div>
       <Modal show={isModalOpen} onClose={handleCloseModal} onSuccess={handleCloseAddSuccessModal} >
       </Modal>
+      {isModalOpenDelete && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-5 rounded-lg shadow-lg">
+      <p>Are you sure you want to delete?</p>
+      <div className="flex justify-end mt-4 space-x-2">
+        <button
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+          onClick={handleDelete}
+        >
+          Delete
+        </button>
+        <button
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          onClick={() => setIsModalOpenDelete(false)}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

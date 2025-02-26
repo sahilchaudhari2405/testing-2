@@ -2,10 +2,9 @@ import { getTenantModel } from "../database/getTenantModel.js";
 import categorySchema from "../model/category.model.js";
 import productSchema from "../model/product.model.js";
 
-async function CreateCategory(name, level, slug, parentId, CategoryModel) {
-  const category = new CategoryModel({ name, level, slug, parentId });
-  await category.save();
-  return category;
+async function CreateCategory(name, level, slug, parentId) {
+
+  return { name, level, slug, parentId };
 }
 
 // Helper function to generate a random category name
@@ -51,8 +50,17 @@ function parseField(value, type = "string") {
     const newProducts = [];
     const updateOperations = [];
     const newCategories = [];
-    const categoryMap = new Map();
-
+    const existingCategories = await Category.find().lean();
+    const existingProducts = await Product.findOne();
+// Convert fetched categories into a Map for quick lookup
+const categoryMap = new Map();
+existingCategories.forEach((category) => {
+  categoryMap.set(category.name, category);
+});
+const ProductMap = new Map();
+existingProducts.forEach((product) => {
+  ProductMap.set(product.BarCode, product);
+});
     const parentCategory =
       (await Category.findOne({ name: "GENERAL" })) ||
       (await CreateCategory("GENERAL", 1, "general", null, Category));
@@ -66,25 +74,22 @@ function parseField(value, type = "string") {
         generateRandomStringCategory();
 
       if (!categoryMap.has(categoryName)) {
-        let category = await Category.findOne({ name: categoryName });
+        let category =categoryMap.get(categoryName);
         if (!category) {
           category = await CreateCategory(
             categoryName,
             2,
             categoryName,
             parentCategory._id,
-            Category
           );
           newCategories.push(category);
         }
-        categoryMap.set(categoryName, category);
       }
 
-      const category = categoryMap.get(categoryName);
       const barcode = productData.BarCode || productData.Barcode;
 
       if (barcode) {
-        const existingProduct = await Product.findOne({ BarCode: barcode });
+    const existingProduct = ProductMap.get(barcode);
         if (existingProduct) {
           const updateData = buildUpdateData(productData,imageUrl);
           updateOperations.push({
@@ -94,13 +99,13 @@ function parseField(value, type = "string") {
             },
           });
         } else {
-          const newProduct = buildNewProductData(productData, category,imageUrl);
+          const newProduct = buildNewProductData(productData, "",imageUrl);
           newProducts.push(newProduct);
         }
       } else {
         const newBarcode = await generateUniqueBarcode(Product);
         productData.BarCode = newBarcode;
-        const newProduct = buildNewProductData(productData, category,imageUrl);
+        const newProduct = buildNewProductData(productData, "",imageUrl);
         newProducts.push(newProduct);
       }
       console.log("data", barcode)
@@ -120,8 +125,25 @@ function parseField(value, type = "string") {
       );
 
       if (uniqueCategories.length) {
-        await Category.insertMany(uniqueCategories);
+        // Insert new categories and store the result (returns an array)
+        const newCategories = await Category.insertMany(uniqueCategories);
+      
+        // Convert the inserted categories array into a Map for quick lookup
+        const categoryMap = new Map(
+          newCategories.map((cat) => [cat.name, cat._id])
+        );
+      
+        // Update product categories based on categoryMap
+        newProducts.forEach((product) => {
+          const categoryName =
+            product.title?.trim().substring(0, 50) ||
+            product.Name?.trim().substring(0, 50);
+      
+          const updatedCategoryId = categoryMap.get(categoryName) || "Uncategorized";
+          product.category = updatedCategoryId; // Assign category _id
+        });
       }
+      
     }
     if (newProducts.length) {
       await Product.insertMany(newProducts);
@@ -170,7 +192,7 @@ function buildNewProductData(productData, category,imageUrl) {
     ratings: productData.ratings || [],
     reviews: productData.reviews || [],
     numRatings: parseField(productData.numRatings, "int"),
-    category: category._id,
+    category: category,
     createdAt: productData.createdAt || new Date(),
     updatedAt: productData.updatedAt || new Date(),
     BarCode: parseField(isGSTPad ? productData.Barcode : productData.BarCode),

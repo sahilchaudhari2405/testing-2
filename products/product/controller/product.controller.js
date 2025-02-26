@@ -102,7 +102,25 @@ export const viewProducts = async (req, res) => {
     return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
   }
 };
+export const deleteAllProduct = async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Get the page number from query, default to 1
+  const limit =50; // Get the limit from query, default to 20
+  const skip = (page - 1) * limit; // Calculate how many products to skip
+  try {
+    // Query to get products sorted by updatedAt, with pagination
+    const tenantId = req.user.tenantId;
+    const Product = await getTenantModel(tenantId, "Product", productSchema);
+    const Category = await getTenantModel(tenantId, "Category", categorySchema);
 
+    const products = await Product.deleteMany();
+    const categories = await Category.deleteMany();
+
+    return res.status(200).send({ message: "Products delete successfully", status: true, data: products });
+  } catch (error) {
+    console.error(error);  
+    return res.status(500).send({ message: "Internal server error", status: false, error: error.message });
+  }
+};
 export const getProducts = async (req, res) => {
   const page = parseInt(req.body.page) || 1; // Get the page number from body, default to 1
   const limit = 50; // Set limit, default to 50
