@@ -87,7 +87,7 @@ existingProducts.forEach((product) => {
       }
 
       const barcode = productData.BarCode || productData.Barcode;
-
+      console.log("data", barcode)
       if (barcode) {
     const existingProduct = ProductMap.get(barcode);
         if (existingProduct) {
@@ -108,7 +108,6 @@ existingProducts.forEach((product) => {
         const newProduct = buildNewProductData(productData, "",imageUrl);
         newProducts.push(newProduct);
       }
-      console.log("data", barcode)
     }
 
     // Before bulk insertion of new categories
